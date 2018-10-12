@@ -15,38 +15,45 @@ const Web3 = require('web3')
 
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 
-contract('OceanAuth', (accounts) => {
+contract('ServiceAgreement', (accounts) => {
     describe('Test On-chain Authorization', () => {
         it('Should walk through setup of SLA', async () => {
             const token = await OceanToken.deployed()
             const market = await OceanMarket.deployed()
             const sla = await SLA.deployed()
-            const paymentController = await PaymentCtrl.deployed()
-            const accessController = await AccessCtrl.deployed()
+            const paymentConditions = await PaymentCtrl.deployed()
+            const accessConditions = await AccessCtrl.deployed()
 
             const provider = accounts[0]
             const consumer = accounts[1]
 
             const scale = 10 ** 18
 
-            const str = 'resource'
-            const resourceId = await market.generateId(str, { from: provider })
-            const resourcePrice = 100 * scale
-
-            // 1. provider register dataset
-            await market.register(resourceId, new BigNumber(resourcePrice), { from: provider })
-            console.log('publisher registers asset with id = ', resourceId)
-
+            // Do some preperations: give consumer funds, add an asset
             // consumer request initial funds to play
             console.log(consumer)
             await market.requestTokens(new BigNumber(1000 * scale), { from: consumer })
             const bal = await token.balanceOf.call(consumer)
             console.log(`consumer has balance := ${bal.valueOf() / scale} now`)
+
+            // register dataset
+            const resourceName = 'resource'
+            const resourceId = await market.generateId(resourceName, { from: provider })
+            const resourcePrice = 100 * scale
+            await market.register(resourceId, new BigNumber(resourcePrice), { from: provider })
+            console.log('publisher registers asset with id = ', resourceId)
+
+            // Provider setup SLA on-chain
+            const contracts = [paymentConditions.address, accessConditions.address, paymentConditions.address]
+            const funcFingerPrints = [paymentConditions.lockPayment, accessConditions.grantAccess, paymentConditions.releasePayment]
+            const serviceName = 'doService'
+            const result = sla.setupAgreement(contracts, funcFingerPrints, serviceName)
+            // :TODO: Grab `serviceAgreementTemplateSetup` event to fetch the serviceAgreementTemplateId
+
+
+            // 1. consumer request access to asset
             // consumer approve market to withdraw amount of token from his account
             await token.approve(market.address, new BigNumber(200 * scale), { from: consumer })
-
-            // 2. consumer initiate an access request
-            const modulusBit = 512
 
 
         })
