@@ -11,10 +11,15 @@ contract PaymentConditions{
         serviceAgreementStorage = ServiceAgreement(_serviceAgreementAddress);
     }
 
+    function updateState(bytes32 serviceId, bytes32 funcFingerPrint, string eventId) private returns (bool) {
+        return true;
+    }
 
-    function updateState(bytes32 serviceId, bytes32 funcFingerPrint, string eventId) private returns (bool);
+    function lockPayment(bytes32 serviceId, uint256 tokens, bytes32 assetId, bytes32 provider) public returns(bool) {
+        return true;
+    }
 
-    function lockPayment(bytes32 serviceId, uint256 tokens, bytes32 assetId, bytes32 provider) public returns(bool);
-
-    function releasePayment(bytes32 serviceId, bytes32 paymentId) public returns(bool);
+    function releasePayment(bytes32 serviceId, bytes32 paymentId) public returns(bool) {
+        return true;
+    }
 }

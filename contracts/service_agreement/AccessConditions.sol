@@ -10,5 +10,7 @@ contract AccessConditions{
         serviceAgreementStorage = ServiceAgreement(_serviceAgreementAddress);
     }
 
-    function grantAccess(bytes32 serviceId, bytes32 assetId) public returns (bool);
+    function grantAccess(bytes32 serviceId, bytes32 assetId) public returns (bool) {
+        return true
+    }
 }

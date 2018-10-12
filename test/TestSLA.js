@@ -45,7 +45,12 @@ contract('ServiceAgreement', (accounts) => {
 
             // Provider setup SLA on-chain
             const contracts = [paymentConditions.address, accessConditions.address, paymentConditions.address]
-            const funcFingerPrints = [paymentConditions.lockPayment, accessConditions.grantAccess, paymentConditions.releasePayment]
+            const funcFingerPrints = [
+                web3.utils.keccak256('lockPayment(bytes32 , uint256 , bytes32 , bytes32 )').slice(0, 4),
+                web3.utils.keccak256('grantAccess(bytes32 , bytes32 )').slice(0, 4),
+                web3.utils.keccak256('releasePayment(bytes32 , bytes32 )').slice(0, 4)]
+
+            console.log('functions: ', funcFingerPrints)
             const serviceName = 'doService'
             const result = sla.setupAgreement(contracts, funcFingerPrints, serviceName)
             // :TODO: Grab `serviceAgreementTemplateSetup` event to fetch the serviceAgreementTemplateId
