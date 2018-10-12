@@ -24,25 +24,30 @@ contract('OceanAuth', (accounts) => {
             const paymentController = await PaymentCtrl.deployed()
             const accessController = await AccessCtrl.deployed()
 
+            const provider = accounts[0]
+            const consumer = accounts[1]
+
             const scale = 10 ** 18
 
             const str = 'resource'
-            const resourceId = await market.generateId(str, { from: accounts[0] })
+            const resourceId = await market.generateId(str, { from: provider })
             const resourcePrice = 100 * scale
+
             // 1. provider register dataset
-            await market.register(resourceId, new BigNumber(resourcePrice), { from: accounts[0] })
+            await market.register(resourceId, new BigNumber(resourcePrice), { from: provider })
             console.log('publisher registers asset with id = ', resourceId)
 
-            // consumer accounts[1] request initial funds to play
-            console.log(accounts[1])
-            await market.requestTokens(new BigNumber(1000 * scale), { from: accounts[1] })
-            const bal = await token.balanceOf.call(accounts[1])
+            // consumer request initial funds to play
+            console.log(consumer)
+            await market.requestTokens(new BigNumber(1000 * scale), { from: consumer })
+            const bal = await token.balanceOf.call(consumer)
             console.log(`consumer has balance := ${bal.valueOf() / scale} now`)
             // consumer approve market to withdraw amount of token from his account
-            await token.approve(market.address, new BigNumber(200 * scale), { from: accounts[1] })
+            await token.approve(market.address, new BigNumber(200 * scale), { from: consumer })
 
             // 2. consumer initiate an access request
             const modulusBit = 512
+
 
         })
     })
