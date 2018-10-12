@@ -14,6 +14,7 @@ contract AccessConditions{
     }
 
     function grantAccess(bytes32 serviceId, bytes32 assetId) public returns (bool) {
-        return true
+        emit AccessGranted("sla", serviceId, this.grantAccess.selector, assetId);
+        return true;
     }
 }
