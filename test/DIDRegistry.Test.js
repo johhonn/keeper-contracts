@@ -45,6 +45,20 @@ contract('DIDRegistry', (accounts) => {
             utils.assertEmitted(result, 1, 'DIDAttributeRegistered')
         })
 
+        it('Should not fail to register crazy long did', async () => {
+            const registry = await DIDRegistry.new()
+
+            const crazyLongDID = 'did:ocn:test-attr-twice-crazy-long-dude-really-oh-yeah'
+            const did = web3.utils.sha3(crazyLongDID)
+            const providerDID = 'did:ocn:provider'
+            const provider = web3.utils.fromAscii('provider')
+            const assetType = 0
+
+            const result = await registry.registerAttribute(did, assetType, provider, providerDID)
+            const payload = result.logs[0].args
+            assert.strictEqual(did, payload.did)
+        })
+
         it('Should register multiple attributes', async () => {
             const registry = await DIDRegistry.new()
 
