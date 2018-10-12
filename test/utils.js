@@ -1,5 +1,6 @@
 /* eslint-env mocha */
-/* global artifacts */
+/* eslint-disable no-console */
+/* global artifacts, assert */
 
 const Eth = require('ethjs')
 const HttpProvider = require('ethjs-provider-http')
@@ -109,6 +110,17 @@ const utils = {
     multiplyByPercentage: (x, y, z = 100) => {
         const weiQuotient = utils.divideAndGetWei(y, z)
         return utils.multiplyFromWei(x, weiQuotient)
+    },
+
+    assertEmitted: (result, n, name, payload) => {
+        var gotEvents = 0
+        for (var i = 0; i < result.logs.length; i++) {
+            const ev = result.logs[i]
+            if (ev.event === name) {
+                gotEvents++
+            }
+        }
+        assert.strictEqual(n, gotEvents)
     }
 }
 
