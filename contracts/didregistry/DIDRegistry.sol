@@ -3,7 +3,7 @@ pragma solidity 0.4.25;
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
 contract DIDRegistry is Ownable {
-    enum DocumentType { Asset }
+    enum DocumentType { Asset, Provider }
 
     struct Identity {
         address owner;
