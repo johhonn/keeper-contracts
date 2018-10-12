@@ -3,9 +3,9 @@
 
 const OceanToken = artifacts.require('OceanToken.sol')
 const OceanMarket = artifacts.require('OceanMarket.sol')
-const OceanAuth = artifacts.require('ServiceAgreement.sol')
-const OceanAuth = artifacts.require('.sol')
-const OceanAuth = artifacts.require('.sol')
+const SLA = artifacts.require('ServiceAgreement.sol')
+const PaymentCtrl = artifacts.require('PaymentController.sol')
+const AccessCtrl = artifacts.require('AccessController.sol')
 
 
 const ursa = require('ursa')
@@ -17,12 +17,13 @@ const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 
 contract('OceanAuth', (accounts) => {
     describe('Test On-chain Authorization', () => {
-        // support upto 50 assets and providers; each asset has one single provider at this time
         it('Should walk through setup of SLA', async () => {
-            // const marketPlace = await Market.deployed();
             const token = await OceanToken.deployed()
             const market = await OceanMarket.deployed()
-            const auth = await OceanAuth.deployed()
+            const sla = await SLA.deployed()
+            const paymentController = await PaymentCtrl.deployed()
+            const accessController = await AccessCtrl.deployed()
+
             const scale = 10 ** 18
 
             const str = 'resource'
@@ -42,6 +43,7 @@ contract('OceanAuth', (accounts) => {
 
             // 2. consumer initiate an access request
             const modulusBit = 512
+
         })
     })
 })
