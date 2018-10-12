@@ -10,10 +10,8 @@ contract DIDRegistry is Ownable {
         DocumentType _type;
     }
 
-    // FIXME if we index the string field (did), there gonna be problems reading it
-    // via web3js - https://github.com/ethereum/web3.js/issues/434.
     event DIDAttributeRegistered(
-        string did,
+        bytes32 indexed did,
         address indexed owner,
         DocumentType _type,
         bytes32 indexed key,
@@ -21,12 +19,12 @@ contract DIDRegistry is Ownable {
         uint updatedAt
     );
 
-    mapping(string => Identity) private identities;
+    mapping(bytes32 => Identity) private identities;
 
     constructor() Ownable() public {
     }
 
-    function registerAttribute(string _did, DocumentType _type, bytes32 _key, string _value) public {
+    function registerAttribute(bytes32 _did, DocumentType _type, bytes32 _key, string _value) public {
         address currentOwner;
         currentOwner = identities[_did].owner;
         require(currentOwner == address(0x0) || currentOwner == msg.sender, 'Attributes must be registered by the DID owners.');

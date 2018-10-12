@@ -12,81 +12,82 @@ const utils = require('./utils.js')
 contract('DIDRegistry', (accounts) => {
     describe('Register decentralised identifiers with attributes, fetch attributes by DID', () => {
         it('Should discover the attribute after registering it', async () => {
-            const did = 'did:ocn:test-register-attribute'
             const registry = await DIDRegistry.new()
 
-            const host = 'http://example.com'
+            const did = web3.utils.fromAscii('did:ocn:test-attr')
+            const providerDID = 'did:ocn:provider'
             const provider = web3.utils.fromAscii('provider')
             const assetType = 0
-            const result = await registry.registerAttribute(did, assetType, provider, host)
+            const result = await registry.registerAttribute(did, assetType, provider, providerDID)
 
             utils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             const payload = result.logs[0].args
-            assert.strictEqual(did, payload.did)
+            assert.strictEqual('did:ocn:test-attr', web3.utils.hexToString(payload.did))
             assert.strictEqual(accounts[0], payload.owner)
             assert.strictEqual(0, web3.utils.toDecimal(payload._type))
             assert.strictEqual('provider', web3.utils.hexToString(payload.key))
-            assert.strictEqual(host, payload.value)
+            assert.strictEqual(providerDID, payload.value)
         })
 
         it('Should not fail to register the same attribute twice', async () => {
-            const did = 'did:ocn:test-register-same-attribute-twice'
             const registry = await DIDRegistry.new()
 
-            const host = 'http://example.com'
+            const did = web3.utils.fromAscii('did:ocn:test-attr-twice')
+            const providerDID = 'did:ocn:provider'
             const provider = web3.utils.fromAscii('provider')
             const assetType = 0
 
-            await registry.registerAttribute(did, assetType, provider, host)
+            await registry.registerAttribute(did, assetType, provider, providerDID)
             // try to register the same attribute the second time
-            const result = await registry.registerAttribute(did, assetType, provider, host)
+            const result = await registry.registerAttribute(did, assetType, provider, providerDID)
 
             utils.assertEmitted(result, 1, 'DIDAttributeRegistered')
         })
 
         it('Should register multiple attributes', async () => {
-            const did = 'did:ocn:test-register-multiple-attributes'
             const registry = await DIDRegistry.new()
 
-            const host = 'http://example.com'
+            const did = web3.utils.fromAscii('did:ocn:test-multiple-attrs')
+            const providerDID = 'http://example.com'
             const provider = web3.utils.fromAscii('provider')
             const assetType = 0
 
-            await registry.registerAttribute(did, assetType, provider, host)
+            await registry.registerAttribute(did, assetType, provider, providerDID)
 
-            const alternativeProvider = web3.utils.fromAscii('alternative-provider')
-            const result = await registry.registerAttribute(did, assetType, alternativeProvider, host)
+            const nameKey = web3.utils.fromAscii('name')
+            const name = 'My asset.'
+            const result = await registry.registerAttribute(did, assetType, nameKey, name)
 
             utils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             const payload = result.logs[0].args
-            assert.strictEqual(did, payload.did)
+            assert.strictEqual('did:ocn:test-multiple-attrs', web3.utils.hexToString(payload.did))
             assert.strictEqual(accounts[0], payload.owner)
             assert.strictEqual(0, web3.utils.toDecimal(payload._type))
-            assert.strictEqual('alternative-provider', web3.utils.hexToString(payload.key))
-            assert.strictEqual(host, payload.value)
+            assert.strictEqual('name', web3.utils.hexToString(payload.key))
+            assert.strictEqual(name, payload.value)
         })
 
         it('Should only allow the owner to set an attribute', async () => {
-            const did = 'did:ocn:test-register-attributes-ownership'
             const registry = await DIDRegistry.new()
 
-            const host = 'http://example.com'
+            const did = web3.utils.fromAscii('did:ocn:test-ownership')
+            const providerDID = 'did:ocn:provider'
             const provider = web3.utils.fromAscii('provider')
             const assetType = 0
 
-            await registry.registerAttribute(did, assetType, provider, host)
+            await registry.registerAttribute(did, assetType, provider, providerDID)
 
             const anotherPerson = { from: accounts[1] }
-            const anotherDID = 'did:ocn:test-register-attributes-another-owner'
+            const anotherDID = web3.utils.fromAscii('did:ocn:test-another-owner')
             // a different owner can register his own DID
-            await registry.registerAttribute(anotherDID, assetType, provider, host, anotherPerson)
+            await registry.registerAttribute(anotherDID, assetType, provider, providerDID, anotherPerson)
 
             var failed = false
             try {
                 // must not be able to add attributes to someone else's DID
-                await registry.registerAttribute(did, assetType, provider, host, anotherPerson)
+                await registry.registerAttribute(did, assetType, provider, providerDID, anotherPerson)
             } catch (e) {
                 failed = true
             }
