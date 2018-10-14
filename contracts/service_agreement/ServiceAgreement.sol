@@ -31,7 +31,14 @@ contract ServiceAgreement {
     event DependencyCondition(address parent, address child);
 
     function setupAgreement(address [] contracts, bytes4 [] fingerprints,
-        uint256 [] parents, int256 [] childs, string service) public returns (bool){
+        uint256 [] parents, int256 [] children, string service) public returns (bool){
+
+        // We can specify any number of dependent using only a single array of integers
+        // Each bit in the int represents a dependency if it is set to `1`
+        // For example, to set dependency on conditions:
+        //   1, and 3 => 1010 (int `10`)
+        //   2, 3, and 5 => 101100 (int `44`)
+
         bytes32 conditionId;
         bytes32 [] agreementConditions;
         bytes32 [] dependency;
@@ -40,28 +47,29 @@ contract ServiceAgreement {
         templates[serviceTemplateId] = ServiceAgreementTemplate(false, agreementConditions);
         // the current implementation supports only binary tree
         // parents = [0, 0, 1, 1, 2,  3,  4,  5]
-        // childs  = [1, 2, 3, 4, 5, -1, -1, -1]
+        // children  = [1, 2, 3, 4, 5, -1, -1, -1]
 
+        // process each parent condition
         for (uint256 i=0; i< parents.length; i++){
             conditionId = keccak256(abi.encodePacked(serviceTemplateId, contracts[parents[i]], fingerprints[parents[i]]));
             if(i < parents.length-1){
-                if(childs[i] != -1){
+                if(children[i] != -1){
                     if(parents[i] == parents[i+1]){
-                        dependency.push(keccak256(abi.encodePacked(serviceTemplateId, contracts[uint256(childs[i])], fingerprints[uint256(childs[i])])));
-                        dependency.push(keccak256(abi.encodePacked(serviceTemplateId, contracts[uint256(childs[i+1])], fingerprints[uint256(childs[i+1])])));
-                        emit DependencyCondition(contracts[parents[i]], contracts[uint256(childs[i])]);
-                        emit DependencyCondition(contracts[parents[i+1]], contracts[uint256(childs[i+1])]);
+                        dependency.push(keccak256(abi.encodePacked(serviceTemplateId, contracts[uint256(children[i])], fingerprints[uint256(children[i])])));
+                        dependency.push(keccak256(abi.encodePacked(serviceTemplateId, contracts[uint256(children[i+1])], fingerprints[uint256(children[i+1])])));
+                        emit DependencyCondition(contracts[parents[i]], contracts[uint256(children[i])]);
+                        emit DependencyCondition(contracts[parents[i+1]], contracts[uint256(children[i+1])]);
                         i++;
                     }else{
-                        dependency.push(keccak256(abi.encodePacked(serviceTemplateId, contracts[uint256(childs[i])], fingerprints[uint256(childs[i])])));
-                        emit DependencyCondition(contracts[parents[i]], contracts[uint256(childs[i])]);
+                        dependency.push(keccak256(abi.encodePacked(serviceTemplateId, contracts[uint256(children[i])], fingerprints[uint256(children[i])])));
+                        emit DependencyCondition(contracts[parents[i]], contracts[uint256(children[i])]);
 
                     }
                 }
             }else{
-                if(childs[i] != -1){
-                    dependency.push(keccak256(abi.encodePacked(serviceTemplateId, contracts[uint256(childs[i])], fingerprints[uint256(childs[i])])));
-                    emit DependencyCondition(contracts[parents[i]], contracts[uint256(childs[i])]);
+                if(children[i] != -1){
+                    dependency.push(keccak256(abi.encodePacked(serviceTemplateId, contracts[uint256(children[i])], fingerprints[uint256(children[i])])));
+                    emit DependencyCondition(contracts[parents[i]], contracts[uint256(children[i])]);
                 }
             }
             Condition memory cond = Condition(false,dependency);

@@ -31,17 +31,17 @@ contract('ServiceAgreement', (accounts) => {
 
             // Do some preperations: give consumer funds, add an asset
             // consumer request initial funds to play
-            console.log(consumer)
-            await market.requestTokens(new BigNumber(1000 * scale), { from: consumer })
-            const bal = await token.balanceOf.call(consumer)
-            console.log(`consumer has balance := ${bal.valueOf() / scale} now`)
+            // console.log(consumer)
+            // await market.requestTokens(new BigNumber(1000 * scale), { from: consumer })
+            // const bal = await token.balanceOf.call(consumer)
+            // console.log(`consumer has balance := ${bal.valueOf() / scale} now`)
 
             // register dataset
-            const resourceName = 'resource'
-            const resourceId = await market.generateId(resourceName, { from: provider })
-            const resourcePrice = 100 * scale
-            await market.register(resourceId, new BigNumber(resourcePrice), { from: provider })
-            console.log('publisher registers asset with id = ', resourceId)
+            // const resourceName = 'resource'
+            // const resourceId = await market.generateId(resourceName, { from: provider })
+            // const resourcePrice = 100 * scale
+            // await market.register(resourceId, new BigNumber(resourcePrice), { from: provider })
+            // console.log('publisher registers asset with id = ', resourceId)
 
             // Provider setup SLA on-chain
             const contracts = [paymentConditions.address, accessConditions.address, paymentConditions.address]
@@ -50,15 +50,16 @@ contract('ServiceAgreement', (accounts) => {
                 web3.utils.keccak256('grantAccess(bytes32 , bytes32 )').slice(0, 4),
                 web3.utils.keccak256('releasePayment(bytes32 , bytes32 )').slice(0, 4)]
 
+            console.log('conditions control contracts', contracts)
             console.log('functions: ', funcFingerPrints)
-            const serviceName = 'doService'
-            const result = sla.setupAgreement(contracts, funcFingerPrints, serviceName)
+            // const serviceName = 'doService'
+            // const result = sla.setupAgreement(contracts, funcFingerPrints, serviceName)
             // :TODO: Grab `serviceAgreementTemplateSetup` event to fetch the serviceAgreementTemplateId
 
 
             // 1. consumer request access to asset
             // consumer approve market to withdraw amount of token from his account
-            await token.approve(market.address, new BigNumber(200 * scale), { from: consumer })
+            // await token.approve(market.address, new BigNumber(200 * scale), { from: consumer })
 
 
         })
