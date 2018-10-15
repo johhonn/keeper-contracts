@@ -153,7 +153,7 @@ The libraries provided currently are:
 Run tests with `npm test`, e.g.:
 
 ```bash
-npm test -- test/TestAuth.js
+npm test -- test/Auth.Test.js
 ```
 
 ### Code Linting
