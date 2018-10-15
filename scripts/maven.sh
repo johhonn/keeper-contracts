@@ -7,5 +7,5 @@ do
     web3j truffle generate --javaTypes $file -o src/main/java -p com.oceanprotocol.keeper.contracts 
 done
 
-mvn clean package
+mvn clean install
 
