@@ -1,12 +1,16 @@
 pragma solidity ^0.4.25;
 
+/**
+@title Ocean Protocol Service Level Agreement
+@author Team: Ahmed Ali, Samer Sallam
+*/
 
 contract ServiceAgreement {
 
     struct ServiceAgreementTemplate{
         bool state; // 1->Established 0-> revoked serviceTemplateId
         address owner; // template owner
-        bytes32 [] conditionKeys; // we use this arrary in order to preserve the order in the condition state (check Service Agreement struct)
+        bytes32 [] conditionKeys; // preserving the order in the condition state (check Agreement struct)
     }
     // conditions id (templateId, contract address , function fingerprint)
     // it maps condition id to dependencies [uint256 is a compressed version]
@@ -16,33 +20,32 @@ contract ServiceAgreement {
         bool state; // instance of SLA status
         bool [] conditionsState; // maps the condition status in the template
         bytes32 templateId; // referes to SLA template id
+        address consumer;
     }
 
     mapping (bytes32 => ServiceAgreementTemplate) templates;
     // instances of SLA template
     mapping (bytes32 => Agreement) agreements;
 
+    // check if the no longer pending unfulfilled conditions in the SLA
     modifier noPendingFulfillments(bytes32 serviceId){
         _;
     }
 
+    // check if the controller contract is authorized to change the condition state
     modifier isValidControllerHandler(bytes32 serviceId, bytes4 fingerprint) {
-        Agreement sa = agreements[serviceId];
-        ServiceAgreementTemplate template = templates[sa.templateId];
-        bytes32 condId = keccak256(abi.encodePacked(sa.templateId, msg.sender, fingerprint));
+        bytes32 condId = keccak256(abi.encodePacked(agreements[serviceId].templateId, msg.sender, fingerprint));
         uint dependenciesValue = conditions[condId];
-
+        // check the dependency conditions
         if(dependenciesValue != 0){
-            for (uint i=0; i < template.conditionKeys.length; i++) {
-                require(
-                        !isDependantOnIndex(dependenciesValue, i) ||
-                        sa.conditionsState[i])
+            for (uint i=0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
+                require(!isDependantOnIndex(dependenciesValue, i) || agreements[serviceId].conditionsState[i]);
             }
         }
-
         _;
     }
 
+    // is the sender authorized to create instance of the SLA template
     modifier isOwner(bytes32 templateId, address consumer){
         require(templates[templateId].owner == msg.sender);
         require(consumer != msg.sender);
@@ -54,6 +57,8 @@ contract ServiceAgreement {
     event SetupAgreementTemplate(bytes32 serviceTemplateId, address provider);
     event ExecuteCondition(bytes32 serviceId, bytes32 condition, bool status, address templateOwner, address consumer);
     event ExecuteAgreement(bytes32 serviceId, bytes32 templateId, bool status, address templateOwner, address consumer);
+    event ConditionFulfilled(bytes32 serviceId, bytes32 templateId, bytes32 condition, bool status);
+    event AgreementFulfilled(bytes32 serviceId, bytes32 templateId, address owner, bool status);
 
     // Setup service agreement template only once!
     function setupAgreementTemplate(address [] contracts, bytes4 [] fingerprints,
@@ -94,7 +99,7 @@ contract ServiceAgreement {
             states[i] = false;
             emit ExecuteCondition(serviceAgreementId, templates[templateId].conditionKeys[i], false , templates[templateId].owner, consumer);
         }
-        agreements[serviceAgreementId] = Agreement(false, states, templateId);
+        agreements[serviceAgreementId] = Agreement(false, states, templateId, consumer);
         emit ExecuteAgreement(serviceAgreementId, templateId, false, templates[templateId].owner, consumer);
     }
 
@@ -121,5 +126,52 @@ contract ServiceAgreement {
         return (dependencyValue & (2**index) == 1);
     }
 
+    function fulfillAgreement(bytes32 serviceId)
+        noPendingFulfillments(serviceId) public returns(bool){
+        agreements[serviceId].state = true;
+        emit AgreementFulfilled(serviceId, agreements[serviceId].templateId, templates[agreements[serviceId].templateId].owner, true);
+        return true;
+    }
+
+
+    function getConditionIndex(bytes32 serviceId, bytes32 condition) private view returns(int){
+        for(uint256 i=0; i< templates[agreements[serviceId].templateId].conditionKeys.length; i++){
+            if (condition == templates[agreements[serviceId].templateId].conditionKeys[i]){
+                return int(i);
+            }
+        }
+        return -1;
+    }
+    function setConditionStatus(bytes32 serviceId, bytes4 fingerprint)
+         isValidControllerHandler(serviceId, fingerprint) public returns (bool){
+         bytes32 condition = keccak256(abi.encodePacked(agreements[serviceId].templateId, msg.sender, fingerprint));
+         int index = getConditionIndex(serviceId, condition);
+         if(index != -1){
+            agreements[serviceId].conditionsState[uint256(index)] = true;
+            emit ConditionFulfilled(serviceId, agreements[serviceId].templateId, condition, true);
+            return true;
+         }
+         return false;
+    }
+
+    function getConditionStatus(bytes32 serviceId, bytes32 condition) view public returns(bool){
+        int index = getConditionIndex(serviceId, condition);
+        if (index != -1){
+                return agreements[serviceId].conditionsState[uint256(index)];
+        }
+        return false;
+    }
+
+    function getAgreementStatus(bytes32 serviceId) view public returns(bool){
+         return agreements[serviceId].state;
+    }
+
+    function getTemplateOwner(bytes32 templateId) view public returns (address owner){
+        return templates[templateId].owner;
+    }
+
+    function getServiceAgreementConsumer(bytes32 serviceId) view public returns(address consumer){
+        return agreements[serviceId].consumer;
+    }
 
 }
