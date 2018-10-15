@@ -8,7 +8,37 @@
   <version>0.1.0</version>
   <name>Keeper Contracts</name>
 
+  <properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+
+    	<web3j.version>3.6.0</web3j.version>
+  </properties>
+
   <dependencies>
+		<!-- Web3j -->
+		<dependency>
+			<groupId>org.web3j</groupId>
+			<artifactId>core</artifactId>
+			<version>${web3j.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.web3j</groupId>
+			<artifactId>parity</artifactId>
+			<version>${web3j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.web3j</groupId>
+			<artifactId>utils</artifactId>
+			<version>${web3j.version}</version>
+		</dependency>
   </dependencies>
 
   <build>
@@ -18,7 +48,7 @@
         <includes>
           <include>*.json</include>
         </includes>
-		<targetPath>com/oceanprotocol/keeper-contracts</targetPath>
+		<targetPath>com/oceanprotocol/keeper/contracts/abi</targetPath>
       </resource>
 	</resources>
 
