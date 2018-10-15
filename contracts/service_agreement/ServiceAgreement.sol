@@ -22,13 +22,23 @@ contract ServiceAgreement {
     // instances of SLA template
     mapping (bytes32 => Agreement) agreements;
 
-
-    modifier noPendingFulfillments(bytes32 serviceTemplateId){
-
+    modifier noPendingFulfillments(bytes32 serviceId){
         _;
     }
 
     modifier isValidControllerHandler(bytes32 serviceId, bytes4 fingerprint) {
+        Agreement sa = agreements[serviceId];
+        ServiceAgreementTemplate template = templates[sa.templateId];
+        bytes32 condId = keccak256(abi.encodePacked(sa.templateId, msg.sender, fingerprint));
+        uint dependenciesValue = conditions[condId];
+
+        if(dependenciesValue != 0){
+            for (uint i=0; i < template.conditionKeys.length; i++) {
+                require(
+                        !isDependantOnIndex(dependenciesValue, i) ||
+                        sa.conditionsState[i])
+            }
+        }
 
         _;
     }
@@ -106,5 +116,10 @@ contract ServiceAgreement {
         }
         return (v, r, s);
     }
+
+    function isDependantOnIndex(uint dependencyValue, uint index) pure private returns (bool) {
+        return (dependencyValue & (2**index) == 1);
+    }
+
 
 }
