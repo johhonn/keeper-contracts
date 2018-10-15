@@ -94,7 +94,7 @@ npm install -g ganache-cli
 Compile the solidity contracts:
 
 ```bash
-truffle compile
+npm run compile
 ```
 
 In a new terminal, launch an Ethereum RPC client, e.g. [ganache-cli](https://github.com/trufflesuite/ganache-cli):
@@ -106,35 +106,36 @@ ganache-cli
 Switch back to your other terminal and deploy the contracts:
 
 ```bash
-truffle migrate
+npm run migrate
 
 # for redeployment run this instead
-truffle migrate --reset
+npm run migrate -- --reset
 ```
 
 ### Testnet deployment
 
-Follow the steps for local deployment. Make sure that the address `0x2c0d5f47374b130ee398f4c34dbe8168824a8616` is having enough (~1) Ether.
+Follow the steps for local deployment. Make sure that the address [0x2c0d5f47374b130ee398f4c34dbe8168824a8616](https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616) is having enough (~1) Ether.
 
 If you managed to deploy the contracts locally do:
 
 ```bash
 export INFURA_TOKEN=<your infura token>
 export KOVAN_NMEMORIC=<your kovan nmemoric>
-truffle migrate --network kovan
+npm run migrate:kovan
 ```
 
 The transaction should show up on: `https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616`
 
 The contract addresses deployed on Kovan testnet:
 
-| Contract | Address |
-|---|---|
-| OceanMarket | `0x35a9207ae77cb19bd59cf0bf932ce3a510286ccf` |
-| OceanAuth   | `0x830d15f45ecff8b786f5685f6e18625721cf3148` |
-| OceanToken  | `0x08500f6cc30cb737c15a011adce47baa71cc99ac` |
-| OceanRegistry  | `0x4bf0a92cb7151f11913c479dc22df8f064d936c7` |
-
+| Contract      | Address                                      |
+|---------------|----------------------------------------------|
+| OceanAuth     | `0xfA65f2662224Dd340a2dea0972E70BA450E94e3C` |
+| OceanDispute  | `0x6071e51DB7a3CCc81e0ae1D05908c6F958a59f5B` |
+| OceanExchange | `0x018F8A880A11f8c7Ec4112D9CA20D9256e7d64CD` |
+| OceanMarket   | `0xb8277FC2A46C11235775BEC194BD8C12ed92343C` |
+| OceanRegistry | `0xD9Ca6e9aD36E70A0a2A995a7BDD02017459dD45b` |
+| OceanToken    | `0x656f2Ab5D4C4bC2D5821fd959B083fd50273C2f1` |
 
 
 ## Libraries
@@ -149,10 +150,10 @@ The libraries provided currently are:
 
 ## Testing
 
-Run tests with `truffle test`, e.g.:
+Run tests with `npm test`, e.g.:
 
 ```bash
-truffle test test/TestAuth.js
+npm test -- test/Auth.Test.js
 ```
 
 ### Code Linting
