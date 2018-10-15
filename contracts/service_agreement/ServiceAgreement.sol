@@ -3,86 +3,89 @@ pragma solidity ^0.4.25;
 
 contract ServiceAgreement {
 
-    struct Condition {
-        bool state; // fulfilled or not fulfilled
-        bytes32 [] dependency;
-    }
-
     struct ServiceAgreementTemplate{
-        bool state; // 1->Established 0->Revoked serviceTemplateId
-        bytes32 [] conditions;
+        bool state; // 1->Established 0-> revoked serviceTemplateId
+        address owner; // template owner
+        bytes32 [] conditionKeys; // we use this arrary in order to preserve the order in the condition state (check Service Agreement struct)
+    }
+    // conditions id (templateId, contract address , function fingerprint)
+    // it maps condition id to dependencies [uint256 is a compressed version]
+    mapping(bytes32 => uint256) conditions;
+
+    struct Agreement{
+        bool state; // instance of SLA status
+        bool [] conditionsState; // maps the condition status in the template
+        bytes32 templateId; // referes to SLA template id
     }
 
     mapping (bytes32 => ServiceAgreementTemplate) templates;
-    mapping (bytes32 => Condition) conditions;
+    // instances of SLA template
+    mapping (bytes32 => Agreement) agreements;
+
 
     modifier noPendingFulfillments(bytes32 serviceTemplateId){
-        for (uint i=0; i < templates[serviceTemplateId].conditions.length; i++){
-            require(conditions[templates[serviceTemplateId].conditions[i]].state == true);
-        }
+
         _;
     }
 
     modifier isValidControllerHandler(bytes32 serviceId, bytes4 fingerprint) {
-        bytes32 condition = keccak256(abi.encodePacked(serviceId, msg.sender, fingerprint));
-        require(conditions[condition].state != true);
-        if(conditions[condition].dependency.length > 0) {
-            for (uint256 i=0; i< conditions[condition].dependency.length; i++){
-                require(conditions[conditions[condition].dependency[i]].state == true);
-            }
-        }
+
         _;
     }
 
-    event SetupCondition(bytes32 serviceTemplate, bytes32 condition, bool status);
-    event SetupDependencyCondition(address parent, address child);
-    event SetupAgreementTemplate(bytes32 serviceTemplateId);
-    event ExecuteCondition(bytes32 serviceTemplate, bytes32 condition, bool status, address provider, address consumer);
-    event ConditionFulfilled(bytes32 serviceTemplate, bytes32 condition, bool status, address contractAddress, bytes4 fingerprint);
+    modifier isOwner(bytes32 templateId, address consumer){
+        require(templates[templateId].owner == msg.sender);
+        require(consumer != msg.sender);
+        _;
+    }
 
-    function setupAgreement(address [] contracts, bytes4 [] fingerprints,
-        uint256 [] parents, int256 [] childs, string service, address consumer) public returns (bool){
-        bytes32 conditionId;
-        bytes32 [] agreementConditions;
-        bytes32 [] dependency;
-        // generate random template service Id
-        bytes32 serviceTemplateId = keccak256(abi.encodePacked(msg.sender, service, contracts.length, consumer));
-        templates[serviceTemplateId] = ServiceAgreementTemplate(false, agreementConditions);
-        // the current implementation supports only binary tree
-        // parents = [0, 0, 1, 1, 2,  3,  4,  5]
-        // childs  = [1, 2, 3, 4, 5, -1, -1, -1]
+    // events
+    event SetupCondition(bytes32 serviceTemplate, bytes32 condition, address provider);
+    event SetupAgreementTemplate(bytes32 serviceTemplateId, address provider);
+    event ExecuteCondition(bytes32 serviceId, bytes32 condition, bool status, address templateOwner, address consumer);
+    event ExecuteAgreement(bytes32 serviceId, bytes32 templateId, bool status, address templateOwner, address consumer);
 
-        for (uint256 i=0; i< parents.length; i++){
-            conditionId = keccak256(abi.encodePacked(serviceTemplateId, contracts[parents[i]], fingerprints[parents[i]]));
-            if(i < parents.length-1){
-                if(childs[i] != -1){
-                    if(parents[i] == parents[i+1]){
-                        dependency.push(keccak256(abi.encodePacked(serviceTemplateId, contracts[uint256(childs[i])], fingerprints[uint256(childs[i])])));
-                        dependency.push(keccak256(abi.encodePacked(serviceTemplateId, contracts[uint256(childs[i+1])], fingerprints[uint256(childs[i+1])])));
-                        emit SetupDependencyCondition(contracts[parents[i]], contracts[uint256(childs[i])]);
-                        emit SetupDependencyCondition(contracts[parents[i+1]], contracts[uint256(childs[i+1])]);
-                        i++;
-                    }else{
-                        dependency.push(keccak256(abi.encodePacked(serviceTemplateId, contracts[uint256(childs[i])], fingerprints[uint256(childs[i])])));
-                        emit SetupDependencyCondition(contracts[parents[i]], contracts[uint256(childs[i])]);
-                    }
-                }
-            }else{
-                if(childs[i] != -1){
-                    dependency.push(keccak256(abi.encodePacked(serviceTemplateId, contracts[uint256(childs[i])], fingerprints[uint256(childs[i])])));
-                    emit SetupDependencyCondition(contracts[parents[i]], contracts[uint256(childs[i])]);
-                }
-            }
-            Condition memory cond = Condition(false,dependency);
-            emit SetupCondition(serviceTemplateId, conditionId, false);
-            templates[serviceTemplateId].conditions.push(conditionId);
-            conditions[conditionId] = cond;
-            // free dependency array;
-            dependency.length =0;
+    // Setup service agreement template only once!
+    function setupAgreementTemplate(address [] contracts, bytes4 [] fingerprints,
+        uint256 [] dependencies, bytes32 service) public returns (bool){
+        // TODO: whitelisting the contracts/fingerprints
+        require(contracts.length == fingerprints.length, "fingerprints and contracts length don't match");
+        require(contracts.length == dependencies.length, "contracts and dependencies don't match");
+        // 1. generate service ID
+        bytes32 templateId =  keccak256(abi.encodePacked(msg.sender, service, dependencies.length, contracts.length));
+        // 2. generate conditions
+        bytes32 condition;
+        templates[templateId] = ServiceAgreementTemplate(true, msg.sender, new bytes32 [](0));
+        for (uint256 i=0; i< contracts.length; i++){
+            condition = keccak256(abi.encodePacked(templateId, contracts[i], fingerprints[i]));
+            templates[templateId].conditionKeys.push(condition);
+            conditions[condition] = dependencies[i];
+            emit SetupCondition(templateId, condition, msg.sender);
         }
-        // TODO: whitelisting conditions (to be developed)!
-        emit SetupAgreementTemplate(serviceTemplateId);
+        emit SetupAgreementTemplate(templateId, msg.sender);
         return true;
+    }
+
+    function isValidSignature(bytes32 hash, bytes signature, address consumer) private pure returns(bool){
+        (uint8 v, bytes32 r, bytes32 s) = splitSignature(signature);
+        return (consumer == ecrecover(hash,v, r, s));
+    }
+
+
+    function executeAgreement(bytes32 templateId, bytes signature, address consumer) public
+        isOwner(templateId, consumer) returns (bool) {
+        // verify consumer's signature
+        bytes32 hash = keccak256(abi.encodePacked(templateId, templates[templateId].conditionKeys));
+        require(isValidSignature(hash, signature, consumer));
+        // create new instance of service agreement template
+        bytes32 serviceAgreementId = keccak256(abi.encodePacked(templateId, consumer, block.timestamp));
+        bool [] memory states;
+        for(uint256 i=0; i < templates[templateId].conditionKeys.length; i++){
+            states[i] = false;
+            emit ExecuteCondition(serviceAgreementId, templates[templateId].conditionKeys[i], false , templates[templateId].owner, consumer);
+        }
+        agreements[serviceAgreementId] = Agreement(false, states, templateId);
+        emit ExecuteAgreement(serviceAgreementId, templateId, false, templates[templateId].owner, consumer);
     }
 
     function splitSignature(bytes signature) private pure returns (uint8 v, bytes32 r, bytes32 s) {
@@ -102,39 +105,6 @@ contract ServiceAgreement {
              v += 27;
         }
         return (v, r, s);
-    }
-
-    function executeAgreement(bytes32 serviceTemplateId, bytes signature, address consumer) public returns(bool){
-        // verify the consumer's signature in oder to start the execution of agreement
-        (uint8 v, bytes32 r, bytes32 s) = splitSignature(signature);
-        // hash of serviceTemplateId
-        bytes32 message = keccak256(abi.encodePacked(serviceTemplateId));
-        require(consumer == ecrecover(message, v, r, s));
-        for (uint256 i=0; i< templates[serviceTemplateId].conditions.length; i++){
-            emit ExecuteCondition(serviceTemplateId, templates[serviceTemplateId].conditions[i],false, msg.sender, consumer);
-        }
-        return true;
-    }
-
-    function fulfillAgreement(bytes32 serviceTemplateId)
-        noPendingFulfillments(serviceTemplateId) public returns(bool){
-        templates[serviceTemplateId].state = true;
-        return true;
-    }
-
-    function setConditionStatus(bytes32 serviceId, bytes4 fingerprint)
-        isValidControllerHandler(serviceId, fingerprint) public returns (bool){
-        bytes32 condition = keccak256(abi.encodePacked(serviceId, msg.sender, fingerprint));
-        conditions[condition].state = true;
-        emit ConditionFulfilled(serviceId, condition, true, msg.sender, fingerprint);
-    }
-
-    function getConditionStatus(bytes32 conditionId) view public returns(bool){
-        return conditions[conditionId].state;
-    }
-
-    function getAgreementStatus(bytes32 serviceId) view public returns(bool){
-        return templates[serviceId].state;
     }
 
 }
