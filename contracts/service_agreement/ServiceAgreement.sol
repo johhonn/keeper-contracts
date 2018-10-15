@@ -27,8 +27,22 @@ contract ServiceAgreement {
     // instances of SLA template
     mapping (bytes32 => Agreement) agreements;
 
+    // map template Id to a list of agreement instances
+    mapping(bytes32 => bytes32[]) templateId2Agreements;
+
+    // is able to revoke agreement template (template is no longer accessible)
+    modifier canRevokeTemplate(bytes32 templateId){
+        for (uint256 i=0; i < templateId2Agreements[templateId].length; i++){
+            require (agreements[templateId2Agreements[templateId][i]].state == true);
+        }
+        _;
+    }
+
     // check if the no longer pending unfulfilled conditions in the SLA
     modifier noPendingFulfillments(bytes32 serviceId){
+        for (uint256 i=0; i< agreements[serviceId].conditionsState.length; i++){
+            require(agreements[serviceId].conditionsState[i] == true);
+        }
         _;
     }
 
@@ -46,9 +60,8 @@ contract ServiceAgreement {
     }
 
     // is the sender authorized to create instance of the SLA template
-    modifier isOwner(bytes32 templateId, address consumer){
+    modifier isOwner(bytes32 templateId){
         require(templates[templateId].owner == msg.sender);
-        require(consumer != msg.sender);
         _;
     }
 
@@ -57,8 +70,8 @@ contract ServiceAgreement {
     event SetupAgreementTemplate(bytes32 serviceTemplateId, address provider);
     event ExecuteCondition(bytes32 serviceId, bytes32 condition, bool status, address templateOwner, address consumer);
     event ExecuteAgreement(bytes32 serviceId, bytes32 templateId, bool status, address templateOwner, address consumer);
-    event ConditionFulfilled(bytes32 serviceId, bytes32 templateId, bytes32 condition, bool status);
-    event AgreementFulfilled(bytes32 serviceId, bytes32 templateId, address owner, bool status);
+    event ConditionFulfilled(bytes32 serviceId, bytes32 templateId, bytes32 condition);
+    event AgreementFulfilled(bytes32 serviceId, bytes32 templateId, address owner);
 
     // Setup service agreement template only once!
     function setupAgreementTemplate(address [] contracts, bytes4 [] fingerprints,
@@ -88,7 +101,9 @@ contract ServiceAgreement {
 
 
     function executeAgreement(bytes32 templateId, bytes signature, address consumer) public
-        isOwner(templateId, consumer) returns (bool) {
+        isOwner(templateId) returns (bool) {
+        // check if the template is not revoked
+        require(templates[templateId].state == true);
         // verify consumer's signature
         bytes32 hash = keccak256(abi.encodePacked(templateId, templates[templateId].conditionKeys));
         require(isValidSignature(hash, signature, consumer));
@@ -100,6 +115,7 @@ contract ServiceAgreement {
             emit ExecuteCondition(serviceAgreementId, templates[templateId].conditionKeys[i], false , templates[templateId].owner, consumer);
         }
         agreements[serviceAgreementId] = Agreement(false, states, templateId, consumer);
+        templateId2Agreements[templateId].push(serviceAgreementId);
         emit ExecuteAgreement(serviceAgreementId, templateId, false, templates[templateId].owner, consumer);
     }
 
@@ -129,7 +145,7 @@ contract ServiceAgreement {
     function fulfillAgreement(bytes32 serviceId)
         noPendingFulfillments(serviceId) public returns(bool){
         agreements[serviceId].state = true;
-        emit AgreementFulfilled(serviceId, agreements[serviceId].templateId, templates[agreements[serviceId].templateId].owner, true);
+        emit AgreementFulfilled(serviceId, agreements[serviceId].templateId, templates[agreements[serviceId].templateId].owner);
         return true;
     }
 
@@ -148,10 +164,14 @@ contract ServiceAgreement {
          int index = getConditionIndex(serviceId, condition);
          if(index != -1){
             agreements[serviceId].conditionsState[uint256(index)] = true;
-            emit ConditionFulfilled(serviceId, agreements[serviceId].templateId, condition, true);
+            emit ConditionFulfilled(serviceId, agreements[serviceId].templateId, condition);
             return true;
          }
          return false;
+    }
+
+    function revokeAgreementTemplate(bytes32 templateId) isOwner(templateId) canRevokeTemplate(templateId) public returns(bool) {
+        templates[templateId].state = false;
     }
 
     function getConditionStatus(bytes32 serviceId, bytes32 condition) view public returns(bool){
