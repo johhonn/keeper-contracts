@@ -163,6 +163,11 @@ contract ServiceAgreement {
         templates[templateId].state = false;
     }
 
+    function getDependencyStatus(bytes32 serviceId, bytes32 condition) view public returns(bool) {
+        // TODO
+        return false;
+    }
+
     function getConditionStatus(bytes32 serviceId, bytes32 condition) view public returns(bool){
         return agreements[serviceId].conditionsState[conditionKeyToIndex[condition]];
     }
