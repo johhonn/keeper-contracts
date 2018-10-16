@@ -39,31 +39,33 @@ contract('SLA', (accounts) => {
             templateId = result.logs[3].args.serviceTemplateId
 
             console.log("execute agreement")
-            const a = web3.utils.sha3([ 'bytes32', 'address', 'bytes4' ],[ templateId, contract1, fingerprint1 ])
-            const condition1 = web3.utils.sha3(web3.eth.abi.encodeParameters([ 'bytes32', 'address', 'bytes4' ],[ templateId, contract1, fingerprint1 ])).toString('hex')
-            const condition2 = web3.utils.sha3(web3.eth.abi.encodeParameters([ 'bytes32', 'address', 'bytes4' ],[ templateId, contract2, fingerprint2 ])).toString('hex')
-            const condition3 = web3.utils.sha3(web3.eth.abi.encodeParameters([ 'bytes32', 'address', 'bytes4' ],[ templateId, contract3, fingerprint3 ])).toString('hex')
+            const condition1 = "0x"+abi.soliditySHA3([ 'bytes32', 'address', 'bytes4' ],[ templateId, contract1, fingerprint1 ]).toString('hex')
+            const condition2 = "0x"+abi.soliditySHA3([ 'bytes32', 'address', 'bytes4' ],[ templateId, contract2, fingerprint2 ]).toString('hex')
+            const condition3 = "0x"+abi.soliditySHA3([ 'bytes32', 'address', 'bytes4' ],[ templateId, contract3, fingerprint3 ]).toString('hex')
 
-            console.log('condition: ', templateId, condition1, condition2, condition3)
+            //console.log('condition: ', templateId, condition1, condition2, condition3)
             // get hash of conditions
-             const hash = web3.utils.sha3(web3.eth.abi.encodeParameters([ 'bytes32', 'bytes32[]' ], [templateId, [condition1, condition2, condition3]]))
+             const hash = web3.utils.soliditySha3({type: 'bytes32', value: templateId}, {type: 'bytes32[]', value: [ condition1, condition2, condition3 ]}).toString('hex')
+             console.log("test hash", hash)
+             console.log(templateId, condition1, condition2, condition3)
+
              const prefix = '0x'
              const hexString = Buffer.from(hash).toString('hex')
-             console.log(`${prefix}${hexString}`)
+             //console.log(`${prefix}${hexString}`)
              const signature = await web3.eth.sign(`${prefix}${hexString}`, consumer)
 
-             console.log('\t >> consumer signature: ', signature)
+             //console.log('\t >> consumer signature: ', signature)
 
              const EthereumMessage = `\x19Ethereum Signed Message:\n${hexString.length}${hexString}`
              const EthereumMessageHash = web3.utils.sha3(EthereumMessage)
-             console.log('signed message from consumer to be validated: ', EthereumMessage)
+             //console.log('signed message from consumer to be validated: ', EthereumMessage)
 
-             console.log("\t >> Hash of message ", EthereumMessageHash)
-             console.log("\t >> Message:", hexString)
+             //console.log("\t >> Hash of message ", EthereumMessageHash)
+             //console.log("\t >> Message:", hexString)
              const val = await sla.executeAgreement(templateId, signature, consumer, {from: SLATemplateOwner })
-             console.log(condition1)
-             console.log(val)
-
+             //console.log(condition1)
+             console.log(val.logs[0].args)
+             console.log(val.logs[1].args)
         })
 
     })
