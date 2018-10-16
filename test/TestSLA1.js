@@ -39,22 +39,23 @@ contract('SLA', (accounts) => {
             templateId = result.logs[3].args.serviceTemplateId
 
             console.log("execute agreement")
-            const a = abi.solidityPack([ 'bytes32', 'address', 'bytes4' ],[ templateId, contract1, fingerprint1 ])
-            const condition1 = "0x"+abi.soliditySHA3([ 'bytes32', 'address', 'bytes4' ],[ templateId, contract1, fingerprint1 ]).toString('hex')
-            const condition2 = "0x"+abi.soliditySHA3([ 'bytes32', 'address', 'bytes4' ],[ templateId, contract2, fingerprint2 ]).toString('hex')
-            const condition3 = "0x"+abi.soliditySHA3([ 'bytes32', 'address', 'bytes4' ],[ templateId, contract3, fingerprint3 ]).toString('hex')
+            const a = web3.utils.sha3([ 'bytes32', 'address', 'bytes4' ],[ templateId, contract1, fingerprint1 ])
+            const condition1 = web3.utils.sha3(web3.eth.abi.encodeParameters([ 'bytes32', 'address', 'bytes4' ],[ templateId, contract1, fingerprint1 ])).toString('hex')
+            const condition2 = web3.utils.sha3(web3.eth.abi.encodeParameters([ 'bytes32', 'address', 'bytes4' ],[ templateId, contract2, fingerprint2 ])).toString('hex')
+            const condition3 = web3.utils.sha3(web3.eth.abi.encodeParameters([ 'bytes32', 'address', 'bytes4' ],[ templateId, contract3, fingerprint3 ])).toString('hex')
 
+            console.log('condition: ', templateId, condition1, condition2, condition3)
             // get hash of conditions
-             const hash = abi.soliditySHA3([ 'bytes32', 'bytes32[]' ], [templateId, [condition1, condition2, condition3]])
+             const hash = web3.utils.sha3(web3.eth.abi.encodeParameters([ 'bytes32', 'bytes32[]' ], [templateId, [condition1, condition2, condition3]]))
              const prefix = '0x'
              const hexString = Buffer.from(hash).toString('hex')
              console.log(`${prefix}${hexString}`)
-             const signature = web3.eth.sign(consumer, `${prefix}${hexString}`)
+             const signature = await web3.eth.sign(`${prefix}${hexString}`, consumer)
 
              console.log('\t >> consumer signature: ', signature)
 
              const EthereumMessage = `\x19Ethereum Signed Message:\n${hexString.length}${hexString}`
-             const EthereumMessageHash = web3.sha3(EthereumMessage)
+             const EthereumMessageHash = web3.utils.sha3(EthereumMessage)
              console.log('signed message from consumer to be validated: ', EthereumMessage)
 
              console.log("\t >> Hash of message ", EthereumMessageHash)
