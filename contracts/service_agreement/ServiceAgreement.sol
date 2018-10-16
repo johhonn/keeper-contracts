@@ -11,10 +11,11 @@ contract ServiceAgreement {
         bool state; // 1->Established 0-> revoked serviceTemplateId
         address owner; // template owner
         bytes32 [] conditionKeys; // preserving the order in the condition state (check Agreement struct)
+        uint32 [] dependencies;
     }
     // conditions id (templateId, contract address , function fingerprint)
     // it maps condition id to dependencies [uint256 is a compressed version]
-    mapping(bytes32 => uint256) conditions;
+    mapping(bytes32 => uint32) conditionKeyToIndex;
 
     struct Agreement{
         bool state; // instance of SLA status
@@ -49,7 +50,7 @@ contract ServiceAgreement {
     // check if the controller contract is authorized to change the condition state
     modifier isValidControllerHandler(bytes32 serviceId, bytes4 fingerprint) {
         bytes32 condId = keccak256(abi.encodePacked(agreements[serviceId].templateId, msg.sender, fingerprint));
-        uint dependenciesValue = conditions[condId];
+        uint dependenciesValue = templates[agreements[serviceId].templateId].dependencies[conditionKeyToIndex[condId]];
         // check the dependency conditions
         if(dependenciesValue != 0){
             for (uint i=0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
@@ -83,11 +84,11 @@ contract ServiceAgreement {
         bytes32 templateId =  keccak256(abi.encodePacked(msg.sender, service, dependencies.length, contracts.length));
         // 2. generate conditions
         bytes32 condition;
-        templates[templateId] = ServiceAgreementTemplate(true, msg.sender, new bytes32 [](0));
+        templates[templateId] = ServiceAgreementTemplate(true, msg.sender, new bytes32 [](0), dependencies);
         for (uint256 i=0; i< contracts.length; i++){
             condition = keccak256(abi.encodePacked(templateId, contracts[i], fingerprints[i]));
             templates[templateId].conditionKeys.push(condition);
-            conditions[condition] = dependencies[i];
+            conditionKeyToIndex[condition] = i;
             emit SetupCondition(templateId, condition, msg.sender);
         }
         emit SetupAgreementTemplate(templateId, msg.sender);
@@ -149,25 +150,13 @@ contract ServiceAgreement {
         return true;
     }
 
+    function setConditionStatus(bytes32 serviceId, bytes4 fingerprint) isValidControllerHandler(serviceId, fingerprint)
+        public returns (bool){
 
-    function getConditionIndex(bytes32 serviceId, bytes32 condition) private view returns(int){
-        for(uint256 i=0; i< templates[agreements[serviceId].templateId].conditionKeys.length; i++){
-            if (condition == templates[agreements[serviceId].templateId].conditionKeys[i]){
-                return int(i);
-            }
-        }
-        return -1;
-    }
-    function setConditionStatus(bytes32 serviceId, bytes4 fingerprint)
-         isValidControllerHandler(serviceId, fingerprint) public returns (bool){
-         bytes32 condition = keccak256(abi.encodePacked(agreements[serviceId].templateId, msg.sender, fingerprint));
-         int index = getConditionIndex(serviceId, condition);
-         if(index != -1){
-            agreements[serviceId].conditionsState[uint256(index)] = true;
-            emit ConditionFulfilled(serviceId, agreements[serviceId].templateId, condition);
-            return true;
-         }
-         return false;
+        bytes32 condition = keccak256(abi.encodePacked(agreements[serviceId].templateId, msg.sender, fingerprint));
+        agreements[serviceId].conditionsState[conditionKeyToIndex[condition]] = true;
+        emit ConditionFulfilled(serviceId, agreements[serviceId].templateId, condition);
+        return true;
     }
 
     function revokeAgreementTemplate(bytes32 templateId) isOwner(templateId) canRevokeTemplate(templateId) public returns(bool) {
@@ -175,11 +164,7 @@ contract ServiceAgreement {
     }
 
     function getConditionStatus(bytes32 serviceId, bytes32 condition) view public returns(bool){
-        int index = getConditionIndex(serviceId, condition);
-        if (index != -1){
-                return agreements[serviceId].conditionsState[uint256(index)];
-        }
-        return false;
+        return agreements[serviceId].conditionsState[conditionKeyToIndex[condition]];
     }
 
     function getAgreementStatus(bytes32 serviceId) view public returns(bool){
