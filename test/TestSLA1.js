@@ -1,4 +1,4 @@
-bal artifacts, assert, contract, describe, it */
+/* global artifacts, assert, contract, describe, it */
 /* eslint-disable no-console, max-len */
 
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
@@ -45,7 +45,7 @@ contract('SLA', (accounts) => {
             const condition3 = "0x"+abi.soliditySHA3([ 'bytes32', 'address', 'bytes4' ],[ templateId, contract3, fingerprint3 ]).toString('hex')
 
             // get hash of conditions
-             const hash = abi.soliditySHA3([ 'bytes32', 'bytes32', 'bytes32', 'bytes32' ], [templateId, contract1, contract2, contract3]).toString('hex')
+             const hash = abi.soliditySHA3([ 'bytes32', 'bytes32[]' ], [templateId, [condition1, condition2, condition3]])
              const prefix = '0x'
              const hexString = Buffer.from(hash).toString('hex')
              console.log(`${prefix}${hexString}`)
@@ -53,11 +53,15 @@ contract('SLA', (accounts) => {
 
              console.log('\t >> consumer signature: ', signature)
 
-             const EthereumMessage = `\x19Ethereum Signed Message:\n${hash.length}${hash}`
+             const EthereumMessage = `\x19Ethereum Signed Message:\n${hexString.length}${hexString}`
              const EthereumMessageHash = web3.sha3(EthereumMessage)
              console.log('signed message from consumer to be validated: ', EthereumMessage)
 
-             await sla.executeAgreement(templateId, signature, consumer, {from: SLATemplateOwner })
+             console.log("\t >> Hash of message ", EthereumMessageHash)
+             console.log("\t >> Message:", hexString)
+             const val = await sla.executeAgreement(templateId, signature, consumer, {from: SLATemplateOwner })
+             console.log(condition1)
+             console.log(val)
 
         })
 
