@@ -1,6 +1,6 @@
-pragma solidity ^0.4.25;
+pragma solidity 0.4.25;
 
-import 'ServiceAgreement.sol';
+import './ServiceAgreement.sol';
 
 
 contract PaymentConditions{
@@ -22,7 +22,7 @@ contract PaymentConditions{
     }
 
     function releasePayment(bytes32 serviceId, bytes32 paymentId) public returns(bool) {
-        emit PaymentReleased("sla", serviceId, this.releasePayment.selector, payment);
+        emit PaymentReleased("sla", serviceId, this.releasePayment.selector, paymentId);
         return true;
     }
 }
