@@ -11,7 +11,7 @@ contract ServiceAgreement {
         bool state; // 1->Established 0-> revoked serviceTemplateId
         address owner; // template owner
         bytes32 [] conditionKeys; // preserving the order in the condition state (check Agreement struct)
-        uint32 [] dependencies;
+        uint256 [] dependencies;
     }
     // conditions id (templateId, contract address , function fingerprint)
     // it maps condition id to dependencies [uint256 is a compressed version]
@@ -88,7 +88,7 @@ contract ServiceAgreement {
         for (uint256 i=0; i< contracts.length; i++){
             condition = keccak256(abi.encodePacked(templateId, contracts[i], fingerprints[i]));
             templates[templateId].conditionKeys.push(condition);
-            conditionKeyToIndex[condition] = i;
+            conditionKeyToIndex[condition] = uint32(i);
             emit SetupCondition(templateId, condition, msg.sender);
         }
         emit SetupAgreementTemplate(templateId, msg.sender);
