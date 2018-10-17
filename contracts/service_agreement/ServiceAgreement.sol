@@ -1,4 +1,4 @@
-pragma solidity 0.4.25;
+pragma solidity 0.4.24;
 
 /**
 @title Ocean Protocol Service Level Agreement
@@ -15,7 +15,7 @@ contract ServiceAgreement {
     }
     // conditions id (templateId, contract address , function fingerprint)
     // it maps condition id to dependencies [uint256 is a compressed version]
-    mapping(bytes32 => uint32) conditionKeyToIndex;
+    mapping(bytes32 => uint256) conditionKeyToIndex;
 
     struct Agreement{
         bool state; // instance of SLA status
@@ -50,7 +50,7 @@ contract ServiceAgreement {
     // check if the controller contract is authorized to change the condition state
     modifier isValidControllerHandler(bytes32 serviceId, bytes4 fingerprint) {
         bytes32 condition = keccak256(abi.encodePacked(agreements[serviceId].templateId, msg.sender, fingerprint));
-        require(getDependencyStatus(serviceId, condition));
+        require(getDependencyStatus(serviceId, condition), "This condition has unfulfilled dependency");
         _;
     }
 
@@ -68,6 +68,7 @@ contract ServiceAgreement {
     event ConditionFulfilled(bytes32 serviceId, bytes32 templateId, bytes32 condition);
     event AgreementFulfilled(bytes32 serviceId, bytes32 templateId, address owner);
 
+
     // Setup service agreement template only once!
     function setupAgreementTemplate(address [] contracts, bytes4 [] fingerprints,
         uint256 [] dependencies, bytes32 service) public returns (bool){
@@ -82,7 +83,7 @@ contract ServiceAgreement {
         for (uint256 i=0; i< contracts.length; i++){
             condition = keccak256(abi.encodePacked(templateId, contracts[i], fingerprints[i]));
             templates[templateId].conditionKeys.push(condition);
-            conditionKeyToIndex[condition] = uint32(i);
+            conditionKeyToIndex[condition] = i;
             emit SetupCondition(templateId, condition, msg.sender);
         }
         emit SetupAgreementTemplate(templateId, msg.sender);
@@ -143,8 +144,8 @@ contract ServiceAgreement {
         return (v, r, s);
     }
 
-    function isDependantOnIndex(uint dependencyValue, uint index) pure private returns (bool) {
-        return (dependencyValue & (2**index) == 1);
+    function isDependantOnIndex(uint256 dependencyValue, uint256 index) pure private returns (bool) {
+        return (dependencyValue & (2**index) != 0);
     }
 
     function fulfillAgreement(bytes32 serviceId)
@@ -170,19 +171,15 @@ contract ServiceAgreement {
     function getDependencyStatus(bytes32 serviceId, bytes32 condition) view public returns(bool status) {
         uint dependenciesValue = templates[agreements[serviceId].templateId].dependencies[conditionKeyToIndex[condition]];
         // check the dependency conditions
-        status = false;
-        if(dependenciesValue != 0){
-            for (uint i=0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
-                if(!isDependantOnIndex(dependenciesValue, i) || agreements[serviceId].conditionsState[i]){
-                    status= true;
-                }
-                if(!status){
-                    return false;
-                }
-            }
+        if(dependenciesValue == 0){
             return true;
+         }
+         for (uint i=0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
+            if(isDependantOnIndex(dependenciesValue, i) && !agreements[serviceId].conditionsState[i]){
+                return false;
+            }
         }
-        return false;
+        return true;
     }
 
     function getConditionStatus(bytes32 serviceId, bytes32 condition) view public returns(bool){
