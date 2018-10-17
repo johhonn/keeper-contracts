@@ -50,7 +50,7 @@ contract ServiceAgreement {
     // check if the controller contract is authorized to change the condition state
     modifier isValidControllerHandler(bytes32 serviceId, bytes4 fingerprint) {
         bytes32 condition = keccak256(abi.encodePacked(agreements[serviceId].templateId, msg.sender, fingerprint));
-        require(getDependencyStatus(serviceId, condition), "This condition has unfulfilled dependency");
+        require(!hasUnfulfilledDependencies(serviceId, condition), "This condition has unfulfilled dependency");
         _;
     }
 
@@ -168,18 +168,18 @@ contract ServiceAgreement {
         templates[templateId].state = false;
     }
 
-    function getDependencyStatus(bytes32 serviceId, bytes32 condition) view public returns(bool status) {
+    function hasUnfulfilledDependencies(bytes32 serviceId, bytes32 condition) view public returns(bool status) {
         uint dependenciesValue = templates[agreements[serviceId].templateId].dependencies[conditionKeyToIndex[condition]];
         // check the dependency conditions
         if(dependenciesValue == 0){
-            return true;
+            return false;
          }
          for (uint i=0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
             if(isDependantOnIndex(dependenciesValue, i) && !agreements[serviceId].conditionsState[i]){
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     function getConditionStatus(bytes32 serviceId, bytes32 condition) view public returns(bool){
