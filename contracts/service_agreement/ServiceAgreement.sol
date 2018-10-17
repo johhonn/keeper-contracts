@@ -1,4 +1,4 @@
-pragma solidity 0.4.25;
+pragma solidity 0.4.24;
 
 /**
 @title Ocean Protocol Service Level Agreement
@@ -49,14 +49,8 @@ contract ServiceAgreement {
 
     // check if the controller contract is authorized to change the condition state
     modifier isValidControllerHandler(bytes32 serviceId, bytes4 fingerprint) {
-        bytes32 condId = keccak256(abi.encodePacked(agreements[serviceId].templateId, msg.sender, fingerprint));
-        uint dependenciesValue = templates[agreements[serviceId].templateId].dependencies[conditionKeyToIndex[condId]];
-        // check the dependency conditions
-        if(dependenciesValue != 0){
-            for (uint i=0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
-                require(!isDependantOnIndex(dependenciesValue, i) || agreements[serviceId].conditionsState[i]);
-            }
-        }
+        bytes32 condition = keccak256(abi.encodePacked(agreements[serviceId].templateId, msg.sender, fingerprint));
+        require(getDependencyStatus(serviceId, condition));
         _;
     }
 
@@ -70,7 +64,7 @@ contract ServiceAgreement {
     event SetupCondition(bytes32 serviceTemplate, bytes32 condition, address provider);
     event SetupAgreementTemplate(bytes32 serviceTemplateId, address provider);
     event ExecuteCondition(bytes32 serviceId, bytes32 condition, bool status, address templateOwner, address consumer);
-    event ExecuteAgreement(bytes32 serviceId, bytes32 templateId, bool status, address templateOwner, address consumer);
+    event ExecuteAgreement(bytes32 serviceId, bytes32 templateId, bool status, address templateOwner, address consumer, bool state);
     event ConditionFulfilled(bytes32 serviceId, bytes32 templateId, bytes32 condition);
     event AgreementFulfilled(bytes32 serviceId, bytes32 templateId, address owner);
 
@@ -101,23 +95,33 @@ contract ServiceAgreement {
     }
 
 
+    function generatePrefixHash(bytes32 hash) pure private returns(bytes32 prefixedHash) {
+        bytes memory prefix = "\x19Ethereum Signed Message:\n32";
+        return keccak256(abi.encodePacked(prefix, hash));
+    }
+
     function executeAgreement(bytes32 templateId, bytes signature, address consumer) public
         isOwner(templateId) returns (bool) {
         // check if the template is not revoked
         require(templates[templateId].state == true);
-        // verify consumer's signature
+        // reconstruct the template fingerprint and check the consumer signature
         bytes32 hash = keccak256(abi.encodePacked(templateId, templates[templateId].conditionKeys));
-        require(isValidSignature(hash, signature, consumer));
-        // create new instance of service agreement template
+        bytes32 prefixedHash = generatePrefixHash(hash);
+        // verify consumer's signature and notify actors the execution of agreement
         bytes32 serviceAgreementId = keccak256(abi.encodePacked(templateId, consumer, block.timestamp));
-        bool [] memory states;
-        for(uint256 i=0; i < templates[templateId].conditionKeys.length; i++){
-            states[i] = false;
-            emit ExecuteCondition(serviceAgreementId, templates[templateId].conditionKeys[i], false , templates[templateId].owner, consumer);
-        }
-        agreements[serviceAgreementId] = Agreement(false, states, templateId, consumer);
-        templateId2Agreements[templateId].push(serviceAgreementId);
-        emit ExecuteAgreement(serviceAgreementId, templateId, false, templates[templateId].owner, consumer);
+        if(isValidSignature(prefixedHash, signature, consumer)){
+            bool [] storage states;
+            for(uint256 i=0; i < templates[templateId].conditionKeys.length; i++){
+                states.push(false);
+                emit ExecuteCondition(serviceAgreementId, templates[templateId].conditionKeys[i], false , templates[templateId].owner, consumer);
+            }
+            agreements[serviceAgreementId] = Agreement(false, states, templateId, consumer);
+            templateId2Agreements[templateId].push(serviceAgreementId);
+            emit ExecuteAgreement(serviceAgreementId, templateId, false, templates[templateId].owner, consumer, true);
+            states.length = 0;
+         }else{
+            emit ExecuteAgreement(serviceAgreementId, templateId, false, templates[templateId].owner, consumer, false);
+         }
     }
 
     function splitSignature(bytes signature) private pure returns (uint8 v, bytes32 r, bytes32 s) {
@@ -163,8 +167,21 @@ contract ServiceAgreement {
         templates[templateId].state = false;
     }
 
-    function getDependencyStatus(bytes32 serviceId, bytes32 condition) view public returns(bool) {
-        // TODO
+    function getDependencyStatus(bytes32 serviceId, bytes32 condition) view public returns(bool status) {
+        uint dependenciesValue = templates[agreements[serviceId].templateId].dependencies[conditionKeyToIndex[condition]];
+        // check the dependency conditions
+        status = false;
+        if(dependenciesValue != 0){
+            for (uint i=0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
+                if(!isDependantOnIndex(dependenciesValue, i) || agreements[serviceId].conditionsState[i]){
+                    status= true;
+                }
+                if(!status){
+                    return false;
+                }
+            }
+            return true;
+        }
         return false;
     }
 
