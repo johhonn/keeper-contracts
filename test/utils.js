@@ -109,7 +109,30 @@ const utils = {
     multiplyByPercentage: (x, y, z = 100) => {
         const weiQuotient = utils.divideAndGetWei(y, z)
         return utils.multiplyFromWei(x, weiQuotient)
+    },
+
+    toBigNumber: (num) => {
+        // return new BigNumber(num)
+        return num
+    },
+
+    createSLAHash: (web3, slaTemplateId, contracts, fingerprints) => {
+        // Conditions keys
+        const conditions = Array()
+        for (let i=0; i<contracts.length; i++) {
+            conditions.push("0x"+abi.soliditySHA3([ 'bytes32', 'address', 'bytes4' ],[ slaTemplateId, contracts[i], fingerprints[i] ]).toString('hex'))
+        }
+        //console.log('condition: ', slaTemplateId, conditions)
+        // message to sign by consumer. this is the hash of slaTemplateId and condition keys
+        return web3.utils.soliditySha3({type: 'bytes32', value: slaTemplateId}, {type: 'bytes32[]', value: conditions}).toString('hex')
+    },
+
+    getEventArgsFromTx: (txReceipt, eventName) => {
+        return txReceipt.logs.filter((log) => {
+            return log.event === eventName
+        })[0].args
     }
+
 }
 
 module.exports = utils
