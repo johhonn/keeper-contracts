@@ -57,7 +57,7 @@ contract('ServiceAgreement', (accounts) => {
             console.log('functions: ', funcFingerPrints)
             const serviceName = 'doService'
             const dependencies = [0, 1, 2]
-            const setupTx = await sla.setupAgreementTemplate(contracts, funcFingerPrints, dependencies, serviceName, { from: accounts[1] })
+            const setupTx = await sla.setupAgreementTemplate(contracts, funcFingerPrints, dependencies, serviceName, { from: provider })
             // Grab `SetupAgreementTemplate` event to fetch the serviceTemplateId
             const templateId = testUtils.getEventArgsFromTx(setupTx, 'SetupAgreementTemplate').serviceTemplateId
 
@@ -80,6 +80,7 @@ contract('ServiceAgreement', (accounts) => {
             )
             const serviceId = testUtils.getEventArgsFromTx(execSLATx, 'ExecuteAgreement').serviceId
             console.log('serviceId: ', serviceId)
+            console.log(execSLATx.logs[3].args)
 
             // try to get access before lock payment, should fail
             // accessConditions.
