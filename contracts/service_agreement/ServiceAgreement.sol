@@ -168,6 +168,10 @@ contract ServiceAgreement {
         templates[templateId].state = false;
     }
 
+    function getTemplateId(bytes32 serviceId) view public returns(bytes32 templateId){
+        return agreements[serviceId].templateId;
+    }
+
     function hasUnfulfilledDependencies(bytes32 serviceId, bytes32 condition) view public returns(bool status) {
         uint dependenciesValue = templates[agreements[serviceId].templateId].dependencies[conditionKeyToIndex[condition]];
         // check the dependency conditions

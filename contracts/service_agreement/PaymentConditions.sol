@@ -13,7 +13,6 @@ contract PaymentConditions {
         address sender;
         address receiver;
         uint256 amount;
-        PaymentStatus status;
     }
 
     ServiceAgreement private serviceAgreementStorage;
@@ -44,49 +43,34 @@ contract PaymentConditions {
         uint256 amount
     );
 
+    event TestEvent(
+        bool status,
+        uint256 value
+    );
+
     function lockPayment(bytes32 serviceId) public returns (bool) {
-        bool status = serviceAgreementStorage.getDependencyStatus(serviceId, this.lockPayment.selector);
-
-        if (!status)
-            return false;
-
-        Payment storage payment = payments[serviceId];
-        if (payment.status == PaymentStatus.Released)
-            return false;
-
-        if (payment.status == PaymentStatus.Locked)
-            return true;
+        bytes32 condition = keccak256(abi.encodePacked(serviceAgreementStorage.getTemplateId(serviceId), address(this), this.lockPayment.selector));
+        bool allgood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition);
+        if (!allgood)
+            return;
 
         address sender = msg.sender;
         address receiver = address(this);
-
-        require(token.transferFrom(sender, receiver, price), 'payment failed');
-        payments[serviceId] = Payment(sender, receiver, price, PaymentStatus.Locked);
-
-        emit PaymentLocked(serviceId, payment.sender, payment.receiver, payment.amount);
-
-        return serviceAgreementStorage.setConditionStatus(serviceId, this.lockPayment.selector);
+        require(serviceAgreementStorage.setConditionStatus(serviceId, this.lockPayment.selector), "Cannot fulfill lockPayment condition");
+        token.transferFrom(sender, receiver, price);
+        payments[serviceId] = Payment(sender, receiver, price);
+        emit PaymentLocked(serviceId, payments[serviceId].sender, payments[serviceId].receiver, payments[serviceId].amount);
     }
 
     function releasePayment(bytes32 serviceId) public returns (bool) {
-        bool status = serviceAgreementStorage.getDependencyStatus(serviceId, this.releasePayment.selector);
+        bytes32 condition = keccak256(abi.encodePacked(serviceAgreementStorage.getTemplateId(serviceId), address(this), this.releasePayment.selector));
+        bool allgood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition);
+        if (!allgood)
+            return;
 
-        if (!status)
-            return false;
-
-        Payment storage payment = payments[serviceId];
-        if (payment.status == PaymentStatus.None)
-            return false;
-
-        if (payment.status == PaymentStatus.Released)
-            return true;
-
-        require(token.transferFrom(payment.receiver, payment.sender, payment.amount), 'payment release failed');
-
-        payments[serviceId].status = PaymentStatus.Released;
-        emit PaymentReleased(serviceId, payment.sender, payment.receiver, payment.amount);
-
-        serviceAgreementStorage.setConditionStatus(serviceId, this.releasePayment.selector);
-        return true;
+        require(serviceAgreementStorage.setConditionStatus(serviceId, this.releasePayment.selector), 'payment release failed');
+        token.approve(address(this), payments[serviceId].amount);
+        token.transferFrom(address(this), msg.sender, payments[serviceId].amount);
+        emit PaymentReleased(serviceId, payments[serviceId].receiver, msg.sender, payments[serviceId].amount);
     }
 }

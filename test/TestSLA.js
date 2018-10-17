@@ -36,7 +36,9 @@ contract('ServiceAgreement', (accounts) => {
             // consumer request initial funds to play
             console.log(consumer)
             await market.requestTokens(testUtils.toBigNumber(1000 * scale), { from: consumer })
+            await market.requestTokens(testUtils.toBigNumber(1000 * scale), { from: provider })
             const bal = await token.balanceOf.call(consumer)
+            const balProvider = await token.balanceOf.call(provider)
             console.log(`consumer has balance := ${bal.valueOf() / scale} now`)
 
             // register dataset
@@ -64,7 +66,7 @@ contract('ServiceAgreement', (accounts) => {
             console.log('templateid: ', templateId)
             // 1. consumer request access to asset
             // consumer approve market to withdraw amount of token from his account
-            await token.approve(market.address, testUtils.toBigNumber(200 * scale), { from: consumer })
+            // await token.approve(market.address, testUtils.toBigNumber(200 * scale), { from: consumer })
             const conditionsKeys = testUtils.generateConditionsKeys(templateId, contracts, funcFingerPrints)
             const slaMsgHash = testUtils.createSLAHash(web3, templateId, conditionsKeys)
             const signature = await web3.eth.sign(slaMsgHash, consumer)
@@ -78,24 +80,37 @@ contract('ServiceAgreement', (accounts) => {
             const execSLATx = await sla.executeAgreement(
                 templateId, signature, consumer, {from: provider }
             )
-            const serviceId = testUtils.getEventArgsFromTx(execSLATx, 'ExecuteAgreement').serviceId
+            const execAgr_args = testUtils.getEventArgsFromTx(execSLATx, 'ExecuteAgreement')
+            const serviceId = execAgr_args.serviceId
             console.log('serviceId: ', serviceId)
-            console.log(execSLATx.logs[3].args)
+            console.log(execAgr_args)
 
             // Check status of sla
             // const tx = await sla.fulfillAgreement(serviceId)
             const canlock = !(await sla.hasUnfulfilledDependencies(serviceId, conditionsKeys[0]))
-            console.log('canlock: ', canlock)
-            // console.log('fulfilled: ', tx)//, testUtils.getEventArgsFromTx(tx, 'AgreementFulfilled'))
+            console.log('canLock: ', canlock)
+            const canAccess = !(await sla.hasUnfulfilledDependencies(serviceId, conditionsKeys[1]))
+            console.log('canAccess: ', canAccess)
+            const canRelease = !(await sla.hasUnfulfilledDependencies(serviceId, conditionsKeys[2]))
+            console.log('canRelease: ', canRelease)
 
             // try to get access before lock payment, should fail
-            const payTx = await paymentConditions.lockPayment(serviceId)
-            console.log('lockpayment event: ', payTx)
+            // TODO:
 
-            // accessConditions.
             // Submit payment via the PaymentConditions contract
-            // paymentConditions.lockPayment(serviceId)
             // grab event of payment locked
+            await token.approve(paymentConditions.address, testUtils.toBigNumber(200 * scale), { from: consumer })
+            const payTx = await paymentConditions.lockPayment(serviceId, { from: consumer })
+            console.log('lockpayment event: ', testUtils.getEventArgsFromTx(payTx, 'PaymentLocked').serviceId)
+
+            // grant access
+            const gaccTx = await accessConditions.grantAccess(serviceId, resourceId, { from: provider })
+            console.log('accessgranted event: ', testUtils.getEventArgsFromTx(gaccTx, 'AccessGranted').serviceId)
+
+            // release payment
+            const releaseTx = await paymentConditions.releasePayment(serviceId, { from: provider })
+            console.log('releasepayment event: ', testUtils.getEventArgsFromTx(releaseTx, 'PaymentReleased').serviceId)
+
 
 
 
