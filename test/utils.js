@@ -116,15 +116,18 @@ const utils = {
         return num
     },
 
-    createSLAHash: (web3, slaTemplateId, contracts, fingerprints) => {
-        // Conditions keys
+    generateConditionsKeys: (slaTemplateId, contracts, fingerprints) => {
         const conditions = Array()
         for (let i=0; i<contracts.length; i++) {
             conditions.push("0x"+abi.soliditySHA3([ 'bytes32', 'address', 'bytes4' ],[ slaTemplateId, contracts[i], fingerprints[i] ]).toString('hex'))
         }
+        return conditions
+    },
+    createSLAHash: (web3, slaTemplateId, conditionsKeys) => {
+        // Conditions keys
         //console.log('condition: ', slaTemplateId, conditions)
         // message to sign by consumer. this is the hash of slaTemplateId and condition keys
-        return web3.utils.soliditySha3({type: 'bytes32', value: slaTemplateId}, {type: 'bytes32[]', value: conditions}).toString('hex')
+        return web3.utils.soliditySha3({type: 'bytes32', value: slaTemplateId}, {type: 'bytes32[]', value: conditionsKeys}).toString('hex')
     },
 
     getEventArgsFromTx: (txReceipt, eventName) => {

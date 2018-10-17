@@ -65,8 +65,8 @@ contract('ServiceAgreement', (accounts) => {
             // 1. consumer request access to asset
             // consumer approve market to withdraw amount of token from his account
             await token.approve(market.address, testUtils.toBigNumber(200 * scale), { from: consumer })
-
-            const slaMsgHash = testUtils.createSLAHash(web3, templateId, contracts, funcFingerPrints)
+            const conditionsKeys = testUtils.generateConditionsKeys(templateId, contracts, funcFingerPrints)
+            const slaMsgHash = testUtils.createSLAHash(web3, templateId, conditionsKeys)
             const signature = await web3.eth.sign(slaMsgHash, consumer)
 
             //console.log('\t >> consumer signature: ', signature)
@@ -82,7 +82,16 @@ contract('ServiceAgreement', (accounts) => {
             console.log('serviceId: ', serviceId)
             console.log(execSLATx.logs[3].args)
 
+            // Check status of sla
+            // const tx = await sla.fulfillAgreement(serviceId)
+            const canlock = !(await sla.hasUnfulfilledDependencies(serviceId, conditionsKeys[0]))
+            console.log('canlock: ', canlock)
+            // console.log('fulfilled: ', tx)//, testUtils.getEventArgsFromTx(tx, 'AgreementFulfilled'))
+
             // try to get access before lock payment, should fail
+            const payTx = await paymentConditions.lockPayment(serviceId)
+            console.log('lockpayment event: ', payTx)
+
             // accessConditions.
             // Submit payment via the PaymentConditions contract
             // paymentConditions.lockPayment(serviceId)
