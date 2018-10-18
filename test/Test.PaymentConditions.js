@@ -1,4 +1,4 @@
-/* global afterEach, assert, artifacts, contract, before, describe, it */
+/* global assert, artifacts, contract, before, describe, it */
 
 const AccessConditions = artifacts.require('AccessConditions.sol')
 const OceanToken = artifacts.require('OceanToken.sol')

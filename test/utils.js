@@ -87,17 +87,20 @@ const utils = {
     },
 
     generateConditionsKeys: (slaTemplateId, contracts, fingerprints) => {
-        const conditions = Array()
-        for (let i=0; i<contracts.length; i++) {
-            conditions.push("0x"+abi.soliditySHA3([ 'bytes32', 'address', 'bytes4' ],[ slaTemplateId, contracts[i], fingerprints[i] ]).toString('hex'))
+        const conditions = []
+        for (let i = 0; i < contracts.length; i++) {
+            conditions.push('0x' + abi.soliditySHA3(
+                ['bytes32', 'address', 'bytes4'],
+                [slaTemplateId, contracts[i], fingerprints[i]]
+            ).toString('hex'))
         }
         return conditions
     },
     createSLAHash: (web3, slaTemplateId, conditionsKeys) => {
-        // Conditions keys
-        //console.log('condition: ', slaTemplateId, conditions)
-        // message to sign by consumer. this is the hash of slaTemplateId and condition keys
-        return web3.utils.soliditySha3({type: 'bytes32', value: slaTemplateId}, {type: 'bytes32[]', value: conditionsKeys}).toString('hex')
+        return web3.utils.soliditySha3(
+            { type: 'bytes32', value: slaTemplateId },
+            { type: 'bytes32[]', value: conditionsKeys }
+        ).toString('hex')
     },
 
     getEventArgsFromTx: (txReceipt, eventName) => {
@@ -108,14 +111,14 @@ const utils = {
 
     getSelector: (contract, name) => {
         for (var i = 0; i < contract.abi.length; i++) {
-             const meta = contract.abi[i]
+            const meta = contract.abi[i]
 
-             if (meta.name == name) {
+            if (meta.name === name) {
                 return meta.signature
             }
         }
 
-        throw 'function with the given name not found in the given contact'
+        throw new Error('function with the given name not found in the given contact')
     }
 }
 
