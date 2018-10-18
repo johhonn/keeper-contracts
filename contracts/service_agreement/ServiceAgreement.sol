@@ -188,13 +188,21 @@ contract ServiceAgreement {
     function hasUnfulfilledDependencies(bytes32 serviceId, bytes32 condition) view public returns(bool status) {
         // TODO: process the dependency (based on flags)
         uint dependenciesValue = templates[agreements[serviceId].templateId].dependencies[conditionKeyToIndex[condition]];
+        uint dependenciesFlag = templates[agreements[serviceId].templateId].flags[conditionKeyToIndex[condition]];
         // check the dependency conditions
         if(dependenciesValue == 0){
             return false;
-         }
-         for (uint i=0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
-            if(isDependantOnIndex(dependenciesValue, i) && !agreements[serviceId].conditionsState[i]){
-                return true;
+        }
+        for (uint i=0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
+            flag = (dependenciesFlag & (2**index) != 0); // != 0 means the bit for this ith condition is 1 (true)
+            if(isDependantOnIndex(dependenciesValue, i)) {
+                if (flag != agreements[serviceId].conditionsState[i]){
+                    return true;
+                }
+                // TODO: Handle the unknown state (-1)
+                // Discussed using an exit state/condition that can be specified at the dependency level. This exist
+                // state determines the behaviour when a dependency has an unknown state.
+
             }
         }
         return false;
