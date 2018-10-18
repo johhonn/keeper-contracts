@@ -16,6 +16,7 @@
     "migrate:mainnet": "truffle migrate --network mainnet",
     "coverage": "solidity-coverage",
     "release": "release-it patch -n",
+    "clean": "rm -rf ./build/ && rm -rf ./artifacts/*.development.json",
     "lint-fix": "eslint --fix ./**/*.js && ./node_modules/solium/bin/solium.js -d ./contracts/ --fix",
     "lint": "eslint --ignore-pattern '/coverage/' . && npm run solium",
     "solium": "solium -d ./contracts/",
