@@ -33,7 +33,6 @@ contract OceanMarket is Ownable {
         uint256 amount;             // amount of tokens to be transferred
         uint256 date;               // timestamp of the payment event (in sec.)
         uint256 expiration;         // consumer may request refund after expiration timestamp (in sec.)
-        bool paused;                // pause the process of payment if dispute raised
     }
     enum PaymentState {Locked, Released, Refunded}
     mapping(bytes32 => Payment) private mPayments;  // mapping from id to associated payment struct
@@ -45,7 +44,6 @@ contract OceanMarket is Ownable {
 
     // limit access to refund payment
     address private authAddress;
-    address private disputeAddress;
 
     // marketplace global variables
     OceanToken  public  mToken;
@@ -75,7 +73,7 @@ contract OceanMarket is Ownable {
 
     modifier isAuthContract() {
         require(
-            msg.sender == authAddress || msg.sender == address(this) || msg.sender == disputeAddress, 'Sender is not an authorized contract.'
+            msg.sender == authAddress || msg.sender == address(this), 'Sender is not an authorized contract.'
         );
         _;
     }
@@ -124,34 +122,9 @@ contract OceanMarket is Ownable {
         // consumer make payment to Market contract
         require(mToken.transferFrom(msg.sender, address(this), _amount), 'Token transferFrom failed.');
         /* solium-disable-next-line security/no-block-members */
-        mPayments[_paymentId] = Payment(msg.sender, _receiver, PaymentState.Locked, _amount, block.timestamp, _expire, false);
+        mPayments[_paymentId] = Payment(msg.sender, _receiver, PaymentState.Locked, _amount, block.timestamp, _expire);
         emit PaymentReceived(_paymentId, _receiver, _amount, _expire);
         return true;
-    }
-
-    /**
-    * @dev dispute resolution calls this function to pause payment
-    * @param _paymentId the integer identifier of payment (the same as dispute Id and service agreement Id)
-    */
-    function pausePayment(bytes32 _paymentId) public isLocked(_paymentId) isAuthContract() {
-        mPayments[_paymentId].paused = true;
-    }
-
-    /**
-    * @dev dispute resolution calls this function to process payment
-    * @param _paymentId the integer identifier of payment (the same as dispute Id and service agreement Id)
-    * @param _release the boolean value indication of release payment
-    * @param _refund the boolean value indication of refund payment
-    */
-    function processPayment(bytes32 _paymentId, bool _release, bool _refund) public isLocked(_paymentId) isAuthContract() {
-        // unpause the payment
-        mPayments[_paymentId].paused = false;
-        // process payment
-        if (_release == true && _refund == false) {
-            releasePayment(_paymentId);
-        } else if (_release == false && _refund == true) {
-            refundPayment(_paymentId);
-        }
     }
 
 
@@ -161,8 +134,6 @@ contract OceanMarket is Ownable {
     * @return valid Boolean indication of payment is released
     */
     function releasePayment(bytes32 _paymentId) public isLocked(_paymentId) isAuthContract() returns (bool) {
-        // payment must not be paused
-        require(mPayments[_paymentId].paused == false, 'Payment is paused');
         // update state to avoid re-entry attack
         mPayments[_paymentId].state = PaymentState.Released;
         require(mToken.transfer(mPayments[_paymentId].receiver, mPayments[_paymentId].amount), 'Token transfer failed.');
@@ -176,8 +147,6 @@ contract OceanMarket is Ownable {
     * @return valid Boolean indication of payment is refunded
     */
     function refundPayment(bytes32 _paymentId) public isLocked(_paymentId) isAuthContract() returns (bool) {
-        // payment must not be paused
-        require(mPayments[_paymentId].paused == false, 'Payment is paused');
         // refund payment to consumer
         mPayments[_paymentId].state = PaymentState.Refunded;
         require(mToken.transfer(mPayments[_paymentId].sender, mPayments[_paymentId].amount), 'Token transfer failed.');
@@ -251,17 +220,6 @@ contract OceanMarket is Ownable {
         // authAddress can only be set at deployment of Auth contract - only once
         require(authAddress == address(0), 'authAddress is not 0x0');
         authAddress = msg.sender;
-        return true;
-    }
-
-    /**
-    * @dev OceanMarket add the deployed address of OceanDispute contract
-    * @return valid Boolean indication of contract address is updated
-    */
-    function addDisputeAddress() public validAddress(msg.sender) returns (bool) {
-        // authAddress can only be set at deployment of Auth contract - only once
-        require(disputeAddress == address(0), 'disputeAddress is not 0x0');
-        disputeAddress = msg.sender;
         return true;
     }
 
