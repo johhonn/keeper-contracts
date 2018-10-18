@@ -4,7 +4,6 @@ import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
 import './token/OceanToken.sol';
-import './tcr/OceanRegistry.sol';
 
 /**
 @title Ocean Protocol Marketplace Contract
@@ -51,10 +50,6 @@ contract OceanMarket is Ownable {
     // marketplace global variables
     OceanToken  public  mToken;
 
-    // todo: rename to registry
-    // tcr global variable
-    OceanRegistry  public  tcr;
-
     // ============
     // EVENTS:
     // ============
@@ -88,20 +83,14 @@ contract OceanMarket is Ownable {
     /**
     * @dev OceanMarket Constructor
     * @param _tokenAddress The deployed contract address of OceanToken
-    * @param _registryAddress The deployed contract address of OceanRegistry
     * Runs only on initial contract creation.
     */
-    constructor(address _tokenAddress, address _registryAddress) public {
+    constructor(address _tokenAddress) public {
         require(_tokenAddress != address(0x0), 'Token address is 0x0.');
         // instantiate Ocean token contract
         mToken = OceanToken(_tokenAddress);
-        // todo: rename to registry
-        // instance of registry
-        tcr = OceanRegistry(_registryAddress);
         // set the token receiver to be marketplace
         mToken.setReceiver(address(this));
-        // create market contract instance in tcr
-        tcr.setMarketInstance(address(this));
     }
 
     /**
@@ -244,24 +233,13 @@ contract OceanMarket is Ownable {
     }
 
     /**
-    * @dev OceanMarket checks the voting result of OceanRegistry
-    * @param listing the identifier of voting
-    * @return valid Boolean indication of listing is whitelisted
-    */
-    function checkListingStatus(bytes32 listing) public view returns (bool){
-        return tcr.isWhitelisted(listing);
-    }
-
-    /**
     * @dev OceanRegistry changes the asset status according to the voting result
     * @param assetId the integer identifier of asset in the voting
     * @return valid Boolean indication of asset is whitelisted
     */
     function deactivateAsset(bytes32 assetId) public returns (bool){
         // disable asset if it is not whitelisted in the registry
-        if (!tcr.isWhitelisted(assetId)) {
-            mAssets[assetId].active = false;
-        }
+        mAssets[assetId].active = false;
         return true;
     }
 
