@@ -14,7 +14,8 @@ contract AccessConditions{
     }
 
     function grantAccess(bytes32 serviceId, bytes32 assetId) public returns (bool) {
-        bool allgood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, this.grantAccess.selector);
+        bytes32 condition= serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.grantAccess.selector);
+        bool allgood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition);
         if (!allgood)
             return;
 

@@ -49,7 +49,8 @@ contract PaymentConditions {
     );
 
     function lockPayment(bytes32 serviceId) public returns (bool) {
-        bool allgood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, this.lockPayment.selector);
+        bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.lockPayment.selector);
+        bool allgood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition);
         if (!allgood)
             return;
 
