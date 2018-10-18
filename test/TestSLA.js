@@ -87,11 +87,11 @@ contract('ServiceAgreement', (accounts) => {
 
             // Check status of sla
             // const tx = await sla.fulfillAgreement(serviceId)
-            const canlock = !(await sla.hasUnfulfilledDependencies(serviceId, conditionsKeys[0]))
+            const canlock = !(await sla.hasUnfulfilledDependencies(serviceId, funcFingerPrints[0]))
             console.log('canLock: ', canlock)
-            const canAccess = !(await sla.hasUnfulfilledDependencies(serviceId, conditionsKeys[1]))
+            const canAccess = !(await sla.hasUnfulfilledDependencies(serviceId, funcFingerPrints[1]))
             console.log('canAccess: ', canAccess)
-            const canRelease = !(await sla.hasUnfulfilledDependencies(serviceId, conditionsKeys[2]))
+            const canRelease = !(await sla.hasUnfulfilledDependencies(serviceId, funcFingerPrints[2]))
             console.log('canRelease: ', canRelease)
 
             // try to get access before lock payment, should fail

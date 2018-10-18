@@ -49,8 +49,7 @@ contract PaymentConditions {
     );
 
     function lockPayment(bytes32 serviceId) public returns (bool) {
-        bytes32 condition = keccak256(abi.encodePacked(serviceAgreementStorage.getTemplateId(serviceId), address(this), this.lockPayment.selector));
-        bool allgood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition);
+        bool allgood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, this.lockPayment.selector);
         if (!allgood)
             return;
 
@@ -63,8 +62,7 @@ contract PaymentConditions {
     }
 
     function releasePayment(bytes32 serviceId) public returns (bool) {
-        bytes32 condition = keccak256(abi.encodePacked(serviceAgreementStorage.getTemplateId(serviceId), address(this), this.releasePayment.selector));
-        bool allgood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition);
+        bool allgood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, this.releasePayment.selector);
         if (!allgood)
             return;
 

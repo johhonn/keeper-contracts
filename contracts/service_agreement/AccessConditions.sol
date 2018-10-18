@@ -6,7 +6,7 @@ import './ServiceAgreement.sol';
 contract AccessConditions{
 
     ServiceAgreement private serviceAgreementStorage;
-    event AccessGranted(bytes32 serviceId, bytes32 condition, bytes32 asset);
+    event AccessGranted(bytes32 serviceId, bytes32 asset);
 
     constructor(address _serviceAgreementAddress) public {
         require(_serviceAgreementAddress != address(0), 'invalid contract address');
@@ -14,13 +14,12 @@ contract AccessConditions{
     }
 
     function grantAccess(bytes32 serviceId, bytes32 assetId) public returns (bool) {
-        bytes32 condition = keccak256(abi.encodePacked(serviceAgreementStorage.getTemplateId(serviceId), address(this), this.grantAccess.selector));
-        bool allgood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition);
+        bool allgood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, this.grantAccess.selector);
         if (!allgood)
             return;
 
         require(serviceAgreementStorage.setConditionStatus(serviceId, this.grantAccess.selector), "Cannot fulfill lockPayment condition");
 
-        emit AccessGranted(serviceId, condition, assetId);
+        emit AccessGranted(serviceId, assetId);
     }
 }
