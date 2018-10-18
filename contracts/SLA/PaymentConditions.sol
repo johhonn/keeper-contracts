@@ -50,8 +50,11 @@ contract PaymentConditions {
 
     function lockPayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.lockPayment.selector);
-        bool allgood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition);
-        if (!allgood)
+        bool depsFulfilled = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition);
+        if (!depsFulfilled)
+            return;
+
+        if (serviceAgreementStorage.getConditionStatus(serviceId, condition))
             return;
 
         bytes32 valueHash = keccak256(abi.encodePacked(assetId, price));
@@ -64,14 +67,18 @@ contract PaymentConditions {
     }
 
     function releasePayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
-        bool allgood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, this.releasePayment.selector);
-        if (!allgood)
+        bool depsFulfilled = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, this.releasePayment.selector);
+        if (!depsFulfilled)
+            return;
+
+        if (serviceAgreementStorage.getConditionStatus(serviceId, condition))
             return;
 
         bytes32 valueHash = keccak256(abi.encodePacked(assetId, price));
         require(serviceAgreementStorage.setConditionStatus(serviceId, this.releasePayment.selector, valueHash, 1), 'payment release failed');
+
         token.approve(address(this), payments[serviceId].amount);
-        token.transferFrom(address(this), msg.sender, payments[serviceId].amount);
+        token.transferFrom(payments[serviceId].receiver, msg.sender, payments[serviceId].amount);
         emit PaymentReleased(serviceId, payments[serviceId].receiver, msg.sender, payments[serviceId].amount);
     }
 }
