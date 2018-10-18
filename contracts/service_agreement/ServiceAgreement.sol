@@ -67,7 +67,7 @@ contract ServiceAgreement {
     event ExecuteAgreement(bytes32 serviceId, bytes32 templateId, bool status, address templateOwner, address consumer, bool state);
     event ConditionFulfilled(bytes32 serviceId, bytes32 templateId, bytes32 condition);
     event AgreementFulfilled(bytes32 serviceId, bytes32 templateId, address owner);
-
+    event SLATemplateRevoked(bytes32 templateId, bool state);
 
     // Setup service agreement template only once!
     function setupAgreementTemplate(address [] contracts, bytes4 [] fingerprints,
@@ -166,10 +166,15 @@ contract ServiceAgreement {
 
     function revokeAgreementTemplate(bytes32 templateId) isOwner(templateId) canRevokeTemplate(templateId) public returns(bool) {
         templates[templateId].state = false;
+        emit SLATemplateRevoked(templateId, true);
     }
 
     function getTemplateId(bytes32 serviceId) view public returns(bytes32 templateId){
         return agreements[serviceId].templateId;
+    }
+
+    function getTemplateStatus(bytes32 templateId) view public returns(bool status){
+        return templates[templateId].state;
     }
 
     function hasUnfulfilledDependencies(bytes32 serviceId, bytes32 condition) view public returns(bool status) {

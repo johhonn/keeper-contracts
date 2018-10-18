@@ -43,7 +43,7 @@ contract('SLA', (accounts) => {
                                                            {type: 'uint', value: 3}).toString('hex')
             templateId = result.logs[3].args.serviceTemplateId
             assert.strictEqual(templateId, testTemplateId, "Template Id should match indicating creating of agreement template")
-            console.log("\t ... Done!")
+            console.log("\t >> Template ID:", templateId,"... Done!")
             console.log("\t >> Execute service level agreement")
             // reconstruct the three condition off-chain
             const condition1 = "0x"+abi.soliditySHA3([ 'bytes32', 'address', 'bytes4' ],[ templateId, contract1, fingerprint1 ]).toString('hex')
@@ -57,7 +57,7 @@ contract('SLA', (accounts) => {
             const EthereumMessageHash = web3.utils.soliditySha3({type: 'string', value:EthereumMessage}, {type:'bytes32', value: hash})
             const val = await sla.executeAgreement(templateId, signature, consumer, {from: SLATemplateOwner })
             assert.strictEqual(val.logs[3].args.state, true, "Execute Agreement should return true")
-            console.log("\t ... Done!")
+            console.log("\t >> Service Agreement ID: ",val.logs[3].args.serviceId ," ... Done!")
 
 
             const serviceAgreementId = val.logs[3].args.serviceId
@@ -82,6 +82,12 @@ contract('SLA', (accounts) => {
             const slaStatus = await sla.getAgreementStatus(serviceAgreementId)
             assert.strictEqual(slaStatus, true, "Agreement should be fulfilled")
             console.log("\t >> Agreement fulfillment status: ", slaStatus)
+
+            console.log("\t >> Revoke Agreement Template: ", templateId)
+            const revoked = await sla.revokeAgreementTemplate(templateId, {from : SLATemplateOwner})
+            assert.strictEqual(revoked.logs[0].args.state, true, "Template is Revoked!")
+            console.log("\t >> Revoked")
+
 
         })
 
