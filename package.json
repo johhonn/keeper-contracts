@@ -14,6 +14,7 @@
     "migrate:kovan": "truffle migrate --network kovan",
     "migrate:rinkeby": "truffle migrate --network rinkeby",
     "migrate:mainnet": "truffle migrate --network mainnet",
+    "truffle:test": "truffle test",
     "coverage": "solidity-coverage",
     "release": "release-it patch -n",
     "lint-fix": "eslint --fix ./**/*.js && ./node_modules/solium/bin/solium.js -d ./contracts/ --fix",
