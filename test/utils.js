@@ -134,8 +134,19 @@ const utils = {
         return txReceipt.logs.filter((log) => {
             return log.event === eventName
         })[0].args
-    }
+    },
 
+    getSelector: (contract, name) => {
+        for (var i = 0; i < contract.abi.length; i++) {
+             const meta = contract.abi[i]
+
+             if (meta.name == name) {
+                return meta.signature
+            }
+        }
+
+        throw 'function with the given name not found in the given contact'
+    }
 }
 
 module.exports = utils
