@@ -106,29 +106,30 @@ contract ServiceAgreement {
 
     function executeAgreement(bytes32 templateId, bytes signature, address consumer, bytes32[] valueHash) public
         isOwner(templateId) returns (bool) {
+        ServiceAgreementTemplate slaTemplate = templates[templateId];
         // check if the template is not revoked
-        require(templates[templateId].state == true, 'Template is revoked');
+        require(slaTemplate.state == true, 'Template is revoked');
         // reconstruct the template fingerprint and check the consumer signature
-        bytes32 hash = keccak256(abi.encodePacked(templateId, templates[templateId].conditionKeys, valueHash));
+        bytes32 hash = keccak256(abi.encodePacked(templateId, slaTemplate.conditionKeys, valueHash));
         bytes32 prefixedHash = generatePrefixHash(hash);
         // verify consumer's signature and notify actors the execution of agreement
         bytes32 serviceAgreementId = keccak256(abi.encodePacked(templateId, consumer, block.timestamp));
         if(isValidSignature(prefixedHash, signature, consumer)){
             int8[] storage states;
             bytes32[] storage instances;
-            for(uint256 i = 0; i < templates[templateId].conditionKeys.length; i++){
+            for(uint256 i = 0; i < slaTemplate.conditionKeys.length; i++){
                 states.push(-1);
-                bytes32 condition = keccak256(abi.encodePacked(templates[templateId].conditionKeys[i], valueHash[i]));
+                bytes32 condition = keccak256(abi.encodePacked(slaTemplate.conditionKeys[i], valueHash[i]));
                 instances.push(condition);
-                emit ExecuteCondition(serviceAgreementId, condition, false, templates[templateId].owner, consumer);
+                emit ExecuteCondition(serviceAgreementId, condition, false, slaTemplate.owner, consumer);
             }
             agreements[serviceAgreementId] = Agreement(false, states, templateId, consumer, instances);
             templateId2Agreements[templateId].push(serviceAgreementId);
-            emit ExecuteAgreement(serviceAgreementId, templateId, false, templates[templateId].owner, consumer, true);
+            emit ExecuteAgreement(serviceAgreementId, templateId, false, slaTemplate.owner, consumer, true);
             states.length = 0;
             instances.length = 0;
          }else{
-            emit ExecuteAgreement(serviceAgreementId, templateId, false, templates[templateId].owner, consumer, false);
+            emit ExecuteAgreement(serviceAgreementId, templateId, false, slaTemplate.owner, consumer, false);
          }
     }
 
@@ -191,15 +192,18 @@ contract ServiceAgreement {
         if(dependenciesValue == 0){
             return false;
         }
-        for (uint i = 0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
-            flag = (dependenciesFlag & (2**index) != 0); // != 0 means the bit for this ith condition is 1 (true)
+        for (uint i=0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
+            int8 flag = int8(dependenciesFlag & (2**i)) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
             if(isDependantOnIndex(dependenciesValue, i)) {
+//                if (agreements[serviceId].conditionsState[i] == -1) {
+                    // TODO: Handle the unknown state (-1)
+                    // Discussed using an exit state/condition that can be specified at the dependency level. This exist
+                    // state determines the behaviour when a dependency has an unknown state.
+
+//                }
                 if (flag != agreements[serviceId].conditionsState[i]){
                     return true;
                 }
-                // TODO: Handle the unknown state (-1)
-                // Discussed using an exit state/condition that can be specified at the dependency level. This exist
-                // state determines the behaviour when a dependency has an unknown state.
 
             }
         }
