@@ -14,12 +14,12 @@ contract AccessConditions{
     }
 
     function grantAccess(bytes32 serviceId, bytes32 assetId) public returns (bool) {
-        bytes32 condition= serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.grantAccess.selector);
+        bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.grantAccess.selector);
         bool allgood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition);
         if (!allgood)
             return;
 
-        require(serviceAgreementStorage.setConditionStatus(serviceId, this.grantAccess.selector), "Cannot fulfill lockPayment condition");
+        require(serviceAgreementStorage.setConditionStatus(serviceId, this.grantAccess.selector), 'Cannot fulfill lockPayment condition');
 
         emit AccessGranted(serviceId, assetId);
     }

@@ -56,7 +56,7 @@ contract PaymentConditions {
 
         address sender = msg.sender;
         address receiver = address(this);
-        require(serviceAgreementStorage.setConditionStatus(serviceId, this.lockPayment.selector), "Cannot fulfill lockPayment condition");
+        require(serviceAgreementStorage.setConditionStatus(serviceId, this.lockPayment.selector), 'Cannot fulfill lockPayment condition');
         token.transferFrom(sender, receiver, price);
         payments[serviceId] = Payment(sender, receiver, price);
         emit PaymentLocked(serviceId, payments[serviceId].sender, payments[serviceId].receiver, payments[serviceId].amount);
