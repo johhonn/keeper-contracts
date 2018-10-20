@@ -110,8 +110,8 @@ contract ServiceAgreement {
         // check if the template is not revoked
         require(slaTemplate.state == true, 'Template is revoked');
         // reconstruct the template fingerprint and check the consumer signature
-        bytes32 hash = keccak256(abi.encodePacked(templateId, slaTemplate.conditionKeys, valueHash));
-        bytes32 prefixedHash = generatePrefixHash(hash);
+        bytes32 prefixedHash = generatePrefixHash(keccak256(abi.encodePacked(
+                templateId, slaTemplate.conditionKeys, valueHash)));
         // verify consumer's signature and notify actors the execution of agreement
         bytes32 serviceAgreementId = keccak256(abi.encodePacked(templateId, consumer, block.timestamp));
         if(isValidSignature(prefixedHash, signature, consumer)){
