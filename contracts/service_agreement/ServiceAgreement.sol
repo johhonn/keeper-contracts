@@ -11,8 +11,7 @@ contract ServiceAgreement {
         bool state; // 1->Established 0-> revoked serviceTemplateId
         address owner; // template owner
         bytes32[] conditionKeys; // preserving the order in the condition state (check Agreement struct)
-        uint256[] dependencies;
-        uint256[] flags;
+        uint256[] dependenciesBits;
     }
     // conditions id (templateId, contract address , function fingerprint)
     // it maps condition id to dependencies [uint256 is a compressed version]
@@ -74,15 +73,15 @@ contract ServiceAgreement {
     event SLATemplateRevoked(bytes32 templateId, bool state);
 
     // Setup service agreement template only once!
-    function setupAgreementTemplate(address[] contracts, bytes4[] fingerprints, uint256[] dependencies, uint256[] flags, bytes32 service) public returns (bool){
+    function setupAgreementTemplate(address[] contracts, bytes4[] fingerprints, uint256[] dependenciesBits, bytes32 service) public returns (bool){
         // TODO: whitelisting the contracts/fingerprints
         require(contracts.length == fingerprints.length, 'fingerprints and contracts length do not match');
-        require(contracts.length == dependencies.length, 'contracts and dependencies do not match');
+        require(contracts.length == dependenciesBits.length, 'contracts and dependencies do not match');
         // 1. generate service ID
-        bytes32 templateId = keccak256(abi.encodePacked(msg.sender, service, dependencies.length, contracts.length));
+        bytes32 templateId = keccak256(abi.encodePacked(msg.sender, service, dependenciesBits.length, contracts.length));
         // 2. generate conditions
         bytes32 condition;
-        templates[templateId] = ServiceAgreementTemplate(true, msg.sender, new bytes32[](0), dependencies, flags);
+        templates[templateId] = ServiceAgreementTemplate(true, msg.sender, new bytes32[](0), dependenciesBits);
         for (uint256 i = 0; i < contracts.length; i++){
             condition = keccak256(abi.encodePacked(templateId, contracts[i], fingerprints[i]));
             templates[templateId].conditionKeys.push(condition);
@@ -104,8 +103,10 @@ contract ServiceAgreement {
         return keccak256(abi.encodePacked(prefix, hash));
     }
 
-    function executeAgreement(bytes32 templateId, bytes signature, address consumer, bytes32[] valueHash) public
+    function executeAgreement(bytes32 templateId, bytes signature, address consumer, bytes32[] valueHash, int256[] timeoutValues) public
         isOwner(templateId) returns (bool) {
+        // `timeouts` must be same length as the conditions.
+
         ServiceAgreementTemplate slaTemplate = templates[templateId];
         // check if the template is not revoked
         require(slaTemplate.state == true, 'Template is revoked');
@@ -123,6 +124,7 @@ contract ServiceAgreement {
                 instances.push(condition);
                 emit ExecuteCondition(serviceAgreementId, condition, false, slaTemplate.owner, consumer);
             }
+            // TODO: save timeoutValues in Agreement struct
             agreements[serviceAgreementId] = Agreement(false, states, templateId, consumer, instances);
             templateId2Agreements[templateId].push(serviceAgreementId);
             emit ExecuteAgreement(serviceAgreementId, templateId, false, slaTemplate.owner, consumer, true);
@@ -185,28 +187,34 @@ contract ServiceAgreement {
     }
 
     function hasUnfulfilledDependencies(bytes32 serviceId, bytes32 condition) public view returns(bool status) {
-        // TODO: process the dependency (based on flags)
         uint dependenciesValue = templates[agreements[serviceId].templateId].dependencies[conditionKeyToIndex[condition]];
-        uint dependenciesFlag = templates[agreements[serviceId].templateId].flags[conditionKeyToIndex[condition]];
         // check the dependency conditions
         if(dependenciesValue == 0){
             return false;
         }
         for (uint i=0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
-            int8 flag = int8(dependenciesFlag & (2**i)) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
-            if(isDependantOnIndex(dependenciesValue, i)) {
-//                if (agreements[serviceId].conditionsState[i] == -1) {
-                    // TODO: Handle the unknown state (-1)
+            int8 dep = int8(dependenciesValue & (2**((i*3)+0)) ) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
+
+            if(dep) {
+                int8 flag = int8(dependenciesValue & (2**((i*3)+1)) ) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
+                int8 timeoutFlag = int8(dependenciesValue & (2**((i*3)+2)) ) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
+                if (agreements[serviceId].conditionsState[i] == -1) {
+                    if (timeoutFlag && !conditionTimedOut(serviceId, condition)) {
+                        return true;
+                    }
                     // Discussed using an exit state/condition that can be specified at the dependency level. This exist
                     // state determines the behaviour when a dependency has an unknown state.
 
-//                }
-                if (flag != agreements[serviceId].conditionsState[i]){
+                }
+                if (flag != agreements[serviceId].conditionsState[i] || !conditionTimedOut(serviceId, condition)){
                     return true;
                 }
-
             }
         }
+        return false;
+    }
+
+    function conditionTimedOut(bytes32 serviceId, bytes32 condition) public view returns(bool){
         return false;
     }
 
