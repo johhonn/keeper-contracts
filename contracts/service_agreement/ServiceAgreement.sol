@@ -81,13 +81,11 @@ contract ServiceAgreement {
         // 1. generate service ID
         bytes32 templateId = keccak256(abi.encodePacked(msg.sender, service, dependenciesBits.length, contracts.length));
         // 2. generate conditions
-        bytes32 condition;
         templates[templateId] = ServiceAgreementTemplate(true, msg.sender, new bytes32[](0), dependenciesBits);
         for (uint256 i = 0; i < contracts.length; i++){
-            condition = keccak256(abi.encodePacked(templateId, contracts[i], fingerprints[i]));
-            templates[templateId].conditionKeys.push(condition);
-            conditionKeyToIndex[condition] = i;
-            emit SetupCondition(templateId, condition, msg.sender);
+            templates[templateId].conditionKeys.push(keccak256(abi.encodePacked(templateId, contracts[i], fingerprints[i])));
+            conditionKeyToIndex[keccak256(abi.encodePacked(templateId, contracts[i], fingerprints[i]))] = i;
+            emit SetupCondition(templateId, keccak256(abi.encodePacked(templateId, contracts[i], fingerprints[i])), msg.sender);
         }
         emit SetupAgreementTemplate(templateId, msg.sender);
         return true;
@@ -184,19 +182,19 @@ contract ServiceAgreement {
             return false;
         }
         for (uint i = 0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
-            int8 dep = int8(dependenciesValue & (2**((i*3)+0))) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
+            uint16 dep = uint16(dependenciesValue & (2**((i*3)+0))) == 0 ? uint16(0) : uint16(1); // != 0 means the bit for this ith condition is 1 (true)
             if(dep != 0) {
-                int8 flag = int8(dependenciesValue & (2**((i*3)+1))) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
-                int8 timeoutFlag = int8(dependenciesValue & (2**((i*3)+2))) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
+                uint16 flag = uint16(dependenciesValue & (2**((i*3)+1))) == 0 ? uint16(0) : uint16(1); // != 0 means the bit for this ith condition is 1 (true)
+                uint16 timeoutFlag = uint16(dependenciesValue & (2**((i*3)+2))) == 0 ? uint16(0) : uint16(1); // != 0 means the bit for this ith condition is 1 (true)
                 if (agreements[serviceId].conditionsState[i] == -1) {
-                    // This exist state determines the behaviour when a dependency has an unknown state.
                     if (timeoutFlag != 0 && !conditionTimedOut(serviceId, condition)) {
                         return true;
                     }
-                    // Discussed using an exit state/condition that can be specified at the dependency level.
+                    // Discussed using an exit state/condition that can be specified at the dependency level. This exist
+                    // state determines the behaviour when a dependency has an unknown state.
 
                 }
-                if (flag != int8(agreements[serviceId].conditionsState[i]) || !conditionTimedOut(serviceId, condition)){
+                if (flag != uint16(agreements[serviceId].conditionsState[i]) || !conditionTimedOut(serviceId, condition)){
                     return true;
                 }
             }
