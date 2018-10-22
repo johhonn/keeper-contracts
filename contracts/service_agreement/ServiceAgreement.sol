@@ -8,10 +8,10 @@ pragma solidity 0.4.25;
 contract ServiceAgreement {
 
     struct ServiceAgreementTemplate{
-        bool state; // 1->Established 0-> revoked serviceTemplateId
+        bool state; // 1 -> Available 0 -> revoked template
         address owner; // template owner
-        bytes32[] conditionKeys; // preserving the order in the condition state (check Agreement struct)
-        uint256[] dependenciesBits;
+        bytes32[] conditionKeys; // preserving the order in the condition state
+        uint256[] dependenciesBits; // 1st bit --> dependency, 2nd bit --> flag, 3rd --> timeout (exit strategy) flag
     }
     // conditions id (templateId, contract address , function fingerprint)
     // it maps condition id to dependencies [uint256 is a compressed version]
@@ -24,6 +24,7 @@ contract ServiceAgreement {
         address consumer;
         // condition Instance = [handler + value hash]
         bytes32[] conditionInstances;
+        uint256 [] timeoutValues; // in terms of block number not sec!
     }
 
     mapping (bytes32 => ServiceAgreementTemplate) templates;
@@ -103,33 +104,28 @@ contract ServiceAgreement {
         return keccak256(abi.encodePacked(prefix, hash));
     }
 
-    function executeAgreement(bytes32 templateId, bytes signature, address consumer, bytes32[] valueHash, int256[] timeoutValues) public
+    function executeAgreement(bytes32 templateId, bytes signature, address consumer, bytes32[] valueHash, uint256[] timeoutValues) public
         isOwner(templateId) returns (bool) {
-        // `timeouts` must be same length as the conditions.
-
-        ServiceAgreementTemplate slaTemplate = templates[templateId];
-        // check if the template is not revoked
+        require(timeoutValues.length == templates[templateId].conditionKeys.length, 'invalid timout values length');
+        ServiceAgreementTemplate storage slaTemplate = templates[templateId];
         require(slaTemplate.state == true, 'Template is revoked');
-        // reconstruct the template fingerprint and check the consumer signature
+        // reconstruct the agreement fingerprint and check the consumer signature
         bytes32 prefixedHash = generatePrefixHash(keccak256(abi.encodePacked(
-                templateId, slaTemplate.conditionKeys, valueHash)));
-        // verify consumer's signature and notify actors the execution of agreement
+                templateId, slaTemplate.conditionKeys, valueHash, timeoutValues)));
+        // verify consumer's signature and trigger the execution of agreement
         bytes32 serviceAgreementId = keccak256(abi.encodePacked(templateId, consumer, block.timestamp));
         if(isValidSignature(prefixedHash, signature, consumer)){
-            int8[] storage states;
-            bytes32[] storage instances;
+            agreements[serviceAgreementId] = Agreement(false, new int8[] (0), templateId, consumer, new bytes32[] (0), new uint256[] (0));
             for(uint256 i = 0; i < slaTemplate.conditionKeys.length; i++){
-                states.push(-1);
-                bytes32 condition = keccak256(abi.encodePacked(slaTemplate.conditionKeys[i], valueHash[i]));
-                instances.push(condition);
-                emit ExecuteCondition(serviceAgreementId, condition, false, slaTemplate.owner, consumer);
+                require(timeoutValues[i] > block.number + 4, 'invalid timeout with a margin (~ 60 to 70 seconds = 4 blocks intervals) to avoid race conditions');
+                agreements[serviceAgreementId].conditionsState.push(-1); // init state to unknow!
+                agreements[serviceAgreementId].timeoutValues.push(timeoutValues[i]);
+                // add condition instances
+                agreements[serviceAgreementId].conditionInstances.push(keccak256(abi.encodePacked(slaTemplate.conditionKeys[i], valueHash[i])));
+                emit ExecuteCondition(serviceAgreementId, keccak256(abi.encodePacked(slaTemplate.conditionKeys[i], valueHash[i])), false, slaTemplate.owner, consumer);
             }
-            // TODO: save timeoutValues in Agreement struct
-            agreements[serviceAgreementId] = Agreement(false, states, templateId, consumer, instances);
             templateId2Agreements[templateId].push(serviceAgreementId);
             emit ExecuteAgreement(serviceAgreementId, templateId, false, slaTemplate.owner, consumer, true);
-            states.length = 0;
-            instances.length = 0;
          }else{
             emit ExecuteAgreement(serviceAgreementId, templateId, false, slaTemplate.owner, consumer, false);
          }
@@ -187,19 +183,18 @@ contract ServiceAgreement {
     }
 
     function hasUnfulfilledDependencies(bytes32 serviceId, bytes32 condition) public view returns(bool status) {
-        uint dependenciesValue = templates[agreements[serviceId].templateId].dependencies[conditionKeyToIndex[condition]];
+        uint dependenciesValue = templates[agreements[serviceId].templateId].dependenciesBits[conditionKeyToIndex[condition]];
         // check the dependency conditions
         if(dependenciesValue == 0){
             return false;
         }
         for (uint i=0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
             int8 dep = int8(dependenciesValue & (2**((i*3)+0)) ) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
-
-            if(dep) {
+            if(dep != 0) {
                 int8 flag = int8(dependenciesValue & (2**((i*3)+1)) ) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
                 int8 timeoutFlag = int8(dependenciesValue & (2**((i*3)+2)) ) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
                 if (agreements[serviceId].conditionsState[i] == -1) {
-                    if (timeoutFlag && !conditionTimedOut(serviceId, condition)) {
+                    if (timeoutFlag != 0 && !conditionTimedOut(serviceId, condition)) {
                         return true;
                     }
                     // Discussed using an exit state/condition that can be specified at the dependency level. This exist
@@ -214,7 +209,8 @@ contract ServiceAgreement {
         return false;
     }
 
-    function conditionTimedOut(bytes32 serviceId, bytes32 condition) public view returns(bool){
+    function conditionTimedOut(bytes32 serviceId, bytes32 condition) private view returns(bool){
+        if(block.number+1 > agreements[serviceId].timeoutValues[conditionKeyToIndex[condition]]) return true;
         return false;
     }
 
