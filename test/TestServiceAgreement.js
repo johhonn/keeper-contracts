@@ -28,6 +28,16 @@ contract('SLA', (accounts) => {
             const fingerprint2 = "0xc8cd645f"
             const fingerprint3 = "0xc1964de7"
 
+            /*
+            condition1 --dependsOn--> condition2 --dependsOn----> condition3
+                        \                                         /
+                         \__dependsOn__> condition4 __dependsOn__/
+            [   0                           ,    1        ,      2   ,         3        ]
+            [ [[1, 1, 0], [3, 1, 0]]  ,     [[2, 1, 0]]   ,     []   ,    [[2, 0, 1]]   ]
+            [         v1              ,          v2       ,     v3   ,        v4        ]
+            [ 011 000 011 000,          000 011 000 000,        000 000 000 000,        000 101 000 000]
+            */
+
             const dependencies = [2,4,0]
 
             const serviceTemplateId = "0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae"

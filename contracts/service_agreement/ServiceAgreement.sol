@@ -11,7 +11,7 @@ contract ServiceAgreement {
         bool state; // 1 -> Available 0 -> revoked template
         address owner; // template owner
         bytes32[] conditionKeys; // preserving the order in the condition state
-        uint16[] dependenciesBits; // 1st bit --> dependency, 2nd bit --> flag, 3rd --> timeout (exit strategy) flag
+        uint256[] dependenciesBits; // 1st bit --> dependency, 2nd bit --> flag, 3rd --> timeout (exit strategy) flag
     }
     // conditions id (templateId, contract address , function fingerprint)
     // it maps condition id to dependencies [uint256 is a compressed version]
@@ -74,7 +74,7 @@ contract ServiceAgreement {
     event SLATemplateRevoked(bytes32 templateId, bool state);
 
     // Setup service agreement template only once!
-    function setupAgreementTemplate(address[] contracts, bytes4[] fingerprints, uint16[] dependenciesBits, bytes32 service) public returns (bool){
+    function setupAgreementTemplate(address[] contracts, bytes4[] fingerprints, uint256[] dependenciesBits, bytes32 service) public returns (bool){
         // TODO: whitelisting the contracts/fingerprints
         require(contracts.length == fingerprints.length, 'fingerprints and contracts length do not match');
         require(contracts.length == dependenciesBits.length, 'contracts and dependencies do not match');
@@ -184,19 +184,19 @@ contract ServiceAgreement {
             return false;
         }
         for (uint i = 0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
-            uint16 dep = uint16(dependenciesValue & (2**((i*3)+0))) == 0 ? uint16(0) : uint16(1); // != 0 means the bit for this ith condition is 1 (true)
+            int8 dep = int8(dependenciesValue & (2**((i*3)+0))) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
             if(dep != 0) {
-                uint16 flag = uint16(dependenciesValue & (2**((i*3)+1))) == 0 ? uint16(0) : uint16(1); // != 0 means the bit for this ith condition is 1 (true)
-                uint16 timeoutFlag = int8(dependenciesValue & (2**((i*3)+2))) == 0 ? uint16(0) : uint16(1); // != 0 means the bit for this ith condition is 1 (true)
+                int8 flag = int8(dependenciesValue & (2**((i*3)+1))) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
+                int8 timeoutFlag = int8(dependenciesValue & (2**((i*3)+2))) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
                 if (agreements[serviceId].conditionsState[i] == -1) {
+                    // This exist state determines the behaviour when a dependency has an unknown state.
                     if (timeoutFlag != 0 && !conditionTimedOut(serviceId, condition)) {
                         return true;
                     }
-                    // Discussed using an exit state/condition that can be specified at the dependency level. This exist
-                    // state determines the behaviour when a dependency has an unknown state.
+                    // Discussed using an exit state/condition that can be specified at the dependency level.
 
                 }
-                if (flag != uint16(agreements[serviceId].conditionsState[i]) || !conditionTimedOut(serviceId, condition)){
+                if (flag != int8(agreements[serviceId].conditionsState[i]) || !conditionTimedOut(serviceId, condition)){
                     return true;
                 }
             }
@@ -207,6 +207,10 @@ contract ServiceAgreement {
     function conditionTimedOut(bytes32 serviceId, bytes32 condition) private view returns(bool){
         if(block.number+1 > agreements[serviceId].timeoutValues[conditionKeyToIndex[condition]]) return true;
         return false;
+    }
+
+    function getCurrentBlockNumber() public view returns (uint){
+        return block.number;
     }
 
     function getConditionStatus(bytes32 serviceId, bytes32 condition) public view returns(int8){
