@@ -150,10 +150,6 @@ contract ServiceAgreement {
         return (v, r, s);
     }
 
-    function isDependantOnIndex(uint256 dependencyValue, uint256 index) private pure returns (bool) {
-        return (dependencyValue & (2**index) != 0);
-    }
-
     function fulfillAgreement(bytes32 serviceId) public noPendingFulfillments(serviceId)  returns(bool){
         // TODO: handle OR for agreement terminate
         agreements[serviceId].state = true;
