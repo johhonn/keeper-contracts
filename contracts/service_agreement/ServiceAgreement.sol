@@ -24,7 +24,7 @@ contract ServiceAgreement {
         address consumer;
         // condition Instance = [handler + value hash]
         bytes32[] conditionInstances;
-        uint256 [] timeoutValues; // in terms of block number not sec!
+        uint256[] timeoutValues; // in terms of block number not sec!
     }
 
     mapping (bytes32 => ServiceAgreementTemplate) templates;
@@ -110,15 +110,14 @@ contract ServiceAgreement {
         ServiceAgreementTemplate storage slaTemplate = templates[templateId];
         require(slaTemplate.state == true, 'Template is revoked');
         // reconstruct the agreement fingerprint and check the consumer signature
-        bytes32 prefixedHash = generatePrefixHash(keccak256(abi.encodePacked(
-                templateId, slaTemplate.conditionKeys, valueHash, timeoutValues)));
+        bytes32 prefixedHash = generatePrefixHash(keccak256(abi.encodePacked(templateId, slaTemplate.conditionKeys, valueHash, timeoutValues)));
         // verify consumer's signature and trigger the execution of agreement
-        bytes32 serviceAgreementId = keccak256(abi.encodePacked(templateId, consumer, block.timestamp));
+        bytes32 serviceAgreementId = keccak256(abi.encodePacked(templateId, consumer, block.number, prefixedHash));
         if(isValidSignature(prefixedHash, signature, consumer)){
             agreements[serviceAgreementId] = Agreement(false, new int8[] (0), templateId, consumer, new bytes32[] (0), new uint256[] (0));
             for(uint256 i = 0; i < slaTemplate.conditionKeys.length; i++){
                 require(timeoutValues[i] > block.number + 4, 'invalid timeout with a margin (~ 60 to 70 seconds = 4 blocks intervals) to avoid race conditions');
-                agreements[serviceAgreementId].conditionsState.push(-1); // init state to unknow!
+                agreements[serviceAgreementId].conditionsState.push(-1); // init (unknown state)!
                 agreements[serviceAgreementId].timeoutValues.push(timeoutValues[i]);
                 // add condition instances
                 agreements[serviceAgreementId].conditionInstances.push(keccak256(abi.encodePacked(slaTemplate.conditionKeys[i], valueHash[i])));
@@ -188,11 +187,11 @@ contract ServiceAgreement {
         if(dependenciesValue == 0){
             return false;
         }
-        for (uint i=0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
-            int8 dep = int8(dependenciesValue & (2**((i*3)+0)) ) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
+        for (uint i = 0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
+            int8 dep = int8(dependenciesValue & (2**((i*3)+0))) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
             if(dep != 0) {
-                int8 flag = int8(dependenciesValue & (2**((i*3)+1)) ) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
-                int8 timeoutFlag = int8(dependenciesValue & (2**((i*3)+2)) ) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
+                int8 flag = int8(dependenciesValue & (2**((i*3)+1))) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
+                int8 timeoutFlag = int8(dependenciesValue & (2**((i*3)+2))) == 0 ? int8(0) : int8(1); // != 0 means the bit for this ith condition is 1 (true)
                 if (agreements[serviceId].conditionsState[i] == -1) {
                     if (timeoutFlag != 0 && !conditionTimedOut(serviceId, condition)) {
                         return true;
