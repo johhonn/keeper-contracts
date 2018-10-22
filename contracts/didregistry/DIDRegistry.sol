@@ -8,6 +8,7 @@ contract DIDRegistry is Ownable {
     struct Identity {
         address owner;
         DocumentType _type;
+        uint blockNumber;
     }
 
     event DIDAttributeRegistered(
@@ -19,7 +20,7 @@ contract DIDRegistry is Ownable {
         uint updatedAt
     );
 
-    mapping(bytes32 => Identity) private identities;
+    mapping(bytes32 => Identity) public identities;
 
     constructor() Ownable() public {
     }
@@ -29,7 +30,7 @@ contract DIDRegistry is Ownable {
         currentOwner = identities[_did].owner;
         require(currentOwner == address(0x0) || currentOwner == msg.sender, 'Attributes must be registered by the DID owners.');
 
-        identities[_did] = Identity(msg.sender, _type);
+        identities[_did] = Identity(msg.sender, _type, block.number);
         emit DIDAttributeRegistered(_did, msg.sender, _type, _key, _value, block.number);
     }
 }
