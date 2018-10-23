@@ -56,6 +56,13 @@ docker build -t oceanprotocol/keeper-contracts:0.1 .
 docker run -d -p 8545:8545 oceanprotocol/keeper-contracts:0.1
 ```
 
+or simply pull it from docker hub:
+
+```bash
+docker pull oceanprotocol/keeper-contracts
+docker run -d -p 8545:8545 oceanprotocol/keeper-contracts 
+```
+
 Which will expose the Ethereum RPC client with all contracts loaded under localhost:8545, which you can add to your `truffle.js`:
 
 ```js
