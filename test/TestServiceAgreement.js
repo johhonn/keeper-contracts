@@ -21,7 +21,7 @@ contract('SLA', (accounts) => {
 
             /*
 
-                                                condition-1             Index: 0
+                                                condition-1            Index: 0
                                                    / \
                                                   /   \
                                                  /     \
@@ -76,7 +76,25 @@ contract('SLA', (accounts) => {
 
             templateId = result.logs[4].args.serviceTemplateId
             assert.strictEqual(templateId, testTemplateId, "Template Id should match indicating creating of agreement template")
-            console.log("\t >> Template ID:", templateId,"... Done!")
+                        console.log(''+ '\n' +
+'                                                condition-1            Index: 0   '+'\n' +
+'                                                   //\                            '+'\n' +
+'                                                  /  /\                           '+'\n' +
+'                                                 /    /\                          '+'\n' +
+'                                                /      /\                         '+'\n' +
+'                                               /        /\                        '+'\n' +
+'                                          F=1 /          /\ F=1                   '+'\n' +
+'                                Index: 3 condition-4    condition-2     Index: 1  '+'\n' +
+'                                             /\            /                      '+'\n' +
+'                                              /\          /                       '+'\n' +
+'                                          Timeout=1     /                        '+'\n' +
+'                                                /\      /                         '+'\n' +
+'                                                 /\    /                          '+'\n' +
+'                                               F=0/\  / F=1                       '+'\n' +
+'                                                condition3              Index: 2  '+'\n\n'
+
+            )
+            console.log('\x1b[36m%s\x1b[0m',"\t >> Template ID:", templateId,"... Done!")
             console.log("\t >> Execute service level agreement")
             // reconstruct the three condition keys off-chain
             const conditionKey1 = "0x"+abi.soliditySHA3([ 'bytes32', 'address', 'bytes4' ],[ templateId, contract1, fingerprint1 ]).toString('hex')
@@ -113,17 +131,34 @@ contract('SLA', (accounts) => {
                                                    [ valHash1, valHash2, valHash3, valHash4],
                                                    timeoutValues, {from: SLATemplateOwner })
             assert.strictEqual(val.logs[4].args.state, true, "Execute Agreement should return true")
-            console.log("\t >> Service Agreement ID: ",val.logs[4].args.serviceId ," ... Done!")
+            console.log('\x1b[36m%s\x1b[0m',"\t >> Service Agreement ID: ",val.logs[4].args.serviceId ," ... Done!")
 
 
             const serviceAgreementId = val.logs[4].args.serviceId
 
-//            console.log("\t >> Fulfill 3rd condition by contract address: ", contract3, " Fingerprint: ",fingerprint3)
-//            console.log("\t >> Reconstruct condition-3 authorized hash")
-//            console.log("\t >> Hash(ConditionKey, ValueHash): ",)
-//            const cond3 = await sla.setConditionStatus(serviceAgreementId, fingerprint3, valHash3,  { from: contract3 })
-//            const conditionId3Status = await sla.getConditionStatus(serviceAgreementId, condition3)
-//            console.log("\t >> Condition 3 status: ", conditionId3Status)
+            console.log('\x1b[36m%s\x1b[0m',"\t >> Set 3rd condition status to 1 by contract address: ", contract3, " Fingerprint: ",fingerprint3)
+            console.log("\t >> Reconstruct condition-3 authorized hash")
+            const condition3 = "0x"+abi.soliditySHA3([ 'bytes32', 'bytes32'], [conditionKey3, valHash3]).toString('hex')
+            console.log("\t >> Hash(ConditionKey, ValueHash): ", condition3)
+            const cond3 = await sla.setConditionStatus(serviceAgreementId, fingerprint3, valHash3, 1 ,{ from: contract3 })
+
+            const conditionIdStatus = await sla.getConditionStatus(serviceAgreementId, conditionKey3)
+            assert.strictEqual(cond3.logs[0].args.state.toNumber(), conditionIdStatus.toNumber(), "Invalid condition state")
+            console.log('\x1b[36m%s\x1b[0m',"\t >> Condition 3 status: ", conditionIdStatus.toNumber())
+
+
+            console.log('\x1b[36m%s\x1b[0m',"\t >> Set 2nd condition status to 1 by contract address: ", contract2, " Fingerprint: ",fingerprint2)
+            console.log("\t >> Reconstruct condition-2 authorized hash")
+            const condition2 = "0x"+abi.soliditySHA3([ 'bytes32', 'bytes32'], [conditionKey2, valHash2]).toString('hex')
+            console.log("\t >> Hash(ConditionKey, ValueHash): ", condition2)
+            const cond2 = await sla.setConditionStatus(serviceAgreementId, fingerprint2, valHash2, 1 ,{ from: contract2 })
+
+            const conditionId2Status = await sla.getConditionStatus(serviceAgreementId, conditionKey2)
+            assert.strictEqual(cond2.logs[0].args.state.toNumber(), conditionId2Status.toNumber(), "Invalid condition state")
+            console.log('\x1b[36m%s\x1b[0m',"\t >> Condition 2 status: ", conditionId2Status.toNumber())
+
+
+
 //
 //            console.log("\t >> Fulfill 2nd condition by contract address: ", contract2, " Fingerprint: ",fingerprint2)
 //            const cond2 = await sla.setConditionStatus(serviceAgreementId, fingerprint2, { from: contract2 })

@@ -1,4 +1,4 @@
-pragma solidity 0.4.24;
+pragma solidity 0.4.25;
 
 /**
 @title Ocean Protocol Service Level Agreement
@@ -69,7 +69,7 @@ contract ServiceAgreement {
     event SetupAgreementTemplate(bytes32 serviceTemplateId, address provider);
     event ExecuteCondition(bytes32 serviceId, bytes32 condition, bool status, address templateOwner, address consumer);
     event ExecuteAgreement(bytes32 serviceId, bytes32 templateId, bool status, address templateOwner, address consumer, bool state);
-    event ConditionFulfilled(bytes32 serviceId, bytes32 templateId, bytes32 condition);
+    event ConditionFulfilled(bytes32 serviceId, bytes32 templateId, bytes32 condition, int8 state);
     event AgreementFulfilled(bytes32 serviceId, bytes32 templateId, address owner);
     event SLATemplateRevoked(bytes32 templateId, bool state);
 
@@ -166,7 +166,7 @@ contract ServiceAgreement {
     function setConditionStatus(bytes32 serviceId, bytes4 fingerprint, bytes32 valueHash, int8 state) public isValidControllerHandler(serviceId, fingerprint, valueHash) returns (bool){
         bytes32 conditionKey = keccak256(abi.encodePacked(agreements[serviceId].templateId, msg.sender, fingerprint));
         agreements[serviceId].conditionsState[conditionKeyToIndex[conditionKey]] = state;
-        emit ConditionFulfilled(serviceId, agreements[serviceId].templateId, conditionKey);
+        emit ConditionFulfilled(serviceId, agreements[serviceId].templateId, conditionKey, agreements[serviceId].conditionsState[conditionKeyToIndex[conditionKey]]);
         return true;
     }
 
