@@ -195,33 +195,34 @@ contract('SLA', (accounts) => {
 
 
 
-            console.log('\x1b[36m%s\x1b[0m',"\t >> Try to set condition 1 state to 1, Please do note that condition 4 status is -1")
-            console.log('\x1b[36m%s\x1b[0m',"\t >> Set 1st condition status to 1 by contract address: ", contract1, " Fingerprint: ",fingerprint1)
+//            console.log('\x1b[36m%s\x1b[0m',"\t >> Try to set condition 1 state to 1, Please do note that condition 4 status is -1")
+//            console.log('\x1b[36m%s\x1b[0m',"\t >> Set 1st condition status to 1 by contract address: ", contract1, " Fingerprint: ",fingerprint1)
+//
+//
+//            try {
+//                console.log("\t >> Reconstruct condition-1 authorized hash")
+//                const condition1 = "0x"+abi.soliditySHA3([ 'bytes32', 'bytes32'], [conditionKey1, valHash1]).toString('hex')
+//                console.log("\t >> Hash(ConditionKey, ValueHash): ", condition1)
+//                const cond1 = await sla.setConditionStatus(serviceAgreementId, fingerprint1, valHash1, 1 ,{ from: contract1 })
+//
+//                const conditionId1Status = await sla.getConditionStatus(serviceAgreementId, conditionKey1)
+//                assert.strictEqual(cond1.logs[0].args.state.toNumber(), conditionId1Status.toNumber(), "Invalid condition state")
+//                console.log('\x1b[36m%s\x1b[0m',"\t >> Condition 1 status: ", conditionId1Status.toNumber())
+//            }catch(err){
+//
+//                console.error("\t >> Error: Unauthorized access to condition-1, dependencies have not fulfilled yet!")
+//                const conditionId1State = await sla.getConditionStatus(serviceAgreementId, conditionKey1)
+//                console.warn("\t >> Current State of condition-1: ", conditionId1State.toNumber())
+//            }
 
-
-            try {
-                console.log("\t >> Reconstruct condition-1 authorized hash")
-                const condition1 = "0x"+abi.soliditySHA3([ 'bytes32', 'bytes32'], [conditionKey1, valHash1]).toString('hex')
-                console.log("\t >> Hash(ConditionKey, ValueHash): ", condition1)
-                const cond1 = await sla.setConditionStatus(serviceAgreementId, fingerprint1, valHash1, 1 ,{ from: contract1 })
-
-                const conditionId1Status = await sla.getConditionStatus(serviceAgreementId, conditionKey1)
-                assert.strictEqual(cond1.logs[0].args.state.toNumber(), conditionId1Status.toNumber(), "Invalid condition state")
-                console.log('\x1b[36m%s\x1b[0m',"\t >> Condition 1 status: ", conditionId1Status.toNumber())
-            }catch(err){
-
-                console.error("\t >> Error: Unauthorized access to condition-1, dependencies have not fulfilled yet!")
-                const conditionId1State = await sla.getConditionStatus(serviceAgreementId, conditionKey1)
-                console.warn("\t >> Current State of condition-1: ", conditionId1State.toNumber())
-            }
-
+            console.warn("\t >> Try to change the state of condition 4")
             console.info("\t >> wait for 2 sec condition 3 timeout")
             await sleep(2000);
             if (await sla.conditionTimedOut(serviceAgreementId, conditionKey4)){
                   console.info("yes")
             }else{
                 console.warn("\t >> Condition-3 isn't timeout yet")
-                console.warn("\t >> Try to change the state of condition 4")
+
                 try{
                     console.log('\x1b[36m%s\x1b[0m',"\t >> Set 4th condition status to 0 by contract address: ", contract4, " Fingerprint: ",fingerprint4)
                     console.log("\t >> Reconstruct condition-4 authorized hash")
@@ -233,25 +234,19 @@ contract('SLA', (accounts) => {
                     assert.strictEqual(cond4.logs[0].args.state.toNumber(), conditionId4Status.toNumber(), "Invalid condition state")
                     console.log('\x1b[36m%s\x1b[0m',"\t >> Condition 4 status: ", conditionId4Status.toNumber())
                 }catch(err){
-                    console.error("\t >> Error: Unauthorized access for condition state, wait for timeout")
+                    console.error("\t >> Error: Unauthorized access for condition 4 state, wait for timeout")
 
                 }
             }
-
+            console.info("\t >> wait for 30 sec, the actual condition 3 timeout")
             await sleep(30000);
 
             if (await sla.conditionTimedOut(serviceAgreementId, conditionKey4)){
-                console.log('\x1b[36m%s\x1b[0m',"\t >> Set 4th condition status to 0 by contract address: ", contract4, " Fingerprint: ",fingerprint4)
-                console.log("\t >> Reconstruct condition-4 authorized hash")
-                const condition4 = "0x"+abi.soliditySHA3([ 'bytes32', 'bytes32'], [conditionKey4, valHash4]).toString('hex')
-                console.log("\t >> Hash(ConditionKey, ValueHash): ", condition4)
-                const cond4 = await sla.setConditionStatus(serviceAgreementId, fingerprint4, valHash4, 0 ,{ from: contract4 })
 
                 const conditionId4Status = await sla.getConditionStatus(serviceAgreementId, conditionKey4)
-                assert.strictEqual(cond4.logs[0].args.state.toNumber(), conditionId4Status.toNumber(), "Invalid condition state")
                 console.log('\x1b[36m%s\x1b[0m',"\t >> Condition 4 status: ", conditionId4Status.toNumber())
 
-                if(conditionId4Status.toNumber() == 0 && conditionId2Status.toNumber() == 1){
+                if((conditionId4Status.toNumber() == -1 || conditionId4Status.toNumber() == 0) && conditionId2Status.toNumber() == 1){
                     console.info("\t >> Set condition-1 to true if condition2=1 and condition4=0")
                     console.log("\t >> Reconstruct condition-1 authorized hash")
                     const condition1 = "0x"+abi.soliditySHA3([ 'bytes32', 'bytes32'], [conditionKey1, valHash1]).toString('hex')
@@ -261,12 +256,21 @@ contract('SLA', (accounts) => {
                     assert.strictEqual(cond1.logs[0].args.state.toNumber(), conditionId1Status.toNumber(), "Invalid condition state")
                     console.log('\x1b[36m%s\x1b[0m',"\t >> Condition 1 status: ", conditionId1Status.toNumber())
 
+                }else{
+                    console.error("\t >> Condition 1 don't match the state")
                 }
             }else{
                 console.warn("\t >> Condition-4 isn't timeout yet")
             }
 
 //
+//                console.log('\x1b[36m%s\x1b[0m',"\t >> Set 4th condition status to 0 by contract address: ", contract4, " Fingerprint: ",fingerprint4)
+//                console.log("\t >> Reconstruct condition-4 authorized hash")
+//                const condition4 = "0x"+abi.soliditySHA3([ 'bytes32', 'bytes32'], [conditionKey4, valHash4]).toString('hex')
+//                console.log("\t >> Hash(ConditionKey, ValueHash): ", condition4)
+//                const cond4 = await sla.setConditionStatus(serviceAgreementId, fingerprint4, valHash4, 0 ,{ from: contract4 })
+
+
 //            console.log("\t >> Fulfill Service Level Agreement")
 //            const fulfillSLA = await sla.fulfillAgreement(serviceAgreementId)
 //            const slaStatus = await sla.getAgreementStatus(serviceAgreementId)

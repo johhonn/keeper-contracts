@@ -1,4 +1,4 @@
-pragma solidity 0.4.25;
+pragma solidity 0.4.24;
 
 /**
 @title Ocean Protocol Service Level Agreement
@@ -201,8 +201,9 @@ contract ServiceAgreement {
                     if (timeoutFlag != 0 && !conditionTimedOut(serviceId, condition)) {
                         return true;
                     }
+                }else{
+                    if (flag != uint16(agreements[serviceId].conditionsState[i]) || !conditionTimedOut(serviceId, condition)) return true;
                 }
-                if (flag != uint16(agreements[serviceId].conditionsState[i]) && !conditionTimedOut(serviceId, condition)) return true;
             }
         }
         return false;
