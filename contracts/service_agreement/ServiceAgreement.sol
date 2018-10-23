@@ -1,4 +1,4 @@
-pragma solidity 0.4.25;
+pragma solidity 0.4.24;
 
 /**
 @title Ocean Protocol Service Level Agreement
@@ -122,9 +122,12 @@ contract ServiceAgreement {
                 if(timeoutValues[i] != 0){
                     // TODO: define dynamic margin
                     require(timeoutValues[i] > 2, 'invalid timeout with a margin (~ 30 to 40 seconds = 2 blocks intervals) to avoid race conditions');
+                    agreements[serviceAgreementId].timeoutValues.push(block.timestamp + timeoutValues[i]);
+                }else{
+                    agreements[serviceAgreementId].timeoutValues.push(0);
                 }
                 agreements[serviceAgreementId].conditionsState.push(-1); // init (unknown state)!
-                agreements[serviceAgreementId].timeoutValues.push(timeoutValues[i]);
+
                 // add condition instances
                 agreements[serviceAgreementId].conditionInstances.push(keccak256(abi.encodePacked(slaTemplate.conditionKeys[i], valueHash[i])));
                 emit ExecuteCondition(serviceAgreementId, keccak256(abi.encodePacked(slaTemplate.conditionKeys[i], valueHash[i])), false, slaTemplate.owner, consumer);
@@ -198,20 +201,15 @@ contract ServiceAgreement {
                     if (timeoutFlag != 0 && !conditionTimedOut(serviceId, condition)) {
                         return true;
                     }
-                    // Discussed using an exit state/condition that can be specified at the dependency level. This exist
-                    // state determines the behaviour when a dependency has an unknown state.
-
                 }
-                if (flag != uint16(agreements[serviceId].conditionsState[i]) || !conditionTimedOut(serviceId, condition)){
-                    return true;
-                }
+                if (flag != uint16(agreements[serviceId].conditionsState[i]) && !conditionTimedOut(serviceId, condition)) return true;
             }
         }
         return false;
     }
 
-    function conditionTimedOut(bytes32 serviceId, bytes32 condition) private view returns(bool){
-        if(block.number+1 > agreements[serviceId].timeoutValues[conditionKeyToIndex[condition]]) return true;
+    function conditionTimedOut(bytes32 serviceId, bytes32 condition) public view returns(bool){
+        if(block.timestamp > agreements[serviceId].timeoutValues[conditionKeyToIndex[condition]]) return true;
         return false;
     }
 
