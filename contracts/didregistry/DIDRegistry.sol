@@ -3,7 +3,7 @@ pragma solidity 0.4.25;
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
 contract DIDRegistry is Ownable {
-    enum ValueType { 
+    enum ValueType {
         DID,                // DID string e.g. 'did:op:xxx'
         DIDRef,             // hash of DID same as in parameter (bytes32 _did) in text 0x0123abc.. or 0123abc..
         URL,                // URL string e.g. 'http(s)://xx'
@@ -24,7 +24,7 @@ contract DIDRegistry is Ownable {
         uint updatedAt
     );
 
-    mapping(bytes32 => Identity) public didRegister;
+    mapping(bytes32 => DIDRegister) public didRegister;
 
     constructor() Ownable() public {
     }
@@ -37,4 +37,13 @@ contract DIDRegistry is Ownable {
         didRegister[_did] = DIDRegister(msg.sender, block.number);
         emit DIDAttributeRegistered(_did, msg.sender, _type, _key, _value, block.number);
     }
+
+    function getUpdateAt(bytes32 _did) public view returns(uint) {
+        return didRegister[_did].updateAt;
+    }
+
+    function getOwner(bytes32 _did) public view returns(address) {
+        return didRegister[_did].owner;
+    }
+
 }
