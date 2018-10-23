@@ -1,4 +1,4 @@
-pragma solidity 0.4.25;
+pragma solidity 0.4.24;
 
 /**
 @title Ocean Protocol Service Level Agreement
@@ -73,6 +73,9 @@ contract ServiceAgreement {
     event AgreementFulfilled(bytes32 serviceId, bytes32 templateId, address owner);
     event SLATemplateRevoked(bytes32 templateId, bool state);
 
+    // temp events
+    event PrefixedHash(bytes32 hash, bool status, bytes32 sid);
+
     // Setup service agreement template only once!
     function setupAgreementTemplate(address[] contracts, bytes4[] fingerprints, uint256[] dependenciesBits, bytes32 service) public returns (bool){
         // TODO: whitelisting the contracts/fingerprints
@@ -104,17 +107,22 @@ contract ServiceAgreement {
 
     function executeAgreement(bytes32 templateId, bytes signature, address consumer, bytes32[] valueHash, uint256[] timeoutValues) public
         isOwner(templateId) returns (bool) {
-        require(timeoutValues.length == templates[templateId].conditionKeys.length, 'invalid timout values length');
+        require(timeoutValues.length == templates[templateId].conditionKeys.length, 'invalid timeout values length');
         ServiceAgreementTemplate storage slaTemplate = templates[templateId];
         require(slaTemplate.state == true, 'Template is revoked');
         // reconstruct the agreement fingerprint and check the consumer signature
         bytes32 prefixedHash = generatePrefixHash(keccak256(abi.encodePacked(templateId, slaTemplate.conditionKeys, valueHash, timeoutValues)));
-        // verify consumer's signature and trigger the execution of agreement
+
         bytes32 serviceAgreementId = keccak256(abi.encodePacked(templateId, consumer, block.number, prefixedHash));
+
+        // verify consumer's signature and trigger the execution of agreement
         if(isValidSignature(prefixedHash, signature, consumer)){
             agreements[serviceAgreementId] = Agreement(false, new int8[] (0), templateId, consumer, new bytes32[] (0), new uint256[] (0));
             for(uint256 i = 0; i < slaTemplate.conditionKeys.length; i++){
-                require(timeoutValues[i] > block.number + 4, 'invalid timeout with a margin (~ 60 to 70 seconds = 4 blocks intervals) to avoid race conditions');
+                if(timeoutValues[i] != 0){
+                    // TODO: define dynamic margin
+                    require(timeoutValues[i] > 2, 'invalid timeout with a margin (~ 30 to 40 seconds = 2 blocks intervals) to avoid race conditions');
+                }
                 agreements[serviceAgreementId].conditionsState.push(-1); // init (unknown state)!
                 agreements[serviceAgreementId].timeoutValues.push(timeoutValues[i]);
                 // add condition instances
@@ -149,7 +157,7 @@ contract ServiceAgreement {
     }
 
     function fulfillAgreement(bytes32 serviceId) public noPendingFulfillments(serviceId)  returns(bool){
-        // TODO: handle OR for agreement terminate
+        // TODO: handle OR for agreement termination
         agreements[serviceId].state = true;
         emit AgreementFulfilled(serviceId, agreements[serviceId].templateId, templates[agreements[serviceId].templateId].owner);
         return true;
