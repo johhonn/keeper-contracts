@@ -11,7 +11,7 @@ contract ServiceAgreement {
         bool state; // 1 -> Available 0 -> revoked template
         address owner; // template owner
         bytes32[] conditionKeys; // preserving the order in the condition state
-        uint256[] dependenciesBits; // 1st bit --> dependency, 2nd bit --> flag, 3rd --> timeout (exit strategy) flag
+        uint256[] dependenciesBits; // 1st bit --> dependency, 2nd bit --> timeout flag (enabled/disabled)
     }
     // conditions id (templateId, contract address , function fingerprint)
     // it maps condition id to dependencies [uint256 is a compressed version]
@@ -19,7 +19,7 @@ contract ServiceAgreement {
 
     struct Agreement{
         bool state; // instance of SLA status
-        int8[] conditionsState; // maps the condition status in the template
+        uint8[] conditionsState; // maps the condition status in the template
         bytes32 templateId; // referes to SLA template id
         address consumer;
         // condition Instance = [handler + value hash]
@@ -69,7 +69,7 @@ contract ServiceAgreement {
     event SetupAgreementTemplate(bytes32 serviceTemplateId, address provider);
     event ExecuteCondition(bytes32 serviceId, bytes32 condition, bool status, address templateOwner, address consumer);
     event ExecuteAgreement(bytes32 serviceId, bytes32 templateId, bool status, address templateOwner, address consumer, bool state);
-    event ConditionFulfilled(bytes32 serviceId, bytes32 templateId, bytes32 condition, int8 state);
+    event ConditionFulfilled(bytes32 serviceId, bytes32 templateId, bytes32 condition, uint8 state);
     event AgreementFulfilled(bytes32 serviceId, bytes32 templateId, address owner);
     event SLATemplateRevoked(bytes32 templateId, bool state);
 
@@ -117,7 +117,7 @@ contract ServiceAgreement {
 
         // verify consumer's signature and trigger the execution of agreement
         if(isValidSignature(prefixedHash, signature, consumer)){
-            agreements[serviceAgreementId] = Agreement(false, new int8[] (0), templateId, consumer, new bytes32[] (0), new uint256[] (0));
+            agreements[serviceAgreementId] = Agreement(false, new uint8[] (0), templateId, consumer, new bytes32[] (0), new uint256[] (0));
             for(uint256 i = 0; i < slaTemplate.conditionKeys.length; i++){
                 if(timeoutValues[i] != 0){
                     // TODO: define dynamic margin
@@ -126,7 +126,7 @@ contract ServiceAgreement {
                 }else{
                     agreements[serviceAgreementId].timeoutValues.push(0);
                 }
-                agreements[serviceAgreementId].conditionsState.push(-1); // init (unknown state)!
+                agreements[serviceAgreementId].conditionsState.push(0); // init (unknown state)!
 
                 // add condition instances
                 agreements[serviceAgreementId].conditionInstances.push(keccak256(abi.encodePacked(slaTemplate.conditionKeys[i], valueHash[i])));
@@ -166,7 +166,7 @@ contract ServiceAgreement {
         return true;
     }
 
-    function setConditionStatus(bytes32 serviceId, bytes4 fingerprint, bytes32 valueHash, int8 state) public isValidControllerHandler(serviceId, fingerprint, valueHash) returns (bool){
+    function setConditionStatus(bytes32 serviceId, bytes4 fingerprint, bytes32 valueHash, uint8 state) public isValidControllerHandler(serviceId, fingerprint, valueHash) returns (bool){
         bytes32 conditionKey = keccak256(abi.encodePacked(agreements[serviceId].templateId, msg.sender, fingerprint));
         agreements[serviceId].conditionsState[conditionKeyToIndex[conditionKey]] = state;
         emit ConditionFulfilled(serviceId, agreements[serviceId].templateId, conditionKey, agreements[serviceId].conditionsState[conditionKeyToIndex[conditionKey]]);
@@ -186,23 +186,25 @@ contract ServiceAgreement {
         return templates[templateId].state;
     }
 
+    function getBitValue(uint256 value, uint16 i, uint16 bitPosition, uint16 numBits) pure private returns(uint8 bitValue) {
+        return uint8(value & (2**uint256((i*numBits)+bitPosition))) == 0 ? uint8(0) : uint8(1);
+    }
+
     function hasUnfulfilledDependencies(bytes32 serviceId, bytes32 condition) public view returns(bool status) {
         uint dependenciesValue = templates[agreements[serviceId].templateId].dependenciesBits[conditionKeyToIndex[condition]];
         // check the dependency conditions
         if(dependenciesValue == 0){
             return false;
         }
-        for (uint i = 0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
-            uint16 dep = uint16(dependenciesValue & (2**((i*3)+0))) == 0 ? uint16(0) : uint16(1); // != 0 means the bit for this ith condition is 1 (true)
-            if(dep != 0) {
-                uint16 flag = uint16(dependenciesValue & (2**((i*3)+1))) == 0 ? uint16(0) : uint16(1); // != 0 means the bit for this ith condition is 1 (true)
-                uint16 timeoutFlag = uint16(dependenciesValue & (2**((i*3)+2))) == 0 ? uint16(0) : uint16(1); // != 0 means the bit for this ith condition is 1 (true)
-                if (agreements[serviceId].conditionsState[i] == -1) {
-                    if (timeoutFlag != 0 && !conditionTimedOut(serviceId, condition)) {
+        for (uint16 i = 0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
+            if(getBitValue(dependenciesValue, i, 0, 2) != 0) {
+                uint8 timeoutFlag = getBitValue(dependenciesValue, i, 1, 2);
+                if (timeoutFlag == 1) {
+                    if (agreements[serviceId].conditionsState[i] == 1 || !conditionTimedOut(serviceId, condition)) {
                         return true;
                     }
-                }else{
-                    if (flag != uint16(agreements[serviceId].conditionsState[i]) || !conditionTimedOut(serviceId, condition)) return true;
+                } else if (agreements[serviceId].conditionsState[i] == 0) {
+                    return true;
                 }
             }
         }
@@ -218,7 +220,7 @@ contract ServiceAgreement {
         return block.number;
     }
 
-    function getConditionStatus(bytes32 serviceId, bytes32 condition) public view returns(int8){
+    function getConditionStatus(bytes32 serviceId, bytes32 condition) public view returns(uint8){
         return agreements[serviceId].conditionsState[conditionKeyToIndex[condition]];
     }
 
