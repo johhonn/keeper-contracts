@@ -1,6 +1,6 @@
 pragma solidity 0.4.25;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol';
+import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
 
 import '../token/OceanToken.sol';
 import './ServiceAgreement.sol';
@@ -16,7 +16,7 @@ contract PaymentConditions {
     }
 
     ServiceAgreement private serviceAgreementStorage;
-    StandardToken private token;
+    ERC20 private token;
     uint256 private price;
 
     constructor(address _serviceAgreementAddress, address _tokenAddress, uint256 _price) public {
