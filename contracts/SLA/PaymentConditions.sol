@@ -7,8 +7,6 @@ import './ServiceAgreement.sol';
 
 contract PaymentConditions {
 
-    enum PaymentStatus { None, Locked, Released }
-
     struct Payment {
         address sender;
         address receiver;
@@ -42,13 +40,18 @@ contract PaymentConditions {
     );
 
     function lockPayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
+        bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.lockPayment.selector);
+
+        if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition))
+            return false;
+
+        if (serviceAgreementStorage.getConditionStatus(serviceId, condition) == 1)
+            return true;
+
         bytes32 valueHash = keccak256(abi.encodePacked(assetId, price));
         address sender = msg.sender;
         address receiver = address(this);
-        bool depsFulfilled = serviceAgreementStorage.setConditionStatus(serviceId, this.lockPayment.selector, valueHash, 1);
-
-        if (!depsFulfilled)
-            return false;
+        serviceAgreementStorage.setConditionStatus(serviceId, this.lockPayment.selector, valueHash, 1);
 
         require(token.transferFrom(sender, receiver, price), 'Can not lock payment');
         payments[serviceId] = Payment(sender, receiver, price);
@@ -56,11 +59,16 @@ contract PaymentConditions {
     }
 
     function releasePayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
-        bytes32 valueHash = keccak256(abi.encodePacked(assetId, price));
-        bool depsFulfilled = serviceAgreementStorage.setConditionStatus(serviceId, this.releasePayment.selector, valueHash, 1);
-
-        if (!depsFulfilled)
+        bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.releasePayment.selector);
+        if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition))
             return false;
+
+        if (serviceAgreementStorage.getConditionStatus(serviceId, condition) == 1)
+            return true;
+
+        bytes32 valueHash = keccak256(abi.encodePacked(assetId, price));
+
+        serviceAgreementStorage.setConditionStatus(serviceId, this.releasePayment.selector, valueHash, 1);
 
         require(token.approve(address(this), payments[serviceId].amount), 'Can not approve token operation');
         require(token.transferFrom(payments[serviceId].receiver, msg.sender, payments[serviceId].amount), 'Can not release payment');

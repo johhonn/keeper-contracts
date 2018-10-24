@@ -62,7 +62,7 @@ contract('PaymentConditions', (accounts) => {
                 utils.getSelector(paymentConditions, 'lockPayment'),
                 utils.getSelector(paymentConditions, 'releasePayment')
             ]
-            dependencies = [0, 3, 24]
+            dependencies = [0, 1, 2]
 
             const result = await agreement.setupAgreementTemplate(
                 contracts,
@@ -115,7 +115,9 @@ contract('PaymentConditions', (accounts) => {
 
             agreement.setConditionStatus(
                 serviceId,
-                utils.getSelector(accessConditions, 'grantAccess')
+                utils.getSelector(accessConditions, 'grantAccess'),
+                hashes[0],
+                1
             )
 
             await paymentConditions.lockPayment(serviceId, asset, price)
@@ -131,7 +133,9 @@ contract('PaymentConditions', (accounts) => {
 
             agreement.setConditionStatus(
                 serviceId,
-                utils.getSelector(accessConditions, 'grantAccess')
+                utils.getSelector(accessConditions, 'grantAccess'),
+                hashes[0],
+                1
             )
 
             await paymentConditions.lockPayment(serviceId, asset, price)
@@ -164,7 +168,9 @@ contract('PaymentConditions', (accounts) => {
 
             agreement.setConditionStatus(
                 serviceId,
-                utils.getSelector(accessConditions, 'grantAccess')
+                utils.getSelector(accessConditions, 'grantAccess'),
+                hashes[0],
+                1
             )
             await paymentConditions.lockPayment(serviceId, asset, price)
             walletBalance += price
@@ -182,7 +188,9 @@ contract('PaymentConditions', (accounts) => {
 
             agreement.setConditionStatus(
                 serviceId,
-                utils.getSelector(accessConditions, 'grantAccess')
+                utils.getSelector(accessConditions, 'grantAccess'),
+                hashes[0],
+                1
             )
             await paymentConditions.lockPayment(serviceId, asset, price)
             walletBalance += price
