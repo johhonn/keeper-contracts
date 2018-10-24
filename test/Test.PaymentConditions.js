@@ -25,9 +25,13 @@ contract('PaymentConditions', (accounts) => {
         let contracts
         let fingerprints
         let dependencies
+        let hashes
+
+        const timeouts = [0, 0, 0]
 
         const walletAllowance = 1000
 
+        const asset = web3.utils.fromAscii('my-asset')
         const price = 10
 
         var walletBalance = 0
@@ -41,7 +45,7 @@ contract('PaymentConditions', (accounts) => {
             agreement = await ServiceAgreement.new()
 
             paymentConditions = await PaymentConditions.new(
-                agreement.address, token.address, price
+                agreement.address, token.address
             )
             await token.approve(paymentConditions.address, walletAllowance)
 
@@ -58,7 +62,7 @@ contract('PaymentConditions', (accounts) => {
                 utils.getSelector(paymentConditions, 'lockPayment'),
                 utils.getSelector(paymentConditions, 'releasePayment')
             ]
-            dependencies = [0, 1, 2]
+            dependencies = [0, 3, 24]
 
             const result = await agreement.setupAgreementTemplate(
                 contracts,
@@ -68,23 +72,38 @@ contract('PaymentConditions', (accounts) => {
             )
             templateId = result.logs[3].args.serviceTemplateId
 
+            const lockPaymentHash = utils.valueHash(['bytes32', 'uint256'], [asset, price])
+            const releasePaymentHash = utils.valueHash(['bytes32', 'uint256'], [asset, price])
+            const grantAccessHash = utils.valueHash(['bytes32'], [asset])
+
+            hashes = [grantAccessHash, lockPaymentHash, releasePaymentHash]
+
             const hash = utils.createSLAHash(
                 web3, templateId,
-                utils.generateConditionsKeys(templateId, contracts, fingerprints)
+                utils.generateConditionsKeys(templateId, contracts, fingerprints),
+                hashes,
+                timeouts
             )
 
             signature = await web3.eth.sign(hash, consumer)
         })
 
         async function signAgreement() {
-            const result = await agreement.executeAgreement(templateId, signature, consumer)
+            const result = await agreement.executeAgreement(
+                templateId,
+                signature,
+                consumer,
+                hashes,
+                timeouts
+            )
+
             return result.logs[3].args.serviceId
         }
 
         it('Rejects to lock payments if conditions are not met', async () => {
             const serviceId = await signAgreement()
 
-            await paymentConditions.lockPayment(serviceId)
+            await paymentConditions.lockPayment(serviceId, asset, price)
             assert.strictEqual(
                 0,
                 web3.utils.toDecimal(await token.balanceOf.call(paymentConditions.address))
@@ -99,7 +118,7 @@ contract('PaymentConditions', (accounts) => {
                 utils.getSelector(accessConditions, 'grantAccess')
             )
 
-            await paymentConditions.lockPayment(serviceId)
+            await paymentConditions.lockPayment(serviceId, asset, price)
             walletBalance += price
             assert.strictEqual(
                 walletBalance,
@@ -115,7 +134,7 @@ contract('PaymentConditions', (accounts) => {
                 utils.getSelector(accessConditions, 'grantAccess')
             )
 
-            await paymentConditions.lockPayment(serviceId)
+            await paymentConditions.lockPayment(serviceId, asset, price)
             walletBalance += price
             assert.strictEqual(
                 walletBalance,
@@ -123,7 +142,7 @@ contract('PaymentConditions', (accounts) => {
             )
 
             // Try to lock again, the balance must not change.
-            await paymentConditions.lockPayment(serviceId)
+            await paymentConditions.lockPayment(serviceId, asset, price)
             assert.strictEqual(
                 walletBalance,
                 web3.utils.toDecimal(await token.balanceOf.call(paymentConditions.address))
@@ -133,7 +152,7 @@ contract('PaymentConditions', (accounts) => {
         it('Rejects to release payment if conditions are not met', async () => {
             const serviceId = await signAgreement()
 
-            await paymentConditions.releasePayment(serviceId)
+            await paymentConditions.releasePayment(serviceId, asset, price)
             assert.strictEqual(
                 0,
                 web3.utils.toDecimal(await token.balanceOf.call(agreement.address))
@@ -147,10 +166,10 @@ contract('PaymentConditions', (accounts) => {
                 serviceId,
                 utils.getSelector(accessConditions, 'grantAccess')
             )
-            await paymentConditions.lockPayment(serviceId)
+            await paymentConditions.lockPayment(serviceId, asset, price)
             walletBalance += price
 
-            await paymentConditions.releasePayment(serviceId)
+            await paymentConditions.releasePayment(serviceId, asset, price)
             walletBalance -= price
             assert.strictEqual(
                 walletBalance,
@@ -165,10 +184,10 @@ contract('PaymentConditions', (accounts) => {
                 serviceId,
                 utils.getSelector(accessConditions, 'grantAccess')
             )
-            await paymentConditions.lockPayment(serviceId)
+            await paymentConditions.lockPayment(serviceId, asset, price)
             walletBalance += price
 
-            await paymentConditions.releasePayment(serviceId)
+            await paymentConditions.releasePayment(serviceId, asset, price)
             walletBalance -= price
             assert.strictEqual(
                 walletBalance,
@@ -176,7 +195,7 @@ contract('PaymentConditions', (accounts) => {
             )
 
             // Try to release again, the balance must not change.
-            await paymentConditions.releasePayment(serviceId)
+            await paymentConditions.releasePayment(serviceId, asset, price)
             assert.strictEqual(
                 walletBalance,
                 web3.utils.toDecimal(await token.balanceOf.call(paymentConditions.address))

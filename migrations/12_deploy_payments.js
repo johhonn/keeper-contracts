@@ -5,7 +5,7 @@ const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const { saveDefinition } = require('./helper')
 
 const serviceAgreement = async (deployer, network) => {
-    await deployer.deploy(PaymentConditions, ServiceAgreement.address, OceanToken.address, 1)
+    await deployer.deploy(PaymentConditions, ServiceAgreement.address, OceanToken.address)
 
     saveDefinition(network, PaymentConditions)
 }

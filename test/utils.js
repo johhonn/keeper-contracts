@@ -96,10 +96,13 @@ const utils = {
         }
         return conditions
     },
-    createSLAHash: (web3, slaTemplateId, conditionsKeys) => {
+
+    createSLAHash: (web3, slaTemplateId, conditionsKeys, hashes, timeouts) => {
         return web3.utils.soliditySha3(
             { type: 'bytes32', value: slaTemplateId },
-            { type: 'bytes32[]', value: conditionsKeys }
+            { type: 'bytes32[]', value: conditionsKeys },
+            { type: 'bytes32[]', value: hashes },
+            { type: 'uint256[]', value: timeouts }
         ).toString('hex')
     },
 
@@ -119,6 +122,10 @@ const utils = {
         }
 
         throw new Error('function with the given name not found in the given contact')
+    },
+
+    valueHash: (types, values) => {
+        return '0x' + abi.soliditySHA3(types, values).toString('hex')
     }
 }
 
