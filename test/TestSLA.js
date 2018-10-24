@@ -1,4 +1,4 @@
-/* global artifacts, assert, contract, describe, it */
+/* global artifacts, contract, describe, it */
 /* eslint-disable no-console, max-len */
 
 const OceanToken = artifacts.require('OceanToken.sol')
@@ -6,12 +6,10 @@ const OceanMarket = artifacts.require('OceanMarket.sol')
 const SLA = artifacts.require('ServiceAgreement.sol')
 const PaymentCtrl = artifacts.require('PaymentConditions.sol')
 const AccessCtrl = artifacts.require('AccessConditions.sol')
-const abi = require('ethereumjs-abi')
 const testUtils = require('./utils')
 
 // const ursa = require('ursa')
 // const ethers = require('ethers')
-const BigNumber = require('bignumber.js')
 const Web3 = require('web3')
 
 // const web3 = new Web3(Web3.givenProvider || 'localhost:8546')
@@ -38,7 +36,6 @@ contract('ServiceAgreement', (accounts) => {
             await market.requestTokens(testUtils.toBigNumber(1000 * scale), { from: consumer })
             await market.requestTokens(testUtils.toBigNumber(1000 * scale), { from: provider })
             const bal = await token.balanceOf.call(consumer)
-            const balProvider = await token.balanceOf.call(provider)
             console.log(`consumer has balance := ${bal.valueOf() / scale} now`)
 
             // register dataset
@@ -71,19 +68,14 @@ contract('ServiceAgreement', (accounts) => {
             const slaMsgHash = testUtils.createSLAHash(web3, templateId, conditionsKeys)
             const signature = await web3.eth.sign(slaMsgHash, consumer)
 
-            //console.log('\t >> consumer signature: ', signature)
-
-            const EthereumMessage = `\x19Ethereum Signed Message:\n32`
-            const EthereumMessageHash = web3.utils.soliditySha3({type: 'string', value:EthereumMessage}, {type:'bytes32', value: slaMsgHash})
-
             // Start a purchase, i.e. execute the service agreement
             const execSLATx = await sla.executeAgreement(
-                templateId, signature, consumer, {from: provider }
+                templateId, signature, consumer, { from: provider }
             )
-            const execAgr_args = testUtils.getEventArgsFromTx(execSLATx, 'ExecuteAgreement')
-            const serviceId = execAgr_args.serviceId
+            const execAgrArgs = testUtils.getEventArgsFromTx(execSLATx, 'ExecuteAgreement')
+            const { serviceId } = execAgrArgs.serviceId
             console.log('serviceId: ', serviceId)
-            console.log(execAgr_args)
+            console.log(execAgrArgs)
 
             // Check status of sla
             // const tx = await sla.fulfillAgreement(serviceId)
@@ -110,10 +102,6 @@ contract('ServiceAgreement', (accounts) => {
             // release payment
             const releaseTx = await paymentConditions.releasePayment(serviceId, { from: provider })
             console.log('releasepayment event: ', testUtils.getEventArgsFromTx(releaseTx, 'PaymentReleased').serviceId)
-
-
-
-
         })
     })
 })
