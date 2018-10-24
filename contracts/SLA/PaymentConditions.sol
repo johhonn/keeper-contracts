@@ -51,7 +51,7 @@ contract PaymentConditions {
         bytes32 valueHash = keccak256(abi.encodePacked(assetId, price));
         address sender = msg.sender;
         address receiver = address(this);
-        serviceAgreementStorage.setConditionStatus(serviceId, this.lockPayment.selector, valueHash, 1);
+        serviceAgreementStorage.fulfillCondition(serviceId, this.lockPayment.selector, valueHash);
 
         require(token.transferFrom(sender, receiver, price), 'Can not lock payment');
         payments[serviceId] = Payment(sender, receiver, price);
@@ -68,7 +68,7 @@ contract PaymentConditions {
 
         bytes32 valueHash = keccak256(abi.encodePacked(assetId, price));
 
-        serviceAgreementStorage.setConditionStatus(serviceId, this.releasePayment.selector, valueHash, 1);
+        serviceAgreementStorage.fulfillCondition(serviceId, this.releasePayment.selector, valueHash);
 
         require(token.approve(address(this), payments[serviceId].amount), 'Can not approve token operation');
         require(token.transferFrom(payments[serviceId].receiver, msg.sender, payments[serviceId].amount), 'Can not release payment');

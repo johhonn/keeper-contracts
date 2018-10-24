@@ -20,6 +20,7 @@ contract ServiceAgreement {
     struct Agreement{
         bool state; // instance of SLA status
         uint8[] conditionsState; // maps the condition status in the template
+        uint8[] conditionLockedState; // maps the condition status in the template
         bytes32 templateId; // referes to SLA template id
         address consumer;
         // condition Instance = [handler + value hash]
@@ -54,6 +55,7 @@ contract ServiceAgreement {
     modifier isValidControllerHandler(bytes32 serviceId, bytes4 fingerprint, bytes32 valueHash) {
         bytes32 conditionKey = getConditionByFingerprint(serviceId, msg.sender, fingerprint);
         require(agreements[serviceId].conditionInstances[conditionKeyToIndex[conditionKey]] == keccak256(abi.encodePacked(conditionKey, valueHash)), 'unable to reconstruct the right condition hash');
+        require(agreements[serviceId].conditionLockedState[conditionKeyToIndex[conditionKey]] == 0);
         require(!hasUnfulfilledDependencies(serviceId, conditionKey), 'This condition has unfulfilled dependency');
         _;
     }
@@ -69,7 +71,7 @@ contract ServiceAgreement {
     event SetupAgreementTemplate(bytes32 serviceTemplateId, address provider);
     event ExecuteCondition(bytes32 serviceId, bytes32 condition, bool status, address templateOwner, address consumer);
     event ExecuteAgreement(bytes32 serviceId, bytes32 templateId, bool status, address templateOwner, address consumer, bool state);
-    event ConditionFulfilled(bytes32 serviceId, bytes32 templateId, bytes32 condition, uint8 state);
+    event ConditionFulfilled(bytes32 serviceId, bytes32 templateId, bytes32 condition);
     event AgreementFulfilled(bytes32 serviceId, bytes32 templateId, address owner);
     event SLATemplateRevoked(bytes32 templateId, bool state);
 
@@ -99,7 +101,6 @@ contract ServiceAgreement {
         return (consumer == ecrecover(hash,v, r, s));
     }
 
-
     function generatePrefixHash(bytes32 hash) private pure returns(bytes32 prefixedHash) {
         bytes memory prefix = '\x19Ethereum Signed Message:\n32';
         return keccak256(abi.encodePacked(prefix, hash));
@@ -117,7 +118,7 @@ contract ServiceAgreement {
 
         // verify consumer's signature and trigger the execution of agreement
         if(isValidSignature(prefixedHash, signature, consumer)){
-            agreements[serviceAgreementId] = Agreement(false, new uint8[] (0), templateId, consumer, new bytes32[] (0), new uint256[] (0));
+            agreements[serviceAgreementId] = Agreement(false, new uint8[] (0), new uint8[] (0), templateId, consumer, new bytes32[] (0), new uint256[] (0));
             for(uint256 i = 0; i < slaTemplate.conditionKeys.length; i++){
                 if(timeoutValues[i] != 0){
                     // TODO: define dynamic margin
@@ -126,7 +127,8 @@ contract ServiceAgreement {
                 }else{
                     agreements[serviceAgreementId].timeoutValues.push(0);
                 }
-                agreements[serviceAgreementId].conditionsState.push(0); // init (unknown state)!
+                agreements[serviceAgreementId].conditionsState.push(0);
+                agreements[serviceAgreementId].conditionLockedState.push(0);
 
                 // add condition instances
                 agreements[serviceAgreementId].conditionInstances.push(keccak256(abi.encodePacked(slaTemplate.conditionKeys[i], valueHash[i])));
@@ -166,10 +168,16 @@ contract ServiceAgreement {
         return true;
     }
 
-    function setConditionStatus(bytes32 serviceId, bytes4 fingerprint, bytes32 valueHash, uint8 state) public isValidControllerHandler(serviceId, fingerprint, valueHash) returns (bool){
+//    function setConditionStatus(bytes32 serviceId, bytes4 fingerprint, bytes32 valueHash) public isValidControllerHandler(serviceId, fingerprint, valueHash) returns (bool){
+    function fulfillCondition(bytes32 serviceId, bytes4 fingerprint, bytes32 valueHash) public isValidControllerHandler(serviceId, fingerprint, valueHash) returns (bool){
         bytes32 conditionKey = keccak256(abi.encodePacked(agreements[serviceId].templateId, msg.sender, fingerprint));
-        agreements[serviceId].conditionsState[conditionKeyToIndex[conditionKey]] = state;
-        emit ConditionFulfilled(serviceId, agreements[serviceId].templateId, conditionKey, agreements[serviceId].conditionsState[conditionKeyToIndex[conditionKey]]);
+        agreements[serviceId].conditionsState[conditionKeyToIndex[conditionKey]] = 1;
+        // Lock dependencies of this condition
+        uint dependenciesValue = templates[agreements[serviceId].templateId].dependenciesBits[conditionKeyToIndex[conditionKey]];
+        if(dependenciesValue != 0){
+            lockChildConditions(serviceId, conditionKey, dependenciesValue);
+        }
+        emit ConditionFulfilled(serviceId, agreements[serviceId].templateId, conditionKey);
         return true;
     }
 
@@ -188,6 +196,19 @@ contract ServiceAgreement {
 
     function getBitValue(uint256 value, uint16 i, uint16 bitPosition, uint16 numBits) pure private returns(uint8 bitValue) {
         return uint8(value & (2**uint256((i*numBits)+bitPosition))) == 0 ? uint8(0) : uint8(1);
+    }
+
+    function lockChildConditions(bytes32 serviceId, bytes32 condition, uint256 dependenciesValue) private {
+        // check the dependency conditions
+        for (uint16 i = 0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
+            if(getBitValue(dependenciesValue, i, 0, 2) != 0) {
+                // This is a dependency, lock
+                // verify its state is either 1 or has timed out
+                uint8 timeoutFlag = getBitValue(dependenciesValue, i, 1, 2);
+                require((agreements[serviceId].conditionsState[i] == 1) || ((timeoutFlag == 1) && conditionTimedOut(serviceId, condition)));
+                agreements[serviceId].conditionLockedState[i] = 1;
+            }
+        }
     }
 
     function hasUnfulfilledDependencies(bytes32 serviceId, bytes32 condition) public view returns(bool status) {

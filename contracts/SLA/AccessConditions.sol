@@ -20,7 +20,7 @@ contract AccessConditions{
             return;
 
         bytes32 valueHash = keccak256(abi.encodePacked(assetId));
-        require(serviceAgreementStorage.setConditionStatus(serviceId, this.grantAccess.selector, valueHash, 1), 'Cannot fulfill lockPayment condition');
+        require(serviceAgreementStorage.fulfillCondition(serviceId, this.grantAccess.selector, valueHash), 'Cannot fulfill lockPayment condition');
 
         emit AccessGranted(serviceId, assetId);
     }
