@@ -112,12 +112,15 @@ const utils = {
         })[0].args
     },
 
-    getSelector: (contract, name) => {
+    getSelector: (web3, contract, name) => {
         for (var i = 0; i < contract.abi.length; i++) {
             const meta = contract.abi[i]
-
             if (meta.name === name) {
-                return meta.signature
+                let argsStr = ''
+                for (let input of meta.inputs) {
+                    argsStr += input.type + ','
+                }
+                return web3.utils.sha3(`${name}(${argsStr.slice(0, -1)})`).slice(0, 10)
             }
         }
 

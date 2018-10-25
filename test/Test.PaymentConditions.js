@@ -58,9 +58,9 @@ contract('PaymentConditions', (accounts) => {
                 paymentConditions.address
             ]
             fingerprints = [
-                utils.getSelector(accessConditions, 'grantAccess'),
-                utils.getSelector(paymentConditions, 'lockPayment'),
-                utils.getSelector(paymentConditions, 'releasePayment')
+                utils.getSelector(web3, accessConditions, 'grantAccess'),
+                utils.getSelector(web3, paymentConditions, 'lockPayment'),
+                utils.getSelector(web3, paymentConditions, 'releasePayment')
             ]
             dependencies = [0, 1, 2]
 
@@ -115,7 +115,7 @@ contract('PaymentConditions', (accounts) => {
 
             agreement.fulfillCondition(
                 serviceId,
-                utils.getSelector(accessConditions, 'grantAccess'),
+                utils.getSelector(web3, accessConditions, 'grantAccess'),
                 hashes[0]
             )
 
@@ -132,7 +132,7 @@ contract('PaymentConditions', (accounts) => {
 
             agreement.fulfillCondition(
                 serviceId,
-                utils.getSelector(accessConditions, 'grantAccess'),
+                utils.getSelector(web3, accessConditions, 'grantAccess'),
                 hashes[0]
             )
 
@@ -166,7 +166,7 @@ contract('PaymentConditions', (accounts) => {
 
             agreement.fulfillCondition(
                 serviceId,
-                utils.getSelector(accessConditions, 'grantAccess'),
+                utils.getSelector(web3, accessConditions, 'grantAccess'),
                 hashes[0]
             )
             await paymentConditions.lockPayment(serviceId, asset, price)
@@ -185,7 +185,7 @@ contract('PaymentConditions', (accounts) => {
 
             agreement.fulfillCondition(
                 serviceId,
-                utils.getSelector(accessConditions, 'grantAccess'),
+                utils.getSelector(web3, accessConditions, 'grantAccess'),
                 hashes[0]
             )
             await paymentConditions.lockPayment(serviceId, asset, price)
