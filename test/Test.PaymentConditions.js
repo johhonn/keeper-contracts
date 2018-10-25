@@ -113,10 +113,9 @@ contract('PaymentConditions', (accounts) => {
         it('Locks payment if conditions are met', async () => {
             const serviceId = await signAgreement()
 
-            agreement.fulfillCondition(
+            await accessConditions.grantAccess(
                 serviceId,
-                utils.getSelector(web3, accessConditions, 'grantAccess'),
-                hashes[0]
+                asset
             )
 
             await paymentConditions.lockPayment(serviceId, asset, price)
@@ -130,10 +129,9 @@ contract('PaymentConditions', (accounts) => {
         it('Does not lock twice', async () => {
             const serviceId = await signAgreement()
 
-            agreement.fulfillCondition(
+            await accessConditions.grantAccess(
                 serviceId,
-                utils.getSelector(web3, accessConditions, 'grantAccess'),
-                hashes[0]
+                asset
             )
 
             await paymentConditions.lockPayment(serviceId, asset, price)
@@ -164,10 +162,9 @@ contract('PaymentConditions', (accounts) => {
         it('Releases payment if conditions are met', async () => {
             const serviceId = await signAgreement()
 
-            agreement.fulfillCondition(
+            await accessConditions.grantAccess(
                 serviceId,
-                utils.getSelector(web3, accessConditions, 'grantAccess'),
-                hashes[0]
+                asset
             )
             await paymentConditions.lockPayment(serviceId, asset, price)
             walletBalance += price
@@ -183,10 +180,9 @@ contract('PaymentConditions', (accounts) => {
         it('Does not release twice', async () => {
             const serviceId = await signAgreement()
 
-            agreement.fulfillCondition(
+            await accessConditions.grantAccess(
                 serviceId,
-                utils.getSelector(web3, accessConditions, 'grantAccess'),
-                hashes[0]
+                asset
             )
             await paymentConditions.lockPayment(serviceId, asset, price)
             walletBalance += price
