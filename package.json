@@ -14,16 +14,16 @@
     "migrate:kovan": "truffle migrate --network kovan",
     "migrate:rinkeby": "truffle migrate --network rinkeby",
     "migrate:mainnet": "truffle migrate --network mainnet",
-    "truffle:test": "truffle test",
-    "coverage": "solidity-coverage",
+    "test": "truffle test",
+    "test:cover": "solidity-coverage",
     "release": "release-it patch -n",
     "clean": "rm -rf ./build/ && rm -rf ./artifacts/*.development.json",
-    "lint-fix": "eslint --fix ./**/*.js && ./node_modules/solium/bin/solium.js -d ./contracts/ --fix",
-    "lint": "eslint --ignore-pattern '/coverage/' . && npm run solium",
-    "solium": "solium -d ./contracts/",
-    "solium:watch": "solium -d ./contracts/ --watch",
-    "mythril": "truffle compile && myth -x --truffle --max-depth 8 --outform markdown > mythril-report.md",
-    "test": "npm run lint && truffle test"
+    "lint": "npm run lint:eslint && npm run lint:solium",
+    "lint:eslint": "eslint --ignore-pattern '/coverage/' .",
+    "lint:solium": "solium -d ./contracts/",
+    "lint:solium:watch": "solium -d ./contracts/ --watch",
+    "lint:mythril": "truffle compile && myth -x --truffle --max-depth 8 --outform markdown > mythril-report.md",
+    "lint:fix": "eslint --fix ./**/*.js && ./node_modules/solium/bin/solium.js -d ./contracts/ --fix"
   },
   "directories": {
     "doc": "doc",
@@ -67,9 +67,13 @@
     "truffle-hdwallet-provider": "^1.0.0-web3one.0",
     "ursa": "^0.9.4",
     "web3": "1.0.0-beta.36",
-    "web3-utils": "1.0.0-beta.36"
+    "web3-utils": "^1.0.0-beta.36"
   },
   "engines": {
     "node": ">=8.11.1"
+  },
+  "dependencies": {
+    "bignumber": "^1.1.0",
+    "web3-eth-abi": "^1.0.0-beta.36"
   }
 }

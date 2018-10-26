@@ -79,6 +79,71 @@ const utils = {
             }
         }
         assert.strictEqual(n, gotEvents)
+    },
+
+    toBigNumber: (num) => {
+        // return new BigNumber(num)
+        return num
+    },
+
+    generateConditionsKeys: (slaTemplateId, contracts, fingerprints) => {
+        const conditions = []
+        for (let i = 0; i < contracts.length; i++) {
+            conditions.push('0x' + abi.soliditySHA3(
+                ['bytes32', 'address', 'bytes4'],
+                [slaTemplateId, contracts[i], fingerprints[i]]
+            ).toString('hex'))
+        }
+        return conditions
+    },
+
+    createSLAHash: (web3, slaTemplateId, conditionsKeys, hashes, timeouts) => {
+        return web3.utils.soliditySha3(
+            { type: 'bytes32', value: slaTemplateId },
+            { type: 'bytes32[]', value: conditionsKeys },
+            { type: 'bytes32[]', value: hashes },
+            { type: 'uint256[]', value: timeouts }
+        ).toString('hex')
+    },
+
+    getEventArgsFromTx: (txReceipt, eventName) => {
+        return txReceipt.logs.filter((log) => {
+            return log.event === eventName
+        })[0].args
+    },
+
+    getSelector: (web3, contract, name) => {
+        for (var i = 0; i < contract.abi.length; i++) {
+            const meta = contract.abi[i]
+            if (meta.name === name) {
+                let argsStr = ''
+                for (let input of meta.inputs) {
+                    argsStr += input.type + ','
+                }
+                return web3.utils.sha3(`${name}(${argsStr.slice(0, -1)})`).slice(0, 10)
+            }
+        }
+
+        throw new Error('function with the given name not found in the given contact')
+    },
+
+    valueHash: (types, values) => {
+        return '0x' + abi.soliditySHA3(types, values).toString('hex')
+    },
+
+    signAgreement: async (agreement, templateId, signature, consumer, hashes, timeouts, args = {}) => {
+        const result = await agreement.executeAgreement(
+            templateId,
+            signature,
+            consumer,
+            hashes,
+            timeouts,
+            args
+        )
+
+        return result.logs.filter((log) => {
+            return log.event === 'ExecuteAgreement'
+        })[0].args.serviceId
     }
 }
 
