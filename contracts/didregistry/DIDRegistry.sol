@@ -24,7 +24,7 @@ contract DIDRegistry is Ownable {
         uint updatedAt
     );
 
-    mapping(bytes32 => DIDRegister) public didRegister;
+    mapping(bytes32 => DIDRegister) private didRegister;
 
     constructor() Ownable() public {
     }
