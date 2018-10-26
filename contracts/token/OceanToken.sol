@@ -15,16 +15,16 @@ contract OceanToken is ERC20 {
     // ============
     // DATA STRUCTURES:
     // ============
-    string public constant name = 'OceanToken';                        // Set the token name for display
-    string public constant symbol = 'OCN';                             // Set the token symbol for display
+    string public constant name = 'OceanToken';                      // Set the token name for display
+    string public constant symbol = 'OCN';                           // Set the token symbol for display
 
     // SUPPLY
-    uint8 public constant decimals = 18;                               // Set the number of decimals for display
-    uint256 public constant TOTAL_SUPPLY = 1400000000 * 10 ** 18;      // OceanToken total supply
+    uint8 public constant decimals = 18;                             // Set the number of decimals for display
+    uint256 public constant TOTAL_SUPPLY = 1400000000 * 10 ** 18;    // OceanToken total supply
 
     // EMIT TOKENS
-    address public _receiver = address(0);                             // address to receive TOKENS
-    uint256 public totalSupply;                                        // total supply of Ocean tokens including initial tokens plus block rewards
+    address public _receiver = address(0);                           // address to receive TOKENS
+    uint256 public totalSupply;                                      // total supply of Ocean tokens including initial tokens plus block rewards
 
     /**
     * @dev OceanToken Constructor

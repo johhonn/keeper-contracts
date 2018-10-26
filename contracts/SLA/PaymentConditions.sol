@@ -97,7 +97,10 @@ contract PaymentConditions {
         serviceAgreementStorage.fulfillCondition(serviceId, this.refundPayment.selector, valueHash);
         // transfer from this contract to consumer/msg.sender
         require(token.approve(address(this), payments[serviceId].amount), 'Can not approve token operation');
-        require(token.transferFrom(payments[serviceId].receiver, payments[serviceId].sender, payments[serviceId].amount), 'Can not refund payment');
+        require(
+            token.transferFrom(payments[serviceId].receiver, payments[serviceId].sender, payments[serviceId].amount),
+            'Can not refund payment'
+        );
         emit PaymentRefund(serviceId, payments[serviceId].receiver, payments[serviceId].sender, payments[serviceId].amount);
     }
 }
