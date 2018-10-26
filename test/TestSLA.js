@@ -62,18 +62,17 @@ contract('ServiceAgreement', (accounts) => {
             )
             // Grab `SetupAgreementTemplate` event to fetch the serviceTemplateId
             const templateId = testUtils.getEventArgsFromTx(setupTx, 'SetupAgreementTemplate').serviceTemplateId
-            console.log('templateid: ', templateId)
+            // console.log('templateid: ', templateId)
             const slaMsgHash = testUtils.createSLAHash(
                 web3, templateId, testUtils.generateConditionsKeys(templateId, contracts, funcFingerPrints),
                 valuesHashList, timeouts
             )
             signature = await web3.eth.sign(slaMsgHash, consumer)
-            console.log('aaaaaaaaaaaaa')
             // Start a purchase, i.e. execute the service agreement
             serviceId = await testUtils.signAgreement(
                 sla, templateId, signature, consumer, valuesHashList, timeouts, fromProvider
             )
-            console.log('serviceId: ', serviceId)
+            // console.log('serviceId: ', serviceId)
             // console.log(execAgrArgs)
         })
 
