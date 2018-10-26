@@ -23,7 +23,7 @@ contract('ServiceAgreement', (accounts) => {
         const resourceName = 'self-driving ai data'
         const serviceName = resourceName
         let timeouts = [0, 0, 0, 3]
-        const dependencies = [0, 4, 16, (2**6) | (2**7)] // dependency bit | timeout bit
+        const dependencies = [0, 4, 16, (2 ** 6) | (2 ** 7)] // dependency bit | timeout bit
         before(async () => {
             token = await OceanToken.new()
             // await token.setReceiver(consumer)
@@ -59,7 +59,7 @@ contract('ServiceAgreement', (accounts) => {
             const setupTx = await sla.setupAgreementTemplate(
                 contracts, funcFingerPrints, dependencies,
                 web3.utils.fromAscii(serviceName), fromProvider
-                )
+            )
             // Grab `SetupAgreementTemplate` event to fetch the serviceTemplateId
             const templateId = testUtils.getEventArgsFromTx(setupTx, 'SetupAgreementTemplate').serviceTemplateId
             console.log('templateid: ', templateId)
@@ -87,11 +87,11 @@ contract('ServiceAgreement', (accounts) => {
             console.log('lockpayment event: ', testUtils.getEventArgsFromTx(payTx, 'PaymentLocked').serviceId)
 
             // grant access
-            const gaccTx = await accessConditions.grantAccess(serviceId, resourceId, fromProvider)
+            await accessConditions.grantAccess(serviceId, resourceId, fromProvider)
             // console.log('accessgranted event: ', testUtils.getEventArgsFromTx(gaccTx, 'AccessGranted').serviceId)
 
             // release payment
-            const releaseTx = await paymentConditions.releasePayment(serviceId, resourceId, resourcePrice, fromProvider)
+            await paymentConditions.releasePayment(serviceId, resourceId, resourcePrice, fromProvider)
             // console.log('releasepayment event: ', testUtils.getEventArgsFromTx(releaseTx, 'PaymentReleased').serviceId)
 
             // const refundTx = await paymentConditions.refundPayment(serviceId, resourceId, resourcePrice, fromConsumer)
