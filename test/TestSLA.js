@@ -1,4 +1,4 @@
-/* global artifacts, contract, describe, it */
+/* global assert, artifacts, contract, before, describe, it */
 /* eslint-disable no-console, max-len */
 
 const OceanToken = artifacts.require('OceanToken.sol')
@@ -18,90 +18,105 @@ const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 
 contract('ServiceAgreement', (accounts) => {
     describe('Test On-chain Authorization', () => {
-        it('Should walk through setup of SLA', async () => {
-            const token = await OceanToken.deployed()
-            const market = await OceanMarket.deployed()
-            const sla = await SLA.deployed()
-            const paymentConditions = await PaymentCtrl.deployed()
-            const accessConditions = await AccessCtrl.deployed()
+        let token, market, sla, paymentConditions, accessConditions, resourceId, valuesHashList, signature, serviceId
+        let funcFingerPrints, contracts
+        const provider = accounts[0]
+        const consumer = accounts[1]
+        const scale = 10 ** 18
+        const resourcePrice = 3
+        const resourceName = 'self-driving ai data'
+        const serviceName = resourceName
+        let timeouts = [0, 0, 0, 3]
+        const dependencies = [0, 4, 16, (2**6)/*dependency bit*/ | (2**7)/*timeout bit*/]
 
-            const provider = accounts[0]
-            const consumer = accounts[1]
+        before(async () => {
 
-            const scale = 10 ** 18
+            token = await OceanToken.new()
+            // await token.setReceiver(consumer)
+            market = await OceanMarket.new(token.address)
+            sla = await SLA.new()
+            paymentConditions = await PaymentCtrl.new(sla.address, token.address)
+            accessConditions = await AccessCtrl.new(sla.address)
 
             // Do some preperations: give consumer funds, add an asset
             // consumer request initial funds to play
             console.log(consumer)
-            await market.requestTokens(testUtils.toBigNumber(1000 * scale), { from: consumer })
-            await market.requestTokens(testUtils.toBigNumber(1000 * scale), { from: provider })
+            await market.requestTokens(testUtils.toBigNumber(1000 * scale), {from: consumer})
+            await market.requestTokens(testUtils.toBigNumber(1000 * scale), {from: provider})
             const bal = await token.balanceOf.call(consumer)
             console.log(`consumer has balance := ${bal.valueOf() / scale} now`)
 
             // register dataset
-            const resourceName = 'resource'
-            const resourceId = await market.generateId(resourceName, { from: provider })
-            const resourcePrice = 100 * scale
-            await market.register(resourceId, testUtils.toBigNumber(resourcePrice), { from: provider })
+            resourceId = await market.generateId(resourceName, {from: provider})
+            await market.register(resourceId, testUtils.toBigNumber(resourcePrice), {from: provider})
             console.log('publisher registers asset with id = ', resourceId)
 
-            // Provider setup SLA on-chain
-            const contracts = [paymentConditions.address, accessConditions.address, paymentConditions.address]
-            const funcFingerPrints = [
-                web3.utils.sha3('lockPayment(bytes32 , uint256 , bytes32 , bytes32 )').slice(0, 10),
-                web3.utils.sha3('grantAccess(bytes32 , bytes32 )').slice(0, 10),
-                web3.utils.sha3('releasePayment(bytes32 , bytes32 )').slice(0, 10)]
-
+            contracts = [paymentConditions.address, accessConditions.address, paymentConditions.address, paymentConditions.address]
+            funcFingerPrints = [
+                testUtils.getSelector(web3, paymentConditions, 'lockPayment'),
+                testUtils.getSelector(web3, accessConditions, 'grantAccess'),
+                testUtils.getSelector(web3, paymentConditions, 'releasePayment'),
+                testUtils.getSelector(web3, paymentConditions, 'refundPayment')
+            ]
+            valuesHashList = [
+                testUtils.valueHash(['bytes32', 'uint256'], [resourceId, resourcePrice]),
+                testUtils.valueHash(['bytes32'], [resourceId]),
+                testUtils.valueHash(['bytes32', 'uint256'], [resourceId, resourcePrice]),
+                testUtils.valueHash(['bytes32', 'uint256'], [resourceId, resourcePrice])]
             console.log('conditions control contracts', contracts)
-            console.log('functions: ', funcFingerPrints)
-            const serviceName = 'doService'
-            const dependencies = [0, 1, 2]
-            const setupTx = await sla.setupAgreementTemplate(contracts, funcFingerPrints, dependencies, serviceName, { from: provider })
+            console.log('functions: ', funcFingerPrints, valuesHashList)
+
+            const setupTx = await sla.setupAgreementTemplate(
+                contracts, funcFingerPrints, dependencies,
+                web3.utils.fromAscii(serviceName), {from: provider}
+                )
             // Grab `SetupAgreementTemplate` event to fetch the serviceTemplateId
             const templateId = testUtils.getEventArgsFromTx(setupTx, 'SetupAgreementTemplate').serviceTemplateId
-
             console.log('templateid: ', templateId)
-            // 1. consumer request access to asset
-            // consumer approve market to withdraw amount of token from his account
-            // await token.approve(market.address, testUtils.toBigNumber(200 * scale), { from: consumer })
-            const conditionsKeys = testUtils.generateConditionsKeys(templateId, contracts, funcFingerPrints)
-            const slaMsgHash = testUtils.createSLAHash(web3, templateId, conditionsKeys)
-            const signature = await web3.eth.sign(slaMsgHash, consumer)
 
-            // Start a purchase, i.e. execute the service agreement
-            const execSLATx = await sla.executeAgreement(
-                templateId, signature, consumer, { from: provider }
+            const slaMsgHash = testUtils.createSLAHash(
+                web3, templateId, testUtils.generateConditionsKeys(templateId, contracts, funcFingerPrints),
+                valuesHashList, timeouts
             )
-            const execAgrArgs = testUtils.getEventArgsFromTx(execSLATx, 'ExecuteAgreement')
-            const { serviceId } = execAgrArgs.serviceId
-            console.log('serviceId: ', serviceId)
-            console.log(execAgrArgs)
+            signature = await web3.eth.sign(slaMsgHash, consumer)
 
-            // Check status of sla
-            // const tx = await sla.fulfillAgreement(serviceId)
-            const canlock = !(await sla.hasUnfulfilledDependencies(serviceId, conditionsKeys[0]))
-            console.log('canLock: ', canlock)
-            const canAccess = !(await sla.hasUnfulfilledDependencies(serviceId, conditionsKeys[1]))
-            console.log('canAccess: ', canAccess)
-            const canRelease = !(await sla.hasUnfulfilledDependencies(serviceId, conditionsKeys[2]))
-            console.log('canRelease: ', canRelease)
+            console.log('aaaaaaaaaaaaa')
+            // Start a purchase, i.e. execute the service agreement
+            serviceId = await testUtils.signAgreement(
+                sla, templateId, signature, consumer, valuesHashList, timeouts, {from: provider}
+            )
+            console.log('serviceId: ', serviceId)
+            // console.log(execAgrArgs)
+
+        })
+
+        it('Consume asset happy path', async () => {
 
             // try to get access before lock payment, should fail
             // TODO:
 
             // Submit payment via the PaymentConditions contract
             // grab event of payment locked
-            await token.approve(paymentConditions.address, testUtils.toBigNumber(200 * scale), { from: consumer })
-            const payTx = await paymentConditions.lockPayment(serviceId, { from: consumer })
+            await token.approve(paymentConditions.address, testUtils.toBigNumber(200 * scale), {from: consumer})
+            const payTx = await paymentConditions.lockPayment(serviceId, resourceId, resourcePrice, {from: consumer})
             console.log('lockpayment event: ', testUtils.getEventArgsFromTx(payTx, 'PaymentLocked').serviceId)
 
             // grant access
-            const gaccTx = await accessConditions.grantAccess(serviceId, resourceId, { from: provider })
-            console.log('accessgranted event: ', testUtils.getEventArgsFromTx(gaccTx, 'AccessGranted').serviceId)
+            const gaccTx = await accessConditions.grantAccess(serviceId, resourceId, {from: provider})
+            // console.log('accessgranted event: ', testUtils.getEventArgsFromTx(gaccTx, 'AccessGranted').serviceId)
 
             // release payment
-            const releaseTx = await paymentConditions.releasePayment(serviceId, { from: provider })
-            console.log('releasepayment event: ', testUtils.getEventArgsFromTx(releaseTx, 'PaymentReleased').serviceId)
+            const releaseTx = await paymentConditions.releasePayment(serviceId, resourceId, resourcePrice, {from: provider})
+            // console.log('releasepayment event: ', testUtils.getEventArgsFromTx(releaseTx, 'PaymentReleased').serviceId)
+
+            // const refundTx = await paymentConditions.refundPayment(serviceId, resourceId, resourcePrice, {from: consumer})
+            // console.log('releasepayment event: ', testUtils.getEventArgsFromTx(releaseTx, 'PaymentRefund').serviceId)
         })
+
+        it('Consume asset with Refund', async () => {
+            console.log('refund ...')
+
+        })
+
     })
 })

@@ -38,8 +38,15 @@ contract PaymentConditions {
         address receiver,
         uint256 amount
     );
+    event PaymentRefund(
+        bytes32 indexed serviceId,
+        address sender,
+        address receiver,
+        uint256 amount
+    );
 
     function lockPayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
+        require(serviceAgreementStorage.getServiceAgreementConsumer(serviceId) == msg.sender, 'Only consumer can trigger releasePayment.');
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.lockPayment.selector);
 
         if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition))
@@ -59,6 +66,7 @@ contract PaymentConditions {
     }
 
     function releasePayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
+        require(serviceAgreementStorage.getAgreementOwner(serviceId) == msg.sender, 'Only service provider can trigger releasePayment.');
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.releasePayment.selector);
         if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition))
             return false;
@@ -73,5 +81,23 @@ contract PaymentConditions {
         require(token.approve(address(this), payments[serviceId].amount), 'Can not approve token operation');
         require(token.transferFrom(payments[serviceId].receiver, msg.sender, payments[serviceId].amount), 'Can not release payment');
         emit PaymentReleased(serviceId, payments[serviceId].receiver, msg.sender, payments[serviceId].amount);
+    }
+
+    function refundPayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
+        require(payments[serviceId].sender == msg.sender, 'Only consumer can trigger refundPayment.');
+        bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.refundPayment.selector);
+        if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition))
+            return false;
+
+        if (serviceAgreementStorage.getConditionStatus(serviceId, condition) == 1)
+            return true;
+
+        bytes32 valueHash = keccak256(abi.encodePacked(assetId, price));
+
+        serviceAgreementStorage.fulfillCondition(serviceId, this.refundPayment.selector, valueHash);
+        // transfer from this contract to consumer/msg.sender
+        require(token.approve(address(this), payments[serviceId].amount), 'Can not approve token operation');
+        require(token.transferFrom(payments[serviceId].receiver, payments[serviceId].sender, payments[serviceId].amount), 'Can not refund payment');
+        emit PaymentRefund(serviceId, payments[serviceId].receiver, payments[serviceId].sender, payments[serviceId].amount);
     }
 }
