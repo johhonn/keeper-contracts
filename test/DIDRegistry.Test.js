@@ -25,7 +25,7 @@ contract('DIDRegistry', (accounts) => {
             const payload = result.logs[0].args
             assert.strictEqual('did:ocn:test-attr', web3.utils.hexToString(payload.did))
             assert.strictEqual(accounts[0], payload.owner)
-            assert.strictEqual(0, web3.utils.toDecimal(payload._type))
+            assert.strictEqual(0, web3.utils.toDecimal(payload.valueType))
             assert.strictEqual('provider', web3.utils.hexToString(payload.key))
             assert.strictEqual(providerDID, payload.value)
         })
@@ -41,16 +41,13 @@ contract('DIDRegistry', (accounts) => {
 
             utils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
-            // get struct data
-            const data = await registry.didRegister(did)
-
             // get owner for a did
             const owner = await registry.getOwner(did)
-            assert.strictEqual(data[0], owner)
+            assert.strictEqual(accounts[0], owner)
 
             // get the blockNumber for the last update
             const blockNumber = await registry.getUpdateAt(did)
-            assert.deepEqual(data[1], blockNumber)
+            assert(blockNumber > 0)
 
             // filter on the blockNumber only
             const filterOptions = {
@@ -67,7 +64,7 @@ contract('DIDRegistry', (accounts) => {
                         const logItem = logItems[logItems.length - 1]
                         assert.strictEqual(did, logItem.returnValues.did)
                         assert.strictEqual(owner, logItem.returnValues.owner)
-                        assert.strictEqual(0, web3.utils.toDecimal(logItem.returnValues._type))
+                        assert.strictEqual(0, web3.utils.toDecimal(logItem.returnValues.valueType))
                         assert.strictEqual('provider', web3.utils.hexToString(logItem.returnValues.key))
                         assert.strictEqual(providerDID, logItem.returnValues.value)
                     }
@@ -123,7 +120,7 @@ contract('DIDRegistry', (accounts) => {
             const payload = result.logs[0].args
             assert.strictEqual('did:ocn:test-multiple-attrs', web3.utils.hexToString(payload.did))
             assert.strictEqual(accounts[0], payload.owner)
-            assert.strictEqual(0, web3.utils.toDecimal(payload._type))
+            assert.strictEqual(0, web3.utils.toDecimal(payload.valueType))
             assert.strictEqual('name', web3.utils.hexToString(payload.key))
             assert.strictEqual(name, payload.value)
         })
