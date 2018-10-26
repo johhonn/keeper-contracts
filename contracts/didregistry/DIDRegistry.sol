@@ -18,7 +18,7 @@ contract DIDRegistry is Ownable {
     event DIDAttributeRegistered(
         bytes32 indexed did,
         address indexed owner,
-        ValueType _type,
+        ValueType valueType,
         bytes32 indexed key,
         string value,
         uint updatedAt
