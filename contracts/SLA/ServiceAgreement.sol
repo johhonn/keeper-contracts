@@ -54,8 +54,12 @@ contract ServiceAgreement {
     // check if the controller contract is authorized to change the condition state
     modifier isValidControllerHandler(bytes32 serviceId, bytes4 fingerprint, bytes32 valueHash) {
         bytes32 conditionKey = getConditionByFingerprint(serviceId, msg.sender, fingerprint);
-        require(agreements[serviceId].conditionInstances[conditionKeyToIndex[conditionKey]] == keccak256(abi.encodePacked(conditionKey, valueHash)), 'unable to reconstruct the right condition hash');
-        require(agreements[serviceId].conditionLockedState[conditionKeyToIndex[conditionKey]] == 0);
+        require(
+            agreements[serviceId].conditionInstances[conditionKeyToIndex[conditionKey]] ==
+            keccak256(abi.encodePacked(conditionKey, valueHash)),
+            'unable to reconstruct the right condition hash'
+        );
+        require(agreements[serviceId].conditionLockedState[conditionKeyToIndex[conditionKey]] == 0, 'This condition is locked, access denied.');
         require(!hasUnfulfilledDependencies(serviceId, conditionKey), 'This condition has unfulfilled dependency');
         _;
     }
@@ -79,7 +83,8 @@ contract ServiceAgreement {
     event PrefixedHash(bytes32 hash, bool status, bytes32 sid);
 
     // Setup service agreement template only once!
-    function setupAgreementTemplate(address[] contracts, bytes4[] fingerprints, uint256[] dependenciesBits, bytes32 service) public returns (bool){
+    function setupAgreementTemplate(address[] contracts, bytes4[] fingerprints, uint256[] dependenciesBits, bytes32 service)
+    public returns (bool){
         // TODO: whitelisting the contracts/fingerprints
         require(contracts.length == fingerprints.length, 'fingerprints and contracts length do not match');
         require(contracts.length == dependenciesBits.length, 'contracts and dependencies do not match');
@@ -118,11 +123,16 @@ contract ServiceAgreement {
 
         // verify consumer's signature and trigger the execution of agreement
         if(isValidSignature(prefixedHash, signature, consumer)){
-            agreements[serviceAgreementId] = Agreement(false, new uint8[] (0), new uint8[] (0), templateId, consumer, new bytes32[] (0), new uint256[] (0));
+            agreements[serviceAgreementId] = Agreement(
+                false, new uint8[] (0), new uint8[] (0), templateId, consumer, new bytes32[] (0), new uint256[] (0)
+            );
             for(uint256 i = 0; i < slaTemplate.conditionKeys.length; i++){
                 if(timeoutValues[i] != 0){
                     // TODO: define dynamic margin
-                    require(timeoutValues[i] > 2, 'invalid timeout with a margin (~ 30 to 40 seconds = 2 blocks intervals) to avoid race conditions');
+                    require(
+                        timeoutValues[i] > 2,
+                        'invalid timeout with a margin (~ 30 to 40 seconds = 2 blocks intervals) to avoid race conditions'
+                    );
                     agreements[serviceAgreementId].timeoutValues.push(block.timestamp + timeoutValues[i]);
                 }else{
                     agreements[serviceAgreementId].timeoutValues.push(0);
@@ -132,7 +142,10 @@ contract ServiceAgreement {
 
                 // add condition instances
                 agreements[serviceAgreementId].conditionInstances.push(keccak256(abi.encodePacked(slaTemplate.conditionKeys[i], valueHash[i])));
-                emit ExecuteCondition(serviceAgreementId, keccak256(abi.encodePacked(slaTemplate.conditionKeys[i], valueHash[i])), false, slaTemplate.owner, consumer);
+                emit ExecuteCondition(
+                    serviceAgreementId, keccak256(abi.encodePacked(slaTemplate.conditionKeys[i], valueHash[i])),
+                    false, slaTemplate.owner, consumer
+                );
             }
             templateId2Agreements[templateId].push(serviceAgreementId);
             emit ExecuteAgreement(serviceAgreementId, templateId, false, slaTemplate.owner, consumer, true);
@@ -168,8 +181,8 @@ contract ServiceAgreement {
         return true;
     }
 
-//    function setConditionStatus(bytes32 serviceId, bytes4 fingerprint, bytes32 valueHash) public isValidControllerHandler(serviceId, fingerprint, valueHash) returns (bool){
-    function fulfillCondition(bytes32 serviceId, bytes4 fingerprint, bytes32 valueHash) public isValidControllerHandler(serviceId, fingerprint, valueHash) returns (bool){
+    function fulfillCondition(bytes32 serviceId, bytes4 fingerprint, bytes32 valueHash)
+    public isValidControllerHandler(serviceId, fingerprint, valueHash) returns (bool){
         bytes32 conditionKey = keccak256(abi.encodePacked(agreements[serviceId].templateId, msg.sender, fingerprint));
         agreements[serviceId].conditionsState[conditionKeyToIndex[conditionKey]] = 1;
         // Lock dependencies of this condition
@@ -194,7 +207,7 @@ contract ServiceAgreement {
         return templates[templateId].state;
     }
 
-    function getBitValue(uint256 value, uint16 i, uint16 bitPosition, uint16 numBits) pure private returns(uint8 bitValue) {
+    function getBitValue(uint256 value, uint16 i, uint16 bitPosition, uint16 numBits) private pure returns(uint8 bitValue) {
         return uint8(value & (2**uint256((i*numBits)+bitPosition))) == 0 ? uint8(0) : uint8(1);
     }
 
@@ -202,10 +215,10 @@ contract ServiceAgreement {
         // check the dependency conditions
         for (uint16 i = 0; i < templates[agreements[serviceId].templateId].conditionKeys.length; i++) {
             if(getBitValue(dependenciesValue, i, 0, 2) != 0) {
-                // This is a dependency, lock
+                // This is a dependency, lock it
                 // verify its state is either 1 or has timed out
                 uint8 timeoutFlag = getBitValue(dependenciesValue, i, 1, 2);
-                require((agreements[serviceId].conditionsState[i] == 1) || ((timeoutFlag == 1) && conditionTimedOut(serviceId, condition)));
+                require((agreements[serviceId].conditionsState[i] == 1) || ((timeoutFlag == 1) && conditionTimedOut(serviceId, condition)), 'Invalid state, child dependency expected to be fulfilled or parent timeout occurred.');
                 agreements[serviceId].conditionLockedState[i] = 1;
             }
         }
