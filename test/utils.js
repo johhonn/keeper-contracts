@@ -144,6 +144,9 @@ const utils = {
         return result.logs.filter((log) => {
             return log.event === 'ExecuteAgreement'
         })[0].args.serviceId
+    },
+    sleep: (millis) => {
+        return new Promise(resolve => setTimeout(resolve, millis))
     }
 }
 

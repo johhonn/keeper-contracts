@@ -74,7 +74,7 @@ contract('PaymentConditions', (accounts) => {
 
             const lockPaymentHash = utils.valueHash(['bytes32', 'uint256'], [asset, price])
             const releasePaymentHash = utils.valueHash(['bytes32', 'uint256'], [asset, price])
-            const grantAccessHash = utils.valueHash(['bytes32'], [asset])
+            const grantAccessHash = utils.valueHash(['bytes32', 'bytes32'], [asset, asset])
 
             hashes = [grantAccessHash, lockPaymentHash, releasePaymentHash]
 
@@ -115,6 +115,7 @@ contract('PaymentConditions', (accounts) => {
 
             await accessConditions.grantAccess(
                 serviceId,
+                asset,
                 asset
             )
 
@@ -131,6 +132,7 @@ contract('PaymentConditions', (accounts) => {
 
             await accessConditions.grantAccess(
                 serviceId,
+                asset,
                 asset
             )
 
@@ -164,6 +166,7 @@ contract('PaymentConditions', (accounts) => {
 
             await accessConditions.grantAccess(
                 serviceId,
+                asset,
                 asset
             )
             await paymentConditions.lockPayment(serviceId, asset, price)
@@ -182,6 +185,7 @@ contract('PaymentConditions', (accounts) => {
 
             await accessConditions.grantAccess(
                 serviceId,
+                asset,
                 asset
             )
             await paymentConditions.lockPayment(serviceId, asset, price)

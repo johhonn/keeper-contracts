@@ -13,7 +13,7 @@ const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 
 contract('ServiceAgreement', (accounts) => {
     describe('Test On-chain Authorization', () => {
-        let token, market, sla, paymentConditions, accessConditions, resourceId, valuesHashList, signature, serviceId
+        let token, market, sla, paymentConditions, accessConditions, resourceId, valuesHashList, signature, serviceId, conditionKeys, templateId
         let funcFingerPrints, contracts
         const provider = accounts[0]
         const consumer = accounts[1]
@@ -23,7 +23,7 @@ contract('ServiceAgreement', (accounts) => {
         const resourceName = 'self-driving ai data'
         const serviceName = resourceName
         let timeouts = [0, 0, 0, 3]
-        const dependencies = [0, 4, 16, (2 ** 6) | (2 ** 7)] // dependency bit | timeout bit
+        const dependencies = [0, 1, 4, 1 | 2**4 | 2**5] // dependency bit | timeout bit
         before(async () => {
             token = await OceanToken.new()
             // await token.setReceiver(consumer)
@@ -51,7 +51,7 @@ contract('ServiceAgreement', (accounts) => {
             ]
             valuesHashList = [
                 testUtils.valueHash(['bytes32', 'uint256'], [resourceId, resourcePrice]),
-                testUtils.valueHash(['bytes32'], [resourceId]),
+                testUtils.valueHash(['bytes32', 'bytes32'], [resourceId, resourceId]),
                 testUtils.valueHash(['bytes32', 'uint256'], [resourceId, resourcePrice]),
                 testUtils.valueHash(['bytes32', 'uint256'], [resourceId, resourcePrice])]
             console.log('conditions control contracts', contracts)
@@ -61,44 +61,76 @@ contract('ServiceAgreement', (accounts) => {
                 web3.utils.fromAscii(serviceName), fromProvider
             )
             // Grab `SetupAgreementTemplate` event to fetch the serviceTemplateId
-            const templateId = testUtils.getEventArgsFromTx(setupTx, 'SetupAgreementTemplate').serviceTemplateId
+            templateId = testUtils.getEventArgsFromTx(setupTx, 'SetupAgreementTemplate').serviceTemplateId
+
             // console.log('templateid: ', templateId)
+            conditionKeys = testUtils.generateConditionsKeys(templateId, contracts, funcFingerPrints)
+            console.log('conditions: ', conditionKeys)
             const slaMsgHash = testUtils.createSLAHash(
-                web3, templateId, testUtils.generateConditionsKeys(templateId, contracts, funcFingerPrints),
+                web3, templateId, conditionKeys,
                 valuesHashList, timeouts
             )
             signature = await web3.eth.sign(slaMsgHash, consumer)
             // Start a purchase, i.e. execute the service agreement
-            serviceId = await testUtils.signAgreement(
-                sla, templateId, signature, consumer, valuesHashList, timeouts, fromProvider
-            )
-            // console.log('serviceId: ', serviceId)
-            // console.log(execAgrArgs)
+            // serviceId = await testUtils.signAgreement(
+            //     sla, templateId, signature, consumer, valuesHashList, timeouts, fromProvider
+            // )
         })
 
         it('Consume asset happy path', async () => {
-            // try to get access before lock payment, should fail
-            // TODO:
-            // Submit payment via the PaymentConditions contract
-            // grab event of payment locked
+            serviceId = await testUtils.signAgreement(
+                sla, templateId, signature, consumer, valuesHashList, timeouts, fromProvider
+            )
             await token.approve(paymentConditions.address, testUtils.toBigNumber(200), fromConsumer)
             const payTx = await paymentConditions.lockPayment(serviceId, resourceId, resourcePrice, fromConsumer)
             console.log('lockpayment event: ', testUtils.getEventArgsFromTx(payTx, 'PaymentLocked').serviceId)
 
+            const locked = await sla.getConditionStatus(serviceId, conditionKeys[0])
+            console.log('locked: ', locked.toNumber())
+            const hasPermission = await accessConditions.checkAssetPermission(resourceId, consumer)
+            console.log('consumer permission: ', hasPermission)
             // grant access
-            await accessConditions.grantAccess(serviceId, resourceId, fromProvider)
-            // console.log('accessgranted event: ', testUtils.getEventArgsFromTx(gaccTx, 'AccessGranted').serviceId)
+            const dep = await sla.hasUnfulfilledDependencies(serviceId, conditionKeys[1]);
+            console.log('has dependencies: ', dep)
+
+            const gaccTx = await accessConditions.grantAccess(serviceId, resourceId, resourceId, fromProvider)
+            console.log('accessgranted event: ', testUtils.getEventArgsFromTx(gaccTx, 'AccessGranted').serviceId)
+            const hasPermission1 = await accessConditions.checkAssetPermission(resourceId, consumer)
+            console.log('consumer permission: ', hasPermission1)
 
             // release payment
-            await paymentConditions.releasePayment(serviceId, resourceId, resourcePrice, fromProvider)
-            // console.log('releasepayment event: ', testUtils.getEventArgsFromTx(releaseTx, 'PaymentReleased').serviceId)
+            const releaseTx = await paymentConditions.releasePayment(serviceId, resourceId, resourcePrice, fromProvider)
+            console.log('releasepayment event: ', testUtils.getEventArgsFromTx(releaseTx, 'PaymentReleased').serviceId)
 
-            // const refundTx = await paymentConditions.refundPayment(serviceId, resourceId, resourcePrice, fromConsumer)
-            // console.log('releasepayment event: ', testUtils.getEventArgsFromTx(releaseTx, 'PaymentRefund').serviceId)
+            try {
+                await paymentConditions.refundPayment(serviceId, resourceId, resourcePrice, fromConsumer)
+            } catch (err) {
+                console.log('\t >> Good, refund is denied as expected.')
+            }
+
         })
 
         it('Consume asset with Refund', async () => {
-            console.log('refund ...')
+            serviceId = await testUtils.signAgreement(
+                sla, templateId, signature, consumer, valuesHashList, timeouts, fromProvider
+            )
+            try {
+                await paymentConditions.refundPayment(serviceId, resourceId, resourcePrice, fromConsumer)
+            } catch (err) {
+                console.log('\t >> Good, refund is denied as expected since payment is not locked yet.')
+            }
+
+            await token.approve(paymentConditions.address, testUtils.toBigNumber(200), fromConsumer)
+            const payTx = await paymentConditions.lockPayment(serviceId, resourceId, resourcePrice, fromConsumer)
+            console.log('lockpayment event: ', testUtils.getEventArgsFromTx(payTx, 'PaymentLocked').serviceId)
+            // Now refund should go through, after timeout
+            await testUtils.sleep(4000)
+            try {
+                const refundTx = await paymentConditions.refundPayment(serviceId, resourceId, resourcePrice, fromConsumer)
+                console.log('refundPayment event: ', testUtils.getEventArgsFromTx(refundTx, 'PaymentRefund').serviceId)
+            } catch (err) {
+                console.log('\t >> Error: refund is denied, this should not occur.', err.message)
+            }
         })
     })
 })
