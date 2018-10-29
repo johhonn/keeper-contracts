@@ -21,9 +21,9 @@
     "lint": "npm run lint:eslint && npm run lint:solium",
     "lint:eslint": "eslint --ignore-pattern '/coverage/' .",
     "lint:solium": "solium -d ./contracts/",
-    "lint:solium:watch": "solium -d ./contracts/ --watch",
+    "lint:solium:watch": "npm run lint:solium -- --watch",
     "lint:mythril": "truffle compile && myth -x --truffle --max-depth 8 --outform markdown > mythril-report.md",
-    "lint:fix": "eslint --fix ./**/*.js && ./node_modules/solium/bin/solium.js -d ./contracts/ --fix"
+    "lint:fix": "npm run lint:eslint -- --fix && npm run lint:solium -- --fix"
   },
   "directories": {
     "doc": "doc",
@@ -43,13 +43,16 @@
   "devDependencies": {
     "babel-eslint": "^10.0.1",
     "babel-preset-env": "^1.7.0",
+    "bignumber": "^1.1.0",
     "bignumber.js": "^7.2.1",
-    "eslint": "^5.7.0",
+    "eslint": "^5.8.0",
     "eslint-config-oceanprotocol": "^1.2.0",
     "eslint-config-standard": "^12.0.0",
+    "eslint-config-standard-react": "^7.0.2",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-node": "^7.0.1",
     "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-react": "^7.11.1",
     "eslint-plugin-security": "^1.4.0",
     "eslint-plugin-standard": "^4.0.0",
     "ethereumjs-abi": "^0.6.5",
@@ -67,13 +70,13 @@
     "truffle-hdwallet-provider": "^1.0.0-web3one.0",
     "ursa": "^0.9.4",
     "web3": "1.0.0-beta.36",
+    "web3-eth-abi": "^1.0.0-beta.36",
     "web3-utils": "^1.0.0-beta.36"
   },
   "engines": {
     "node": ">=8.11.1"
   },
   "dependencies": {
-    "bignumber": "^1.1.0",
-    "web3-eth-abi": "^1.0.0-beta.36"
+    "jslint": "^0.12.0"
   }
 }

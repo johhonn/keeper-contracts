@@ -19,6 +19,14 @@ setup_requirements = []
 
 test_requirements = []
 
+# Add the ABI Json artifacts
+data_files = []
+directories = glob('artifacts/*.json')
+for directory in directories:
+    files = glob(directory+'*')
+    print("Contract artifact found:",directory, files)
+    data_files.append((directory, files))
+
 setup(
     author="leucothia",
     author_email='devops@oceanprotocol.com',
@@ -32,9 +40,7 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     description=" 🐳 Integration of TCRs, CPM and Ocean Tokens in Solidity",
-    data_files=[
-        ('contracts', glob('build/contracts/*.json')),
-    ],
+    data_files=data_files,
     install_requires=requirements,
     license="Apache Software License 2.0",
     long_description=readme,
@@ -45,7 +51,7 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/oceanprotocol/keeper-contracts',
-    version='0.1.1',
+    version='0.3.3b',
     zip_safe=False,
 )
 
