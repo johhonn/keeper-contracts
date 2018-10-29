@@ -121,12 +121,16 @@ contract('SLA', (accounts) => {
                 2) Array of Condition Keys
                 3) Array of Controller Methods inputs hash (valueHash)
                 4) Array of timeout for each condition in terms of blocks
+                5) bytes32 service_definition_id (id of service in DID)
+                6) bytes32 DID --> refer to the off-chain DID document
             */
 
             // generate template fingerprint including all the conditions and
-            const hash = utils.createSLAHash(web3, templateId, condKeys, valHashList, timeoutValues)
+            const DID = '0x315f158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
+            const serviceDefinitionId = '0x515f158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b894'
+            const hash = utils.createSLAHash(web3, templateId, condKeys, valHashList, timeoutValues, serviceDefinitionId, DID)
             const signature = await web3.eth.sign(hash, consumer)
-            const val = await sla.executeAgreement(templateId, signature, consumer, [ valHashList[0], valHashList[1], valHashList[2], valHashList[3] ], timeoutValues, { from: SLATemplateOwner })
+            const val = await sla.executeAgreement(templateId, signature, consumer, [ valHashList[0], valHashList[1], valHashList[2], valHashList[3] ], timeoutValues, serviceDefinitionId, DID, { from: SLATemplateOwner })
             assert.strictEqual(val.logs[4].args.state, true, 'Execute Agreement should return true')
             console.log('\x1b[36m%s\x1b[0m', '\t >> Service Agreement ID: ', val.logs[4].args.serviceId, ' ... Done!')
 
