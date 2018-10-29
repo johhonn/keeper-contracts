@@ -26,6 +26,8 @@ contract ServiceAgreement {
         // condition Instance = [handler + value hash]
         bytes32[] conditionInstances;
         uint256[] timeoutValues; // in terms of block number not sec!
+        bytes32 serviceDefinition;
+        bytes32 DID;
     }
 
     mapping(bytes32 => ServiceAgreementTemplate) templates;
@@ -111,20 +113,20 @@ contract ServiceAgreement {
         return keccak256(abi.encodePacked(prefix, hash));
     }
 
-    function executeAgreement(bytes32 templateId, bytes signature, address consumer, bytes32[] valueHash, uint256[] timeoutValues) public
+    function executeAgreement(bytes32 templateId, bytes signature, address consumer, bytes32[] valueHash, uint256[] timeoutValues, bytes32 serviceDefinition, bytes32 did) public
     isOwner(templateId) returns (bool) {
         require(timeoutValues.length == templates[templateId].conditionKeys.length, 'invalid timeout values length');
         ServiceAgreementTemplate storage slaTemplate = templates[templateId];
         require(slaTemplate.state == true, 'Template is revoked');
         // reconstruct the agreement fingerprint and check the consumer signature
-        bytes32 prefixedHash = generatePrefixHash(keccak256(abi.encodePacked(templateId, slaTemplate.conditionKeys, valueHash, timeoutValues)));
+        bytes32 prefixedHash = generatePrefixHash(keccak256(abi.encodePacked(templateId, slaTemplate.conditionKeys, valueHash, timeoutValues, serviceDefinition, did)));
 
         bytes32 serviceAgreementId = keccak256(abi.encodePacked(templateId, consumer, block.number, prefixedHash));
 
         // verify consumer's signature and trigger the execution of agreement
         if (isValidSignature(prefixedHash, signature, consumer)) {
             agreements[serviceAgreementId] = Agreement(
-                false, new uint8[](0), new uint8[](0), templateId, consumer, new bytes32[](0), new uint256[](0)
+                false, new uint8[](0), new uint8[](0), templateId, consumer, new bytes32[](0), new uint256[](0), serviceDefinition, did
             );
             for (uint256 i = 0; i < slaTemplate.conditionKeys.length; i++) {
                 if (timeoutValues[i] != 0) {
