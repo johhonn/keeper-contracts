@@ -26,6 +26,8 @@ contract('PaymentConditions', (accounts) => {
         let fingerprints
         let dependencies
         let hashes
+        let DID
+        let serviceDefinitionId
 
         const timeouts = [0, 0, 0]
 
@@ -74,7 +76,10 @@ contract('PaymentConditions', (accounts) => {
 
             const lockPaymentHash = utils.valueHash(['bytes32', 'uint256'], [asset, price])
             const releasePaymentHash = utils.valueHash(['bytes32', 'uint256'], [asset, price])
-            const grantAccessHash = utils.valueHash(['bytes32'], [asset])
+            const grantAccessHash = utils.valueHash(['bytes32', 'bytes32'], [asset, asset])
+
+            DID = '0x315f158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
+            serviceDefinitionId = '0x515f158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b894'
 
             hashes = [grantAccessHash, lockPaymentHash, releasePaymentHash]
 
@@ -82,7 +87,9 @@ contract('PaymentConditions', (accounts) => {
                 web3, templateId,
                 utils.generateConditionsKeys(templateId, contracts, fingerprints),
                 hashes,
-                timeouts
+                timeouts,
+                serviceDefinitionId,
+                DID
             )
 
             signature = await web3.eth.sign(hash, consumer)
@@ -94,7 +101,9 @@ contract('PaymentConditions', (accounts) => {
                 signature,
                 consumer,
                 hashes,
-                timeouts
+                timeouts,
+                serviceDefinitionId,
+                DID
             )
 
             return result.logs[3].args.serviceId
@@ -115,6 +124,7 @@ contract('PaymentConditions', (accounts) => {
 
             await accessConditions.grantAccess(
                 serviceId,
+                asset,
                 asset
             )
 
@@ -131,6 +141,7 @@ contract('PaymentConditions', (accounts) => {
 
             await accessConditions.grantAccess(
                 serviceId,
+                asset,
                 asset
             )
 
@@ -164,6 +175,7 @@ contract('PaymentConditions', (accounts) => {
 
             await accessConditions.grantAccess(
                 serviceId,
+                asset,
                 asset
             )
             await paymentConditions.lockPayment(serviceId, asset, price)
@@ -182,6 +194,7 @@ contract('PaymentConditions', (accounts) => {
 
             await accessConditions.grantAccess(
                 serviceId,
+                asset,
                 asset
             )
             await paymentConditions.lockPayment(serviceId, asset, price)
