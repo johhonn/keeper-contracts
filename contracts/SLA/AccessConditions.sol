@@ -20,7 +20,7 @@ contract AccessConditions{
         serviceAgreementStorage = ServiceAgreement(_serviceAgreementAddress);
     }
 
-    function checkPermissions(address consumer, bytes32 documentKeyId) view public returns(bool) {
+    function checkPermissions(address consumer, bytes32 documentKeyId) public view  returns(bool) {
         return assetPermissions[documentKeyId][consumer];
     }
 

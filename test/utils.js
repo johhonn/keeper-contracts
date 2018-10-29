@@ -97,12 +97,14 @@ const utils = {
         return conditions
     },
 
-    createSLAHash: (web3, slaTemplateId, conditionsKeys, hashes, timeouts) => {
+    createSLAHash: (web3, slaTemplateId, conditionsKeys, hashes, timeouts, serviceDefinition, did) => {
         return web3.utils.soliditySha3(
             { type: 'bytes32', value: slaTemplateId },
             { type: 'bytes32[]', value: conditionsKeys },
             { type: 'bytes32[]', value: hashes },
-            { type: 'uint256[]', value: timeouts }
+            { type: 'uint256[]', value: timeouts },
+            { type: 'bytes32', value: serviceDefinition },
+            { type: 'bytes32', value: did }
         ).toString('hex')
     },
 
