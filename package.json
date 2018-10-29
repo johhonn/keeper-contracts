@@ -20,12 +20,10 @@
     "clean": "rm -rf ./build/ && rm -rf ./artifacts/*.development.json",
     "lint": "npm run lint:eslint && npm run lint:solium",
     "lint:eslint": "eslint --ignore-pattern '/coverage/' .",
-    "lint:eslint:fix": "eslint --ignore-pattern '/coverage/' . --fix",
     "lint:solium": "solium -d ./contracts/",
-    "lint:solium:fix": "solium -d ./contracts/ --fix",
-    "lint:solium:watch": "solium -d ./contracts/ --watch",
+    "lint:solium:watch": "npm run lint:solium -- --watch",
     "lint:mythril": "truffle compile && myth -x --truffle --max-depth 8 --outform markdown > mythril-report.md",
-    "lint:fix": "npm run lint:eslint:fix && npm run lint:solium:fix"
+    "lint:fix": "npm run lint:eslint -- --fix && npm run lint:solium -- --fix"
   },
   "directories": {
     "doc": "doc",
