@@ -24,6 +24,7 @@ data_files = []
 directories = glob('artifacts/*.json')
 for directory in directories:
     files = glob(directory+'*')
+    print("Contract artifact found:",directory, files)
     data_files.append((directory, files))
 
 setup(
