@@ -14,6 +14,9 @@ const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 contract('ServiceAgreement', (accounts) => {
     describe('Test On-chain Authorization', () => {
         let token, market, sla, paymentConditions, accessConditions, resourceId, valuesHashList, signature, serviceId, conditionKeys, templateId
+        const DID = '0x315f158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
+        const serviceDefinitionId = '0x515f158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b894'
+
         let funcFingerPrints, contracts
         const provider = accounts[0]
         const consumer = accounts[1]
@@ -35,12 +38,9 @@ contract('ServiceAgreement', (accounts) => {
             // consumer request initial funds to play
             console.log(consumer)
             await market.requestTokens(testUtils.toBigNumber(1000), fromConsumer)
-            await market.requestTokens(testUtils.toBigNumber(1000), fromProvider)
             const bal = await token.balanceOf.call(consumer)
             console.log(`consumer has balance := ${bal.valueOf()} now`)
-            // register dataset
             resourceId = await market.generateId(resourceName, fromProvider)
-            await market.register(resourceId, testUtils.toBigNumber(resourcePrice), fromProvider)
             console.log('publisher registers asset with id = ', resourceId)
             contracts = [paymentConditions.address, accessConditions.address, paymentConditions.address, paymentConditions.address]
             funcFingerPrints = [
@@ -68,18 +68,16 @@ contract('ServiceAgreement', (accounts) => {
             console.log('conditions: ', conditionKeys)
             const slaMsgHash = testUtils.createSLAHash(
                 web3, templateId, conditionKeys,
-                valuesHashList, timeouts
+                valuesHashList, timeouts,
+                serviceDefinitionId,
+                DID
             )
             signature = await web3.eth.sign(slaMsgHash, consumer)
-            // Start a purchase, i.e. execute the service agreement
-            // serviceId = await testUtils.signAgreement(
-            //     sla, templateId, signature, consumer, valuesHashList, timeouts, fromProvider
-            // )
         })
 
         it('Consume asset happy path', async () => {
             serviceId = await testUtils.signAgreement(
-                sla, templateId, signature, consumer, valuesHashList, timeouts, fromProvider
+                sla, templateId, signature, consumer, valuesHashList, timeouts, serviceDefinitionId, DID, fromProvider
             )
             await token.approve(paymentConditions.address, testUtils.toBigNumber(200), fromConsumer)
             const payTx = await paymentConditions.lockPayment(serviceId, resourceId, resourcePrice, fromConsumer)
@@ -111,7 +109,7 @@ contract('ServiceAgreement', (accounts) => {
 
         it('Consume asset with Refund', async () => {
             serviceId = await testUtils.signAgreement(
-                sla, templateId, signature, consumer, valuesHashList, timeouts, fromProvider
+                sla, templateId, signature, consumer, valuesHashList, timeouts, serviceDefinitionId, DID, fromProvider
             )
             try {
                 await paymentConditions.refundPayment(serviceId, resourceId, resourcePrice, fromConsumer)

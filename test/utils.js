@@ -133,13 +133,15 @@ const utils = {
         return '0x' + abi.soliditySHA3(types, values).toString('hex')
     },
 
-    signAgreement: async (agreement, templateId, signature, consumer, hashes, timeouts, args = {}) => {
+    signAgreement: async (agreement, templateId, signature, consumer, hashes, timeouts, serviceDefinitionId, did, args = {}) => {
         const result = await agreement.executeAgreement(
             templateId,
             signature,
             consumer,
             hashes,
             timeouts,
+            serviceDefinitionId,
+            did,
             args
         )
 
