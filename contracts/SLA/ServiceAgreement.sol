@@ -266,8 +266,12 @@ contract ServiceAgreement {
         return templates[agreements[serviceId].templateId].owner;
     }
 
-    function getTemplateOwner(bytes32 templateId) public view returns (address owner){
+    function getTemplateOwner(bytes32 templateId) public view returns (address owner) {
         return templates[templateId].owner;
+    }
+
+    function getTemplateOwnerByServiceId(bytes32 serviceId) public view returns (address owner) {
+        return getTemplateOwner(agreements[serviceId].templateId);
     }
 
     function getServiceAgreementConsumer(bytes32 serviceId) public view returns (address consumer){

@@ -10,6 +10,11 @@ contract AccessConditions{
     ServiceAgreement private serviceAgreementStorage;
     event AccessGranted(bytes32 serviceId, bytes32 asset);
 
+    modifier onlySLAPublisher(bytes32 serviceId, address publisher) {
+        require(serviceAgreementStorage.getTemplateOwnerByServiceId(serviceId) == publisher, 'Restricted access - only SLA publisher');
+        _;
+    }
+
     constructor(address _serviceAgreementAddress) public {
         require(_serviceAgreementAddress != address(0), 'invalid contract address');
         serviceAgreementStorage = ServiceAgreement(_serviceAgreementAddress);
@@ -19,7 +24,7 @@ contract AccessConditions{
         return assetPermissions[documentKeyId][consumer];
     }
 
-    function grantAccess(bytes32 serviceId, bytes32 assetId, bytes32 documentKeyId) public returns (bool) {
+    function grantAccess(bytes32 serviceId, bytes32 assetId, bytes32 documentKeyId) public onlySLAPublisher(serviceId, msg.sender) returns (bool) {
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.grantAccess.selector);
         bool allgood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition);
         if (!allgood)
