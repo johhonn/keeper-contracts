@@ -23,7 +23,7 @@ contract('ServiceAgreement', (accounts) => {
         const resourceName = 'self-driving ai data'
         const serviceName = resourceName
         let timeouts = [0, 0, 0, 3]
-        const dependencies = [0, 1, 4, 1 | 2**4 | 2**5] // dependency bit | timeout bit
+        const dependencies = [0, 1, 4, 1 | 2 ** 4 | 2 ** 5] // dependency bit | timeout bit
         before(async () => {
             token = await OceanToken.new()
             // await token.setReceiver(consumer)
@@ -90,7 +90,7 @@ contract('ServiceAgreement', (accounts) => {
             const hasPermission = await accessConditions.checkAssetPermission(resourceId, consumer)
             console.log('consumer permission: ', hasPermission)
             // grant access
-            const dep = await sla.hasUnfulfilledDependencies(serviceId, conditionKeys[1]);
+            const dep = await sla.hasUnfulfilledDependencies(serviceId, conditionKeys[1])
             console.log('has dependencies: ', dep)
 
             const gaccTx = await accessConditions.grantAccess(serviceId, resourceId, resourceId, fromProvider)
@@ -107,7 +107,6 @@ contract('ServiceAgreement', (accounts) => {
             } catch (err) {
                 console.log('\t >> Good, refund is denied as expected.')
             }
-
         })
 
         it('Consume asset with Refund', async () => {
