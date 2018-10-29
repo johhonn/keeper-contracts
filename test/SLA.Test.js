@@ -87,7 +87,7 @@ contract('ServiceAgreement', (accounts) => {
 
             const locked = await sla.getConditionStatus(serviceId, conditionKeys[0])
             console.log('locked: ', locked.toNumber())
-            const hasPermission = await accessConditions.checkAssetPermission(resourceId, consumer)
+            const hasPermission = await accessConditions.checkPermissions(consumer, resourceId)
             console.log('consumer permission: ', hasPermission)
             // grant access
             const dep = await sla.hasUnfulfilledDependencies(serviceId, conditionKeys[1])
@@ -95,7 +95,7 @@ contract('ServiceAgreement', (accounts) => {
 
             const gaccTx = await accessConditions.grantAccess(serviceId, resourceId, resourceId, fromProvider)
             console.log('accessgranted event: ', testUtils.getEventArgsFromTx(gaccTx, 'AccessGranted').serviceId)
-            const hasPermission1 = await accessConditions.checkAssetPermission(resourceId, consumer)
+            const hasPermission1 = await accessConditions.checkPermissions(consumer, resourceId)
             console.log('consumer permission: ', hasPermission1)
 
             // release payment
