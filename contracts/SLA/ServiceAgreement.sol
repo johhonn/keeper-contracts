@@ -26,6 +26,8 @@ contract ServiceAgreement {
         // condition Instance = [handler + value hash]
         bytes32[] conditionInstances;
         uint256[] timeoutValues; // in terms of block number not sec!
+        bytes32 nonce;
+        bytes signature;
     }
 
     mapping (bytes32 => bool) consumerNonce; // avoid replay-attack
@@ -117,7 +119,13 @@ contract ServiceAgreement {
         return keccak256(abi.encodePacked(prefix, hash));
     }
 
-    function initConditions(bytes32 serviceAgreementId, bytes32 templateId,address consumer, bytes32[] valueHash, uint256[] timeoutValues) private returns (bool) {
+    function initAgreement(bytes32 id, bytes32 templateId, address consumer, uint256[] timeoutValues, bytes32 nonce, bytes signature) private returns(bool){
+        agreements[id] = Agreement(false, new uint8[](0), new uint8[](0), templateId, consumer, new bytes32[](0), timeoutValues, nonce, signature);
+        return true;
+    }
+
+    function initConditions(bytes32 serviceAgreementId, bytes32[] valueHash, uint256[] timeoutValues) private returns (bool) {
+        bytes32 templateId = getTemplateId(serviceAgreementId);
         for (uint256 i = 0; i < templates[templateId].conditionKeys.length; i++) {
             if (timeoutValues[i] != 0) {
                 // TODO: define dynamic margin
@@ -136,31 +144,33 @@ contract ServiceAgreement {
             agreements[serviceAgreementId].conditionInstances.push(keccak256(abi.encodePacked(templates[templateId].conditionKeys[i], valueHash[i])));
             emit ExecuteCondition(
                 serviceAgreementId, keccak256(abi.encodePacked(templates[templateId].conditionKeys[i], valueHash[i])),
-                false, templates[templateId].owner, consumer
+                false, templates[templateId].owner, agreements[serviceAgreementId].consumer
             );
         }
         templateId2Agreements[templateId].push(serviceAgreementId);
-        emit ExecuteAgreement(serviceAgreementId, templateId, false, templates[templateId].owner, consumer, true);
+        emit ExecuteAgreement(serviceAgreementId, templateId, false, templates[templateId].owner, agreements[serviceAgreementId].consumer, true);
     }
 
-    function verifyAgreementFingerprint(bytes32 templateId, bytes32[] valueHash, uint256[] timeoutValues, bytes32 nonce, bytes signature, address consumer) private returns (bool){
-        return isValidSignature(generatePrefixHash(keccak256(abi.encodePacked(templates[templateId].conditionKeys, valueHash, timeoutValues, nonce))),
-        signature, consumer);
+    function verifyAgreementFingerprint(bytes32 serviceAgreementId, bytes32[] valueHash) private returns (bool){
+        return isValidSignature(generatePrefixHash(keccak256(abi.encodePacked(templates[agreements[serviceAgreementId].templateId].conditionKeys, valueHash, agreements[serviceAgreementId].timeoutValues, agreements[serviceAgreementId].nonce))),
+        agreements[serviceAgreementId].signature, agreements[serviceAgreementId].consumer);
     }
 
-    function executeAgreement(bytes32 templateId, bytes signature, address consumer, bytes32[] valueHash, uint256[] timeoutValues, bytes32 serviceDefinition, bytes32 did, bytes32 nonce) public
+    function executeAgreement(bytes32 templateId, bytes signature, address consumer, bytes32[] valueHash, uint256[] timeoutValues, bytes32 serviceDefinition, bytes32 nonce) public
     isTemplateOwner(templateId) isValidExecuteRequest(templateId, timeoutValues, nonce, consumer) returns (bool) {
-        agreements[keccak256(abi.encodePacked(serviceDefinition, did, nonce))] = Agreement(false, new uint8[](0), new uint8[](0), templateId, consumer, new bytes32[](0), new uint256[](0));
-        // verify consumer's signature and trigger the execution of agreement
-        if (verifyAgreementFingerprint(templateId, valueHash, timeoutValues, nonce, signature, consumer)) {
+        bytes32 serviceAgreementId = keccak256(abi.encodePacked(serviceDefinition, nonce));
+        if (initAgreement(serviceAgreementId, templateId, consumer, timeoutValues, nonce, signature)){
+            // verify consumer's signature and trigger the execution of agreement
 
-            // initialize SLA conditions
-            require(initConditions(keccak256(abi.encodePacked(serviceDefinition, did, nonce)), templateId, consumer, valueHash, timeoutValues), 'unable to init conditions');
-            templateId2Agreements[templateId].push(keccak256(abi.encodePacked(serviceDefinition, did, nonce)));
-            emit ExecuteAgreement(keccak256(abi.encodePacked(serviceDefinition, did, nonce)), templateId, false, templates[templateId].owner, consumer, true);
-            consumerNonce[keccak256(abi.encodePacked(nonce, consumer))] = true;
-        } else {
-            emit ExecuteAgreement(keccak256(abi.encodePacked(serviceDefinition, did, nonce)), templateId, false, templates[templateId].owner, consumer, false);
+            if (verifyAgreementFingerprint(serviceAgreementId, valueHash)) {
+                // initialize SLA conditions
+                require(initConditions(serviceAgreementId, valueHash, timeoutValues), 'unable to init conditions');
+                templateId2Agreements[templateId].push(serviceAgreementId);
+                emit ExecuteAgreement(serviceAgreementId, templateId, false, templates[templateId].owner, consumer, true);
+                consumerNonce[keccak256(abi.encodePacked(nonce, consumer))] = true;
+            } else {
+                emit ExecuteAgreement(serviceAgreementId, templateId, false, templates[templateId].owner, consumer, false);
+            }
         }
     }
 
