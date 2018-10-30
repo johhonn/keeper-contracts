@@ -26,10 +26,9 @@ contract ServiceAgreement {
         // condition Instance = [handler + value hash]
         bytes32[] conditionInstances;
         uint256[] timeoutValues; // in terms of block number not sec!
-        bytes32 serviceDefinition;
-        bytes32 DID;
     }
 
+    mapping (bytes32 => bool) consumerNonce; // avoid replay-attack
     mapping(bytes32 => ServiceAgreementTemplate) templates;
     // instances of SLA template
     mapping(bytes32 => Agreement) agreements;
@@ -67,8 +66,16 @@ contract ServiceAgreement {
     }
 
     // is the sender authorized to create instance of the SLA template
-    modifier isOwner(bytes32 templateId){
+    modifier isTemplateOwner(bytes32 templateId){
         require(templates[templateId].owner == msg.sender, 'Not a template owner');
+        _;
+    }
+
+    // validate agreement executation request
+    modifier isValidExecuteRequest(bytes32 templateId, uint256[] timeoutValues, bytes32 nonce, address consumer) {
+        require(timeoutValues.length == templates[templateId].conditionKeys.length, 'invalid timeout values length');
+        require(templates[templateId].state == true, 'Template is revoked');
+        require(!consumerNonce[keccak256(abi.encodePacked(nonce, consumer))], 'Indicating Replay attack');
         _;
     }
 
@@ -80,9 +87,6 @@ contract ServiceAgreement {
     event ConditionFulfilled(bytes32 serviceId, bytes32 templateId, bytes32 condition);
     event AgreementFulfilled(bytes32 serviceId, bytes32 templateId, address owner);
     event SLATemplateRevoked(bytes32 templateId, bool state);
-
-    // temp events
-    event PrefixedHash(bytes32 hash, bool status, bytes32 sid);
 
     // Setup service agreement template only once!
     function setupAgreementTemplate(address[] contracts, bytes4[] fingerprints, uint256[] dependenciesBits, bytes32 service)
@@ -113,46 +117,50 @@ contract ServiceAgreement {
         return keccak256(abi.encodePacked(prefix, hash));
     }
 
-    function executeAgreement(bytes32 templateId, bytes signature, address consumer, bytes32[] valueHash, uint256[] timeoutValues, bytes32 serviceDefinition, bytes32 did) public
-    isOwner(templateId) returns (bool) {
-        require(timeoutValues.length == templates[templateId].conditionKeys.length, 'invalid timeout values length');
-        ServiceAgreementTemplate storage slaTemplate = templates[templateId];
-        require(slaTemplate.state == true, 'Template is revoked');
-        // reconstruct the agreement fingerprint and check the consumer signature
-        bytes32 prefixedHash = generatePrefixHash(keccak256(abi.encodePacked(templateId, slaTemplate.conditionKeys, valueHash, timeoutValues, serviceDefinition, did)));
-
-        bytes32 serviceAgreementId = keccak256(abi.encodePacked(templateId, consumer, block.number, prefixedHash));
-
-        // verify consumer's signature and trigger the execution of agreement
-        if (isValidSignature(prefixedHash, signature, consumer)) {
-            agreements[serviceAgreementId] = Agreement(
-                false, new uint8[](0), new uint8[](0), templateId, consumer, new bytes32[](0), new uint256[](0), serviceDefinition, did
-            );
-            for (uint256 i = 0; i < slaTemplate.conditionKeys.length; i++) {
-                if (timeoutValues[i] != 0) {
-                    // TODO: define dynamic margin
-                    require(
-                        timeoutValues[i] > 2,
-                        'invalid timeout with a margin (~ 30 to 40 seconds = 2 blocks intervals) to avoid race conditions'
-                    );
-                    agreements[serviceAgreementId].timeoutValues.push(block.timestamp + timeoutValues[i]);
-                } else {
-                    agreements[serviceAgreementId].timeoutValues.push(0);
-                }
-                agreements[serviceAgreementId].conditionsState.push(0);
-                agreements[serviceAgreementId].conditionLockedState.push(0);
-
-                // add condition instances
-                agreements[serviceAgreementId].conditionInstances.push(keccak256(abi.encodePacked(slaTemplate.conditionKeys[i], valueHash[i])));
-                emit ExecuteCondition(
-                    serviceAgreementId, keccak256(abi.encodePacked(slaTemplate.conditionKeys[i], valueHash[i])),
-                    false, slaTemplate.owner, consumer
+    function initConditions(bytes32 serviceAgreementId, bytes32 templateId,address consumer, bytes32[] valueHash, uint256[] timeoutValues) private returns (bool) {
+        for (uint256 i = 0; i < templates[templateId].conditionKeys.length; i++) {
+            if (timeoutValues[i] != 0) {
+                // TODO: define dynamic margin
+                require(
+                    timeoutValues[i] > 2,
+                    'invalid timeout with a margin (~ 30 to 40 seconds = 2 blocks intervals) to avoid race conditions'
                 );
+                agreements[serviceAgreementId].timeoutValues.push(block.timestamp + timeoutValues[i]);
+            } else {
+                agreements[serviceAgreementId].timeoutValues.push(0);
             }
-            templateId2Agreements[templateId].push(serviceAgreementId);
-            emit ExecuteAgreement(serviceAgreementId, templateId, false, slaTemplate.owner, consumer, true);
+            agreements[serviceAgreementId].conditionsState.push(0);
+            agreements[serviceAgreementId].conditionLockedState.push(0);
+
+            // add condition instance
+            agreements[serviceAgreementId].conditionInstances.push(keccak256(abi.encodePacked(templates[templateId].conditionKeys[i], valueHash[i])));
+            emit ExecuteCondition(
+                serviceAgreementId, keccak256(abi.encodePacked(templates[templateId].conditionKeys[i], valueHash[i])),
+                false, templates[templateId].owner, consumer
+            );
+        }
+        templateId2Agreements[templateId].push(serviceAgreementId);
+        emit ExecuteAgreement(serviceAgreementId, templateId, false, templates[templateId].owner, consumer, true);
+    }
+
+    function verifyAgreementFingerprint(bytes32 templateId, bytes32[] valueHash, uint256[] timeoutValues, bytes32 nonce, bytes signature, address consumer) private returns (bool){
+        return isValidSignature(generatePrefixHash(keccak256(abi.encodePacked(templates[templateId].conditionKeys, valueHash, timeoutValues, nonce))),
+        signature, consumer);
+    }
+
+    function executeAgreement(bytes32 templateId, bytes signature, address consumer, bytes32[] valueHash, uint256[] timeoutValues, bytes32 serviceDefinition, bytes32 did, bytes32 nonce) public
+    isTemplateOwner(templateId) isValidExecuteRequest(templateId, timeoutValues, nonce, consumer) returns (bool) {
+        agreements[keccak256(abi.encodePacked(serviceDefinition, did, nonce))] = Agreement(false, new uint8[](0), new uint8[](0), templateId, consumer, new bytes32[](0), new uint256[](0));
+        // verify consumer's signature and trigger the execution of agreement
+        if (verifyAgreementFingerprint(templateId, valueHash, timeoutValues, nonce, signature, consumer)) {
+
+            // initialize SLA conditions
+            require(initConditions(keccak256(abi.encodePacked(serviceDefinition, did, nonce)), templateId, consumer, valueHash, timeoutValues), 'unable to init conditions');
+            templateId2Agreements[templateId].push(keccak256(abi.encodePacked(serviceDefinition, did, nonce)));
+            emit ExecuteAgreement(keccak256(abi.encodePacked(serviceDefinition, did, nonce)), templateId, false, templates[templateId].owner, consumer, true);
+            consumerNonce[keccak256(abi.encodePacked(nonce, consumer))] = true;
         } else {
-            emit ExecuteAgreement(serviceAgreementId, templateId, false, slaTemplate.owner, consumer, false);
+            emit ExecuteAgreement(keccak256(abi.encodePacked(serviceDefinition, did, nonce)), templateId, false, templates[templateId].owner, consumer, false);
         }
     }
 
@@ -196,7 +204,7 @@ contract ServiceAgreement {
         return true;
     }
 
-    function revokeAgreementTemplate(bytes32 templateId) public isOwner(templateId) canRevokeTemplate(templateId) returns (bool) {
+    function revokeAgreementTemplate(bytes32 templateId) public isTemplateOwner(templateId) canRevokeTemplate(templateId) returns (bool) {
         templates[templateId].state = false;
         emit SLATemplateRevoked(templateId, true);
     }
