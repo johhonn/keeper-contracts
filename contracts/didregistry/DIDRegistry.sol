@@ -18,9 +18,9 @@ contract DIDRegistry is Ownable {
     event DIDAttributeRegistered(
         bytes32 indexed did,
         address indexed owner,
-        ValueType valueType,
         bytes32 indexed key,
         string value,
+        ValueType valueType,
         uint updatedAt
     );
 
@@ -35,7 +35,7 @@ contract DIDRegistry is Ownable {
         require(currentOwner == address(0x0) || currentOwner == msg.sender, 'Attributes must be registered by the DID owners.');
 
         didRegister[_did] = DIDRegister(msg.sender, block.number);
-        emit DIDAttributeRegistered(_did, msg.sender, _type, _key, _value, block.number);
+        emit DIDAttributeRegistered(_did, msg.sender, _key, _value, _type, block.number);
     }
 
     function getUpdateAt(bytes32 _did) public view returns(uint) {
