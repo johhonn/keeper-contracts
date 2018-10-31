@@ -144,7 +144,7 @@ contract ServiceAgreement {
     }
 
     function executeAgreement(bytes32 templateId, bytes signature, address consumer, bytes32[] valueHashes, uint256[] timeoutValues, bytes32 serviceAgreementId) public
-    isTemplateOwner(templateId) isValidExecuteRequest(templateId, serviceAgreementId) returns (bool) {
+    isValidExecuteRequest(templateId, serviceAgreementId) returns (bool) {
         require(timeoutValues.length == templates[templateId].conditionKeys.length, 'invalid timeout values length');
         ServiceAgreementTemplate storage slaTemplate = templates[templateId];
         // reconstruct the agreement fingerprint and check the consumer signature
