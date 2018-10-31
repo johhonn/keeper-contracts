@@ -103,8 +103,7 @@ const utils = {
             { type: 'bytes32[]', value: conditionsKeys },
             { type: 'bytes32[]', value: hashes },
             { type: 'uint256[]', value: timeouts },
-            { type: 'bytes32', value: serviceDefinition },
-            { type: 'bytes32', value: did }
+            { type: 'bytes32', value: serviceDefinition }
         ).toString('hex')
     },
 
@@ -133,7 +132,7 @@ const utils = {
         return '0x' + abi.soliditySHA3(types, values).toString('hex')
     },
 
-    signAgreement: async (agreement, templateId, signature, consumer, hashes, timeouts, serviceDefinitionId, did, args = {}) => {
+    signAgreement: async (agreement, templateId, signature, consumer, hashes, timeouts, serviceDefinitionId, args = {}) => {
         const result = await agreement.executeAgreement(
             templateId,
             signature,
@@ -141,7 +140,6 @@ const utils = {
             hashes,
             timeouts,
             serviceDefinitionId,
-            did,
             args
         )
 
