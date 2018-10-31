@@ -154,7 +154,7 @@ contract ServiceAgreement {
         // verify consumer's signature and trigger the execution of agreement
         if (isValidSignature(prefixedHash, signature, consumer)) {
             agreements[serviceAgreementId] = Agreement(
-                false, true, new uint8[](0), new uint8[](0), templateId, msg.sender, consumer, new bytes32[](0), new uint256[](0), did
+                false, true, new uint8[](0), new uint8[](0), templateId, consumer, msg.sender, new bytes32[](0), new uint256[](0), did
             );
             require(initConditions(templateId, serviceAgreementId, valueHashes, timeoutValues, did), 'unable to init conditions');
             templateId2Agreements[templateId].push(serviceAgreementId);

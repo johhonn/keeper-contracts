@@ -39,7 +39,7 @@ contract('ServiceAgreement', (accounts) => {
             await market.requestTokens(testUtils.toBigNumber(1000), fromConsumer)
             const bal = await token.balanceOf.call(consumer)
             console.log(`consumer has balance := ${bal.valueOf()} now`)
-            resourceId = await market.generateId(resourceName, fromProvider)
+            resourceId = did
             console.log('publisher registers asset with id = ', resourceId)
             contracts = [paymentConditions.address, accessConditions.address, paymentConditions.address, paymentConditions.address]
             funcFingerPrints = [
