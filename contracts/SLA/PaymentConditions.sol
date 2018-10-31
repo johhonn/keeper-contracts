@@ -66,7 +66,7 @@ contract PaymentConditions {
     }
 
     function releasePayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
-        require(serviceAgreementStorage.getAgreementOwner(serviceId) == msg.sender, 'Only service provider can trigger releasePayment.');
+        require(serviceAgreementStorage.getAgreementPublisher(serviceId) == msg.sender, 'Only service provider can trigger releasePayment.');
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.releasePayment.selector);
         if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition))
             return false;

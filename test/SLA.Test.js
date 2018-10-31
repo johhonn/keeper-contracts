@@ -25,6 +25,7 @@ contract('ServiceAgreement', (accounts) => {
         const serviceName = resourceName
         let timeouts = [0, 0, 0, 3]
         const dependencies = [0, 1, 4, 1 | 2 ** 4 | 2 ** 5] // dependency bit | timeout bit
+        const did = '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
         before(async () => {
             token = await OceanToken.new()
             // await token.setReceiver(consumer)
@@ -76,7 +77,7 @@ contract('ServiceAgreement', (accounts) => {
             const signature = await web3.eth.sign(slaMsgHash, consumer)
 
             serviceId = await testUtils.signAgreement(
-                sla, templateId, signature, consumer, valuesHashList, timeouts, serviceAgreementId, fromProvider
+                sla, templateId, signature, consumer, valuesHashList, timeouts, serviceAgreementId, did, fromProvider
             )
             await token.approve(paymentConditions.address, testUtils.toBigNumber(200), fromConsumer)
             const payTx = await paymentConditions.lockPayment(serviceId, resourceId, resourcePrice, fromConsumer)
@@ -116,7 +117,7 @@ contract('ServiceAgreement', (accounts) => {
             const signature = await web3.eth.sign(slaMsgHash, consumer)
 
             serviceId = await testUtils.signAgreement(
-                sla, templateId, signature, consumer, valuesHashList, timeouts, serviceAgreementId, fromProvider
+                sla, templateId, signature, consumer, valuesHashList, timeouts, serviceAgreementId, did, fromProvider
             )
             try {
                 await paymentConditions.refundPayment(serviceId, resourceId, resourcePrice, fromConsumer)

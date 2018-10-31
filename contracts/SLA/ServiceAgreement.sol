@@ -24,9 +24,10 @@ contract ServiceAgreement {
         uint8[] conditionLockedState; // maps the condition status in the template
         bytes32 templateId; // referes to SLA template id
         address consumer;
-        // condition Instance = [handler + value hash]
-        bytes32[] conditionInstances;
+        address publisher;
+        bytes32[] conditionInstances; // condition Instance = [handler + value hash]
         uint256[] timeoutValues; // in terms of block number not sec!
+        bytes32 did; // Decentralized Identifier
     }
 
     mapping(bytes32 => ServiceAgreementTemplate) templates;
@@ -81,10 +82,10 @@ contract ServiceAgreement {
     // events
     event SetupCondition(bytes32 serviceTemplate, bytes32 condition, address provider);
     event SetupAgreementTemplate(bytes32 serviceTemplateId, address provider);
-    event ExecuteCondition(bytes32 serviceId, bytes32 condition, bool status, address templateOwner, address consumer);
-    event ExecuteAgreement(bytes32 serviceId, bytes32 templateId, bool status, address templateOwner, address consumer, bool state);
-    event ConditionFulfilled(bytes32 serviceId, bytes32 templateId, bytes32 condition);
-    event AgreementFulfilled(bytes32 serviceId, bytes32 templateId, address owner);
+    event ExecuteCondition(bytes32 serviceAgreementId, bytes32 condition, bytes32 did, bool status, address templateOwner, address consumer);
+    event ExecuteAgreement(bytes32 serviceAgreementId, bytes32 templateId, bytes32 did, bool status, address templateOwner, address consumer, bool state);
+    event ConditionFulfilled(bytes32 serviceAgreementId, bytes32 templateId, bytes32 condition);
+    event AgreementFulfilled(bytes32 serviceAgreementId, bytes32 templateId, address owner);
     event SLATemplateRevoked(bytes32 templateId, bool state);
 
 
@@ -117,7 +118,7 @@ contract ServiceAgreement {
         return keccak256(abi.encodePacked(prefix, hash));
     }
 
-    function initConditions(bytes32 templateId, bytes32 serviceAgreementId, bytes32[] valueHash, uint256[] timeoutValues) private returns (bool) {
+    function initConditions(bytes32 templateId, bytes32 serviceAgreementId, bytes32[] valueHash, uint256[] timeoutValues, bytes32 did) private returns (bool) {
         for (uint256 i = 0; i < templates[templateId].conditionKeys.length; i++) {
             if (timeoutValues[i] != 0) {
                 // TODO: define dynamic margin
@@ -135,7 +136,7 @@ contract ServiceAgreement {
             // add condition instance
             agreements[serviceAgreementId].conditionInstances.push(keccak256(abi.encodePacked(templates[templateId].conditionKeys[i], valueHash[i])));
             emit ExecuteCondition(
-                serviceAgreementId, keccak256(abi.encodePacked(templates[templateId].conditionKeys[i], valueHash[i])),
+                serviceAgreementId, keccak256(abi.encodePacked(templates[templateId].conditionKeys[i], valueHash[i])), did,
                 false, templates[templateId].owner, agreements[serviceAgreementId].consumer
             );
         }
@@ -143,7 +144,7 @@ contract ServiceAgreement {
         return true;
     }
 
-    function executeAgreement(bytes32 templateId, bytes signature, address consumer, bytes32[] valueHashes, uint256[] timeoutValues, bytes32 serviceAgreementId) public
+    function executeAgreement(bytes32 templateId, bytes signature, address consumer, bytes32[] valueHashes, uint256[] timeoutValues, bytes32 serviceAgreementId, bytes32 did) public
     isValidExecuteRequest(templateId, serviceAgreementId) returns (bool) {
         require(timeoutValues.length == templates[templateId].conditionKeys.length, 'invalid timeout values length');
         ServiceAgreementTemplate storage slaTemplate = templates[templateId];
@@ -153,13 +154,13 @@ contract ServiceAgreement {
         // verify consumer's signature and trigger the execution of agreement
         if (isValidSignature(prefixedHash, signature, consumer)) {
             agreements[serviceAgreementId] = Agreement(
-                false, true, new uint8[](0), new uint8[](0), templateId, consumer, new bytes32[](0), new uint256[](0)
+                false, true, new uint8[](0), new uint8[](0), templateId, msg.sender, consumer, new bytes32[](0), new uint256[](0), did
             );
-            require(initConditions(templateId, serviceAgreementId, valueHashes, timeoutValues), 'unable to init conditions');
+            require(initConditions(templateId, serviceAgreementId, valueHashes, timeoutValues, did), 'unable to init conditions');
             templateId2Agreements[templateId].push(serviceAgreementId);
-            emit ExecuteAgreement(serviceAgreementId, templateId, false, slaTemplate.owner, consumer, true);
+            emit ExecuteAgreement(serviceAgreementId, templateId, did, false, slaTemplate.owner, consumer, true);
         } else {
-            emit ExecuteAgreement(serviceAgreementId, templateId, false, slaTemplate.owner, consumer, false);
+            emit ExecuteAgreement(serviceAgreementId, templateId, did, false, slaTemplate.owner, consumer, false);
         }
 
         return true;
@@ -273,8 +274,8 @@ contract ServiceAgreement {
         return agreements[serviceId].state;
     }
 
-    function getAgreementOwner(bytes32 serviceId) public view returns (address owner) {
-        return templates[agreements[serviceId].templateId].owner;
+    function getAgreementPublisher(bytes32 serviceId) public view returns (address publisher) {
+        return agreements[serviceId].publisher;
     }
 
     function getTemplateOwner(bytes32 templateId) public view returns (address owner) {

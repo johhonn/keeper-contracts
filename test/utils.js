@@ -136,20 +136,21 @@ const utils = {
         return '0x' + abi.soliditySHA3(types, values).toString('hex')
     },
 
-    signAgreement: async (agreement, templateId, signature, consumer, hashes, timeouts, serviceDefinitionId, args = {}) => {
+    signAgreement: async (agreement, templateId, signature, consumer, hashes, timeouts, serviceAgreementId, did, args = {}) => {
         const result = await agreement.executeAgreement(
             templateId,
             signature,
             consumer,
             hashes,
             timeouts,
-            serviceDefinitionId,
+            serviceAgreementId,
+            did,
             args
         )
 
         return result.logs.filter((log) => {
             return log.event === 'ExecuteAgreement'
-        })[0].args.serviceId
+        })[0].args.serviceAgreementId
     },
     sleep: (millis) => {
         return new Promise(resolve => setTimeout(resolve, millis))
