@@ -161,6 +161,8 @@ contract ServiceAgreement {
         } else {
             emit ExecuteAgreement(serviceAgreementId, templateId, false, slaTemplate.owner, consumer, false);
         }
+
+        return true;
     }
 
     function splitSignature(bytes signature) private pure returns (uint8 v, bytes32 r, bytes32 s) {

@@ -19,6 +19,10 @@ const utils = {
         `0x${abi.soliditySHA3(['string'], [domain]).toString('hex')}`
     ),
 
+    generateId: (web3) => {
+        return web3.utils.sha3(Math.random().toString())
+    },
+
     as: (actor, fn, ...args) => {
         function detectSendObject(potentialSendObj) {
             function hasOwnProperty(obj, prop) {
@@ -97,13 +101,13 @@ const utils = {
         return conditions
     },
 
-    createSLAHash: (web3, slaTemplateId, conditionsKeys, hashes, timeouts, serviceDefinition, did) => {
+    createSLAHash: (web3, slaTemplateId, conditionsKeys, hashes, timeouts, serviceAgreementId) => {
         return web3.utils.soliditySha3(
             { type: 'bytes32', value: slaTemplateId },
             { type: 'bytes32[]', value: conditionsKeys },
             { type: 'bytes32[]', value: hashes },
             { type: 'uint256[]', value: timeouts },
-            { type: 'bytes32', value: serviceDefinition }
+            { type: 'bytes32', value: serviceAgreementId }
         ).toString('hex')
     },
 

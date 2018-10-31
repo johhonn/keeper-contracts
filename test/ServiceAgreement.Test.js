@@ -126,14 +126,12 @@ contract('SLA', (accounts) => {
             */
 
             // generate template fingerprint including all the conditions and
-            const serviceDefinitionId = '0x515f158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b894'
-            const hash = utils.createSLAHash(web3, templateId, condKeys, valHashList, timeoutValues, serviceDefinitionId)
+            const serviceAgreementId = utils.generateId(web3)
+            const hash = utils.createSLAHash(web3, templateId, condKeys, valHashList, timeoutValues, serviceAgreementId)
             const signature = await web3.eth.sign(hash, consumer)
-            const val = await sla.executeAgreement(templateId, signature, consumer, [ valHashList[0], valHashList[1], valHashList[2], valHashList[3] ], timeoutValues, serviceDefinitionId, { from: SLATemplateOwner })
+            const val = await sla.executeAgreement(templateId, signature, consumer, [ valHashList[0], valHashList[1], valHashList[2], valHashList[3] ], timeoutValues, serviceAgreementId, { from: SLATemplateOwner })
             assert.strictEqual(val.logs[4].args.state, true, 'Execute Agreement should return true')
             console.log('\x1b[36m%s\x1b[0m', '\t >> Service Agreement ID: ', val.logs[4].args.serviceId, ' ... Done!')
-
-            const serviceAgreementId = val.logs[4].args.serviceId
 
             console.log('\x1b[36m%s\x1b[0m', '\t >> Set 3rd condition status to 1 by contract address: ', contract3, ' Fingerprint: ', fingerprint3)
             console.log('\t >> Reconstruct condition-3 authorized hash')

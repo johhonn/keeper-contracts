@@ -13,8 +13,7 @@ const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 
 contract('ServiceAgreement', (accounts) => {
     describe('Test On-chain Authorization', () => {
-        let token, market, sla, paymentConditions, accessConditions, resourceId, valuesHashList, signature, serviceId, conditionKeys, templateId
-        const serviceDefinitionId = '0x515f158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b894'
+        let token, market, sla, paymentConditions, accessConditions, resourceId, valuesHashList, serviceId, conditionKeys, templateId
 
         let funcFingerPrints, contracts
         const provider = accounts[0]
@@ -65,17 +64,19 @@ contract('ServiceAgreement', (accounts) => {
             // console.log('templateid: ', templateId)
             conditionKeys = testUtils.generateConditionsKeys(templateId, contracts, funcFingerPrints)
             console.log('conditions: ', conditionKeys)
-            const slaMsgHash = testUtils.createSLAHash(
-                web3, templateId, conditionKeys,
-                valuesHashList, timeouts,
-                serviceDefinitionId
-            )
-            signature = await web3.eth.sign(slaMsgHash, consumer)
         })
 
         it('Consume asset happy path', async () => {
+            const serviceAgreementId = testUtils.generateId(web3)
+            const slaMsgHash = testUtils.createSLAHash(
+                web3, templateId, conditionKeys,
+                valuesHashList, timeouts,
+                serviceAgreementId
+            )
+            const signature = await web3.eth.sign(slaMsgHash, consumer)
+
             serviceId = await testUtils.signAgreement(
-                sla, templateId, signature, consumer, valuesHashList, timeouts, serviceDefinitionId, fromProvider
+                sla, templateId, signature, consumer, valuesHashList, timeouts, serviceAgreementId, fromProvider
             )
             await token.approve(paymentConditions.address, testUtils.toBigNumber(200), fromConsumer)
             const payTx = await paymentConditions.lockPayment(serviceId, resourceId, resourcePrice, fromConsumer)
@@ -106,8 +107,16 @@ contract('ServiceAgreement', (accounts) => {
         })
 
         it('Consume asset with Refund', async () => {
+            const serviceAgreementId = testUtils.generateId(web3)
+            const slaMsgHash = testUtils.createSLAHash(
+                web3, templateId, conditionKeys,
+                valuesHashList, timeouts,
+                serviceAgreementId
+            )
+            const signature = await web3.eth.sign(slaMsgHash, consumer)
+
             serviceId = await testUtils.signAgreement(
-                sla, templateId, signature, consumer, valuesHashList, timeouts, serviceDefinitionId, fromProvider
+                sla, templateId, signature, consumer, valuesHashList, timeouts, serviceAgreementId, fromProvider
             )
             try {
                 await paymentConditions.refundPayment(serviceId, resourceId, resourcePrice, fromConsumer)

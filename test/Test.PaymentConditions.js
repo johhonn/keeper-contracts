@@ -26,7 +26,6 @@ contract('PaymentConditions', (accounts) => {
         let fingerprints
         let dependencies
         let hashes
-        let serviceDefinitionId
 
         const timeouts = [0, 0, 0]
 
@@ -77,36 +76,32 @@ contract('PaymentConditions', (accounts) => {
             const releasePaymentHash = utils.valueHash(['bytes32', 'uint256'], [asset, price])
             const grantAccessHash = utils.valueHash(['bytes32', 'bytes32'], [asset, asset])
 
-            serviceDefinitionId = '0x515f158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b894'
-
             hashes = [grantAccessHash, lockPaymentHash, releasePaymentHash]
+        })
 
+        async function signAgreement(serviceAgreementId) {
             const hash = utils.createSLAHash(
                 web3, templateId,
                 utils.generateConditionsKeys(templateId, contracts, fingerprints),
                 hashes,
                 timeouts,
-                serviceDefinitionId
+                serviceAgreementId
             )
-
             signature = await web3.eth.sign(hash, consumer)
-        })
-
-        async function signAgreement() {
             const result = await agreement.executeAgreement(
                 templateId,
                 signature,
                 consumer,
                 hashes,
                 timeouts,
-                serviceDefinitionId
+                serviceAgreementId
             )
 
             return result.logs[3].args.serviceId
         }
 
         it('Rejects to lock payments if conditions are not met', async () => {
-            const serviceId = await signAgreement()
+            const serviceId = await signAgreement(utils.generateId(web3))
 
             await paymentConditions.lockPayment(serviceId, asset, price)
             assert.strictEqual(
@@ -116,7 +111,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Locks payment if conditions are met', async () => {
-            const serviceId = await signAgreement()
+            const serviceId = await signAgreement(utils.generateId(web3))
 
             await accessConditions.grantAccess(
                 serviceId,
@@ -133,7 +128,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Does not lock twice', async () => {
-            const serviceId = await signAgreement()
+            const serviceId = await signAgreement(utils.generateId(web3))
 
             await accessConditions.grantAccess(
                 serviceId,
@@ -157,7 +152,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Rejects to release payment if conditions are not met', async () => {
-            const serviceId = await signAgreement()
+            const serviceId = await signAgreement(utils.generateId(web3))
 
             await paymentConditions.releasePayment(serviceId, asset, price)
             assert.strictEqual(
@@ -167,7 +162,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Releases payment if conditions are met', async () => {
-            const serviceId = await signAgreement()
+            const serviceId = await signAgreement(utils.generateId(web3))
 
             await accessConditions.grantAccess(
                 serviceId,
@@ -186,7 +181,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Does not release twice', async () => {
-            const serviceId = await signAgreement()
+            const serviceId = await signAgreement(utils.generateId(web3))
 
             await accessConditions.grantAccess(
                 serviceId,
