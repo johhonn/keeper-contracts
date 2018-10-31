@@ -140,8 +140,6 @@ contract ServiceAgreement {
                 false, templates[templateId].owner, agreements[serviceAgreementId].consumer
             );
         }
-        templateId2Agreements[templateId].push(serviceAgreementId);
-        emit ExecuteAgreement(serviceAgreementId, templateId, false, templates[templateId].owner, agreements[serviceAgreementId].consumer, true);
     }
 
     function executeAgreement(bytes32 templateId, bytes signature, address consumer, bytes32[] valueHash, uint256[] timeoutValues, bytes32 serviceAgreementId) public
