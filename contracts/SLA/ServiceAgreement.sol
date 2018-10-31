@@ -18,6 +18,7 @@ contract ServiceAgreement {
     mapping(bytes32 => uint256) conditionKeyToIndex;
 
     struct Agreement {
+        address publisher;
         bool state; // instance of SLA status
         bool nonce; // avoid replay attack
         uint8[] conditionsState; // maps the condition status in the template
@@ -153,7 +154,8 @@ contract ServiceAgreement {
         // verify consumer's signature and trigger the execution of agreement
         if (isValidSignature(prefixedHash, signature, consumer)) {
             agreements[serviceAgreementId] = Agreement(
-                false, true, new uint8[](0), new uint8[](0), templateId, consumer, new bytes32[](0), new uint256[](0)
+                msg.sender, false, true, new uint8[](0), new uint8[](0),
+                templateId, consumer, new bytes32[](0), new uint256[](0)
             );
             require(initConditions(templateId, serviceAgreementId, valueHashes, timeoutValues), 'unable to init conditions');
             templateId2Agreements[templateId].push(serviceAgreementId);
@@ -273,8 +275,8 @@ contract ServiceAgreement {
         return agreements[serviceId].state;
     }
 
-    function getAgreementOwner(bytes32 serviceId) public view returns (address owner) {
-        return templates[agreements[serviceId].templateId].owner;
+    function getAgreementPublisher(bytes32 serviceId) public view returns (address owner) {
+        return agreements[serviceId].publisher;
     }
 
     function getTemplateOwner(bytes32 templateId) public view returns (address owner) {
