@@ -1,12 +1,8 @@
 matrix:
   fast_finish: true
   allow_failures:
-  - language: node_js
-    node_js: "8"
-    env: SOLIDITY_COVERAGE=true
-  - language: node_js
-    node_js: "8"
-    env: SOLC_NIGHTLY=true
+  - env: SOLIDITY_COVERAGE=true
+  - env: SOLC_NIGHTLY=true
   include:
   - language: node_js
     node_js: "8"
