@@ -117,8 +117,7 @@ contract ServiceAgreement {
         return keccak256(abi.encodePacked(prefix, hash));
     }
 
-    function initConditions(bytes32 serviceAgreementId, bytes32[] valueHash, uint256[] timeoutValues) private returns (bool) {
-        bytes32 templateId = getTemplateId(serviceAgreementId);
+    function initConditions(bytes32 templateId, bytes32 serviceAgreementId, bytes32[] valueHash, uint256[] timeoutValues) private returns (bool) {
         for (uint256 i = 0; i < templates[templateId].conditionKeys.length; i++) {
             if (timeoutValues[i] != 0) {
                 // TODO: define dynamic margin
@@ -154,7 +153,7 @@ contract ServiceAgreement {
             agreements[serviceAgreementId] = Agreement(
                 false, true, new uint8[](0), new uint8[](0), templateId, consumer, new bytes32[](0), new uint256[](0)
             );
-            require(initConditions(serviceAgreementId, valueHash, timeoutValues), 'unable to init conditions');
+            require(initConditions(templateId, serviceAgreementId, valueHash, timeoutValues), 'unable to init conditions');
             templateId2Agreements[templateId].push(serviceAgreementId);
             emit ExecuteAgreement(serviceAgreementId, templateId, false, slaTemplate.owner, consumer, true);
         } else {
