@@ -9,7 +9,7 @@ const utils = require('./utils.js')
 
 const Web3 = require('web3')
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
-const did  = '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
+const did = '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
 
 contract('PaymentConditions', (accounts) => {
     describe('Tests payment conditions used in SLAs', () => {
