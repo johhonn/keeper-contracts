@@ -83,9 +83,17 @@ matrix:
   - language: python
     python: "3.6"
     install:
-      - pip install -r requirements_dev.txt
+    - pip install -r requirements_dev.txt
+    - npm install -g npm
+    - npm install -g ganache-cli release-it greenkeeper-lockfile
+    - npm install
+    before_script:
+    - greenkeeper-lockfile-update
+    - ganache-cli > ganache-cli.log &
     script:
-      - echo "Python job"
+    - npm run migrate
+    after_script:
+    - greenkeeper-lockfile-upload
 
 notifications:
   email: false
