@@ -89,6 +89,7 @@ matrix:
       - pip install -r requirements_dev.txt
       - npm install -g npm
       - npm install
+      - npm run compile
     script:
       - echo "Python job"
 
