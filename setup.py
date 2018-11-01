@@ -3,15 +3,13 @@
 
 """The setup script."""
 
-from setuptools import setup, find_packages
+from setuptools import setup
 import os
 from glob import glob
 
 
 with open('README.md') as readme_file:
     readme = readme_file.read()
-
-os.system("truffle compile")
 
 requirements = []
 
@@ -23,8 +21,8 @@ test_requirements = []
 data_files = []
 directories = glob('artifacts/*.json')
 for directory in directories:
-    files = glob(directory+'*')
-    print("Contract artifact found:",directory, files)
+    files = glob(directory + '*')
+    print("Contract artifact found:", directory, files)
     data_files.append((directory, files))
 
 setup(
