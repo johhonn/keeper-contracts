@@ -64,6 +64,7 @@ deploy:
 
   - provider: script
     script: bash -x ./scripts/deploy_pypi.sh
+    skip_cleanup: true
     on:
       # tags: true
       all_branches: true
