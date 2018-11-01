@@ -87,6 +87,8 @@ matrix:
     python: "3.6"
     install:
       - pip install -r requirements_dev.txt
+      - npm install -g npm
+      - npm install
     script:
       - echo "Python job"
 
