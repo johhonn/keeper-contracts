@@ -17,7 +17,7 @@
     "migrate:mainnet": "npm run migrate ----network mainnet",
     "test": "truffle test",
     "test:cover": "solidity-coverage",
-    "release": "release-it patch -n",
+    "release": "./bumpversion.sh patch",
     "clean": "rm -rf ./build/ && rm -rf ./artifacts/*.development.json",
     "lint": "npm run lint:eslint && npm run lint:solium",
     "lint:eslint": "eslint --ignore-pattern '/coverage/' .",
