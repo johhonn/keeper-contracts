@@ -88,12 +88,15 @@ matrix:
     install:
     - pip install -r requirements_dev.txt
     - npm install -g npm
+    - npm install -g ganache-cli release-it greenkeeper-lockfile
     - npm install
     before_script:
     - greenkeeper-lockfile-update
     - ganache-cli > ganache-cli.log &
     script:
     - npm run migrate
+    after_script:
+    - greenkeeper-lockfile-upload
 
 notifications:
   email: false
