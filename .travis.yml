@@ -63,7 +63,8 @@ deploy:
       condition: $DEPLOY_PACKAGE = true
 
   - provider: script
-    script: bash ./scripts/deploy_pypi.sh
+    script: bash -x ./scripts/deploy_pypi.sh
+    skip_cleanup: true
     on:
       tags: true
       all_branches: true
