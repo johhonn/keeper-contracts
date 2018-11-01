@@ -11,6 +11,7 @@
     "compile": "truffle compile",
     "migrate": "truffle migrate",
     "migrate:poa": "npm run migrate -- --network ocean_poa_net_local",
+    "migrate:aws": "npm run migrate -- --network ocean_poa_aws",
     "migrate:kovan": "npm run migrate -- --network kovan",
     "migrate:rinkeby": "npm run migrate -- --network rinkeby",
     "migrate:mainnet": "npm run migrate ----network mainnet",
