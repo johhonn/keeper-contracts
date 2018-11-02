@@ -44,6 +44,9 @@ before_install:
       export PATH="${PWD}/web3j-${WEB3J_VERSION}/bin:${PATH}"
       echo "$PATH"
       web3j version
+      bash -x scripts/maven.sh
+      # echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
+      # echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
     fi
 
 install:
