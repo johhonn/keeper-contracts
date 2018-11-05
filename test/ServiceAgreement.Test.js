@@ -211,7 +211,7 @@ contract('SLA', (accounts) => {
                 console.info('\t >> Terminated: ', terminated)
             }
             const agreementTimeout = await sla.getAgreementTimeout(serviceAgreementId)
-            console.info('\t >> Waiting for timestamp:',agreementTimeout.toNumber())
+            console.info('\t >> Waiting for timestamp:', agreementTimeout.toNumber())
             await sleep(20000)
             await sla.terminateAgreement(serviceAgreementId, { from: accounts[8] })
             const terminated = await sla.isAgreementTerminated(serviceAgreementId)

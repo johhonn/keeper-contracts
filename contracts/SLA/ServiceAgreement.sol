@@ -9,12 +9,12 @@ import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
 
 contract ServiceAgreement {
 
-     struct ServiceAgreementTemplate {
+    struct ServiceAgreementTemplate {
         bool state; // 1 -> Available 0 -> revoked template
         address owner; // template owner
         bytes32[] conditionKeys; // preserving the order in the condition state
         uint256[] dependenciesBits; // 1st bit --> dependency, 2nd bit --> timeout flag (enabled/disabled)
-        uint8 [] fulfillmentIndices; // if conditions true accept as this agreement as fulfiled agreement
+        uint8[] fulfillmentIndices; // if conditions true accept as this agreement as fulfiled agreement
         uint8 fulfillmentOperator; // 0 --> AND, 1--> OR, 2--> N-of-M
     }
     // conditions id (templateId, contract address , function fingerprint)
