@@ -48,7 +48,6 @@ before_install:
       bash -x scripts/maven.sh
       echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
       echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
-      ps aux | grep gpg
     fi
 
 install:
@@ -90,10 +89,10 @@ deploy:
       condition: $DEPLOY_PACKAGE = true
 
   - provider: script
-    script: ps aux | grep gpg && gpg -K && bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
+    script: bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
     skip_cleanup: true
     on:
-      # tags: true
+      tags: true
       all_branches: true
       condition: $DEPLOY_PACKAGE = true
 
