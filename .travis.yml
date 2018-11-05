@@ -32,6 +32,7 @@ before_install:
   - |
     if [ "${DEPLOY_PACKAGE}" = "true" ]; then
       sudo apt-get -y install python3-pip gnupg-agent
+      gpg-agent --daemon --no-grab --write-env-file $HOME/.gpg-agent-info
       pip3 install --user twine six==1.10.0 wheel==0.31.0
       sudo apt-get install oracle-java8-set-default maven
       java -version
@@ -47,6 +48,7 @@ before_install:
       bash -x scripts/maven.sh
       echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
       echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+      ps aux | grep gpg
     fi
 
 install:
@@ -88,7 +90,7 @@ deploy:
       condition: $DEPLOY_PACKAGE = true
 
   - provider: script
-    script: gpg -K && bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
+    script: ps aux | grep gpg && gpg -K && bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
     skip_cleanup: true
     on:
       # tags: true
