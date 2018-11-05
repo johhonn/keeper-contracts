@@ -31,7 +31,7 @@ before_install:
   - npm install -g ganache-cli release-it greenkeeper-lockfile
   - |
     if [ "${DEPLOY_PACKAGE}" = "true" ]; then
-      sudo apt-get -y install python3-pip
+      sudo apt-get -y install python3-pip gnupg-agent
       pip3 install --user twine six==1.10.0 wheel==0.31.0
       sudo apt-get install oracle-java8-set-default maven
       java -version
@@ -88,7 +88,7 @@ deploy:
       condition: $DEPLOY_PACKAGE = true
 
   - provider: script
-    script: bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
+    script: gpg -K && bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
     skip_cleanup: true
     on:
       # tags: true
