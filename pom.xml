@@ -7,6 +7,7 @@
   <version>0.3.12</version>
   <name>Keeper Contracts</name>
   <description>Integration of TCRs, CPM and Ocean Tokens in Solidity</description>
+  <url>https://github.com/oceanprotocol/keeper-contracts</url>
   <properties>
     <final-name>keeper-contracts</final-name>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
