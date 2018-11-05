@@ -1,6 +1,6 @@
 pragma solidity 0.4.25;
 
-import 'github.com/openzeppelin/openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
+import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
 
 /**
 @title Ocean Protocol Service Level Agreement
@@ -24,6 +24,7 @@ contract ServiceAgreement {
     struct Agreement {
         bool state; // instance of SLA status
         bool nonce; // avoid replay attack
+        bool terminated;
         uint8[] conditionsState; // maps the condition status in the template
         uint8[] conditionLockedState; // maps the condition status in the template
         bytes32 templateId; // referes to SLA template id
@@ -174,7 +175,7 @@ contract ServiceAgreement {
         // verify consumer's signature and trigger the execution of agreement
         if (isValidSignature(prefixedHash, signature, consumer)) {
             agreements[serviceAgreementId] = Agreement(
-                false, true, new uint8[](0), new uint8[](0), templateId, consumer, msg.sender, new bytes32[](0), new uint256[](0), did, block.timestamp + timeoutValues[timeoutValues.length]
+                false, true, false, new uint8[](0), new uint8[](0), templateId, consumer, msg.sender, new bytes32[](0), new uint256[](0), did, block.timestamp + timeoutValues[timeoutValues.length]
             );
             require(initConditions(templateId, serviceAgreementId, valueHashes, timeoutValues, did), 'unable to init conditions');
             templateId2Agreements[templateId].push(serviceAgreementId);
@@ -290,4 +291,7 @@ contract ServiceAgreement {
         return keccak256(abi.encodePacked(getTemplateId(serviceId), _contract, fingerprint));
     }
 
+    function terminateAgreement (bytes32 serviceId) public isAgreementTimedOut(serviceId) returns (bool) {
+        agreements[serviceId].terminated = true;
+    }
 }
