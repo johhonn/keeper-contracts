@@ -45,8 +45,8 @@ before_install:
       echo "$PATH"
       web3j version
       bash -x scripts/maven.sh
-      # echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
-      # echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+      echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
+      echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
     fi
 
 install:
@@ -84,6 +84,14 @@ deploy:
     skip_cleanup: true
     on:
       tags: true
+      all_branches: true
+      condition: $DEPLOY_PACKAGE = true
+
+  - provider: script
+    script: bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
+    skip_cleanup: true
+    on:
+      # tags: true
       all_branches: true
       condition: $DEPLOY_PACKAGE = true
 
