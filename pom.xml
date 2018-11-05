@@ -8,6 +8,13 @@
   <name>Keeper Contracts</name>
   <description>Integration of TCRs, CPM and Ocean Tokens in Solidity</description>
   <url>https://github.com/oceanprotocol/keeper-contracts</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
   <properties>
     <final-name>keeper-contracts</final-name>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
