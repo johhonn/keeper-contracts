@@ -97,7 +97,9 @@ contract('SLA', (accounts) => {
                 fingerprints,
                 dependencies,
                 serviceTemplateId,
+                [0], 0,
                 { from: SLATemplateOwner })
+
             // msg.sender, service, dependencies.length, contracts.length
             const testTemplateId = web3.utils.soliditySha3({ type: 'address', value: SLATemplateOwner }, { type: 'bytes32', value: serviceTemplateId }, { type: 'uint', value: 4 }, { type: 'uint', value: 4 }).toString('hex')
 
@@ -114,7 +116,7 @@ contract('SLA', (accounts) => {
                 utils.valueHash(['string'], ['797FD5B9045B841FDFF72']) // asset Id: 797FD5B9045B841FDFF72
             ]
 
-            const timeoutValues = [0, 0, 0, 3] // timeout 5 blocks @ condition 4
+            const timeoutValues = [0, 0, 0, 3, 20] // timeout 5 blocks @ condition 4
             /*
                 To reconstruct the right signature, as SLA provider you should
                 get a signed message by the consumer with the following parameters:
@@ -195,6 +197,25 @@ contract('SLA', (accounts) => {
             } else {
                 console.warn('\t >> Condition-4 is not timed out yet')
             }
+
+            console.info('\t >> fulfill agreement')
+            const fulfilled = await sla.fulfillAgreement(serviceAgreementId, { from: accounts[8] })
+            console.log('\t >> Agreement ', fulfilled.logs[0].args.serviceAgreementId, ' has been fulfilled')
+
+            console.log('\t >> try to terminate agreement')
+            try {
+                await sla.terminateAgreement(serviceAgreementId, { from: accounts[8] })
+            } catch (error) {
+                console.log('\t >> Unable to terminate agreement! ... wait for time out!')
+                const terminated = await sla.isAgreementTerminated(serviceAgreementId)
+                console.info('\t >> Terminated: ', terminated)
+            }
+            const agreementTimeout = await sla.getAgreementTimeout(serviceAgreementId)
+            console.info('\t >> Waiting for timestamp:',agreementTimeout.toNumber())
+            await sleep(20000)
+            await sla.terminateAgreement(serviceAgreementId, { from: accounts[8] })
+            const terminated = await sla.isAgreementTerminated(serviceAgreementId)
+            console.info('\t >> Terminated: ', terminated)
         })
     })
 })

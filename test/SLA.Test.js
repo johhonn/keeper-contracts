@@ -23,7 +23,9 @@ contract('ServiceAgreement', (accounts) => {
         const resourcePrice = 3
         const resourceName = 'self-driving ai data'
         const serviceName = resourceName
-        let timeouts = [0, 0, 0, 3]
+        let timeouts = [0, 0, 0, 3, 20]
+        const fulfillmentIndices = [0] // Root Condition
+        const fulfilmentOperator = 0 // AND
         const dependencies = [0, 1, 4, 1 | 2 ** 4 | 2 ** 5] // dependency bit | timeout bit
         const did = '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
         before(async () => {
@@ -57,7 +59,8 @@ contract('ServiceAgreement', (accounts) => {
             console.log('functions: ', funcFingerPrints, valuesHashList)
             const setupTx = await sla.setupAgreementTemplate(
                 contracts, funcFingerPrints, dependencies,
-                web3.utils.fromAscii(serviceName), fromProvider
+                web3.utils.fromAscii(serviceName), fulfillmentIndices,
+                fulfilmentOperator, fromProvider
             )
             // Grab `SetupAgreementTemplate` event to fetch the serviceTemplateId
             templateId = testUtils.getEventArgsFromTx(setupTx, 'SetupAgreementTemplate').serviceTemplateId

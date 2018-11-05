@@ -28,7 +28,7 @@ contract('PaymentConditions', (accounts) => {
         let dependencies
         let hashes
 
-        const timeouts = [0, 0, 0]
+        const timeouts = [0, 0, 0, 10]
 
         const walletAllowance = 1000
 
@@ -64,12 +64,16 @@ contract('PaymentConditions', (accounts) => {
                 utils.getSelector(web3, paymentConditions, 'releasePayment')
             ]
             dependencies = [0, 1, 2]
+            const fulfillmentIndices = [0] // Root Condition
+            const fulfilmentOperator = 0 // AND
 
             const result = await agreement.setupAgreementTemplate(
                 contracts,
                 fingerprints,
                 dependencies,
-                web3.utils.fromAscii('test-payment-conditions')
+                web3.utils.fromAscii('test-payment-conditions'),
+                fulfillmentIndices,
+                fulfilmentOperator
             )
             templateId = result.logs[3].args.serviceTemplateId
 

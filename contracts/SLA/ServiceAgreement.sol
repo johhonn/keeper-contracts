@@ -33,7 +33,7 @@ contract ServiceAgreement {
         bytes32[] conditionInstances; // condition Instance = [handler + value hash]
         uint256[] timeoutValues; // in terms of block number not sec!
         bytes32 did; // Decentralized Identifier
-        uint256 timeout; // agreement timeout (termination condition) { 0, 1 }
+        uint256 timeout; // agreement timeout (termination condition)
     }
 
     mapping(bytes32 => ServiceAgreementTemplate) templates;
@@ -175,7 +175,7 @@ contract ServiceAgreement {
         // verify consumer's signature and trigger the execution of agreement
         if (isValidSignature(prefixedHash, signature, consumer)) {
             agreements[serviceAgreementId] = Agreement(
-                false, true, false, new uint8[](0), new uint8[](0), templateId, consumer, msg.sender, new bytes32[](0), new uint256[](0), did, block.timestamp + timeoutValues[timeoutValues.length]
+                false, true, false, new uint8[](0), new uint8[](0), templateId, consumer, msg.sender, new bytes32[](0), new uint256[](0), did, block.timestamp + timeoutValues[timeoutValues.length-1]
             );
             require(initConditions(templateId, serviceAgreementId, valueHashes, timeoutValues, did), 'unable to init conditions');
             templateId2Agreements[templateId].push(serviceAgreementId);
@@ -188,7 +188,6 @@ contract ServiceAgreement {
     }
 
     function fulfillAgreement(bytes32 serviceId) public noPendingFulfillments(serviceId) returns (bool){
-        // TODO: handle OR for agreement termination
         agreements[serviceId].state = true;
         emit AgreementFulfilled(serviceId, agreements[serviceId].templateId, templates[agreements[serviceId].templateId].owner);
         return true;
@@ -291,7 +290,15 @@ contract ServiceAgreement {
         return keccak256(abi.encodePacked(getTemplateId(serviceId), _contract, fingerprint));
     }
 
-    function terminateAgreement (bytes32 serviceId) public isAgreementTimedOut(serviceId) returns (bool) {
-        agreements[serviceId].terminated = true;
+    function terminateAgreement (bytes32 serviceAgreementId) public isAgreementTimedOut(serviceAgreementId) returns (bool) {
+        agreements[serviceAgreementId].terminated = true;
+    }
+
+    function isAgreementTerminated(bytes32 serviceAgreementId) public view returns(bool) {
+        return agreements[serviceAgreementId].terminated;
+    }
+
+    function getAgreementTimeout(bytes32 serviceAgreementId) public view returns(uint256) {
+        return agreements[serviceAgreementId].timeout;
     }
 }
