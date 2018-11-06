@@ -53,4 +53,3 @@ setup(
     zip_safe=False,
 )
 
-os.system("rm -rf ./build")
