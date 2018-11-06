@@ -28,7 +28,7 @@ contract('PaymentConditions', (accounts) => {
         let dependencies
         let hashes
 
-        const timeouts = [0, 0, 0, 10]
+        const timeouts = [0, 0, 0]
 
         const walletAllowance = 1000
 
