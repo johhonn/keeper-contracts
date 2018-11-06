@@ -117,6 +117,8 @@ contract ServiceAgreement {
         // TODO: whitelisting the contracts/fingerprints
         require(contracts.length == fingerprints.length, 'fingerprints and contracts length do not match');
         require(contracts.length == dependenciesBits.length, 'contracts and dependencies do not match');
+        require(fulfillmentIndices.length < contracts.length, 'Invalid fulfillment indices');
+        require(fulfillmentOperator <= fulfillmentIndices.length, 'Invalid fulfillment operator');
         // 1. generate service ID [for trilobite use incremental Id). This not secure and it might lead to race-condition issue and
         // should be something like this: bytes32 templateId = keccak256(abi.encodePacked(msg.sender, service, dependenciesBits.length, contracts.length));
         bytes32 templateId = keccak256(abi.encodePacked(templateIndexId));
