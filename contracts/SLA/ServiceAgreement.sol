@@ -39,6 +39,8 @@ contract ServiceAgreement {
     // map template Id to a list of agreement instances
     mapping(bytes32 => bytes32[]) templateId2Agreements;
 
+    uint256 private templateIndexId = 0;
+
     // is able to revoke agreement template (template is no longer accessible)
     modifier canRevokeTemplate(bytes32 templateId){
         for (uint256 i = 0; i < templateId2Agreements[templateId].length; i++) {
@@ -97,8 +99,10 @@ contract ServiceAgreement {
         // TODO: whitelisting the contracts/fingerprints
         require(contracts.length == fingerprints.length, 'fingerprints and contracts length do not match');
         require(contracts.length == dependenciesBits.length, 'contracts and dependencies do not match');
-        // 1. generate service ID
-        bytes32 templateId = keccak256(abi.encodePacked(msg.sender, service, dependenciesBits.length, contracts.length));
+        // 1. generate service ID [for trilobite use incremental Id). This not secure and it might lead to race-condition issue and
+        // should be something like this: bytes32 templateId = keccak256(abi.encodePacked(msg.sender, service, dependenciesBits.length, contracts.length));
+        bytes32 templateId = keccak256(abi.encodePacked(templateIndexId));
+        templateIndexId +=1;
         // 2. generate conditions
         templates[templateId] = ServiceAgreementTemplate(true, msg.sender, new bytes32[](0), dependenciesBits);
         for (uint256 i = 0; i < contracts.length; i++) {
