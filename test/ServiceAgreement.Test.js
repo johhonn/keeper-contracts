@@ -97,7 +97,9 @@ contract('SLA', (accounts) => {
                 fingerprints,
                 dependencies,
                 serviceTemplateId,
+                [0], 0,
                 { from: SLATemplateOwner })
+
             // msg.sender, service, dependencies.length, contracts.length
             const testTemplateId = web3.utils.soliditySha3({ type: 'uint256', value: 0 }).toString('hex')
 
@@ -194,6 +196,18 @@ contract('SLA', (accounts) => {
                 }
             } else {
                 console.warn('\t >> Condition-4 is not timed out yet')
+            }
+
+            console.info('\t >> fulfill agreement')
+            const fulfilled = await sla.fulfillAgreement(serviceAgreementId, { from: accounts[8] })
+            console.log('\t >> Agreement ', fulfilled.logs[0].args.serviceAgreementId, ' has been fulfilled')
+
+            console.log('\t >> Fulfill agreement: ', serviceAgreementId)
+            try {
+                await sla.fulfillAgreement(serviceAgreementId, { from: accounts[8] })
+                console.log('\t >> Done!')
+            } catch (error) {
+                console.log('\t >> Unable to fulfill agreement!')
             }
         })
     })
