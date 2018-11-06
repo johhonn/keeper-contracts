@@ -101,7 +101,7 @@ contract('SLA', (accounts) => {
                 { from: SLATemplateOwner })
 
             // msg.sender, service, dependencies.length, contracts.length
-            const testTemplateId = web3.utils.soliditySha3({ type: 'address', value: SLATemplateOwner }, { type: 'bytes32', value: serviceTemplateId }, { type: 'uint', value: 4 }, { type: 'uint', value: 4 }).toString('hex')
+            const testTemplateId = web3.utils.soliditySha3({ type: 'uint256', value: 0 }).toString('hex')
 
             const templateId = result.logs[4].args.serviceTemplateId
             assert.strictEqual(templateId, testTemplateId, 'Template Id should match indicating creating of agreement template')
