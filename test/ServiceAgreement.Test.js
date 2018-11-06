@@ -93,6 +93,7 @@ contract('SLA', (accounts) => {
             // setup service level agreement template
             console.log('\t >> Create service level agreement template')
             const result = await sla.setupAgreementTemplate(
+                serviceTemplateId,
                 contracts,
                 fingerprints,
                 dependencies,
@@ -101,10 +102,9 @@ contract('SLA', (accounts) => {
                 { from: SLATemplateOwner })
 
             // msg.sender, service, dependencies.length, contracts.length
-            const testTemplateId = web3.utils.soliditySha3({ type: 'uint256', value: 0 }).toString('hex')
 
             const templateId = result.logs[4].args.serviceTemplateId
-            assert.strictEqual(templateId, testTemplateId, 'Template Id should match indicating creating of agreement template')
+            assert.strictEqual(templateId, serviceTemplateId, 'Template Id should match indicating creating of agreement template')
             console.log('\x1b[36m%s\x1b[0m', '\t >> Template ID:', templateId, '... Done!')
             console.log('\t >> Execute service level agreement')
             // reconstruct the three condition keys off-chain

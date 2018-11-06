@@ -10,6 +10,7 @@ const utils = require('./utils.js')
 const Web3 = require('web3')
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 const did = '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
+const serviceTemplateId = '0x419d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
 
 contract('PaymentConditions', (accounts) => {
     describe('Tests payment conditions used in SLAs', () => {
@@ -27,7 +28,6 @@ contract('PaymentConditions', (accounts) => {
         let fingerprints
         let dependencies
         let hashes
-
         const timeouts = [0, 0, 0]
 
         const walletAllowance = 1000
@@ -68,6 +68,7 @@ contract('PaymentConditions', (accounts) => {
             const fulfilmentOperator = 0 // AND
 
             const result = await agreement.setupAgreementTemplate(
+                serviceTemplateId,
                 contracts,
                 fingerprints,
                 dependencies,
