@@ -120,7 +120,7 @@ contract ServiceAgreement {
         // TODO: whitelisting the contracts/fingerprints
         require(contracts.length == fingerprints.length, 'fingerprints and contracts length do not match');
         require(contracts.length == dependenciesBits.length, 'contracts and dependencies do not match');
-        require(fulfillmentIndices.length < contracts.length, 'Invalid fulfillment indices');
+        require(fulfillmentIndices.length <= contracts.length, 'Invalid fulfillment indices');
         require(fulfillmentOperator <= fulfillmentIndices.length, 'Invalid fulfillment operator');
         // 2. generate conditions
         templates[templateId] = ServiceAgreementTemplate(true, msg.sender, new bytes32[](0), dependenciesBits, fulfillmentIndices, fulfillmentOperator);
