@@ -28,6 +28,7 @@ contract('ServiceAgreement', (accounts) => {
         const fulfilmentOperator = 0 // AND
         const dependencies = [0, 1, 4, 1 | 2 ** 4 | 2 ** 5] // dependency bit | timeout bit
         const did = '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
+        const serviceTemplateId = '0x419d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
         before(async () => {
             token = await OceanToken.new()
             // await token.setReceiver(consumer)
@@ -58,7 +59,7 @@ contract('ServiceAgreement', (accounts) => {
             console.log('conditions control contracts', contracts)
             console.log('functions: ', funcFingerPrints, valuesHashList)
             const setupTx = await sla.setupAgreementTemplate(
-                contracts, funcFingerPrints, dependencies,
+                serviceTemplateId, contracts, funcFingerPrints, dependencies,
                 web3.utils.fromAscii(serviceName), fulfillmentIndices,
                 fulfilmentOperator, fromProvider
             )

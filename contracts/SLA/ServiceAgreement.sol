@@ -42,8 +42,6 @@ contract ServiceAgreement {
     // map template Id to a list of agreement instances
     mapping(bytes32 => bytes32[]) templateId2Agreements;
 
-    uint256 private templateIndexId = 0;
-
     // is able to revoke agreement template (template is no longer accessible)
     modifier canRevokeTemplate(bytes32 templateId){
         for (uint256 i = 0; i < templateId2Agreements[templateId].length; i++) {
@@ -101,6 +99,11 @@ contract ServiceAgreement {
         _;
     }
 
+    modifier isValidTemplateId(bytes32 templateId) {
+        require(!templates[templateId].state, 'Template ID already exists');
+        _;
+    }
+
     // events
     event SetupCondition(bytes32 serviceTemplate, bytes32 condition, address provider);
     event SetupAgreementTemplate(bytes32 serviceTemplateId, address provider);
@@ -112,17 +115,13 @@ contract ServiceAgreement {
 
 
     // Setup service agreement template only once!
-    function setupAgreementTemplate(address[] contracts, bytes4[] fingerprints, uint256[] dependenciesBits, bytes32 service, uint8[] fulfillmentIndices, uint8 fulfillmentOperator)
-    public returns (bool){
+    function setupAgreementTemplate(bytes32 templateId, address[] contracts, bytes4[] fingerprints, uint256[] dependenciesBits, bytes32 service, uint8[] fulfillmentIndices, uint8 fulfillmentOperator)
+    public isValidTemplateId(templateId) returns (bool){
         // TODO: whitelisting the contracts/fingerprints
         require(contracts.length == fingerprints.length, 'fingerprints and contracts length do not match');
         require(contracts.length == dependenciesBits.length, 'contracts and dependencies do not match');
         require(fulfillmentIndices.length < contracts.length, 'Invalid fulfillment indices');
         require(fulfillmentOperator <= fulfillmentIndices.length, 'Invalid fulfillment operator');
-        // 1. generate service ID [for trilobite use incremental Id). This not secure and it might lead to race-condition issue and
-        // should be something like this: bytes32 templateId = keccak256(abi.encodePacked(msg.sender, service, dependenciesBits.length, contracts.length));
-        bytes32 templateId = keccak256(abi.encodePacked(templateIndexId));
-        templateIndexId +=1;
         // 2. generate conditions
         templates[templateId] = ServiceAgreementTemplate(true, msg.sender, new bytes32[](0), dependenciesBits, fulfillmentIndices, fulfillmentOperator);
         for (uint256 i = 0; i < contracts.length; i++) {
