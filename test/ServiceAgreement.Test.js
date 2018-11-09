@@ -2,11 +2,10 @@
 /* eslint-disable no-console, max-len */
 
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
-const Web3 = require('web3')
 const abi = require('ethereumjs-abi')
 const utils = require('./utils')
 
-const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
+const web3 = utils.getWeb3()
 
 var colorSet = {
     Reset: '\x1b[0m',

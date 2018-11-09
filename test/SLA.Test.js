@@ -8,8 +8,7 @@ const PaymentCtrl = artifacts.require('PaymentConditions.sol')
 const AccessCtrl = artifacts.require('AccessConditions.sol')
 const testUtils = require('./utils')
 
-const Web3 = require('web3')
-const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
+const web3 = testUtils.getWeb3()
 
 contract('ServiceAgreement', (accounts) => {
     describe('Test On-chain Authorization', () => {
