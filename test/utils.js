@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
 /* global assert */
+const Web3 = require('web3')
 
 const Eth = require('ethjs')
 const HttpProvider = require('ethjs-provider-http')
@@ -14,6 +15,11 @@ const utils = {
     getVoteSaltHash: (vote, salt) => (
         `0x${abi.soliditySHA3(['uint', 'uint'], [vote, salt]).toString('hex')}`
     ),
+
+    getWeb3: () => {
+        const nodeUrl = `http://localhost:${process.env.PORT ? process.env.PORT : '8545'}`
+        return new Web3(new Web3.providers.HttpProvider(nodeUrl))
+    },
 
     getListingHash: domain => (
         `0x${abi.soliditySHA3(['string'], [domain]).toString('hex')}`

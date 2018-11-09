@@ -10,9 +10,9 @@ const EthCrypto = require('eth-crypto')
 const EthjsUtil = require('ethereumjs-util')
 const ethers = require('ethers')
 const BigNumber = require('bignumber.js')
-const Web3 = require('web3')
+const utils = require('./utils.js')
 
-const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
+const web3 = utils.getWeb3()
 
 contract('OceanAuth', (accounts) => {
     describe('Test On-chain Authorization', () => {
