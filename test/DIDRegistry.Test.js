@@ -3,11 +3,9 @@
 /* global artifacts, assert, contract, describe, it */
 
 const DIDRegistry = artifacts.require('DIDRegistry.sol')
-
-const Web3 = require('web3')
-const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
-
 const utils = require('./utils.js')
+
+const web3 = utils.getWeb3()
 
 contract('DIDRegistry', (accounts) => {
     describe('Register decentralised identifiers with attributes, fetch attributes by DID', () => {
