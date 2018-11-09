@@ -81,7 +81,7 @@ deploy:
       condition: $DEPLOY_PACKAGE = true
 
   - provider: script
-    script: bash -x ./scripts/deploy_pypi.sh
+    script: bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
     skip_cleanup: true
     on:
       tags: true
@@ -89,7 +89,7 @@ deploy:
       condition: $DEPLOY_PACKAGE = true
 
   - provider: script
-    script: bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
+    script: bash -x ./scripts/deploy_pypi.sh
     skip_cleanup: true
     on:
       tags: true
