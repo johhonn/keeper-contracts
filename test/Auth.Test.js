@@ -5,7 +5,9 @@ const OceanToken = artifacts.require('OceanToken.sol')
 const OceanMarket = artifacts.require('OceanMarket.sol')
 const OceanAuth = artifacts.require('OceanAuth.sol')
 
-const ursa = require('ursa')
+const EthEcies = require('eth-ecies')
+const EthCrypto = require('eth-crypto')
+const EthjsUtil = require('ethereumjs-util')
 const ethers = require('ethers')
 const BigNumber = require('bignumber.js')
 const Web3 = require('web3')
@@ -23,7 +25,7 @@ contract('OceanAuth', (accounts) => {
             const scale = 10 ** 18
 
             const str = 'resource'
-            const resourceId = await market.generateId(str, { from: accounts[0] })
+            const resourceId = await market.generateId(web3.utils.fromAscii(str), { from: accounts[0] })
             const resourcePrice = 100 * scale
             // 1. provider register dataset
             await market.register(resourceId, new BigNumber(resourcePrice), { from: accounts[0] })
@@ -38,13 +40,9 @@ contract('OceanAuth', (accounts) => {
             await token.approve(market.address, new BigNumber(200 * scale), { from: accounts[1] })
 
             // 2. consumer initiate an access request
-            const modulusBit = 512
-            const key = ursa.generatePrivateKey(modulusBit, 65537)
-            const privatePem = ursa.createPrivateKey(key.toPrivatePem())
-            const publicPem = ursa.createPublicKey(key.toPublicPem())
-            // convert public key into string so that to store on-chain
-            const publicKey = publicPem.toPublicPem('utf8')
-            console.log('public key is: = ', publicKey)
+            const key = EthCrypto.createIdentity()
+            const publicKey = EthjsUtil.privateToPublic(key.privateKey).toString('hex')
+            console.log('public key is: =', publicKey)
 
             const initiateAccessRequestTx = await auth.initiateAccessRequest(resourceId, accounts[0], publicKey, 9999999999, { from: accounts[1] })
 
@@ -52,7 +50,7 @@ contract('OceanAuth', (accounts) => {
                 return log.event === 'AccessConsentRequested'
             })[0].args._id
 
-            console.log('consumer creates an access request with id : ', accessId)
+            console.log('consumer creates an access request with id :', accessId)
 
             // 3. provider commit the request
             await auth.commitAccessRequest(accessId, true, 9999999999, 'discovery', 'read', 'slaLink', 'slaType', { from: accounts[0] })
@@ -71,9 +69,8 @@ contract('OceanAuth', (accounts) => {
             // console.log('provider Retrieve the temp public key:', OnChainPubKey)
             assert.strictEqual(publicKey, OnChainPubKey, 'two public keys should match.')
 
-            const getPubKeyPem = ursa.coerceKey(OnChainPubKey)
-            const encJWT = getPubKeyPem.encrypt('eyJhbGciOiJIUzI1', 'utf8', 'hex')
-            console.log('encJWT: ', `0x${encJWT}`)
+            const encJWT = EthEcies.encrypt(Buffer.from(OnChainPubKey, 'hex'), Buffer.from('eyJhbGciOiJIUzI1')).toString('hex')
+            console.log('encJWT:', `0x${encJWT}`)
             // check status
 
             await auth.deliverAccessToken(accessId, `0x${encJWT}`, { from: accounts[0] })
@@ -81,7 +78,12 @@ contract('OceanAuth', (accounts) => {
 
             // 4. consumer download the encrypted token and decrypt
             const onChainencToken = await auth.getEncryptedAccessToken(accessId, { from: accounts[1] })
-            const decryptJWT = privatePem.decrypt(onChainencToken.slice(2), 'hex', 'utf8') // remove '0x' prefix
+            // remove 0x from token
+            const tokenNo0x = onChainencToken.slice(2)
+            const encryptedTokenBuffer = Buffer.from(tokenNo0x, 'hex')
+            // remove 0x from private key
+            const privateKey = key.privateKey.slice(2)
+            const decryptJWT = EthEcies.decrypt(Buffer.from(privateKey, 'hex'), encryptedTokenBuffer).toString()
             console.log('consumer decrypts JWT token off-chain :', decryptJWT.toString())
             assert.strictEqual(decryptJWT.toString(), 'eyJhbGciOiJIUzI1', 'two public keys should match.')
 
