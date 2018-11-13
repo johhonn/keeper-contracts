@@ -1,4 +1,4 @@
-/* global artifacts, contract, before, describe, it */
+/* global artifacts, contract, before, describe, it, assert */
 /* eslint-disable no-console, max-len */
 
 const OceanToken = artifacts.require('OceanToken.sol')
@@ -12,12 +12,12 @@ const web3 = testUtils.getWeb3()
 
 contract('ComputeConditions', (accounts) => {
     describe('Test On-Premise Compute Service Use Case', () => {
-        let token, market, sla, paymentConditions, accessConditions, computeConditions, resourceId, valuesHashList, serviceId, conditionKeys, templateId
+        let token, market, serviceAgreement, paymentConditions, accessConditions, computeConditions, resourceId, valuesHashList, serviceId, conditionKeys, templateId
         let funcFingerPrints, contracts, serviceAgreementId, slaMsgHash, signature
         const publisher = accounts[0]
         const datascientist = accounts[1]
         // for more info about the Compute use case dependencyBits: https://github.com/oceanprotocol/dev-ocean/pull/85
-        const fulfillmentIndices = [3,4] // Root Conditions
+        const fulfillmentIndices = [3, 4] // Root Conditions
         const fulfilmentOperator = 1 // OR
         const dependencies = [0, 1, 4, 16, 3]
         const price = 5 // 5 OCN tokens
@@ -66,6 +66,7 @@ contract('ComputeConditions', (accounts) => {
                 datascientist, valuesHashList, timeouts,
                 serviceAgreementId, did, { from: publisher }
             )
+            assert.strictEqual(serviceId, serviceAgreementId, 'Error: unable to retrieve service agreement Id')
         })
 
         it('should be able to lock payment for on-premise compute publisher', async () => {
