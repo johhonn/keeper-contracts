@@ -6,7 +6,7 @@ const { saveDefinition } = require('./helper')
 const computeConditions = async (deployer, network) => {
     await deployer.deploy(ComputeConditions, ServiceAgreement.address)
 
-    saveDefinition(network, AccessConditions)
+    saveDefinition(network, ComputeConditions)
 }
 
 module.exports = computeConditions
