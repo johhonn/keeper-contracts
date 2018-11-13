@@ -1,6 +1,6 @@
 pragma solidity ^0.4.25;
 
-import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
+import 'github.com/openzeppelin/openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
 import './ServiceAgreement.sol';
 
 contract ComputeConditions {
@@ -10,7 +10,6 @@ contract ComputeConditions {
         bool valid;
         bool locked;
         address dataScientist;
-        address computePublisher;
         bytes32 algorithmHash;
         bytes signature;
     }
@@ -30,6 +29,7 @@ contract ComputeConditions {
 
     modifier onlyComputePublisher(bytes32 serviceAgreementId) {
         require(msg.sender == serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), 'Invalid publisher address');
+        require(!proofs[serviceAgreementId].valid, 'avoid replay attack!');
         _;
 
     }
@@ -56,7 +56,7 @@ contract ComputeConditions {
             proofs[serviceAgreementId].signature = signature;
             fulfillUpload(serviceAgreementId);
         }else{
-            proofs[serviceAgreementId] = UploadProof(true, false, true, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), bytes32(0), signature);
+            proofs[serviceAgreementId] = UploadProof(true, false, true, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), bytes32(0), signature);
         }
         emit SignatureSubmitted(serviceAgreementId, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), true);
         proofs[serviceAgreementId].locked = false;
@@ -74,7 +74,7 @@ contract ComputeConditions {
             proofs[serviceAgreementId].algorithmHash = hash;
             fulfillUpload(serviceAgreementId);
         }else{
-            proofs[serviceAgreementId] = UploadProof(true, false, true, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), hash, new bytes(0));
+            proofs[serviceAgreementId] = UploadProof(true, false, true, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), hash, new bytes(0));
         }
         emit HashSubmitted(serviceAgreementId, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), true);
         proofs[serviceAgreementId].locked = false;
