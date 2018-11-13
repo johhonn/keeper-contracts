@@ -1,6 +1,6 @@
 pragma solidity ^0.4.25;
 
-import 'github.com/openzeppelin/openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
+import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
 import './ServiceAgreement.sol';
 
 contract ComputeConditions {
