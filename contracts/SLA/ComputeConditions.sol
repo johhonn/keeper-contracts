@@ -30,7 +30,6 @@ contract ComputeConditions {
 
     modifier onlyComputePublisher(bytes32 serviceAgreementId) {
         require(msg.sender == serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), 'Invalid publisher address');
-        require(!proofs[serviceAgreementId].valid, 'avoid replay attack!');
         _;
 
     }
