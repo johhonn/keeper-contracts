@@ -12,7 +12,7 @@ const web3 = testUtils.getWeb3()
 
 contract('ComputeConditions', (accounts) => {
     describe('Test On-Premise Compute Service Use Case', () => {
-        let token, market, serviceAgreement, paymentConditions, accessConditions, computeConditions, resourceId, valuesHashList, serviceId, conditionKeys, templateId
+        let token, market, serviceAgreement, paymentConditions, accessConditions, computeConditions, valuesHashList, serviceId, conditionKeys, templateId
         let funcFingerPrints, contracts, serviceAgreementId, slaMsgHash, signature, algorithmHash
         const publisher = accounts[0]
         const datascientist = accounts[1]
@@ -24,7 +24,6 @@ contract('ComputeConditions', (accounts) => {
         const timeouts = [0, 0, 0, 0, 100]
         const did = testUtils.generateId(web3)
         const serviceTemplateId = testUtils.generateId(web3)
-        const derivedAssetDID = testUtils.generateId(web3)
         serviceAgreementId = testUtils.generateId(web3)
         const algorithm = 'THIS IS FAKE CODE foo=Hello World!'
 
@@ -74,8 +73,8 @@ contract('ComputeConditions', (accounts) => {
         })
 
         it('Data Scientist should be able to lock payment for on-premise compute', async () => {
-            const payTx = await paymentConditions.lockPayment(serviceId, did, price , { from: datascientist })
-            const locked = await serviceAgreement.getConditionStatus(serviceId, conditionKeys[0])
+            await paymentConditions.lockPayment(serviceId, did, price, { from: datascientist })
+            const locked = await serviceAgreement.getConditionStatus(serviceAgreementId, conditionKeys[0])
             assert.strictEqual(locked.toNumber(), 1, 'Error: Unable to lock payment!')
         })
 
@@ -94,25 +93,25 @@ contract('ComputeConditions', (accounts) => {
         })
 
         it('Service publisher should be able to grant access for derived asset to the data scientist', async () => {
-            const grantAccessCondition = await accessConditions.grantAccess(serviceAgreementId, did, did, { from: publisher})
+            await accessConditions.grantAccess(serviceAgreementId, did, did, { from: publisher })
             const fulfillAccessConditionState = await serviceAgreement.getConditionStatus(serviceAgreementId, conditionKeys[2])
             assert.strictEqual(fulfillAccessConditionState.toNumber(), 1, 'Error: unable to fulfill granted access to derived asset condition')
         })
 
         it('Service publisher should be able to release payment', async () => {
-            const releasePaymentCondition = await paymentConditions.releasePayment(serviceAgreementId, did, price, {from: publisher})
+            await paymentConditions.releasePayment(serviceAgreementId, did, price, { from: publisher })
             const fulfillReleasePaymentConditionState = await serviceAgreement.getConditionStatus(serviceAgreementId, conditionKeys[3])
             assert.strictEqual(fulfillReleasePaymentConditionState.toNumber(), 1, 'Error: unable to fulfill release payment condition')
         })
 
         it('data scientist should not be able to make refund payment', async () => {
-            const refundPaymentCondition = await paymentConditions.refundPayment(serviceAgreementId, did, price, {from: datascientist})
+            await paymentConditions.refundPayment(serviceAgreementId, did, price, { from: datascientist })
             const fulfillRefundPaymentConditionState = await serviceAgreement.getConditionStatus(serviceAgreementId, conditionKeys[4])
             assert.strictEqual(fulfillRefundPaymentConditionState.toNumber(), 0, 'Error: unable to fulfill refund payment condition')
         })
 
         it('Service agreement should be fulfilled', async () => {
-            const fulfilled = await serviceAgreement.fulfillAgreement(serviceAgreementId, { from: publisher })
+            await serviceAgreement.fulfillAgreement(serviceAgreementId, { from: publisher })
             const agreementTerminated = await serviceAgreement.isAgreementTerminated(serviceAgreementId, { from: publisher })
             assert.strictEqual(agreementTerminated, true, 'Error: unable to fulfill or terminate the agreement')
         })
