@@ -64,6 +64,7 @@ script:
     fi
 - git status
 - git add package-lock.json
+- git add ./artifacts/*.json
 - git diff-index --quiet HEAD || git commit -m "Travis update"
 
 after_script:
