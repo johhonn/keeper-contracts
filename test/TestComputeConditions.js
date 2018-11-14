@@ -13,7 +13,7 @@ const web3 = testUtils.getWeb3()
 contract('ComputeConditions', (accounts) => {
     describe('Test On-Premise Compute Service Use Case', () => {
         let token, market, serviceAgreement, paymentConditions, accessConditions, computeConditions, resourceId, valuesHashList, serviceId, conditionKeys, templateId
-        let funcFingerPrints, contracts, serviceAgreementId, slaMsgHash, signature
+        let funcFingerPrints, contracts, serviceAgreementId, slaMsgHash, signature, algorithmHash
         const publisher = accounts[0]
         const datascientist = accounts[1]
         // for more info about the Compute use case dependencyBits: https://github.com/oceanprotocol/dev-ocean/pull/85
@@ -24,6 +24,8 @@ contract('ComputeConditions', (accounts) => {
         const timeouts = [0, 0, 0, 0, 100]
         const did = testUtils.generateId(web3)
         const serviceTemplateId = testUtils.generateId(web3)
+        const derivedAssetDID = testUtils.generateId(web3)
+        serviceAgreementId = testUtils.generateId(web3)
         const algorithm = 'THIS IS FAKE CODE foo=Hello World!'
 
         before(async () => {
@@ -46,7 +48,7 @@ contract('ComputeConditions', (accounts) => {
             valuesHashList = [
                 testUtils.valueHash(['bytes32', 'uint256'], [did, price]),
                 testUtils.valueHash(['bool'], [true]),
-                testUtils.valueHash(['bytes32', 'bytes32'], [did, resourceId]),
+                testUtils.valueHash(['bytes32', 'bytes32'], [did, did]),
                 testUtils.valueHash(['bytes32', 'uint256'], [did, price]),
                 testUtils.valueHash(['bytes32', 'uint256'], [did, price])
             ]
@@ -58,7 +60,7 @@ contract('ComputeConditions', (accounts) => {
             )
             templateId = testUtils.getEventArgsFromTx(createAgreementTemplate, 'SetupAgreementTemplate').serviceTemplateId
             // create new agreement instance
-            serviceAgreementId = testUtils.generateId(web3)
+
             conditionKeys = testUtils.generateConditionsKeys(templateId, contracts, funcFingerPrints)
             slaMsgHash = testUtils.createSLAHash(web3, templateId, conditionKeys, valuesHashList, timeouts, serviceAgreementId)
             signature = await web3.eth.sign(slaMsgHash, datascientist)
@@ -78,18 +80,23 @@ contract('ComputeConditions', (accounts) => {
         })
 
         it('Data scientist should be able to submit algorithm signature', async () => {
-            const algorithmHash = web3.utils.soliditySha3({ type: 'string', value: algorithm }).toString('hex')
+            algorithmHash = web3.utils.soliditySha3({ type: 'string', value: algorithm }).toString('hex')
             const signature = await web3.eth.sign(algorithmHash, datascientist)
             const submitAlgorithmSignature = await computeConditions.submitSignature(serviceAgreementId, signature, { from: datascientist })
             assert.strictEqual(submitAlgorithmSignature.logs[0].args.state, true, 'Error: Unable to submit signature')
         })
 
         it('Service publisher should be able to submit algorithm hash and start computation', async () => {
-
+            const submitAlgorithmHash = await computeConditions.submitHash(serviceAgreementId, algorithmHash, { from: publisher })
+            assert.strictEqual(submitAlgorithmHash.logs[0].args.state, true, 'Error: Unable to submit algorithm hash')
+            const fulfillUploadCondition = await serviceAgreement.getConditionStatus(serviceAgreementId, conditionKeys[1])
+            assert.strictEqual(fulfillUploadCondition.toNumber(), 1, 'Error: unable to fulfill the upload condition')
         })
 
         it('Service publisher should be able to grant access for derived asset to the data scientist', async () => {
-
+            const grantAccessCondition = await accessConditions.grantAccess(serviceAgreementId, did, did, { from: publisher})
+            //console.log(grantAccessCondition.logs)
+            //assert.strictEqual(grantAccessCondition.logs[0].args.assetId, derivedAssetDID, 'Error, unable to grant access')
         })
 
         it('Service publisher should be able to release payment', async () => {
@@ -97,6 +104,10 @@ contract('ComputeConditions', (accounts) => {
         })
 
         it('data scientist should not be able to make refund payment', async () => {
+
+        })
+
+        it('Service agreement should be fulfilled', async () => {
 
         })
     })
