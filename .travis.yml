@@ -58,7 +58,10 @@ script:
 - npm run lint
 - npm run test:cover
 - npm run migrate
-- npm run migrate:poa_aws
+- |
+    if [ "${DEPLOY_PACKAGE}" = "true" ]; then
+        npm run migrate:poa_aws
+    fi
 - git status
 - git add package-lock.json
 - git diff-index --quiet HEAD || git commit -m "Travis update"
