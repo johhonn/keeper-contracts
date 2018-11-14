@@ -24,6 +24,7 @@ contract('ComputeConditions', (accounts) => {
         const timeouts = [0, 0, 0, 0, 100]
         const did = testUtils.generateId(web3)
         const serviceTemplateId = testUtils.generateId(web3)
+        const algorithm = 'THIS IS FAKE CODE foo=Hello World!'
 
         before(async () => {
             token = await OceanToken.deployed()
@@ -67,29 +68,35 @@ contract('ComputeConditions', (accounts) => {
                 serviceAgreementId, did, { from: publisher }
             )
             assert.strictEqual(serviceId, serviceAgreementId, 'Error: unable to retrieve service agreement Id')
+            await token.approve(paymentConditions.address, testUtils.toBigNumber(200), { from: datascientist })
         })
 
-        it('should be able to lock payment for on-premise compute publisher', async () => {
+        it('Data Scientist should be able to lock payment for on-premise compute', async () => {
+            const payTx = await paymentConditions.lockPayment(serviceId, did, price , { from: datascientist })
+            const locked = await serviceAgreement.getConditionStatus(serviceId, conditionKeys[0])
+            assert.strictEqual(locked.toNumber(), 1, 'Error: Unable to lock payment!')
+        })
+
+        it('Data scientist should be able to submit algorithm signature', async () => {
+            const algorithmHash = web3.utils.soliditySha3({ type: 'string', value: algorithm }).toString('hex')
+            const signature = await web3.eth.sign(algorithmHash, datascientist)
+            const submitAlgorithmSignature = await computeConditions.submitSignature(serviceAgreementId, signature, { from: datascientist })
+            assert.strictEqual(submitAlgorithmSignature.logs[0].args.state, true, 'Error: Unable to submit signature')
+        })
+
+        it('Service publisher should be able to submit algorithm hash and start computation', async () => {
 
         })
 
-        it('should be able to upload data scientist algorithm', async () => {
+        it('Service publisher should be able to grant access for derived asset to the data scientist', async () => {
 
         })
 
-        it('should be able to grant access for derived asset to the data scientist', async () => {
+        it('Service publisher should be able to release payment', async () => {
 
         })
 
-        it('should be able to grant access for derived asset to the data scientist', async () => {
-
-        })
-
-        it('should be able to release payment for on-premise compute publisher', async () => {
-
-        })
-
-        it('should not be able to make refund payment to data scientist', async () => {
+        it('data scientist should not be able to make refund payment', async () => {
 
         })
     })
