@@ -89,26 +89,32 @@ contract('ComputeConditions', (accounts) => {
         it('Service publisher should be able to submit algorithm hash and start computation', async () => {
             const submitAlgorithmHash = await computeConditions.submitHash(serviceAgreementId, algorithmHash, { from: publisher })
             assert.strictEqual(submitAlgorithmHash.logs[0].args.state, true, 'Error: Unable to submit algorithm hash')
-            const fulfillUploadCondition = await serviceAgreement.getConditionStatus(serviceAgreementId, conditionKeys[1])
-            assert.strictEqual(fulfillUploadCondition.toNumber(), 1, 'Error: unable to fulfill the upload condition')
+            const fulfillUploadConditionState = await serviceAgreement.getConditionStatus(serviceAgreementId, conditionKeys[1])
+            assert.strictEqual(fulfillUploadConditionState.toNumber(), 1, 'Error: unable to fulfill the upload condition')
         })
 
         it('Service publisher should be able to grant access for derived asset to the data scientist', async () => {
             const grantAccessCondition = await accessConditions.grantAccess(serviceAgreementId, did, did, { from: publisher})
-            //console.log(grantAccessCondition.logs)
-            //assert.strictEqual(grantAccessCondition.logs[0].args.assetId, derivedAssetDID, 'Error, unable to grant access')
+            const fulfillAccessConditionState = await serviceAgreement.getConditionStatus(serviceAgreementId, conditionKeys[2])
+            assert.strictEqual(fulfillAccessConditionState.toNumber(), 1, 'Error: unable to fulfill granted access to derived asset condition')
         })
 
         it('Service publisher should be able to release payment', async () => {
-
+            const releasePaymentCondition = await paymentConditions.releasePayment(serviceAgreementId, did, price, {from: publisher})
+            const fulfillReleasePaymentConditionState = await serviceAgreement.getConditionStatus(serviceAgreementId, conditionKeys[3])
+            assert.strictEqual(fulfillReleasePaymentConditionState.toNumber(), 1, 'Error: unable to fulfill release payment condition')
         })
 
         it('data scientist should not be able to make refund payment', async () => {
-
+            const refundPaymentCondition = await paymentConditions.refundPayment(serviceAgreementId, did, price, {from: datascientist})
+            const fulfillRefundPaymentConditionState = await serviceAgreement.getConditionStatus(serviceAgreementId, conditionKeys[4])
+            assert.strictEqual(fulfillRefundPaymentConditionState.toNumber(), 0, 'Error: unable to fulfill refund payment condition')
         })
 
         it('Service agreement should be fulfilled', async () => {
-
+            const fulfilled = await serviceAgreement.fulfillAgreement(serviceAgreementId, { from: publisher })
+            const agreementTerminated = await serviceAgreement.isAgreementTerminated(serviceAgreementId, { from: publisher })
+            assert.strictEqual(agreementTerminated, true, 'Error: unable to fulfill or terminate the agreement')
         })
     })
 })
