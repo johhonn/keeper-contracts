@@ -1,6 +1,6 @@
 {
   "name": "@oceanprotocol/keeper-contracts",
-  "version": "0.3.19",
+  "version": "0.3.21",
   "description": "Integration of TCRs, CPM and Ocean Tokens in Solidity",
   "bugs": {
     "url": "https://github.com/oceanprotocol/keeper-contracts/issues"
@@ -10,8 +10,9 @@
   "scripts": {
     "compile": "truffle compile",
     "migrate": "truffle migrate",
-    "migrate:poa": "npm run migrate -- --network ocean_poa_net_local",
-    "migrate:aws": "npm run migrate -- --network ocean_poa_aws",
+    "migrate:poa_local": "npm run migrate -- --network ocean_poa_net_local",
+    "migrate:poa_net": "npm run migrate -- --network ocean_poa_net",
+    "migrate:poa_aws": "npm run migrate -- --network ocean_poa_aws",
     "migrate:kovan": "npm run migrate -- --network kovan",
     "migrate:rinkeby": "npm run migrate -- --network rinkeby",
     "migrate:mainnet": "npm run migrate ----network mainnet",
@@ -45,15 +46,15 @@
     "babel-eslint": "^10.0.1",
     "babel-preset-env": "^1.7.0",
     "bignumber.js": "^8.0.1",
-    "eslint": "^5.8.0",
+    "eslint": "^5.9.0",
     "eslint-config-oceanprotocol": "^1.3.0",
     "eslint-plugin-node": "^8.0.0",
     "eslint-plugin-standard": "^4.0.0",
-    "eth-crypto": "^1.2.5",
+    "eth-crypto": "^1.2.7",
     "eth-ecies": "^1.0.3",
     "ethereumjs-abi": "^0.6.5",
     "ethereumjs-util": "^6.0.0",
-    "ethers": "^4.0.9",
+    "ethers": "^4.0.12",
     "ethjs": "^0.4.0",
     "ethjs-abi": "^0.2.1",
     "ethjs-provider-http": "^0.1.6",
