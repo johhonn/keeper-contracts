@@ -58,7 +58,7 @@ script:
 - npm run lint
 - npm run test:cover
 - npm run migrate
-- npm run migrate:aws
+- npm run migrate:poa_aws
 - git status
 - git add package-lock.json
 - git diff-index --quiet HEAD || git commit -m "Travis update"
