@@ -37,7 +37,8 @@ module.exports = {
         // kovan testnet
         kovan: {
             provider: () => new HDWalletProvider(process.env.KOVAN_NMEMORIC, `https://kovan.infura.io/v2/${process.env.INFURA_TOKEN}`),
-            network_id: '42'
+            network_id: '42',
+            from: '0x2c0d5f47374b130ee398f4c34dbe8168824a8616'
         },
         // local testnet for generate coverage
         coverage: {
