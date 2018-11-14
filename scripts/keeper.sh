@@ -16,7 +16,7 @@ then
     if [ "${DEPLOY_CONTRACTS}" != "false" ]
     then
 
-        npm run migrate:poa
+        npm run migrate:poa_local
     fi
 else
     if [ "${REUSE_DATABASE}" = "true" -a "${DATABASE_PATH}" != "" ]
