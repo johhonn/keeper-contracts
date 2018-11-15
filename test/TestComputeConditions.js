@@ -82,12 +82,14 @@ contract('ComputeConditions', (accounts) => {
             algorithmHash = web3.utils.soliditySha3({ type: 'string', value: algorithm }).toString('hex')
             const signature = await web3.eth.sign(algorithmHash, datascientist)
             const submitAlgorithmSignature = await computeConditions.submitHashSignature(serviceAgreementId, signature, { from: datascientist })
-            assert.strictEqual(submitAlgorithmSignature.logs[0].args.state, true, 'Error: Unable to submit signature')
+            const isSignatureSubmitted = testUtils.getEventArgsFromTx(submitAlgorithmSignature, 'HashSignatureSubmitted')
+            assert.strictEqual(isSignatureSubmitted.state, true, 'Error: Unable to submit signature')
         })
 
         it('Service publisher should be able to submit algorithm hash and start computation', async () => {
             const submitAlgorithmHash = await computeConditions.submitAlgorithmHash(serviceAgreementId, algorithmHash, { from: publisher })
-            assert.strictEqual(submitAlgorithmHash.logs[0].args.state, true, 'Error: Unable to submit algorithm hash')
+            const isHashSubmitted = testUtils.getEventArgsFromTx(submitAlgorithmHash, 'HashSubmitted')
+            assert.strictEqual(isHashSubmitted.state, true, 'Error: Unable to submit algorithm hash')
             const fulfillUploadConditionState = await serviceAgreement.getConditionStatus(serviceAgreementId, conditionKeys[1])
             assert.strictEqual(fulfillUploadConditionState.toNumber(), 1, 'Error: unable to fulfill the upload condition')
         })

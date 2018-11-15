@@ -56,7 +56,7 @@ contract ComputeConditions {
     /// the message integrity and proof that both parties agree on the same algorithm file/s
     /// @param serviceAgreementId , the service level agreement Id
     /// @param signature data scientist signature = signed_hash(uploaded_algorithm_file/s)
-    function submitHashSignature(bytes32 serviceAgreementId, bytes signature) public onlyDataConsumer(serviceAgreementId) returns(bool) {
+    function submitHashSignature(bytes32 serviceAgreementId, bytes signature) public onlyDataConsumer(serviceAgreementId) returns(bool status) {
         if(proofs[serviceAgreementId].exists){
             if(proofs[serviceAgreementId].isLocked) { // avoid race conditions
                 emit HashSignatureSubmitted(serviceAgreementId, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), false);
@@ -64,10 +64,7 @@ contract ComputeConditions {
             }
             proofs[serviceAgreementId].isLocked = true;
             proofs[serviceAgreementId].algorithmHashSignature = signature;
-            if(fulfillUpload(serviceAgreementId, true)){
-                emit HashSignatureSubmitted(serviceAgreementId, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), false);
-                return false;
-            }
+            fulfillUpload(serviceAgreementId, true);
         }else{
             proofs[serviceAgreementId] = ProofOfUpload(true, false, true, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), bytes32(0), signature);
         }
@@ -83,7 +80,7 @@ contract ComputeConditions {
     /// the message integrity and proof that both parties agree on the same algorithm file/s
     /// @param serviceAgreementId the service level agreement Id
     /// @param hash = kekccak(uploaded_algorithm_file/s)
-    function submitAlgorithmHash(bytes32 serviceAgreementId, bytes32 hash) public onlyComputePublisher(serviceAgreementId) returns(bool) {
+    function submitAlgorithmHash(bytes32 serviceAgreementId, bytes32 hash) public onlyComputePublisher(serviceAgreementId) returns(bool status) {
         if(proofs[serviceAgreementId].exists){
             if(proofs[serviceAgreementId].isLocked) { // avoid race conditions
                 emit HashSubmitted(serviceAgreementId, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), false);
@@ -91,10 +88,7 @@ contract ComputeConditions {
             }
             proofs[serviceAgreementId].isLocked = true;
             proofs[serviceAgreementId].algorithmHash = hash;
-            if(fulfillUpload(serviceAgreementId, true)){
-                emit HashSubmitted(serviceAgreementId, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), false);
-                return false;
-            }
+            fulfillUpload(serviceAgreementId, true);
         }else{
             proofs[serviceAgreementId] = ProofOfUpload(true, false, true, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), hash, new bytes(0));
         }
@@ -109,7 +103,7 @@ contract ComputeConditions {
     /// fulfillCondition in service level agreement storage contract
     /// @param serviceAgreementId the service level agreement Id
     /// @param state get be used fo input value hash for this condition indicating the state of verification
-    function fulfillUpload(bytes32 serviceAgreementId, bool state) public onlyStakeholders(serviceAgreementId) returns(bool) {
+    function fulfillUpload(bytes32 serviceAgreementId, bool state) public onlyStakeholders(serviceAgreementId) returns(bool status) {
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceAgreementId, address(this), this.fulfillUpload.selector);
         if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceAgreementId, condition)){
             emit ProofOfUploadInvalid(serviceAgreementId, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId));
