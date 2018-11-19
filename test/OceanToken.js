@@ -1,8 +1,8 @@
 const assert = require('assert');
 
-const OceanToken = artifacts.require('OceanToken.sol')
+const OceanToken = artifacts.require('OceanToken.sol');
 
-contract.only('OceanToken', (accounts) => {
+contract('OceanToken', (accounts) => {
     let contract;
 
     beforeEach(async () => {
@@ -41,7 +41,7 @@ contract.only('OceanToken', (accounts) => {
             await contract.setReceiver(accounts[0]);
 
             // act
-            await contract.transfer(accounts[1], 100, { from: accounts[0] })
+            await contract.transfer(accounts[1], 100, { from: accounts[0] });
 
             // assert
             const balance = await contract.balanceOf(accounts[1]);
@@ -54,7 +54,7 @@ contract.only('OceanToken', (accounts) => {
 
             // act-assert
             try {
-                await contract.transfer(0x0, 100, { from: accounts[0] })
+                await contract.transfer(0x0, 100, { from: accounts[0] });
             } catch (e) {
                 assert.equal(e.reason, 'To address is 0x0.');
                 return;
@@ -70,7 +70,7 @@ contract.only('OceanToken', (accounts) => {
             await contract.approve(accounts[1], 100, { from: accounts[0] });
 
             // act
-            await contract.transferFrom(accounts[0], accounts[2], 100, { from: accounts[1] })
+            await contract.transferFrom(accounts[0], accounts[2], 100, { from: accounts[1] });
 
             // assert
             const balance = await contract.balanceOf(accounts[2]);
@@ -84,7 +84,7 @@ contract.only('OceanToken', (accounts) => {
 
             // act-assert
             try {
-                await contract.transferFrom(accounts[0], 0x0, 100, { from: accounts[1] })
+                await contract.transferFrom(accounts[0], 0x0, 100, { from: accounts[1] });
             } catch (e) {
                 assert.equal(e.reason, 'To address is 0x0.');
                 return;
