@@ -15,15 +15,15 @@ requirements = []
 
 setup_requirements = []
 
-test_requirements = []
 
-# Add the ABI Json artifacts
-data_files = []
-directories = glob('artifacts/*.json')
-for directory in directories:
-    files = glob(directory + '*')
-    print("Contract artifact found:", directory, files)
-    data_files.append((directory, files))
+test_requirements = []
+artifact_folder = 'artifacts'
+print("Adding all files in /{}".format(artifact_folder))
+data_files = [(artifact_folder, [f for f in glob(os.path.join(artifact_folder, '*'))])]
+
+print("data_files=")
+for df in data_files:
+    print(df)
 
 setup(
     author="leucothia",
@@ -49,7 +49,7 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/oceanprotocol/keeper-contracts',
-    version='0.3.22',
+    version='0.3.23',
     zip_safe=False,
 )
 
