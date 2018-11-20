@@ -28,7 +28,7 @@ matrix:
 
 before_install:
 - npm install -g npm
-- npm install -g ganache-cli release-it greenkeeper-lockfile
+- npm install -g ganache-cli@~6.1.8 release-it greenkeeper-lockfile
 - |
     if [ "${DEPLOY_PACKAGE}" = "true" ]; then
       sudo apt-get -y install python3-pip gnupg-agent
