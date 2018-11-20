@@ -78,5 +78,257 @@ contract('OceanMarket', (accounts) => {
             // assert
             utils.assertEmitted(result, 1, 'PaymentReceived');
         });
+
+        it('Shouldn\'t send payment when not enough balance', async () => {
+            // arrange
+            const id = await contract.generateId("test payment");
+            await contract.requestTokens(1, { from: accounts[0] });
+            await token.approve(contract.address, 10, { from: accounts[0] });
+
+            // act-assert
+            try {
+                await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] });
+            } catch (e) {
+                return;
+            }
+            assert.fail('Expected revert not received');
+        });
+
+        it('Shouldn\'t send payment when transfer is not allowed', async () => {
+            // arrange
+            const id = await contract.generateId("test payment");
+            await contract.requestTokens(10, { from: accounts[0] });
+
+            // act-assert
+            try {
+                await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] });
+            } catch (e) {
+                return;
+            }
+            assert.fail('Expected revert not received');
+        });
+    });
+
+    describe('releasePayment', () => {
+        it('Should release payment', async () => {
+            // arrange
+            const id = await contract.generateId("test payment");
+            await contract.requestTokens(10, { from: accounts[0] });
+            await token.approve(contract.address, 10, { from: accounts[0] });
+            await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] });
+            await contract.addAuthAddress({ from: accounts[0] });
+
+            // act
+            await contract.releasePayment(id, { from: accounts[0] });
+
+            // assert
+            const balance = await token.balanceOf(accounts[1]);
+            assert.equal(parseInt(balance, 10), 10);
+        });
+
+        it('Should emit PaymentReceived event', async () => {
+            // arrange
+            const id = await contract.generateId("test payment");
+            await contract.requestTokens(10, { from: accounts[0] });
+            await token.approve(contract.address, 10, { from: accounts[0] });
+            await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] });
+            await contract.addAuthAddress({ from: accounts[0] });
+
+            // act
+            const result = await contract.releasePayment(id, { from: accounts[0] });
+
+            // assert
+            utils.assertEmitted(result, 1, 'PaymentReleased');
+        });
+
+        it('Shouldn\'t release payment for not authorized address', async () => {
+            // arrange
+            const id = await contract.generateId("test payment");
+            await contract.requestTokens(10, { from: accounts[0] });
+            await token.approve(contract.address, 10, { from: accounts[0] });
+            await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] });
+
+            // act-assert
+            try {
+                await contract.releasePayment(id, { from: accounts[0] });
+            } catch (e) {
+                assert.equal(e.reason, 'Sender is not an authorized contract.');
+                return;
+            }
+            assert.fail('Expected revert not received');
+        });
+
+        it('Shouldn\'t release payment twice', async () => {
+            // arrange
+            const id = await contract.generateId("test payment");
+            await contract.requestTokens(10, { from: accounts[0] });
+            await token.approve(contract.address, 10, { from: accounts[0] });
+            await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] });
+            await contract.addAuthAddress({ from: accounts[0] });
+            await contract.releasePayment(id, { from: accounts[0] });
+
+            // act-assert
+            try {
+                await contract.releasePayment(id, { from: accounts[0] });
+            } catch (e) {
+                assert.equal(e.reason, 'State is not Locked');
+                return;
+            }
+            assert.fail('Expected revert not received');
+        });
+    });
+
+    describe('refundPayment', () => {
+        it('Should refund payment', async () => {
+            // arrange
+            const id = await contract.generateId("test payment");
+            await contract.requestTokens(10, { from: accounts[0] });
+            await token.approve(contract.address, 10, { from: accounts[0] });
+            await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] });
+            await contract.addAuthAddress({ from: accounts[0] });
+
+            // act
+            await contract.refundPayment(id, { from: accounts[0] });
+
+            // assert
+            const balance = await token.balanceOf(accounts[0]);
+            assert.equal(parseInt(balance, 10), 10);
+        });
+
+        it('Should emit PaymentRefunded event', async () => {
+            // arrange
+            const id = await contract.generateId("test payment");
+            await contract.requestTokens(10, { from: accounts[0] });
+            await token.approve(contract.address, 10, { from: accounts[0] });
+            await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] });
+            await contract.addAuthAddress({ from: accounts[0] });
+
+            // act
+            const result = await contract.refundPayment(id, { from: accounts[0] });
+
+            // assert
+            utils.assertEmitted(result, 1, 'PaymentRefunded');
+        });
+
+        it('Shouldn\'t refund payment for not authorized address', async () => {
+            // arrange
+            const id = await contract.generateId("test payment");
+            await contract.requestTokens(10, { from: accounts[0] });
+            await token.approve(contract.address, 10, { from: accounts[0] });
+            await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] });
+
+            // act-assert
+            try {
+                await contract.refundPayment(id, { from: accounts[0] });
+            } catch (e) {
+                assert.equal(e.reason, 'Sender is not an authorized contract.');
+                return;
+            }
+            assert.fail('Expected revert not received');
+        });
+
+        it('Shouldn\'t refund payment twice', async () => {
+            // arrange
+            const id = await contract.generateId("test payment");
+            await contract.requestTokens(10, { from: accounts[0] });
+            await token.approve(contract.address, 10, { from: accounts[0] });
+            await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] });
+            await contract.addAuthAddress({ from: accounts[0] });
+            await contract.refundPayment(id, { from: accounts[0] });
+
+            // act-assert
+            try {
+                await contract.refundPayment(id, { from: accounts[0] });
+            } catch (e) {
+                assert.equal(e.reason, 'State is not Locked');
+                return;
+            }
+            assert.fail('Expected revert not received');
+        });
+    });
+
+    describe('verifyPaymentReceived', () => {
+        it('Should return true for not exists payment', async () => {      // imo: strange that non-exist payment is valid
+            // arrange
+            const id = await contract.generateId("test payment1");
+
+            // act
+            const result = await contract.verifyPaymentReceived(id, { from: accounts[0] });
+
+            // assert
+            assert.equal(result, true);
+        });
+        
+        it('Should return true for locked payment', async () => {
+            // arrange
+            const id = await contract.generateId("test payment");
+            await contract.requestTokens(10, { from: accounts[0] });
+            await token.approve(contract.address, 10, { from: accounts[0] });
+            await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] });
+
+            // act
+            const result = await contract.verifyPaymentReceived(id, { from: accounts[0] });
+
+            // assert
+            assert.equal(result, true);
+        });
+        
+        it('Should return false for refunded payment', async () => {
+            // arrange
+            const id = await contract.generateId("test payment");
+            await contract.requestTokens(10, { from: accounts[0] });
+            await token.approve(contract.address, 10, { from: accounts[0] });
+            await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] });
+            await contract.addAuthAddress({ from: accounts[0] });
+            await contract.refundPayment(id, { from: accounts[0] });
+
+            // act
+            const result = await contract.verifyPaymentReceived(id, { from: accounts[0] });
+
+            // assert
+            assert.equal(result, false);
+        });
+        
+        it('Should return false for released payment', async () => {
+            // arrange
+            const id = await contract.generateId("test payment");
+            await contract.requestTokens(10, { from: accounts[0] });
+            await token.approve(contract.address, 10, { from: accounts[0] });
+            await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] });
+            await contract.addAuthAddress({ from: accounts[0] });
+            await contract.releasePayment(id, { from: accounts[0] });
+
+            // act
+            const result = await contract.verifyPaymentReceived(id, { from: accounts[0] });
+
+            // assert
+            assert.equal(result, false);
+        });
+    });
+
+    describe('deactivateAsset', () => {
+        it('Should deactivate asset', async () => {
+            // arrange
+            const id = await contract.generateId("test asset");
+            await contract.register(id, 1, { from: accounts[0] });
+
+            // act
+            await contract.deactivateAsset(id, { from: accounts[0] });
+
+            // assert
+            assert.equal(await contract.checkAsset(id), false);
+        });
+        
+        it('Should deactivate asset by non-owner', async () => {        // imo: strange that everybody can deactivate assets
+            // arrange
+            const id = await contract.generateId("test asset");
+            await contract.register(id, 1, { from: accounts[0] });
+
+            // act
+            await contract.deactivateAsset(id, { from: accounts[1] });
+
+            // assert
+            assert.equal(await contract.checkAsset(id), false);
+        });
     });
 });
