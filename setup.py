@@ -16,16 +16,17 @@ requirements = []
 setup_requirements = []
 
 test_requirements = []
-
+artifact_folder = 'artifacts'
+data_files = [(artifact_folder, [f for f in glob(os.path.join(artifact_folder, '*'))])]
 # Add the ABI Json artifacts
-data_files = []
-directories = glob('artifacts/*.json')
-for directory in directories:
-    file_paths = glob(directory + '*')
-    for file_path in file_paths:
-        file_name = os.path.basename(file_path)
-        print("Adding contract artifact:", file_name)
-        data_files.append((directory, file_name))
+# data_files = []
+# directories = glob('artifacts/*.json')
+# for directory in directories:
+#     file_paths = glob(directory + '*')
+#     for file_path in file_paths:
+#         file_name = os.path.basename(file_path)
+#         print("Adding contract artifact:", file_name)
+#         data_files.append((directory, file_name))
 
 print("All data files:")
 for df in data_files:
