@@ -21,9 +21,15 @@ test_requirements = []
 data_files = []
 directories = glob('artifacts/*.json')
 for directory in directories:
-    files = glob(directory + '*')
-    print("Contract artifact found:", directory, files)
-    data_files.append((directory, files))
+    file_paths = glob(directory + '*')
+    for file_path in file_paths:
+        file_name = os.path.basename(file_path)
+        print("Adding contract artifact:", file_name)
+        data_files.append((directory, file_name))
+
+print("All data files:")
+for df in data_files:
+    print(df)
 
 setup(
     author="leucothia",
