@@ -7,12 +7,12 @@ const OceanToken = artifacts.require('OceanToken.sol')
 const utils = require('./utils.js')
 
 contract('OceanMarket constructor', (accounts) => {
-    it('Shouldn\'t deploy if token is empty', async () => {
+    it('Should not deploy if token is empty', async () => {
         // act-assert
         try {
             await OceanMarket.new(0x0, { from: accounts[0] })
         } catch (e) {
-            assert.equal(e.reason, 'Token address is 0x0.')
+            assert.strictEqual(e.reason, 'Token address is 0x0.')
             return
         }
         assert.fail('Expected revert not received')
@@ -37,8 +37,8 @@ contract('OceanMarket', (accounts) => {
             await contract.register(id, 1, { from: accounts[0] })
 
             // assert
-            assert.equal(await contract.checkAsset(id), true)
-            assert.equal(await contract.getAssetPrice(id), 1)
+            assert.strictEqual(await contract.checkAsset(id), true)
+            assert.strictEqual(parseInt(await contract.getAssetPrice(id), 10), 1)
         })
 
         it('Should emit AssetRegistered event', async () => {
@@ -65,7 +65,7 @@ contract('OceanMarket', (accounts) => {
 
             // assert
             const balance = await token.balanceOf(contract.address)
-            assert.equal(parseInt(balance, 10), 1400000000000000000000000000)
+            assert.strictEqual(parseInt(balance, 10), 1400000000000000000000000000)
         })
 
         it('Should emit PaymentReceived event', async () => {
@@ -81,7 +81,7 @@ contract('OceanMarket', (accounts) => {
             utils.assertEmitted(result, 1, 'PaymentReceived')
         })
 
-        it('Shouldn\'t send payment when not enough balance', async () => {
+        it('Should not send payment when not enough balance', async () => {
             // arrange
             const id = await contract.generateId('test payment')
             await contract.requestTokens(1, { from: accounts[0] })
@@ -96,7 +96,7 @@ contract('OceanMarket', (accounts) => {
             assert.fail('Expected revert not received')
         })
 
-        it('Shouldn\'t send payment when transfer is not allowed', async () => {
+        it('Should not send payment when transfer is not allowed', async () => {
             // arrange
             const id = await contract.generateId('test payment')
             await contract.requestTokens(10, { from: accounts[0] })
@@ -125,7 +125,7 @@ contract('OceanMarket', (accounts) => {
 
             // assert
             const balance = await token.balanceOf(accounts[1])
-            assert.equal(parseInt(balance, 10), 10)
+            assert.strictEqual(parseInt(balance, 10), 10)
         })
 
         it('Should emit PaymentReceived event', async () => {
@@ -143,7 +143,7 @@ contract('OceanMarket', (accounts) => {
             utils.assertEmitted(result, 1, 'PaymentReleased')
         })
 
-        it('Shouldn\'t release payment for not authorized address', async () => {
+        it('Should not release payment for not authorized address', async () => {
             // arrange
             const id = await contract.generateId('test payment')
             await contract.requestTokens(10, { from: accounts[0] })
@@ -154,13 +154,13 @@ contract('OceanMarket', (accounts) => {
             try {
                 await contract.releasePayment(id, { from: accounts[0] })
             } catch (e) {
-                assert.equal(e.reason, 'Sender is not an authorized contract.')
+                assert.strictEqual(e.reason, 'Sender is not an authorized contract.')
                 return
             }
             assert.fail('Expected revert not received')
         })
 
-        it('Shouldn\'t release payment twice', async () => {
+        it('Should not release payment twice', async () => {
             // arrange
             const id = await contract.generateId('test payment')
             await contract.requestTokens(10, { from: accounts[0] })
@@ -173,7 +173,7 @@ contract('OceanMarket', (accounts) => {
             try {
                 await contract.releasePayment(id, { from: accounts[0] })
             } catch (e) {
-                assert.equal(e.reason, 'State is not Locked')
+                assert.strictEqual(e.reason, 'State is not Locked')
                 return
             }
             assert.fail('Expected revert not received')
@@ -194,7 +194,7 @@ contract('OceanMarket', (accounts) => {
 
             // assert
             const balance = await token.balanceOf(accounts[0])
-            assert.equal(parseInt(balance, 10), 10)
+            assert.strictEqual(parseInt(balance, 10), 10)
         })
 
         it('Should emit PaymentRefunded event', async () => {
@@ -212,7 +212,7 @@ contract('OceanMarket', (accounts) => {
             utils.assertEmitted(result, 1, 'PaymentRefunded')
         })
 
-        it('Shouldn\'t refund payment for not authorized address', async () => {
+        it('Should not refund payment for not authorized address', async () => {
             // arrange
             const id = await contract.generateId('test payment')
             await contract.requestTokens(10, { from: accounts[0] })
@@ -223,13 +223,13 @@ contract('OceanMarket', (accounts) => {
             try {
                 await contract.refundPayment(id, { from: accounts[0] })
             } catch (e) {
-                assert.equal(e.reason, 'Sender is not an authorized contract.')
+                assert.strictEqual(e.reason, 'Sender is not an authorized contract.')
                 return
             }
             assert.fail('Expected revert not received')
         })
 
-        it('Shouldn\'t refund payment twice', async () => {
+        it('Should not refund payment twice', async () => {
             // arrange
             const id = await contract.generateId('test payment')
             await contract.requestTokens(10, { from: accounts[0] })
@@ -242,7 +242,7 @@ contract('OceanMarket', (accounts) => {
             try {
                 await contract.refundPayment(id, { from: accounts[0] })
             } catch (e) {
-                assert.equal(e.reason, 'State is not Locked')
+                assert.strictEqual(e.reason, 'State is not Locked')
                 return
             }
             assert.fail('Expected revert not received')
@@ -258,7 +258,7 @@ contract('OceanMarket', (accounts) => {
             const result = await contract.verifyPaymentReceived(id, { from: accounts[0] })
 
             // assert
-            assert.equal(result, true)
+            assert.strictEqual(result, true)
         })
 
         it('Should return true for locked payment', async () => {
@@ -272,7 +272,7 @@ contract('OceanMarket', (accounts) => {
             const result = await contract.verifyPaymentReceived(id, { from: accounts[0] })
 
             // assert
-            assert.equal(result, true)
+            assert.strictEqual(result, true)
         })
 
         it('Should return false for refunded payment', async () => {
@@ -288,7 +288,7 @@ contract('OceanMarket', (accounts) => {
             const result = await contract.verifyPaymentReceived(id, { from: accounts[0] })
 
             // assert
-            assert.equal(result, false)
+            assert.strictEqual(result, false)
         })
 
         it('Should return false for released payment', async () => {
@@ -304,7 +304,7 @@ contract('OceanMarket', (accounts) => {
             const result = await contract.verifyPaymentReceived(id, { from: accounts[0] })
 
             // assert
-            assert.equal(result, false)
+            assert.strictEqual(result, false)
         })
     })
 
@@ -318,7 +318,7 @@ contract('OceanMarket', (accounts) => {
             await contract.deactivateAsset(id, { from: accounts[0] })
 
             // assert
-            assert.equal(await contract.checkAsset(id), false)
+            assert.strictEqual(await contract.checkAsset(id), false)
         })
 
         it('Should deactivate asset by non-owner', async () => { // IMO strange that everybody can deactivate assets
@@ -330,7 +330,7 @@ contract('OceanMarket', (accounts) => {
             await contract.deactivateAsset(id, { from: accounts[1] })
 
             // assert
-            assert.equal(await contract.checkAsset(id), false)
+            assert.strictEqual(await contract.checkAsset(id), false)
         })
     })
 
@@ -341,10 +341,10 @@ contract('OceanMarket', (accounts) => {
 
             // assert
             const balance = await token.balanceOf(accounts[0])
-            assert.equal(parseInt(balance, 10), 200)
+            assert.strictEqual(parseInt(balance, 10), 200)
         })
 
-        it('Shouldn\'t transfer frequently', async () => {
+        it('Should not transfer frequently', async () => {
             // arrange
             await contract.limitTokenRequest(10, 10)
             await contract.requestTokens(10, { from: accounts[0] })
@@ -354,11 +354,11 @@ contract('OceanMarket', (accounts) => {
 
             // assert
             const balance = await token.balanceOf(accounts[0])
-            assert.equal(parseInt(balance, 10), 10)
+            assert.strictEqual(parseInt(balance, 10), 10)
             utils.assertEmitted(result, 1, 'FrequentTokenRequest')
         })
 
-        it('Shouldn\'t transfer more than max amount', async () => {
+        it('Should not transfer more than max amount', async () => {
             // arrange
             await contract.limitTokenRequest(2, 10)
 
@@ -367,13 +367,13 @@ contract('OceanMarket', (accounts) => {
 
             // assert
             const balance = await token.balanceOf(accounts[0])
-            assert.equal(parseInt(balance, 10), 2)
+            assert.strictEqual(parseInt(balance, 10), 2)
             utils.assertEmitted(result, 1, 'LimitTokenRequest')
         })
     })
 
     describe('addAuthAddress', () => {
-        it('Shouldn\'t mutate not empty authorized address', async () => {
+        it('Should not mutate not empty authorized address', async () => {
             // arrange
             await contract.addAuthAddress({ from: accounts[0] })
 
@@ -393,7 +393,7 @@ contract('OceanMarket', (accounts) => {
             const id = await contract.generateId('test', { from: accounts[0] })
 
             // assert
-            assert.equal(id, '0x9c22ff5f21f0b81b113e63f7db6da94fedef11b2119b4088b89664fb9a3cb658')
+            assert.strictEqual(id, '0x9c22ff5f21f0b81b113e63f7db6da94fedef11b2119b4088b89664fb9a3cb658')
         })
 
         it('Should generate id from bytes', async () => {
@@ -401,7 +401,7 @@ contract('OceanMarket', (accounts) => {
             const id = await contract.generateId('0xff', { from: accounts[0] }) // not possible to call function generateId(bytes) with truffle, it call generateId(string)
 
             // assert
-            assert.equal(id, '0x420daffad4b177bce28bead5f76f7bc97ef63c3aae74c496db8ce6aafe9e6513')
+            assert.strictEqual(id, '0x420daffad4b177bce28bead5f76f7bc97ef63c3aae74c496db8ce6aafe9e6513')
         })
     })
 })

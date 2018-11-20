@@ -8,7 +8,7 @@ const OceanAuth = artifacts.require('OceanAuth.sol')
 const utils = require('./utils.js')
 
 contract('OceanAuth constructor', (accounts) => {
-    it('Shouldn\'t deploy if market address is empty', async () => {
+    it('Should not deploy if market address is empty', async () => {
         // act-assert
         try {
             await OceanAuth.new(0x0, { from: accounts[0] })
@@ -43,7 +43,7 @@ contract('OceanAuth', (accounts) => {
             utils.assertEmitted(result, 1, 'AccessConsentRequested')
             const requestId = result.logs.find(i => i.event === 'AccessConsentRequested').args._id
             const status = await contract.statusOfAccessRequest(requestId)
-            assert.strictEqual(status, 0)
+            assert.strictEqual(parseInt(status, 10), 0)
         })
 
         it('Should create access request for own resource', async () => {
@@ -57,7 +57,7 @@ contract('OceanAuth', (accounts) => {
             utils.assertEmitted(result, 1, 'AccessConsentRequested')
             const requestId = result.logs.find(i => i.event === 'AccessConsentRequested').args._id
             const status = await contract.statusOfAccessRequest(requestId)
-            assert.strictEqual(status, 0)
+            assert.strictEqual(parseInt(status, 10), 0)
         })
     })
 
@@ -107,7 +107,7 @@ contract('OceanAuth', (accounts) => {
             // assert
             utils.assertEmitted(result, 1, 'AccessRequestRejected')
             const status = await contract.statusOfAccessRequest(requestId)
-            assert.strictEqual(status, 4)
+            assert.strictEqual(parseInt(status, 10), 4)
         })
 
         it('Should commit access request if asset is available', async () => {
@@ -122,7 +122,7 @@ contract('OceanAuth', (accounts) => {
             // assert
             utils.assertEmitted(result, 1, 'AccessRequestCommitted')
             const status = await contract.statusOfAccessRequest(requestId)
-            assert.strictEqual(status, 1)
+            assert.strictEqual(parseInt(status, 10), 1)
         })
     })
 
@@ -160,7 +160,7 @@ contract('OceanAuth', (accounts) => {
             assert.fail('Expected revert not received')
         })
 
-        it('Shouldn\'t allow cancel expired request', async () => {
+        it('Should not allow cancel expired request', async () => {
             // arrange
             const id = await market.generateId('test asset')
             const initResult = await contract.initiateAccessRequest(id, accounts[1], 'pk', 10000000000, { from: accounts[0] })
@@ -191,7 +191,7 @@ contract('OceanAuth', (accounts) => {
             // assert
             utils.assertEmitted(result, 1, 'AccessRequestRevoked')
             const status = await contract.statusOfAccessRequest(requestId)
-            assert.strictEqual(status, 4)
+            assert.strictEqual(parseInt(status, 10), 4)
         })
     })
 
@@ -241,7 +241,7 @@ contract('OceanAuth', (accounts) => {
             // assert
             utils.assertEmitted(result, 1, 'EncryptedTokenPublished')
             const status = await contract.statusOfAccessRequest(requestId)
-            assert.strictEqual(status, 2)
+            assert.strictEqual(parseInt(status, 10), 2)
         })
     })
 })

@@ -18,11 +18,11 @@ contract('OceanToken', (accounts) => {
 
             // assert
             const balance = await contract.balanceOf(accounts[0])
-            assert.equal(parseInt(balance, 10), 1400000000000000000000000000)
-            assert.equal(await contract._receiver(), accounts[0])
+            assert.strictEqual(parseInt(balance, 10), 1400000000000000000000000000)
+            assert.strictEqual(await contract._receiver(), accounts[0])
         })
 
-        it('Shouldn\'t set receiver twice', async () => {
+        it('Should not set receiver twice', async () => {
             // arrange
             await contract.setReceiver(accounts[0])
 
@@ -30,7 +30,7 @@ contract('OceanToken', (accounts) => {
             try {
                 await contract.setReceiver(accounts[1])
             } catch (e) {
-                assert.equal(e.reason, 'Receiver address already set.')
+                assert.strictEqual(e.reason, 'Receiver address already set.')
                 return
             }
             assert.fail('Expected revert not received')
@@ -47,10 +47,10 @@ contract('OceanToken', (accounts) => {
 
             // assert
             const balance = await contract.balanceOf(accounts[1])
-            assert.equal(parseInt(balance, 10), 100)
+            assert.strictEqual(parseInt(balance, 10), 100)
         })
 
-        it('Shouldn\'t transfer to empty address', async () => {
+        it('Should not transfer to empty address', async () => {
             // arrange
             await contract.setReceiver(accounts[0])
 
@@ -58,7 +58,7 @@ contract('OceanToken', (accounts) => {
             try {
                 await contract.transfer(0x0, 100, { from: accounts[0] })
             } catch (e) {
-                assert.equal(e.reason, 'To address is 0x0.')
+                assert.strictEqual(e.reason, 'To address is 0x0.')
                 return
             }
             assert.fail('Expected revert not received')
@@ -76,10 +76,10 @@ contract('OceanToken', (accounts) => {
 
             // assert
             const balance = await contract.balanceOf(accounts[2])
-            assert.equal(parseInt(balance, 10), 100)
+            assert.strictEqual(parseInt(balance, 10), 100)
         })
 
-        it('Shouldn\'t transfer to empty address', async () => {
+        it('Should not transfer to empty address', async () => {
             // arrange
             await contract.setReceiver(accounts[0])
             await contract.approve(accounts[1], 100, { from: accounts[0] })
@@ -88,7 +88,7 @@ contract('OceanToken', (accounts) => {
             try {
                 await contract.transferFrom(accounts[0], 0x0, 100, { from: accounts[1] })
             } catch (e) {
-                assert.equal(e.reason, 'To address is 0x0.')
+                assert.strictEqual(e.reason, 'To address is 0x0.')
                 return
             }
             assert.fail('Expected revert not received')
