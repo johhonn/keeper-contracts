@@ -24,6 +24,11 @@ contract('OceanAuth constructor', (accounts) => {
     })
 })
 
+async function createAccessRequest(contract, resourceId, provider, timeout, from) {
+    const result = await contract.initiateAccessRequest(resourceId, provider, 'pk', timeout, { from: from })
+    return result.logs.find(i => i.event === 'AccessConsentRequested').args._id
+}
+
 contract('OceanAuth', (accounts) => {
     let token
     let market
@@ -64,8 +69,7 @@ contract('OceanAuth', (accounts) => {
     describe('commitAccessRequest', () => {
         it('Should allow commit request by provider only', async () => {
             // arrange
-            const initResult = await contract.initiateAccessRequest(assetId, accounts[1], 'pk', 100, { from: accounts[0] })
-            const requestId = initResult.logs.find(i => i.event === 'AccessConsentRequested').args._id
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
 
             // act-assert
             try {
@@ -79,8 +83,7 @@ contract('OceanAuth', (accounts) => {
 
         it('Should allow commit request with status Requested only', async () => {
             // arrange
-            const initResult = await contract.initiateAccessRequest(assetId, accounts[1], 'pk', 100, { from: accounts[0] })
-            const requestId = initResult.logs.find(i => i.event === 'AccessConsentRequested').args._id
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
             await contract.commitAccessRequest(requestId, false, 100, '', '', '', '', { from: accounts[1] })
 
             // act-assert
@@ -95,8 +98,7 @@ contract('OceanAuth', (accounts) => {
 
         it('Should revoke access request if asset is not available', async () => {
             // arrange
-            const initResult = await contract.initiateAccessRequest(assetId, accounts[1], 'pk', 100, { from: accounts[0] })
-            const requestId = initResult.logs.find(i => i.event === 'AccessConsentRequested').args._id
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
 
             // act
             const result = await contract.commitAccessRequest(requestId, false, 100, '', '', '', '', { from: accounts[1] })
@@ -109,8 +111,7 @@ contract('OceanAuth', (accounts) => {
 
         it('Should commit access request if asset is available', async () => {
             // arrange
-            const initResult = await contract.initiateAccessRequest(assetId, accounts[1], 'pk', 100, { from: accounts[0] })
-            const requestId = initResult.logs.find(i => i.event === 'AccessConsentRequested').args._id
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
 
             // act
             const result = await contract.commitAccessRequest(requestId, true, 10000000000, '', '', '', '', { from: accounts[1] })
@@ -125,8 +126,7 @@ contract('OceanAuth', (accounts) => {
     describe('cancelAccessRequest', () => {
         it('Should allow cancel request by consumer only', async () => {
             // arrange
-            const initResult = await contract.initiateAccessRequest(assetId, accounts[1], 'pk', 100, { from: accounts[0] })
-            const requestId = initResult.logs.find(i => i.event === 'AccessConsentRequested').args._id
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
             await contract.commitAccessRequest(requestId, true, 10000000000, '', '', '', '', { from: accounts[1] })
 
             // act-assert
@@ -141,8 +141,7 @@ contract('OceanAuth', (accounts) => {
 
         it('Should allow cancel request with status Committed only', async () => {
             // arrange
-            const initResult = await contract.initiateAccessRequest(assetId, accounts[1], 'pk', 100, { from: accounts[0] })
-            const requestId = initResult.logs.find(i => i.event === 'AccessConsentRequested').args._id
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
 
             // act-assert
             try {
@@ -156,8 +155,7 @@ contract('OceanAuth', (accounts) => {
 
         it('Should not allow cancel expired request', async () => {
             // arrange
-            const initResult = await contract.initiateAccessRequest(assetId, accounts[1], 'pk', 10000000000, { from: accounts[0] })
-            const requestId = initResult.logs.find(i => i.event === 'AccessConsentRequested').args._id
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 10000000000, accounts[0])
             await contract.commitAccessRequest(requestId, true, 10000000000, '', '', '', '', { from: accounts[1] })
 
             // act-assert
@@ -172,8 +170,7 @@ contract('OceanAuth', (accounts) => {
 
         it('Should cancel access request', async () => {
             // arrange
-            const initResult = await contract.initiateAccessRequest(assetId, accounts[1], 'pk', 0, { from: accounts[0] })
-            const requestId = initResult.logs.find(i => i.event === 'AccessConsentRequested').args._id
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 0, accounts[0])
             await contract.commitAccessRequest(requestId, true, 10000000000, '', '', '', '', { from: accounts[1] })
             await market.sendPayment(requestId, accounts[1], 0, 300, { from: accounts[0] })
 
@@ -190,8 +187,7 @@ contract('OceanAuth', (accounts) => {
     describe('deliverAccessToken', () => {
         it('Should allow deliver request by provider only', async () => {
             // arrange
-            const initResult = await contract.initiateAccessRequest(assetId, accounts[1], 'pk', 100, { from: accounts[0] })
-            const requestId = initResult.logs.find(i => i.event === 'AccessConsentRequested').args._id
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
 
             // act-assert
             try {
@@ -205,8 +201,7 @@ contract('OceanAuth', (accounts) => {
 
         it('Should allow deliver request with status Committed only', async () => {
             // arrange
-            const initResult = await contract.initiateAccessRequest(assetId, accounts[1], 'pk', 100, { from: accounts[0] })
-            const requestId = initResult.logs.find(i => i.event === 'AccessConsentRequested').args._id
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
 
             // act-assert
             try {
@@ -220,8 +215,7 @@ contract('OceanAuth', (accounts) => {
 
         it('Should allow deliver request', async () => {
             // arrange
-            const initResult = await contract.initiateAccessRequest(assetId, accounts[1], 'pk', 100, { from: accounts[0] })
-            const requestId = initResult.logs.find(i => i.event === 'AccessConsentRequested').args._id
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
             await contract.commitAccessRequest(requestId, true, 10000000000, '', '', '', '', { from: accounts[1] })
 
             // act
@@ -239,8 +233,7 @@ contract('OceanAuth', (accounts) => {
 
         it('Should allow verify access token by provider only', async () => {
             // arrange
-            const initResult = await contract.initiateAccessRequest(assetId, accounts[1], 'pk', 100, { from: accounts[0] })
-            const requestId = initResult.logs.find(i => i.event === 'AccessConsentRequested').args._id
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
 
             // act-assert
             try {
@@ -255,8 +248,7 @@ contract('OceanAuth', (accounts) => {
 
         it('Should allow verify access token with status Delivered only', async () => {
             // arrange
-            const initResult = await contract.initiateAccessRequest(assetId, accounts[1], 'pk', 100, { from: accounts[0] })
-            const requestId = initResult.logs.find(i => i.event === 'AccessConsentRequested').args._id
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
 
             // act-assert
             try {
@@ -270,8 +262,7 @@ contract('OceanAuth', (accounts) => {
 
         it('Should revoke access request if signature is not valid', async () => {
             // arrange
-            const initResult = await contract.initiateAccessRequest(assetId, accounts[1], 'pk', 100, { from: accounts[0] })
-            const requestId = initResult.logs.find(i => i.event === 'AccessConsentRequested').args._id
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
             await contract.commitAccessRequest(requestId, true, 10000000000, '', '', '', '', { from: accounts[1] })
             await market.sendPayment(requestId, accounts[1], 0, 300, { from: accounts[0] })
             await contract.deliverAccessToken(requestId, '0x10', { from: accounts[1] })
@@ -292,8 +283,7 @@ contract('OceanAuth', (accounts) => {
             const sig = ethers.utils.splitSignature(signature)
             const fixedMsgSha = web3.utils.sha3(`\x19Ethereum Signed Message:\n${msg.length}${msg}`)
 
-            const initResult = await contract.initiateAccessRequest(assetId, accounts[1], 'pk', 100, { from: accounts[0] })
-            const requestId = initResult.logs.find(i => i.event === 'AccessConsentRequested').args._id
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
             await contract.commitAccessRequest(requestId, true, 10000000000, '', '', '', '', { from: accounts[1] })
             await market.sendPayment(requestId, accounts[1], 0, 300, { from: accounts[0] })
             await contract.deliverAccessToken(requestId, '0x10', { from: accounts[1] })
