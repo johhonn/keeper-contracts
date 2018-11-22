@@ -1,3 +1,7 @@
+/* eslint-env mocha */
+/* eslint-disable no-console */
+/* global artifacts, assert, contract, describe, it */
+
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
 const utils = require('./utils.js')
 
@@ -130,4 +134,4 @@ contract('ServiceAgreement', (accounts) => {
             assert.strictEqual(!!(result.logs.find(i => i.event === 'ExecuteAgreement').args.state), false)
         })
     })
-});
+})
