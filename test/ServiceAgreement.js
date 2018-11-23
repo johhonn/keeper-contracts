@@ -302,7 +302,7 @@ contract('ServiceAgreement', (accounts) => {
 
             // act
             const result = await contract.fulfillAgreement(serviceAgreementId, { from: accounts[0] })
-            
+
             // assert
             utils.assertEmitted(result, 1, 'AgreementFulfilled')
         })
