@@ -47,7 +47,7 @@ contract('ServiceAgreement', (accounts) => {
             assert.strictEqual(status, true)
         })
 
-        it('Should accept same amount of contracts as fingerprints', async () => {
+        it('Should not accept different amount of contracts and fingerprints', async () => {
             // act-assert
             try {
                 await contract.setupAgreementTemplate(templateId, [], ['0x1234'], [], emptyBytes32, [], 0, { from: accounts[0] })
@@ -58,10 +58,10 @@ contract('ServiceAgreement', (accounts) => {
             assert.fail('Expected revert not received')
         })
 
-        it('Should accept same amount of contracts as dependencies', async () => {
+        it('Should not accept different amount of contracts and dependencies', async () => {
             // act-assert
             try {
-                await contract.setupAgreementTemplate(templateId, ['0x1111aaaaeeeeffffcccc22223333444455556666'], ['0x1234'], [], emptyBytes32, [], 0, { from: accounts[0] })
+                await contract.setupAgreementTemplate(templateId, [dummyAddress], ['0x1234'], [], emptyBytes32, [], 0, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'contracts and dependencies do not match')
                 return
@@ -69,7 +69,7 @@ contract('ServiceAgreement', (accounts) => {
             assert.fail('Expected revert not received')
         })
 
-        it('Should accept same or more amount of contracts as fulfillment indices', async () => {
+        it('Should not accept less amount of contracts than fulfillment indices', async () => {
             // act-assert
             try {
                 await contract.setupAgreementTemplate(templateId, [dummyAddress], ['0x1234'], [1], emptyBytes32, [1, 2], 0, { from: accounts[0] })
@@ -80,7 +80,7 @@ contract('ServiceAgreement', (accounts) => {
             assert.fail('Expected revert not received')
         })
 
-        it('Should accept same or more amount of fulfillment indices than fulfillment operators', async () => {
+        it('Should not accept less amount of fulfillment indices than fulfillment operators', async () => {
             // act-assert
             try {
                 await contract.setupAgreementTemplate(templateId, [dummyAddress], ['0x1234'], [1], emptyBytes32, [1], 2, { from: accounts[0] })
@@ -129,7 +129,7 @@ contract('ServiceAgreement', (accounts) => {
             assert.fail('Expected revert not received')
         })
 
-        it('Should execute agreement with valid timeout length only', async () => {
+        it('Should not execute agreement with invalid timeout length', async () => {
             // arrange
             await contract.setupAgreementTemplate(templateId, [dummyAddress], ['0x1234'], [1], emptyBytes32, [1], 1, { from: accounts[0] })
 
@@ -272,6 +272,10 @@ contract('ServiceAgreement', (accounts) => {
 
             // assert
             utils.assertEmitted(result, 1, 'AgreementFulfilled')
+            const isTerminated = await contract.isAgreementTerminated(serviceAgreementId, { from: accounts[0] })
+            assert.strictEqual(isTerminated, true)
+            const agreementStatus = await contract.getAgreementStatus(serviceAgreementId, { from: accounts[0] })
+            assert.strictEqual(agreementStatus, true)
         })
 
         it('Should not fulfill agreement with pending conditions', async () => {
@@ -289,10 +293,46 @@ contract('ServiceAgreement', (accounts) => {
             }
             assert.fail('Expected revert not received')
         })
+
+        it('Should not fulfill agreement with pending conditions when single operator', async () => {
+            // arrange
+            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
+            await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 1, { from: accounts[0] })
+            await contract.executeAgreement(templateId, signature, consumer, [valueHashes[0]], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+
+            // act-assert
+            try {
+                await contract.fulfillAgreement(serviceAgreementId, { from: accounts[0] })
+            } catch (e) {
+                assert.strictEqual(e.reason, 'Indicating all fulfillment conditions are false')
+                return
+            }
+            assert.fail('Expected revert not received')
+        })
+
+        it('Should not fulfill agreement with pending conditions when multiple operators', async () => {
+            // arrange
+            contracts = [accounts[2], accounts[2]]
+            fingerprints = ['0x2e0a37a5', '0x2e0a37a6']
+            valueHashes = [utils.valueHash(['bool'], [true]), utils.valueHash(['bool'], [true])]
+            timeoutValues = [0, 0]
+            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
+            await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0, 0], templateId, [0, 1], 2, { from: accounts[0] })
+            await contract.executeAgreement(templateId, signature, consumer, [valueHashes[0], valueHashes[1]], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+
+            // act-assert
+            try {
+                await contract.fulfillAgreement(serviceAgreementId, { from: accounts[0] })
+            } catch (e) {
+                assert.strictEqual(e.reason, 'Indicating N of M fulfillment conditions are false')
+                return
+            }
+            assert.fail('Expected revert not received')
+        })
     })
 
     describe('revokeAgreementTemplate', () => {
-        it('Should revoke by template owner only', async () => {
+        it('Should not revoke by non template owner', async () => {
             // arrange
             await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
 
@@ -301,6 +341,22 @@ contract('ServiceAgreement', (accounts) => {
                 await contract.revokeAgreementTemplate(templateId, { from: accounts[2] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Not a template owner')
+                return
+            }
+            assert.fail('Expected revert not received')
+        })
+
+        it('Should not revoke template when state of agreement is false', async () => {
+            // arrange
+            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
+            await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
+            await contract.executeAgreement(templateId, signature, consumer, [valueHashes[0]], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+
+            // act-assert
+            try {
+                await contract.revokeAgreementTemplate(templateId, { from: accounts[0] })
+            } catch (e) {
+                assert.strictEqual(e.reason, 'Owner can not revoke template!')
                 return
             }
             assert.fail('Expected revert not received')
@@ -315,6 +371,91 @@ contract('ServiceAgreement', (accounts) => {
 
             // assert
             utils.assertEmitted(result, 1, 'SLATemplateRevoked')
+            const status = await contract.getTemplateStatus(templateId)
+            assert.strictEqual(status, false)
+        })
+    })
+
+    describe('getConditionStatus', () => {
+        it('Should not return condition status for non exists condition', async () => {
+            // arrange
+            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
+            await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [3], templateId, [0], 0, { from: accounts[0] })
+            await contract.executeAgreement(templateId, signature, consumer, [valueHashes[0]], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+
+            // act-assert
+            try {
+                await contract.getConditionStatus(serviceAgreementId, emptyBytes32, { from: accounts[0] })
+            } catch (e) {
+                return
+            }
+            assert.fail('Expected revert not received')
+        })
+
+        it('Should return condition status', async () => {
+            // arrange
+            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
+            await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [3], templateId, [0], 0, { from: accounts[0] })
+            await contract.executeAgreement(templateId, signature, consumer, [valueHashes[0]], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            const conditionKey = await contract.getConditionByFingerprint(serviceAgreementId, contracts[0], fingerprints[0], { from: accounts[0] })
+
+            // act
+            const result = await contract.getConditionStatus(serviceAgreementId, conditionKey, { from: accounts[0] })
+
+            // assert
+            assert.strictEqual(parseInt(result, 10), 0)
+        })
+    })
+
+    describe('conditionTimedOut', () => {
+        it('Should return true when condition timeout matches', async () => {
+            // arrange
+            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
+            await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [3], templateId, [0], 0, { from: accounts[0] })
+            await contract.executeAgreement(templateId, signature, consumer, [valueHashes[0]], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            const conditionKey = await contract.getConditionByFingerprint(serviceAgreementId, contracts[0], fingerprints[0], { from: accounts[0] })
+
+            // act
+            const result = await contract.conditionTimedOut(serviceAgreementId, conditionKey, { from: accounts[0] })
+
+            // assert
+            assert.strictEqual(result, true)
+        })
+
+        it('Should return false when condition timeout does not match', async () => {
+            // arrange
+            timeoutValues = [100]
+            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
+            await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [3], templateId, [0], 0, { from: accounts[0] })
+            await contract.executeAgreement(templateId, signature, consumer, [valueHashes[0]], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            const conditionKey = await contract.getConditionByFingerprint(serviceAgreementId, contracts[0], fingerprints[0], { from: accounts[0] })
+
+            // act
+            const result = await contract.conditionTimedOut(serviceAgreementId, conditionKey, { from: accounts[0] })
+
+            // assert
+            assert.strictEqual(result, false)
+        })
+    })
+
+    describe('views', () => {
+        it('Should return current block', async () => {
+            // act
+            const result = await contract.getCurrentBlockNumber({ from: accounts[0] })
+
+            // assert
+            assert.isOk(result > 0)
+        })
+
+        it('Should return tempalte owner', async () => {
+            // arrange
+            await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
+
+            // act
+            const result = await contract.getTemplateOwner(templateId, { from: accounts[0] })
+
+            // assert
+            assert.strictEqual(result, accounts[0])
         })
     })
 })
