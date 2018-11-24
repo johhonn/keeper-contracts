@@ -12,6 +12,12 @@ contract('ServiceAgreement', (accounts) => {
     const templateId = '0x0000000000000000000000000000000000000000000000000000000000000001'
     const dummyAddress = '0x1111aaaaeeeeffffcccc22223333444455556666'
     let contract
+    let consumer
+    let contracts
+    let fingerprints
+    let valueHashes
+    let timeoutValues
+    let serviceAgreementId
 
     function createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer) {
         const conditionKeys = utils.generateConditionsKeys(templateId, contracts, fingerprints)
@@ -21,6 +27,13 @@ contract('ServiceAgreement', (accounts) => {
 
     beforeEach(async () => {
         contract = await ServiceAgreement.new({ from: accounts[0] })
+        /* eslint-disable-next-line prefer-destructuring */
+        consumer = accounts[1]
+        contracts = [accounts[2]]
+        fingerprints = ['0x2e0a37a5']
+        valueHashes = [utils.valueHash(['bool'], [true])]
+        timeoutValues = [0]
+        serviceAgreementId = utils.generateId(web3)
     })
 
     describe('setupAgreementTemplate', () => {
@@ -144,12 +157,6 @@ contract('ServiceAgreement', (accounts) => {
 
         it('Should execute condition when signature is valid', async () => {
             // arrange
-            const consumer = accounts[1]
-            const contracts = [accounts[2]]
-            const fingerprints = ['0x2e0a37a5']
-            const valueHashes = [utils.valueHash(['bool'], [true])]
-            const timeoutValues = [0]
-            const serviceAgreementId = utils.generateId(web3)
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
             await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
 
@@ -163,12 +170,7 @@ contract('ServiceAgreement', (accounts) => {
 
         it('Should revert when timeout can lead to race condition', async () => {
             // arrange
-            const consumer = accounts[1]
-            const contracts = [accounts[2]]
-            const fingerprints = ['0x2e0a37a5']
-            const valueHashes = [utils.valueHash(['bool'], [true])]
-            const timeoutValues = [1]
-            const serviceAgreementId = utils.generateId(web3)
+            timeoutValues = [1]
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
             await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
 
@@ -184,12 +186,7 @@ contract('ServiceAgreement', (accounts) => {
 
         it('Should execute condition when signature is valid and safe timeout', async () => {
             // arrange
-            const consumer = accounts[1]
-            const contracts = [accounts[2]]
-            const fingerprints = ['0x2e0a37a5']
-            const valueHashes = [utils.valueHash(['bool'], [true])]
-            const timeoutValues = [3]
-            const serviceAgreementId = utils.generateId(web3)
+            timeoutValues = [3]
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
             await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
 
@@ -205,12 +202,6 @@ contract('ServiceAgreement', (accounts) => {
     describe('fulfillCondition', () => {
         it('Should not fulfill condition when controller handler is not valid', async () => {
             // arrange
-            const consumer = accounts[1]
-            const contracts = [accounts[2]]
-            const fingerprints = ['0x2e0a37a5']
-            const valueHashes = [utils.valueHash(['bool'], [true])]
-            const timeoutValues = [0]
-            const serviceAgreementId = utils.generateId(web3)
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
             await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
             await contract.executeAgreement(templateId, signature, consumer, [valueHashes[0]], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
@@ -227,12 +218,6 @@ contract('ServiceAgreement', (accounts) => {
 
         it('Should fulfill condition when controller handler is valid', async () => {
             // arrange
-            const consumer = accounts[1]
-            const contracts = [accounts[2]]
-            const fingerprints = ['0x2e0a37a5']
-            const valueHashes = [utils.valueHash(['bool'], [true])]
-            const timeoutValues = [0]
-            const serviceAgreementId = utils.generateId(web3)
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
             await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
             await contract.executeAgreement(templateId, signature, consumer, [valueHashes[0]], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
@@ -246,12 +231,6 @@ contract('ServiceAgreement', (accounts) => {
 
         it('Should not fulfill condition with unfulfilled dependency', async () => {
             // arrange
-            const consumer = accounts[1]
-            const contracts = [accounts[2]]
-            const fingerprints = ['0x2e0a37a5']
-            const valueHashes = [utils.valueHash(['bool'], [true])]
-            const timeoutValues = [0]
-            const serviceAgreementId = utils.generateId(web3)
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
             await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [1], templateId, [0], 0, { from: accounts[0] })
             await contract.executeAgreement(templateId, signature, consumer, [valueHashes[0]], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
@@ -268,12 +247,6 @@ contract('ServiceAgreement', (accounts) => {
 
         it('Should fulfill condition and lock dependencies when controller handler is valid', async () => {
             // arrange
-            const consumer = accounts[1]
-            const contracts = [accounts[2]]
-            const fingerprints = ['0x2e0a37a5']
-            const valueHashes = [utils.valueHash(['bool'], [true])]
-            const timeoutValues = [0]
-            const serviceAgreementId = utils.generateId(web3)
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
             await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [3], templateId, [0], 0, { from: accounts[0] })
             await contract.executeAgreement(templateId, signature, consumer, [valueHashes[0]], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
@@ -289,12 +262,6 @@ contract('ServiceAgreement', (accounts) => {
     describe('fulfillAgreement', () => {
         it('Should fulfill agreement with non pending conditions', async () => {
             // arrange
-            const consumer = accounts[1]
-            const contracts = [accounts[2]]
-            const fingerprints = ['0x2e0a37a5']
-            const valueHashes = [utils.valueHash(['bool'], [true])]
-            const timeoutValues = [0]
-            const serviceAgreementId = utils.generateId(web3)
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
             await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
             await contract.executeAgreement(templateId, signature, consumer, [valueHashes[0]], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
@@ -309,12 +276,6 @@ contract('ServiceAgreement', (accounts) => {
 
         it('Should not fulfill agreement with pending conditions', async () => {
             // arrange
-            const consumer = accounts[1]
-            const contracts = [accounts[2]]
-            const fingerprints = ['0x2e0a37a5']
-            const valueHashes = [utils.valueHash(['bool'], [true])]
-            const timeoutValues = [0]
-            const serviceAgreementId = utils.generateId(web3)
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
             await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
             await contract.executeAgreement(templateId, signature, consumer, [valueHashes[0]], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
@@ -327,6 +288,33 @@ contract('ServiceAgreement', (accounts) => {
                 return
             }
             assert.fail('Expected revert not received')
+        })
+    })
+
+    describe('revokeAgreementTemplate', () => {
+        it('Should revoke by template owner only', async () => {
+            // arrange
+            await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
+
+            // act-assert
+            try {
+                await contract.revokeAgreementTemplate(templateId, { from: accounts[2] })
+            } catch (e) {
+                assert.strictEqual(e.reason, 'Not a template owner')
+                return
+            }
+            assert.fail('Expected revert not received')
+        })
+
+        it('Should revoke template', async () => {
+            // arrange
+            await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
+
+            // act
+            const result = await contract.revokeAgreementTemplate(templateId, { from: accounts[0] })
+
+            // assert
+            utils.assertEmitted(result, 1, 'SLATemplateRevoked')
         })
     })
 })
