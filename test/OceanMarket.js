@@ -22,17 +22,16 @@ contract('OceanMarket constructor', (accounts) => {
 contract('OceanMarket', (accounts) => {
     let token
     let contract
+    let id
 
     beforeEach(async () => {
         token = await OceanToken.new({ from: accounts[0] })
         contract = await OceanMarket.new(token.address, { from: accounts[0] })
+        id = await contract.generateId('test')
     })
 
     describe('register', () => {
         it('Should register new asset', async () => {
-            // arrange
-            const id = await contract.generateId('test asset')
-
             // act
             await contract.register(id, 1, { from: accounts[0] })
 
@@ -42,21 +41,31 @@ contract('OceanMarket', (accounts) => {
         })
 
         it('Should emit AssetRegistered event', async () => {
-            // arrange
-            const id = await contract.generateId('test asset')
-
             // act
             const result = await contract.register(id, 1, { from: accounts[0] })
 
             // assert
             utils.assertEmitted(result, 1, 'AssetRegistered')
         })
+
+        it('Should not register one asset twice', async () => {
+            // arrange
+            await contract.register(id, 1, { from: accounts[0] })
+
+            // act-assert
+            try {
+                await contract.register(id, 1, { from: accounts[0] })
+            } catch (e) {
+                assert.strictEqual(e.reason, 'Owner address is not 0x0.')
+                return
+            }
+            assert.fail('Expected revert not received')
+        })
     })
 
     describe('sendPayment', () => {
         it('Should send payment', async () => {
             // arrange
-            const id = await contract.generateId('test payment')
             await contract.requestTokens(10, { from: accounts[0] })
             await token.approve(contract.address, 10, { from: accounts[0] })
 
@@ -70,7 +79,6 @@ contract('OceanMarket', (accounts) => {
 
         it('Should emit PaymentReceived event', async () => {
             // arrange
-            const id = await contract.generateId('test payment')
             await contract.requestTokens(10, { from: accounts[0] })
             await token.approve(contract.address, 10, { from: accounts[0] })
 
@@ -83,7 +91,6 @@ contract('OceanMarket', (accounts) => {
 
         it('Should not send payment when not enough balance', async () => {
             // arrange
-            const id = await contract.generateId('test payment')
             await contract.requestTokens(1, { from: accounts[0] })
             await token.approve(contract.address, 10, { from: accounts[0] })
 
@@ -98,7 +105,6 @@ contract('OceanMarket', (accounts) => {
 
         it('Should not send payment when transfer is not allowed', async () => {
             // arrange
-            const id = await contract.generateId('test payment')
             await contract.requestTokens(10, { from: accounts[0] })
 
             // act-assert
@@ -114,7 +120,6 @@ contract('OceanMarket', (accounts) => {
     describe('releasePayment', () => {
         it('Should release payment', async () => {
             // arrange
-            const id = await contract.generateId('test payment')
             await contract.requestTokens(10, { from: accounts[0] })
             await token.approve(contract.address, 10, { from: accounts[0] })
             await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] })
@@ -130,7 +135,6 @@ contract('OceanMarket', (accounts) => {
 
         it('Should emit PaymentReceived event', async () => {
             // arrange
-            const id = await contract.generateId('test payment')
             await contract.requestTokens(10, { from: accounts[0] })
             await token.approve(contract.address, 10, { from: accounts[0] })
             await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] })
@@ -145,7 +149,6 @@ contract('OceanMarket', (accounts) => {
 
         it('Should not release payment for not authorized address', async () => {
             // arrange
-            const id = await contract.generateId('test payment')
             await contract.requestTokens(10, { from: accounts[0] })
             await token.approve(contract.address, 10, { from: accounts[0] })
             await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] })
@@ -162,7 +165,6 @@ contract('OceanMarket', (accounts) => {
 
         it('Should not release payment twice', async () => {
             // arrange
-            const id = await contract.generateId('test payment')
             await contract.requestTokens(10, { from: accounts[0] })
             await token.approve(contract.address, 10, { from: accounts[0] })
             await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] })
@@ -183,7 +185,6 @@ contract('OceanMarket', (accounts) => {
     describe('refundPayment', () => {
         it('Should refund payment', async () => {
             // arrange
-            const id = await contract.generateId('test payment')
             await contract.requestTokens(10, { from: accounts[0] })
             await token.approve(contract.address, 10, { from: accounts[0] })
             await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] })
@@ -199,7 +200,6 @@ contract('OceanMarket', (accounts) => {
 
         it('Should emit PaymentRefunded event', async () => {
             // arrange
-            const id = await contract.generateId('test payment')
             await contract.requestTokens(10, { from: accounts[0] })
             await token.approve(contract.address, 10, { from: accounts[0] })
             await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] })
@@ -214,7 +214,6 @@ contract('OceanMarket', (accounts) => {
 
         it('Should not refund payment for not authorized address', async () => {
             // arrange
-            const id = await contract.generateId('test payment')
             await contract.requestTokens(10, { from: accounts[0] })
             await token.approve(contract.address, 10, { from: accounts[0] })
             await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] })
@@ -231,7 +230,6 @@ contract('OceanMarket', (accounts) => {
 
         it('Should not refund payment twice', async () => {
             // arrange
-            const id = await contract.generateId('test payment')
             await contract.requestTokens(10, { from: accounts[0] })
             await token.approve(contract.address, 10, { from: accounts[0] })
             await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] })
@@ -251,9 +249,6 @@ contract('OceanMarket', (accounts) => {
 
     describe('verifyPaymentReceived', () => {
         it('Should return true for not exists payment', async () => { // IMO strange that non-exist payment is valid
-            // arrange
-            const id = await contract.generateId('test payment1')
-
             // act
             const result = await contract.verifyPaymentReceived(id, { from: accounts[0] })
 
@@ -263,7 +258,6 @@ contract('OceanMarket', (accounts) => {
 
         it('Should return true for locked payment', async () => {
             // arrange
-            const id = await contract.generateId('test payment')
             await contract.requestTokens(10, { from: accounts[0] })
             await token.approve(contract.address, 10, { from: accounts[0] })
             await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] })
@@ -277,7 +271,6 @@ contract('OceanMarket', (accounts) => {
 
         it('Should return false for refunded payment', async () => {
             // arrange
-            const id = await contract.generateId('test payment')
             await contract.requestTokens(10, { from: accounts[0] })
             await token.approve(contract.address, 10, { from: accounts[0] })
             await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] })
@@ -293,7 +286,6 @@ contract('OceanMarket', (accounts) => {
 
         it('Should return false for released payment', async () => {
             // arrange
-            const id = await contract.generateId('test payment')
             await contract.requestTokens(10, { from: accounts[0] })
             await token.approve(contract.address, 10, { from: accounts[0] })
             await contract.sendPayment(id, accounts[1], 10, 300, { from: accounts[0] })
@@ -311,7 +303,6 @@ contract('OceanMarket', (accounts) => {
     describe('deactivateAsset', () => {
         it('Should deactivate asset', async () => {
             // arrange
-            const id = await contract.generateId('test asset')
             await contract.register(id, 1, { from: accounts[0] })
 
             // act
@@ -323,7 +314,6 @@ contract('OceanMarket', (accounts) => {
 
         it('Should deactivate asset by non-owner', async () => { // IMO strange that everybody can deactivate assets
             // arrange
-            const id = await contract.generateId('test asset')
             await contract.register(id, 1, { from: accounts[0] })
 
             // act

@@ -9,13 +9,11 @@ contract('OceanToken', (accounts) => {
 
     beforeEach(async () => {
         contract = await OceanToken.new({ from: accounts[0] })
+        await contract.setReceiver(accounts[0])
     })
 
     describe('setReceiver', () => {
         it('Should set receiver', async () => {
-            // act
-            await contract.setReceiver(accounts[0])
-
             // assert
             const balance = await contract.balanceOf(accounts[0])
             assert.strictEqual(parseInt(balance, 10), 1400000000000000000000000000)
@@ -23,9 +21,6 @@ contract('OceanToken', (accounts) => {
         })
 
         it('Should not set receiver twice', async () => {
-            // arrange
-            await contract.setReceiver(accounts[0])
-
             // act-assert
             try {
                 await contract.setReceiver(accounts[1])
@@ -39,9 +34,6 @@ contract('OceanToken', (accounts) => {
 
     describe('transfer', () => {
         it('Should transfer', async () => {
-            // arrange
-            await contract.setReceiver(accounts[0])
-
             // act
             await contract.transfer(accounts[1], 100, { from: accounts[0] })
 
@@ -51,9 +43,6 @@ contract('OceanToken', (accounts) => {
         })
 
         it('Should not transfer to empty address', async () => {
-            // arrange
-            await contract.setReceiver(accounts[0])
-
             // act-assert
             try {
                 await contract.transfer(0x0, 100, { from: accounts[0] })
@@ -68,7 +57,6 @@ contract('OceanToken', (accounts) => {
     describe('transferFrom', () => {
         it('Should transfer', async () => {
             // arrange
-            await contract.setReceiver(accounts[0])
             await contract.approve(accounts[1], 100, { from: accounts[0] })
 
             // act
@@ -81,7 +69,6 @@ contract('OceanToken', (accounts) => {
 
         it('Should not transfer to empty address', async () => {
             // arrange
-            await contract.setReceiver(accounts[0])
             await contract.approve(accounts[1], 100, { from: accounts[0] })
 
             // act-assert
