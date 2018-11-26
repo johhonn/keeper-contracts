@@ -39,7 +39,7 @@ contract('OceanToken', (accounts) => {
 
             // assert
             const balance = await contract.balanceOf(accounts[1])
-            assert.strictEqual(parseInt(balance, 10), 100)
+            assert.strictEqual(balance.toNumber(), 100)
         })
 
         it('Should not transfer to empty address', async () => {
@@ -64,7 +64,7 @@ contract('OceanToken', (accounts) => {
 
             // assert
             const balance = await contract.balanceOf(accounts[2])
-            assert.strictEqual(parseInt(balance, 10), 100)
+            assert.strictEqual(balance.toNumber(), 100)
         })
 
         it('Should not transfer to empty address', async () => {

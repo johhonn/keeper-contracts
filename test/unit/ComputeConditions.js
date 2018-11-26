@@ -4,7 +4,7 @@
 
 const ComputeConditions = artifacts.require('ComputeConditions.sol')
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
-const utils = require('./utils.js')
+const utils = require('../utils.js')
 
 const web3 = utils.getWeb3()
 

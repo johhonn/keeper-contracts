@@ -5,7 +5,7 @@
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
-const utils = require('./utils.js')
+const utils = require('../utils.js')
 
 const web3 = utils.getWeb3()
 

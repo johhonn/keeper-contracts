@@ -4,7 +4,7 @@
 
 const OceanMarket = artifacts.require('OceanMarket.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
-const utils = require('./utils.js')
+const utils = require('../utils.js')
 
 contract('OceanMarket constructor', (accounts) => {
     it('Should not deploy if token is empty', async () => {
@@ -130,7 +130,7 @@ contract('OceanMarket', (accounts) => {
 
             // assert
             const balance = await token.balanceOf(accounts[1])
-            assert.strictEqual(parseInt(balance, 10), 10)
+            assert.strictEqual(balance.toNumber(), 10)
         })
 
         it('Should emit PaymentReceived event', async () => {
@@ -195,7 +195,7 @@ contract('OceanMarket', (accounts) => {
 
             // assert
             const balance = await token.balanceOf(accounts[0])
-            assert.strictEqual(parseInt(balance, 10), 10)
+            assert.strictEqual(balance.toNumber(), 10)
         })
 
         it('Should emit PaymentRefunded event', async () => {
@@ -331,7 +331,7 @@ contract('OceanMarket', (accounts) => {
 
             // assert
             const balance = await token.balanceOf(accounts[0])
-            assert.strictEqual(parseInt(balance, 10), 200)
+            assert.strictEqual(balance.toNumber(), 200)
         })
 
         it('Should not transfer frequently', async () => {
@@ -344,7 +344,7 @@ contract('OceanMarket', (accounts) => {
 
             // assert
             const balance = await token.balanceOf(accounts[0])
-            assert.strictEqual(parseInt(balance, 10), 10)
+            assert.strictEqual(balance.toNumber(), 10)
             utils.assertEmitted(result, 1, 'FrequentTokenRequest')
         })
 
@@ -357,7 +357,7 @@ contract('OceanMarket', (accounts) => {
 
             // assert
             const balance = await token.balanceOf(accounts[0])
-            assert.strictEqual(parseInt(balance, 10), 2)
+            assert.strictEqual(balance.toNumber(), 2)
             utils.assertEmitted(result, 1, 'LimitTokenRequest')
         })
     })

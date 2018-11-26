@@ -7,7 +7,7 @@ const ethers = require('ethers')
 const OceanMarket = artifacts.require('OceanMarket.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 const OceanAuth = artifacts.require('OceanAuth.sol')
-const utils = require('./utils.js')
+const utils = require('../utils.js')
 
 const web3 = utils.getWeb3()
 
@@ -51,7 +51,7 @@ contract('OceanAuth', (accounts) => {
             utils.assertEmitted(result, 1, 'AccessConsentRequested')
             const requestId = result.logs.find(i => i.event === 'AccessConsentRequested').args._id
             const status = await contract.statusOfAccessRequest(requestId)
-            assert.strictEqual(parseInt(status, 10), 0)
+            assert.strictEqual(status.toNumber(), 0)
         })
 
         it('Should create access request for own resource', async () => {
@@ -62,7 +62,7 @@ contract('OceanAuth', (accounts) => {
             utils.assertEmitted(result, 1, 'AccessConsentRequested')
             const requestId = result.logs.find(i => i.event === 'AccessConsentRequested').args._id
             const status = await contract.statusOfAccessRequest(requestId)
-            assert.strictEqual(parseInt(status, 10), 0)
+            assert.strictEqual(status.toNumber(), 0)
         })
     })
 
@@ -106,7 +106,7 @@ contract('OceanAuth', (accounts) => {
             // assert
             utils.assertEmitted(result, 1, 'AccessRequestRejected')
             const status = await contract.statusOfAccessRequest(requestId)
-            assert.strictEqual(parseInt(status, 10), 4)
+            assert.strictEqual(status.toNumber(), 4)
         })
 
         it('Should commit access request if asset is available', async () => {
@@ -119,7 +119,7 @@ contract('OceanAuth', (accounts) => {
             // assert
             utils.assertEmitted(result, 1, 'AccessRequestCommitted')
             const status = await contract.statusOfAccessRequest(requestId)
-            assert.strictEqual(parseInt(status, 10), 1)
+            assert.strictEqual(status.toNumber(), 1)
         })
     })
 
@@ -180,7 +180,7 @@ contract('OceanAuth', (accounts) => {
             // assert
             utils.assertEmitted(result, 1, 'AccessRequestRevoked')
             const status = await contract.statusOfAccessRequest(requestId)
-            assert.strictEqual(parseInt(status, 10), 4)
+            assert.strictEqual(status.toNumber(), 4)
         })
     })
 
@@ -224,7 +224,7 @@ contract('OceanAuth', (accounts) => {
             // assert
             utils.assertEmitted(result, 1, 'EncryptedTokenPublished')
             const status = await contract.statusOfAccessRequest(requestId)
-            assert.strictEqual(parseInt(status, 10), 2)
+            assert.strictEqual(status.toNumber(), 2)
         })
     })
 
@@ -273,7 +273,7 @@ contract('OceanAuth', (accounts) => {
             // assert
             utils.assertEmitted(result, 1, 'AccessRequestRevoked')
             const status = await contract.statusOfAccessRequest(requestId)
-            assert.strictEqual(parseInt(status, 10), 4)
+            assert.strictEqual(status.toNumber(), 4)
         })
 
         it('Should accept access request if signature is valid', async () => {
@@ -294,7 +294,89 @@ contract('OceanAuth', (accounts) => {
             // assert
             utils.assertEmitted(result, 1, 'AccessRequestDelivered')
             const status = await contract.statusOfAccessRequest(requestId)
-            assert.strictEqual(parseInt(status, 10), 3)
+            assert.strictEqual(status.toNumber(), 3)
+        })
+    })
+
+    describe('getTempPubKey', () => {
+        it('Should allow to call by provider only', async () => {
+            // arrange
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
+
+            // act-assert
+            try {
+                await contract.getTempPubKey(requestId, { from: accounts[0] })
+            } catch (e) {
+                return
+            }
+            assert.fail('Expected revert not received')
+        })
+
+        it('Should allow to call for requests with status Committed only', async () => {
+            // arrange
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
+
+            // act-assert
+            try {
+                await contract.getTempPubKey(requestId, { from: accounts[1] })
+            } catch (e) {
+                return
+            }
+            assert.fail('Expected revert not received')
+        })
+
+        it('Should return pub key', async () => {
+            // arrange
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
+            await contract.commitAccessRequest(requestId, true, 10000000000, '', '', '', '', { from: accounts[1] })
+
+            // act
+            const result = await contract.getTempPubKey(requestId, { from: accounts[1] })
+
+            // assert
+            assert.strictEqual(result, 'pk')
+        })
+    })
+
+    describe('getEncryptedAccessToken', () => {
+        it('Should allow to call by consumer only', async () => {
+            // arrange
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
+
+            // act-assert
+            try {
+                await contract.getEncryptedAccessToken(requestId, { from: accounts[1] })
+            } catch (e) {
+                return
+            }
+            assert.fail('Expected revert not received')
+        })
+
+        it('Should allow to call for requests with status Delivered only', async () => {
+            // arrange
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
+
+            // act-assert
+            try {
+                await contract.getEncryptedAccessToken(requestId, { from: accounts[0] })
+            } catch (e) {
+                return
+            }
+            assert.fail('Expected revert not received')
+        })
+
+        it('Should return encripted access token', async () => {
+            // arrange
+            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
+            await contract.commitAccessRequest(requestId, true, 10000000000, '', '', '', '', { from: accounts[1] })
+            await market.sendPayment(requestId, accounts[1], 0, 300, { from: accounts[0] })
+            await contract.deliverAccessToken(requestId, '0x10', { from: accounts[1] })
+
+            // act
+            const result = await contract.getEncryptedAccessToken(requestId, { from: accounts[0] })
+
+            // assert
+            assert.strictEqual(result, '0x10')
         })
     })
 })

@@ -3,7 +3,7 @@
 /* global artifacts, assert, contract, describe, it */
 
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
-const utils = require('./utils.js')
+const utils = require('../utils.js')
 
 const web3 = utils.getWeb3()
 
@@ -403,7 +403,7 @@ contract('ServiceAgreement', (accounts) => {
             const result = await contract.getConditionStatus(serviceAgreementId, conditionKey, { from: accounts[0] })
 
             // assert
-            assert.strictEqual(parseInt(result, 10), 0)
+            assert.strictEqual(result.toNumber(), 0)
         })
     })
 

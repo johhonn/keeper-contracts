@@ -1,3 +1,4 @@
+/* eslint-env mocha */
 /* global artifacts, assert, contract, describe, it */
 /* eslint-disable no-console, max-len */
 
@@ -10,20 +11,25 @@ const EthCrypto = require('eth-crypto')
 const EthjsUtil = require('ethereumjs-util')
 const ethers = require('ethers')
 const BigNumber = require('bignumber.js')
-const utils = require('./utils.js')
+const utils = require('../utils.js')
 
 const web3 = utils.getWeb3()
 
 contract('OceanAuth', (accounts) => {
+    const scale = 10 ** 18
+    let token
+    let market
+    let auth
+
+    beforeEach(async () => {
+        token = await OceanToken.deployed()
+        market = await OceanMarket.deployed()
+        auth = await OceanAuth.deployed()
+    })
+
     describe('Test On-chain Authorization', () => {
         // support upto 50 assets and providers; each asset has one single provider at this time
         it('Should walk through Authorization Process', async () => {
-            // const marketPlace = await Market.deployed();
-            const token = await OceanToken.deployed()
-            const market = await OceanMarket.deployed()
-            const auth = await OceanAuth.deployed()
-            const scale = 10 ** 18
-
             const str = 'resource'
             const resourceId = await market.generateId(web3.utils.fromAscii(str), { from: accounts[0] })
             const resourcePrice = 100 * scale
@@ -37,7 +43,7 @@ contract('OceanAuth', (accounts) => {
             const bal = await token.balanceOf.call(accounts[1])
             console.log(`consumer has balance := ${bal.valueOf() / scale} now`)
             // consumer approve market to withdraw amount of token from his account
-            await token.approve(market.address, new BigNumber(200 * scale), { from: accounts[1] })
+            await token.approve(market.address, new BigNumber(300 * scale), { from: accounts[1] })
 
             // 2. consumer initiate an access request
             const key = EthCrypto.createIdentity()
@@ -109,11 +115,82 @@ contract('OceanAuth', (accounts) => {
             console.log('provider verify the delivery and request payment')
 
             // check balance
-            const pbal = await token.balanceOf.call(accounts[0])
-            console.log(`provider has balance := ${pbal.valueOf() / scale} now`)
+            const pbal = (await token.balanceOf.call(accounts[0])).valueOf() / scale
+            console.log(`provider has balance := ${pbal} now`)
+            assert.strictEqual(pbal, 100)
 
             const mbal = await token.balanceOf.call(market.address)
             console.log(`market has balance := ${mbal.valueOf() / scale} now`)
+        })
+
+        it('Should refund when authorization failed', async () => {
+            // 1. consumer initiate an access request
+            const key = EthCrypto.createIdentity()
+            const publicKey = EthjsUtil.privateToPublic(key.privateKey).toString('hex')
+            console.log('public key is: =', publicKey)
+
+            // 2. consumer initiate new access request
+            const resource2Id = await market.generateId(web3.utils.fromAscii('resource2'), { from: accounts[0] })
+            const initiateAccessRequest2Tx = await auth.initiateAccessRequest(resource2Id, accounts[0], publicKey, 9999999999, { from: accounts[1] })
+
+            const access2Id = initiateAccessRequest2Tx.logs.filter((log) => {
+                return log.event === 'AccessConsentRequested'
+            })[0].args._id
+
+            // 3. provider commit the request
+            await auth.commitAccessRequest(access2Id, true, 9999999999, 'discovery', 'read', 'slaLink', 'slaType', { from: accounts[0] })
+            console.log('provider has committed the order')
+
+            // 4. consumer make payment
+            await market.sendPayment(access2Id, accounts[0], 100 * scale, 9999999999, { from: accounts[1] })
+
+            // 5. provider delivery token
+            await auth.deliverAccessToken(access2Id, `0x1234`, { from: accounts[0] })
+            console.log('provider has delivered token to on-chain')
+
+            // 6. provider send wrong token to ACL contract for verification
+            const emptyBytes32 = '0x0000000000000000000000000000000000000000000000000000000000000000'
+            await auth.verifyAccessTokenDelivery(access2Id, accounts[1], web3.utils.sha3('test'), 28, emptyBytes32, emptyBytes32, { from: accounts[0] })
+            console.log('provider fail verification the delivery and refund payment')
+
+            // check balance
+            const pbal2 = (await token.balanceOf.call(accounts[0])).valueOf() / scale
+            console.log(`provider has balance := ${pbal2} now`)
+            assert.strictEqual(pbal2, 100)
+
+            console.log(`market has balance := ${await token.balanceOf.call(market.address) / scale} now`)
+        })
+
+        it('Should allow to cancel request by consumer when timeout rised', async () => {
+            // 1. consumer initiate an access request
+            const key = EthCrypto.createIdentity()
+            const publicKey = EthjsUtil.privateToPublic(key.privateKey).toString('hex')
+            console.log('public key is: =', publicKey)
+
+            const resourceId = await market.generateId(web3.utils.fromAscii('resource2'), { from: accounts[0] })
+            const initiateAccessRequest3Tx = await auth.initiateAccessRequest(resourceId, accounts[0], publicKey, 1, { from: accounts[1] })
+
+            const accessId = initiateAccessRequest3Tx.logs.filter((log) => {
+                return log.event === 'AccessConsentRequested'
+            })[0].args._id
+
+            // 2. provider commit the request
+            await auth.commitAccessRequest(accessId, true, 9999999999, 'discovery', 'read', 'slaLink', 'slaType', { from: accounts[0] })
+            console.log('provider has committed the order')
+
+            // 3. consumer make payment
+            await market.sendPayment(accessId, accounts[0], 100 * scale, 9999999999, { from: accounts[1] })
+
+            // 4. consumer cancel request
+            await auth.cancelAccessRequest(accessId, { from: accounts[1] })
+            console.log('consumer cancel request to on-chain')
+
+            // check balance
+            const pbal = (await token.balanceOf.call(accounts[0])).valueOf() / scale
+            console.log(`provider has balance := ${pbal} now`)
+            assert.strictEqual(pbal, 100)
+
+            console.log(`market has balance := ${await token.balanceOf.call(market.address) / scale} now`)
         })
     })
 })
