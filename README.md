@@ -121,6 +121,27 @@ npm run migrate -- --reset
 
 ### Testnet deployment
 
+#### POA Testnet
+
+```bash
+npm run migrate:poa_aws
+```
+
+The contract addresses deployed on Ocean POA testnet:
+
+| Contract          | Version | Address                                      |
+|-------------------|---------|----------------------------------------------|
+| AccessConditions  | v0.4.0  | `0x11F7477DBc7A7F748956ba0d2c3FAdC7a4ff51FD` |
+| ComputeConditions | v0.4.0  | `0xf140501a51D524B199632C32B6380d62f80beBCe` |
+| DIDRegistry       | v0.4.0  | `0x36384e734260Da41804b238580FBCb3fbFB6FFD5` |
+| OceanAuth         | v0.4.0  | `0xBc26d16e0bDe5e698dEE38C03ccd0519dfe9e212` |
+| OceanMarket       | v0.4.0  | `0x29863c79727E844440B40Dd367AdA34513B83a52` |
+| OceanToken        | v0.4.0  | `0xB8D7805Fe5cE9F1DCB1cE902b3d9bc7E078D4241` |
+| PaymentConditions | v0.4.0  | `0x22484576e793239169B3758d8bC73E35b0c67DF1` |
+| ServiceAgreement  | v0.4.0  | `0x3C46a24249D2b911259a7BF5e70635d42e711098` |
+
+#### Kovan
+
 Follow the steps for local deployment. Make sure that the address [0x2c0d5f47374b130ee398f4c34dbe8168824a8616](https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616) is having enough (~1) Ether.
 
 If you managed to deploy the contracts locally do:
@@ -135,15 +156,16 @@ The transaction should show up on: `https://kovan.etherscan.io/address/0x2c0d5f4
 
 The contract addresses deployed on Kovan testnet:
 
-| Contract      | Address                                      |
-|---------------|----------------------------------------------|
-| OceanAuth     | `0xfA65f2662224Dd340a2dea0972E70BA450E94e3C` |
-| OceanDispute  | `0x6071e51DB7a3CCc81e0ae1D05908c6F958a59f5B` |
-| OceanExchange | `0x018F8A880A11f8c7Ec4112D9CA20D9256e7d64CD` |
-| OceanMarket   | `0xb8277FC2A46C11235775BEC194BD8C12ed92343C` |
-| OceanRegistry | `0xD9Ca6e9aD36E70A0a2A995a7BDD02017459dD45b` |
-| OceanToken    | `0x656f2Ab5D4C4bC2D5821fd959B083fd50273C2f1` |
-
+| Contract          | Version | Address                                      |
+|-------------------|---------|----------------------------------------------|
+| AccessConditions  | v0.4.0  | `0x4496ccb14Df6c89507790cD1e8A167a24651bA14` |
+| ComputeConditions | v0.4.0  | `0xe6011045985ABC6A6D8C8Cf2Bc3A67Cc8a48C9F0` |
+| DIDRegistry       | v0.4.0  | `0x0669e2375C062d1c2e96c89bBbDaAEa8738B871F` |
+| OceanAuth         | v0.4.0  | `0xfA2C96dF49939adb6bF2EFC9acC2c089cbF9cdf7` |
+| OceanMarket       | v0.4.0  | `0x22cc24DD3BC978322cB81eB396438Ad0797c1b78` |
+| OceanToken        | v0.4.0  | `0x4446D7800a0CaD304D3bf41F9CE2eBc0330D7e6b` |
+| PaymentConditions | v0.4.0  | `0xF7eDd0D99Cae3fcFf358E4C3c48352b8a1fac36d` |
+| ServiceAgreement  | v0.4.0  | `0x2946fe1f5d48d0664e2251251d92cf9600e9BE24` |
 
 ## Libraries
 
