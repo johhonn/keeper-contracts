@@ -13,12 +13,14 @@ contract FitchainConditions{
 
     struct Model {
         bool exists;
-        bool isVerified;
         bool isTrained;
+        bool isVerified;
+        uint Kverifiers;
         bytes32 result;
         address consumer;
         address provider;
-        mapping(address => bool) verifiers;
+        mapping(address => bool) GPCVerifiers;
+        mapping(address => bool) VPCVerifiers;
     }
 
     struct Verifier {
@@ -35,17 +37,29 @@ contract FitchainConditions{
     uint256 private stake;
     ServiceAgreement private serviceAgreementStorage;
 
-
     modifier onlyProvider(bytes32 modelId){
         require(models[modelId].exists, 'model does not exist!');
         require(msg.sender == models[modelId].provider, 'invalid model provider');
+        require(serviceAgreementStorage.getAgreementPublisher(modelId) == msg.sender, 'invalid service provider');
         _;
     }
 
-    modifier onlyVerifier(bytes32 modelId){
+    modifier onlyPublisher(bytes32 modelId){
+        require(serviceAgreementStorage.getAgreementPublisher(modelId) == msg.sender, 'invalid service provider');
+        _;
+    }
+
+    modifier onlyGPCVerifier(bytes32 modelId){
         require(verifiers[msg.sender].isStaking, 'invalid staking verifier');
         require(models[modelId].exists, 'model does not exist!');
-        require(models[modelId].verifiers[msg.sender], 'access denied invalid verifier address');
+        require(models[modelId].GPCVerifiers[msg.sender], 'access denied invalid verifier address');
+        _;
+    }
+
+    modifier onlyVPCVerifier(bytes32 modelId){
+        require(verifiers[msg.sender].isStaking, 'invalid staking verifier');
+        require(models[modelId].exists, 'model does not exist!');
+        require(models[modelId].GPCVerifiers[msg.sender], 'access denied invalid verifier address');
         _;
     }
 
@@ -64,7 +78,7 @@ contract FitchainConditions{
     }
 
     function registerVerifier(uint slots) public onlyValidStakeValue(slots) returns(bool){
-        // TODO: cut this stake from his balance
+        // TODO: cut this stake from the verifier's balance
         verifiers[msg.sender].isStaking = true;
         verifiers[msg.sender].amount = stake * slots;
         verifiers[msg.sender].slots = slots;
@@ -99,5 +113,42 @@ contract FitchainConditions{
             }
         }
         return false;
+    }
+
+    function initPoTProof(bytes32 modelId, uint256 k) public onlyPublisher(modelId) returns(bool){
+        require(k > 0, 'invalid verifiers number');
+        models[modelId].exists = true;
+        models[modelId].isTrained = false;
+        models[modelId].isVerified = false;
+        models[modelId].Kverifiers = k;
+        models[modelId].consumer = serviceAgreementStorage.getServiceAgreementConsumer(modelId);
+        models[modelId].provider = serviceAgreementStorage.getAgreementPublisher(modelId);
+        // get k GPC verifiers
+        address[] memory GPCVerifiers = electRRKVerifiers(k);
+        if(GPCVerifiers.length < k){
+            //TODO: emit event
+            return false;
+        }
+        for(uint i=0; i< GPCVerifiers.length; i++){
+            // set vote false
+            models[modelId].GPCVerifiers[GPCVerifiers[i]] = false;
+        }
+        //TODO: emit event
+        return true;
+    }
+
+    function initVPCProof(bytes32 modelId, uint256 k) public onlyPublisher(modelId) returns(bool){
+        // get k GPC verifiers
+        address[] memory VPCVerifiers = electRRKVerifiers(k);
+        if(VPCVerifiers.length < k){
+            //TODO: emit event
+            return false;
+        }
+        for(uint i=0; i< VPCVerifiers.length; i++){
+            // set vote false
+            models[modelId].VPCVerifiers[VPCVerifiers[i]] = false;
+        }
+        //TODO: emit event
+        return true;
     }
 }
