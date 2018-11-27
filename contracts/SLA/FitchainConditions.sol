@@ -3,11 +3,13 @@ pragma solidity ^0.4.25;
 import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
 import './ServiceAgreement.sol';
 
-/// @title On-premise compute conditions
-/// @author Ahmed Ali
+/// @title Fitchain conditions
+/// @author Ocean Protocol Team
 /// @notice This contract is WIP, don't use if for production
-/// @dev All function calls are currently implement without side effects
+/// @dev All function calls are currently implement with some side effects
+
 /// TODO: Implementing commit-reveal approach to avoid the front-running
+/// TODO: Implement slashing conditions
 
 contract FitchainConditions{
 
@@ -42,6 +44,15 @@ contract FitchainConditions{
     mapping(address => Actor) verifiers;
     uint256 private stake;
     ServiceAgreement private serviceAgreementStorage;
+
+    // events
+    event VerifierRegistered(address verifier, uint256 slots);
+    event VerifierDeregistered(address verifier);
+    event PoTInitialized(address[] verifiers, bool state);
+    event VPCInitialized(address[] verifiers, bool state);
+    event VerificationCondition(bytes32 serviceAgreementId, bool state);
+    event TrainingCondition(bytes32 serviceAgreementId, bool state);
+    event FreeSlots(address verifier, uint256 slots);
 
     modifier onlyProvider(bytes32 modelId){
         require(models[modelId].exists, 'model does not exist!');
@@ -107,6 +118,7 @@ contract FitchainConditions{
         for(uint256 i=0; i < slots; i++)
             //TODO: the below line prone to 51% attack
             registry.push(msg.sender);
+        emit VerifierRegistered(msg.sender, slots);
         return true;
     }
 
@@ -115,6 +127,7 @@ contract FitchainConditions{
             verifiers[msg.sender].isStaking = false;
         }
         //TODO: send back stake to verifier
+        emit VerifierDeregistered(msg.sender);
         return true;
     }
 
@@ -153,7 +166,7 @@ contract FitchainConditions{
         // get k GPC verifiers
         address[] memory GPCVerifiers = electRRKVerifiers(k);
         if(GPCVerifiers.length < k){
-            //TODO: emit event
+            emit PoTInitialized(GPCVerifiers, false);
             return false;
         }
         models[modelId] = Model(true, false, false, k, new uint256[](0), bytes32(0), serviceAgreementStorage.getServiceAgreementConsumer(modelId), serviceAgreementStorage.getAgreementPublisher(modelId));
@@ -162,7 +175,7 @@ contract FitchainConditions{
             models[modelId].GPCVerifiers[GPCVerifiers[i]].exists = false;
             models[modelId].GPCVerifiers[GPCVerifiers[i]].vote = false;
         }
-        //TODO: emit event
+        emit PoTInitialized(GPCVerifiers, true);
         return true;
     }
 
@@ -170,7 +183,7 @@ contract FitchainConditions{
         // get k verifiers
         address[] memory VPCVerifiers = electRRKVerifiers(k);
         if(VPCVerifiers.length < k){
-            //TODO: emit event
+            emit VPCInitialized(VPCVerifiers, false);
             return false;
         }
         for(uint i=0; i< VPCVerifiers.length; i++){
@@ -178,7 +191,7 @@ contract FitchainConditions{
             models[modelId].VPCVerifiers[VPCVerifiers[i]].exists = false;
             models[modelId].VPCVerifiers[VPCVerifiers[i]].vote = false;
         }
-        //TODO: emit event
+        emit VPCInitialized(VPCVerifiers, true);
         return true;
     }
 
@@ -203,15 +216,15 @@ contract FitchainConditions{
     function setPoT(bytes32 serviceAgreementId, uint256 count) public onlyThisContract() returns(bool){
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceAgreementId, address(this), this.setPoT.selector);
         if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceAgreementId, condition)){
-            //TODO: emit event
+            emit TrainingCondition(serviceAgreementId, false);
             return false;
         }
         if (serviceAgreementStorage.getConditionStatus(serviceAgreementId, condition) == 1) {
-            //TODO: emit event
+            emit TrainingCondition(serviceAgreementId, true);
             return true;
         }
         serviceAgreementStorage.fulfillCondition(serviceAgreementId, this.setPoT.selector, keccak256(abi.encodePacked(count)));
-        //TODO: emit event
+        emit TrainingCondition(serviceAgreementId, true);
         models[serviceAgreementId].isTrained = true;
         return true;
     }
@@ -219,15 +232,15 @@ contract FitchainConditions{
     function setVPC(bytes32 serviceAgreementId, uint256 count) public onlyThisContract() returns(bool){
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceAgreementId, address(this), this.setVPC.selector);
         if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceAgreementId, condition)){
-            //TODO: emit event
+            emit VerificationCondition(serviceAgreementId, false);
             return false;
         }
         if (serviceAgreementStorage.getConditionStatus(serviceAgreementId, condition) == 1) {
-            //TODO: emit event
+            emit VerificationCondition(serviceAgreementId, true);
             return true;
         }
         serviceAgreementStorage.fulfillCondition(serviceAgreementId, this.setVPC.selector, keccak256(abi.encodePacked(count)));
-        //TODO: emit event
+        emit VerificationCondition(serviceAgreementId, true);
         models[serviceAgreementId].isTrained = true;
         return true;
     }
@@ -238,12 +251,11 @@ contract FitchainConditions{
             addVerifierToRegistry(msg.sender);
             slots +=1;
         }
-
         if(models[modelId].VPCVerifiers[msg.sender].exists && models[modelId].isVerified){
             addVerifierToRegistry(msg.sender);
             slots +=1;
         }
-        // TODO: emit event
+        emit FreeSlots(msg.sender, slots);
         return true;
     }
 }

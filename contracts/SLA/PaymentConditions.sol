@@ -1,9 +1,12 @@
 pragma solidity 0.4.25;
 
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
-
 import '../token/OceanToken.sol';
 import './ServiceAgreement.sol';
+
+/// @title Payment Conditions Contract
+/// @author Ocean Protocol Team
+/// @dev All function calls are currently implement without side effects
 
 contract PaymentConditions {
 
