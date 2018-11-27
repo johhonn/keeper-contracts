@@ -11,19 +11,26 @@ import './ServiceAgreement.sol';
 
 contract FitchainConditions{
 
+    struct Verifier{
+        bool exists;
+        bool vote;
+        uint256 timeout;
+    }
+
     struct Model {
         bool exists;
         bool isTrained;
         bool isVerified;
         uint Kverifiers;
+        uint256[] counter;
         bytes32 result;
         address consumer;
         address provider;
-        mapping(address => bool) GPCVerifiers;
-        mapping(address => bool) VPCVerifiers;
+        mapping(address => Verifier) GPCVerifiers;
+        mapping(address => Verifier) VPCVerifiers;
     }
 
-    struct Verifier {
+    struct Actor {
         bool isStaking;
         uint256 amount;
         uint256 slots;
@@ -31,9 +38,9 @@ contract FitchainConditions{
         mapping(bytes32 => bool) models;
     }
 
-    address[] verifiersRegistry;
+    address[] registry;
     mapping(bytes32 => Model) models;
-    mapping(address => Verifier) verifiers;
+    mapping(address => Actor) verifiers;
     uint256 private stake;
     ServiceAgreement private serviceAgreementStorage;
 
@@ -52,14 +59,14 @@ contract FitchainConditions{
     modifier onlyGPCVerifier(bytes32 modelId){
         require(verifiers[msg.sender].isStaking, 'invalid staking verifier');
         require(models[modelId].exists, 'model does not exist!');
-        require(models[modelId].GPCVerifiers[msg.sender], 'access denied invalid verifier address');
+        require(models[modelId].GPCVerifiers[msg.sender].exists, 'access denied invalid verifier address');
         _;
     }
 
     modifier onlyVPCVerifier(bytes32 modelId){
         require(verifiers[msg.sender].isStaking, 'invalid staking verifier');
         require(models[modelId].exists, 'model does not exist!');
-        require(models[modelId].GPCVerifiers[msg.sender], 'access denied invalid verifier address');
+        require(models[modelId].GPCVerifiers[msg.sender].exists, 'access denied invalid verifier address');
         _;
     }
 
@@ -82,33 +89,33 @@ contract FitchainConditions{
         verifiers[msg.sender].isStaking = true;
         verifiers[msg.sender].amount = stake * slots;
         verifiers[msg.sender].slots = slots;
-        verifiersRegistry.push(msg.sender);
+        registry.push(msg.sender);
         return true;
     }
 
     function electRRKVerifiers(uint k) private returns(address[] verifiersSet){
-        if(verifiersRegistry.length < k) return verifiersSet;
+        if(registry.length < k) return verifiersSet;
         for(uint256 i=0; i <= k ; i++){
-            if(verifiers[verifiersRegistry[i]].slots == 1){
-                removeVerifierFromRegistry(verifiersRegistry[i]);
+            if(verifiers[registry[i]].slots == 1){
+                removeVerifierFromRegistry(registry[i]);
             }
-            verifiersSet[i] = verifiersRegistry[i];
-            verifiers[verifiersRegistry[i]].slots -=1;
+            verifiersSet[i] = registry[i];
+            verifiers[registry[i]].slots -=1;
         }
     }
 
     function addVerifierToRegistry(address verifier) private returns(bool){
-        verifiersRegistry.push(verifier);
+        registry.push(verifier);
         return true;
     }
 
     function removeVerifierFromRegistry(address verifier)  private returns(bool) {
-        for(uint256 j=0; j<verifiersRegistry.length; j++){
-            if(verifier == verifiersRegistry[j]){
-                for (uint i=j; i< verifiersRegistry.length-1; i++){
-                    verifiersRegistry[i] = verifiersRegistry[i+1];
+        for(uint256 j=0; j<registry.length; j++){
+            if(verifier == registry[j]){
+                for (uint i=j; i< registry.length-1; i++){
+                    registry[i] = registry[i+1];
                 }
-                verifiersRegistry.length--;
+                registry.length--;
                 return true;
             }
         }
@@ -131,7 +138,8 @@ contract FitchainConditions{
         }
         for(uint i=0; i< GPCVerifiers.length; i++){
             // set vote false
-            models[modelId].GPCVerifiers[GPCVerifiers[i]] = false;
+            models[modelId].GPCVerifiers[GPCVerifiers[i]].exists = false;
+            models[modelId].GPCVerifiers[GPCVerifiers[i]].vote = false;
         }
         //TODO: emit event
         return true;
@@ -146,9 +154,17 @@ contract FitchainConditions{
         }
         for(uint i=0; i< VPCVerifiers.length; i++){
             // set vote false
-            models[modelId].VPCVerifiers[VPCVerifiers[i]] = false;
+            models[modelId].GPCVerifiers[VPCVerifiers[i]].exists = false;
+            models[modelId].VPCVerifiers[VPCVerifiers[i]].vote = false;
         }
         //TODO: emit event
         return true;
+    }
+
+    function voteForPoT(bytes32 modelId, bool vote) public onlyGPCVerifier(modelId) returns(bool){
+        require(!models[modelId].GPCVerifiers[msg.sender].exists, 'avoid replay attack');
+        models[modelId].GPCVerifiers[msg.sender].vote = vote;
+        models[modelId].GPCVerifiers[msg.sender].exists = true;
+        models[modelId].counter[0] +=1;
     }
 }
