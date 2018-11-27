@@ -32,7 +32,7 @@ contract FitchainConditions{
     address[] verifiersRegistry;
     mapping(bytes32 => Model) models;
     mapping(address => Verifier) verifiers;
-    uint256 private minStake;
+    uint256 private stake;
     ServiceAgreement private serviceAgreementStorage;
 
 
@@ -49,24 +49,24 @@ contract FitchainConditions{
         _;
     }
 
-    modifier onlyValidStakeValue(uint256 amount, uint256 slots){
-        require(amount > 0 && slots > 0, 'invalid amount or slots values');
+    modifier onlyValidStakeValue(uint256 slots){
+        require(slots > 0, 'invalid slots value');
         // TODO: check if verifier has the same amount of tokens
         _;
     }
 
-    constructor(address serviceAgreementAddress, uint256 _minStake) public {
+    constructor(address serviceAgreementAddress, uint256 _stake) public {
         require(serviceAgreementAddress != address(0), 'invalid service agreement contract address');
-        require(minStake > 0, 'invalid staking amount');
+        require(_stake > 0, 'invalid staking amount');
         serviceAgreementStorage = ServiceAgreement(serviceAgreementAddress);
-        minStake = _minStake;
+        stake = _stake;
 
     }
 
-    function registerVerifier(uint256 amount, uint slots) public onlyValidStakeValue(amount, slots) returns(bool){
+    function registerVerifier(uint slots) public onlyValidStakeValue(slots) returns(bool){
         // TODO: cut this stake from his balance
         verifiers[msg.sender].isStaking = true;
-        verifiers[msg.sender].amount = amount * slots;
+        verifiers[msg.sender].amount = stake * slots;
         verifiers[msg.sender].slots = slots;
         verifiersRegistry.push(msg.sender);
         return true;
