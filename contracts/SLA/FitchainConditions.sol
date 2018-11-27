@@ -35,7 +35,6 @@ contract FitchainConditions{
         uint256 amount;
         uint256 slots;
         uint256 maxSlots;
-        mapping(bytes32 => bool) models;
     }
 
     address[] registry;
@@ -70,6 +69,13 @@ contract FitchainConditions{
         _;
     }
 
+    modifier onlyVerifiers(bytes32 modelId){
+        require(verifiers[msg.sender].isStaking, 'invalid staking verifier');
+        require(models[modelId].exists, 'model does not exist!');
+        require(models[modelId].GPCVerifiers[msg.sender].exists || models[modelId].VPCVerifiers[msg.sender].exists, 'access denied invalid verifier address');
+        _;
+    }
+
     modifier onlyValidStakeValue(uint256 slots){
         require(slots > 0, 'invalid slots value');
         // TODO: check if verifier has the same amount of tokens
@@ -81,20 +87,34 @@ contract FitchainConditions{
         _;
     }
 
+    modifier onlyFreeSlots(){
+        require(verifiers[msg.sender].slots == verifiers[msg.sender].maxSlots, 'access denied, please free some slots');
+        _;
+    }
+
     constructor(address serviceAgreementAddress, uint256 _stake) public {
         require(serviceAgreementAddress != address(0), 'invalid service agreement contract address');
         require(_stake > 0, 'invalid staking amount');
         serviceAgreementStorage = ServiceAgreement(serviceAgreementAddress);
         stake = _stake;
-
     }
 
-    function registerVerifier(uint slots) public onlyValidStakeValue(slots) returns(bool){
+    function registerVerifier(uint256 slots) public onlyValidStakeValue(slots) returns(bool){
         // TODO: cut this stake from the verifier's balance
         verifiers[msg.sender].isStaking = true;
         verifiers[msg.sender].amount = stake * slots;
         verifiers[msg.sender].slots = slots;
-        registry.push(msg.sender);
+        for(uint256 i=0; i < slots; i++)
+            //TODO: the below line prone to 51% attack
+            registry.push(msg.sender);
+        return true;
+    }
+
+    function deregisterVerifier() public onlyFreeSlots() returns(bool) {
+        if(removeVerifierFromRegistry(msg.sender)){
+            verifiers[msg.sender].isStaking = false;
+        }
+        //TODO: send back stake to verifier
         return true;
     }
 
@@ -111,6 +131,7 @@ contract FitchainConditions{
 
     function addVerifierToRegistry(address verifier) private returns(bool){
         registry.push(verifier);
+        verifiers[verifier].slots +=1;
         return true;
     }
 
@@ -135,9 +156,7 @@ contract FitchainConditions{
             //TODO: emit event
             return false;
         }
-        models[modelId] = Model(true, false, false, k, new uint256[](0), bytes32(0),
-        serviceAgreementStorage.getServiceAgreementConsumer(modelId),
-        serviceAgreementStorage.getAgreementPublisher(modelId));
+        models[modelId] = Model(true, false, false, k, new uint256[](0), bytes32(0), serviceAgreementStorage.getServiceAgreementConsumer(modelId), serviceAgreementStorage.getAgreementPublisher(modelId));
         for(uint i=0; i< GPCVerifiers.length; i++){
             // set vote false
             models[modelId].GPCVerifiers[GPCVerifiers[i]].exists = false;
@@ -148,7 +167,7 @@ contract FitchainConditions{
     }
 
     function initVPCProof(bytes32 modelId, uint256 k) public onlyPublisher(modelId) returns(bool){
-        // get k GPC verifiers
+        // get k verifiers
         address[] memory VPCVerifiers = electRRKVerifiers(k);
         if(VPCVerifiers.length < k){
             //TODO: emit event
@@ -156,7 +175,7 @@ contract FitchainConditions{
         }
         for(uint i=0; i< VPCVerifiers.length; i++){
             // set vote false
-            models[modelId].GPCVerifiers[VPCVerifiers[i]].exists = false;
+            models[modelId].VPCVerifiers[VPCVerifiers[i]].exists = false;
             models[modelId].VPCVerifiers[VPCVerifiers[i]].vote = false;
         }
         //TODO: emit event
@@ -176,7 +195,7 @@ contract FitchainConditions{
         require(!models[modelId].VPCVerifiers[msg.sender].exists, 'avoid replay attack');
         models[modelId].VPCVerifiers[msg.sender].vote = vote;
         models[modelId].VPCVerifiers[msg.sender].exists = true;
-        if(models[modelId].VPCVerifiers[msg.sender].vote) models[modelId].counter[0] +=1;
+        if(models[modelId].VPCVerifiers[msg.sender].vote) models[modelId].counter[1] +=1;
         if(models[modelId].counter[1] == models[modelId].Kverifiers) setVPC(modelId, models[modelId].counter[1]);
         return true;
     }
@@ -210,6 +229,21 @@ contract FitchainConditions{
         serviceAgreementStorage.fulfillCondition(serviceAgreementId, this.setVPC.selector, keccak256(abi.encodePacked(count)));
         //TODO: emit event
         models[serviceAgreementId].isTrained = true;
+        return true;
+    }
+
+    function freeMySlots(bytes32 modelId) public onlyVerifiers(modelId) returns(bool){
+        uint slots = verifiers[msg.sender].slots;
+        if(models[modelId].GPCVerifiers[msg.sender].exists && models[modelId].isTrained){
+            addVerifierToRegistry(msg.sender);
+            slots +=1;
+        }
+
+        if(models[modelId].VPCVerifiers[msg.sender].exists && models[modelId].isVerified){
+            addVerifierToRegistry(msg.sender);
+            slots +=1;
+        }
+        // TODO: emit event
         return true;
     }
 }
