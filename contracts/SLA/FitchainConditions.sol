@@ -21,7 +21,7 @@ contract FitchainConditions{
         bool exists;
         bool isTrained;
         bool isVerified;
-        uint Kverifiers;
+        uint256 Kverifiers;
         uint256[] counter;
         bytes32 result;
         address consumer;
@@ -76,6 +76,11 @@ contract FitchainConditions{
         _;
     }
 
+    modifier onlyThisContract(){
+        require(msg.sender == address(this), 'invalid internal call');
+        _;
+    }
+
     constructor(address serviceAgreementAddress, uint256 _stake) public {
         require(serviceAgreementAddress != address(0), 'invalid service agreement contract address');
         require(_stake > 0, 'invalid staking amount');
@@ -124,18 +129,15 @@ contract FitchainConditions{
 
     function initPoTProof(bytes32 modelId, uint256 k) public onlyPublisher(modelId) returns(bool){
         require(k > 0, 'invalid verifiers number');
-        models[modelId].exists = true;
-        models[modelId].isTrained = false;
-        models[modelId].isVerified = false;
-        models[modelId].Kverifiers = k;
-        models[modelId].consumer = serviceAgreementStorage.getServiceAgreementConsumer(modelId);
-        models[modelId].provider = serviceAgreementStorage.getAgreementPublisher(modelId);
         // get k GPC verifiers
         address[] memory GPCVerifiers = electRRKVerifiers(k);
         if(GPCVerifiers.length < k){
             //TODO: emit event
             return false;
         }
+        models[modelId] = Model(true, false, false, k, new uint256[](0), bytes32(0),
+        serviceAgreementStorage.getServiceAgreementConsumer(modelId),
+        serviceAgreementStorage.getAgreementPublisher(modelId));
         for(uint i=0; i< GPCVerifiers.length; i++){
             // set vote false
             models[modelId].GPCVerifiers[GPCVerifiers[i]].exists = false;
@@ -165,6 +167,49 @@ contract FitchainConditions{
         require(!models[modelId].GPCVerifiers[msg.sender].exists, 'avoid replay attack');
         models[modelId].GPCVerifiers[msg.sender].vote = vote;
         models[modelId].GPCVerifiers[msg.sender].exists = true;
-        models[modelId].counter[0] +=1;
+        if(models[modelId].GPCVerifiers[msg.sender].vote) models[modelId].counter[0] +=1;
+        if(models[modelId].counter[0] == models[modelId].Kverifiers) setPoT(modelId, models[modelId].counter[0]);
+        return true;
+    }
+
+    function voteForVPC(bytes32 modelId, bool vote) public onlyVPCVerifier(modelId) returns(bool){
+        require(!models[modelId].VPCVerifiers[msg.sender].exists, 'avoid replay attack');
+        models[modelId].VPCVerifiers[msg.sender].vote = vote;
+        models[modelId].VPCVerifiers[msg.sender].exists = true;
+        if(models[modelId].VPCVerifiers[msg.sender].vote) models[modelId].counter[0] +=1;
+        if(models[modelId].counter[1] == models[modelId].Kverifiers) setVPC(modelId, models[modelId].counter[1]);
+        return true;
+    }
+
+    function setPoT(bytes32 serviceAgreementId, uint256 count) public onlyThisContract() returns(bool){
+        bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceAgreementId, address(this), this.setPoT.selector);
+        if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceAgreementId, condition)){
+            //TODO: emit event
+            return false;
+        }
+        if (serviceAgreementStorage.getConditionStatus(serviceAgreementId, condition) == 1) {
+            //TODO: emit event
+            return true;
+        }
+        serviceAgreementStorage.fulfillCondition(serviceAgreementId, this.setPoT.selector, keccak256(abi.encodePacked(count)));
+        //TODO: emit event
+        models[serviceAgreementId].isTrained = true;
+        return true;
+    }
+
+    function setVPC(bytes32 serviceAgreementId, uint256 count) public onlyThisContract() returns(bool){
+        bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceAgreementId, address(this), this.setVPC.selector);
+        if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceAgreementId, condition)){
+            //TODO: emit event
+            return false;
+        }
+        if (serviceAgreementStorage.getConditionStatus(serviceAgreementId, condition) == 1) {
+            //TODO: emit event
+            return true;
+        }
+        serviceAgreementStorage.fulfillCondition(serviceAgreementId, this.setVPC.selector, keccak256(abi.encodePacked(count)));
+        //TODO: emit event
+        models[serviceAgreementId].isTrained = true;
+        return true;
     }
 }
