@@ -27,6 +27,8 @@ Ocean Keeper implementation where we put the following modules together:
      - [Docker](#docker)
      - [Local development](#local-development)
      - [Testnet deployment](#testnet-deployment)
+        - [Ocean POA Testnet](#ocean-poa-testnet)
+        - [Kovan Testnet](#kovan-testnet)
   - [Libraries](#libraries)
   - [Testing](#testing)
      - [Code Linting](#code-linting)
@@ -121,26 +123,31 @@ npm run migrate -- --reset
 
 ### Testnet deployment
 
-#### POA Testnet
+#### Ocean POA Testnet
+
+Follow the steps for local deployment. Make sure that the address `0x90eE7A30339D05E07d9c6e65747132933ff6e624` is having enough (~1) Ether.
 
 ```bash
+export POA_NMEMORIC=<your poa nmemoric>
 npm run migrate:poa_aws
 ```
+
+The transaction should show up on the account: `0x90eE7A30339D05E07d9c6e65747132933ff6e624`
 
 The contract addresses deployed on Ocean POA testnet:
 
 | Contract          | Version | Address                                      |
 |-------------------|---------|----------------------------------------------|
-| AccessConditions  | v0.4.0  | `0x11F7477DBc7A7F748956ba0d2c3FAdC7a4ff51FD` |
-| ComputeConditions | v0.4.0  | `0xf140501a51D524B199632C32B6380d62f80beBCe` |
-| DIDRegistry       | v0.4.0  | `0x36384e734260Da41804b238580FBCb3fbFB6FFD5` |
-| OceanAuth         | v0.4.0  | `0xBc26d16e0bDe5e698dEE38C03ccd0519dfe9e212` |
-| OceanMarket       | v0.4.0  | `0x29863c79727E844440B40Dd367AdA34513B83a52` |
-| OceanToken        | v0.4.0  | `0xB8D7805Fe5cE9F1DCB1cE902b3d9bc7E078D4241` |
-| PaymentConditions | v0.4.0  | `0x22484576e793239169B3758d8bC73E35b0c67DF1` |
-| ServiceAgreement  | v0.4.0  | `0x3C46a24249D2b911259a7BF5e70635d42e711098` |
+| AccessConditions  | v0.4.0  | `0x31a64a1DCdD9e1b8db84ef94431a61C6B462Ad0c` |
+| ComputeConditions | v0.4.0  | `0xb28BC9489c55be810858F206602cf91c83DF816f` |
+| DIDRegistry       | v0.4.0  | `0xBDFeAc66c022165Bdb320264398977bf8A54e3C0` |
+| OceanAuth         | v0.4.0  | `0x0C84ECe5A68059220ff114de2b11457Fa7d7Fc45` |
+| OceanMarket       | v0.4.0  | `0x0959092E0D313F0BD3a6441151B2E2685d7350b5` |
+| OceanToken        | v0.4.0  | `0x8cCD9073B23689ca2BB76a049Eb33dfF5e16228D` |
+| PaymentConditions | v0.4.0  | `0x78D2CA96F19e0e5b97Ca19Da179CEBF0fC5101BC` |
+| ServiceAgreement  | v0.4.0  | `0xCa925335D4EC611f35388eEeA9b9F7B0a6947d32` |
 
-#### Kovan
+#### Kovan Testnet
 
 Follow the steps for local deployment. Make sure that the address [0x2c0d5f47374b130ee398f4c34dbe8168824a8616](https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616) is having enough (~1) Ether.
 
