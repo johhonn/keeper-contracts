@@ -106,8 +106,9 @@ contract FitchainConditions{
         _;
     }
 
-    modifier onlyValidVotes(bytes32 modelId, uint256 votType){
+    modifier onlyValidVotes(bytes32 modelId, uint256 votType, uint256 count){
         require(models[modelId].counter[votType] == models[modelId].Kverifiers, 'it did not reach the total votes');
+        require(models[modelId].counter[votType] == count, 'invalid count of votes');
         _;
     }
 
@@ -118,6 +119,10 @@ contract FitchainConditions{
         stake = _stake;
     }
 
+    /// @notice registerVerifier called by any verifier in order to register
+    /// @dev any verifier is able to register with a certain number of slots,
+    /// staking will be implemented later
+    /// @param slots , number of pools that a verifier can offer to join multiple games at a time
     function registerVerifier(uint256 slots) public onlyValidStakeValue(slots) returns(bool){
         // TODO: cut this stake from the verifier's balance
         verifiers[msg.sender] = Actor(true, stake * slots, slots, slots);
@@ -128,6 +133,9 @@ contract FitchainConditions{
         return true;
     }
 
+    /// @notice deregisterVerifier called by any verifier in order to deregister
+    /// @dev checks that verifier has no longer part of any verification games, then free slot
+    /// returns the stake to the verifier account and release them from the registry
     function deregisterVerifier() public onlyFreeSlots() returns(bool) {
         if(removeVerifierFromRegistry(msg.sender)){
             verifiers[msg.sender].isStaking = false;
@@ -138,6 +146,12 @@ contract FitchainConditions{
         return true;
     }
 
+    /// @notice electRRKVerifiers private function, elects K verifiers using round-robin
+    /// @dev remove verifiers from registry if there is no available slots to serve more verification games
+    /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
+    /// @param k , number of required verifiers
+    /// @param vType , represent the type of the verifier (1 -> GPC, 2 -> VPC)
+    /// @param timeout , optional but required to set the voting timeout
     function electRRKVerifiers(bytes32 modelId, uint256 k, uint256 vType, uint256 timeout) private returns(bool){
         for(uint256 i=0; i < k && i < registry.length ; i++){
             if(vType == 1){
@@ -163,6 +177,9 @@ contract FitchainConditions{
         return true;
     }
 
+    /// @notice removeVerifierFromRegistry private function maintains the verifiers registry
+    /// @dev remove verifiers from registry if there is no available slots to serve more verification games
+    /// @param verifier , verifier address
     function removeVerifierFromRegistry(address verifier) private returns(bool) {
         for(uint256 j=0; j<registry.length; j++){
             if(verifier == registry[j]){
@@ -176,6 +193,11 @@ contract FitchainConditions{
         return false;
     }
 
+    /// @notice initPoTProof called by publisher or model provider electing verifiers to check the PoT proof in Fitchain
+    /// @dev performs some security checks, elect verifiers and notify them to start the game
+    /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
+    /// @param k , the number of voters that are required to testify
+    /// @param timeout , timeout to set the vote (This will be changed for more advanced options)
     function initPoTProof(bytes32 modelId, uint256 k, uint256 timeout) public onlyPublisher(modelId) returns(bool){
         require(k > 0, 'invalid verifiers number');
         if(registry.length < k){
@@ -192,6 +214,11 @@ contract FitchainConditions{
         return true;
     }
 
+    /// @notice initVPCProof called by publisher or model provider electing verifiers to check the verification proof in Fitchain
+    /// @dev performs some security checks, elect verifiers and notify them to start the game
+    /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
+    /// @param k , the number of voters that are required to testify
+    /// @param timeout , timeout to set the vote (This will be changed for more advanced options)
     function initVPCProof(bytes32 modelId, uint256 k, uint256 timeout) public onlyPublisher(modelId) returns(bool){
         // get k verifiers
         require(k > 0, 'invalid verifiers number');
@@ -204,11 +231,19 @@ contract FitchainConditions{
         return true;
     }
 
+    /// @notice voteForPoT called by verifiers where they vote for the existence of verification proof
+    /// @dev performs some security checks, set the vote and update the state of counter
+    /// and emit some events to notify the model provider/publisher that all votes have been submitted
+    /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
+    /// @param vote , the result of isTrained in Fitchain (T/F)
     function voteForPoT(bytes32 modelId, bool vote) public onlyGPCVerifier(modelId) returns(bool){
         require(!models[modelId].isTrained, 'avoid replay attack');
         require(!models[modelId].GPCVerifiers[msg.sender].nonce, 'avoid replay attack');
         models[modelId].GPCVerifiers[msg.sender].vote = vote;
         models[modelId].GPCVerifiers[msg.sender].nonce = true;
+        //TODO: if vote is false or true, we should follow the majority in order to slash the losers
+        //TODO: the losers. They might be verifiers or model provider
+        //TODO: commit-reveal scheme to be implemented!
         if(models[modelId].GPCVerifiers[msg.sender].vote) models[modelId].counter[0] +=1;
         if(models[modelId].counter[1] == models[modelId].Kverifiers) {
             emit VotesSubmitted(modelId, serviceAgreementStorage.getAgreementPublisher(modelId), 1);
@@ -216,18 +251,31 @@ contract FitchainConditions{
         return true;
     }
 
+    /// @notice voteForVPC called by verifiers where they vote for the existence of verification proof
+    /// @dev performs some security checks, set the vote and update the state of counter
+    /// and emit some events to notify the model provider/publisher that all votes have been submitted
+    /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
+    /// @param vote , the result of isVerified in Fitchain (T/F)
     function voteForVPC(bytes32 modelId, bool vote) public onlyVPCVerifier(modelId) returns(bool){
         require(!models[modelId].isVerified, 'avoid replay attack');
         require(!models[modelId].isVerified, 'avoid replay attack');
         require(!models[modelId].VPCVerifiers[msg.sender].nonce, 'avoid replay attack');
         models[modelId].VPCVerifiers[msg.sender].vote = vote;
         models[modelId].VPCVerifiers[msg.sender].nonce = true;
+        //TODO: if vote is false or true, we should follow the majority in order to slash the losers
+        //TODO: the losers. They might be verifiers or model provider
+        //TODO: commit-reveal scheme to be implemented!
         if(models[modelId].VPCVerifiers[msg.sender].vote) models[modelId].counter[1] +=1;
         if(models[modelId].counter[1] == models[modelId].Kverifiers) emit VotesSubmitted(modelId, serviceAgreementStorage.getAgreementPublisher(modelId), 2);
         return true;
     }
 
-    function setPoT(bytes32 modelId, uint256 count) public onlyValidVotes(modelId, 0) onlyPublisher(modelId) returns(bool){
+    /// @notice setPoT (Gossiper pool contract in Fitchain) is called only by the model provider.
+    /// @dev At first It checks if the proof state is created or not, then uses the count to
+    /// reconstruct the right condition key based on the signed agreement
+    /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
+    /// @param count , represents the number of submitted votes by verifiers who testify that they check the existence of proof in Fitchain
+    function setPoT(bytes32 modelId, uint256 count) public onlyValidVotes(modelId, 0, count) onlyPublisher(modelId) returns(bool){
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(modelId, address(this), this.setPoT.selector);
         if (serviceAgreementStorage.hasUnfulfilledDependencies(modelId, condition)){
             emit TrainingCondition(modelId, false);
@@ -243,7 +291,12 @@ contract FitchainConditions{
         return true;
     }
 
-    function setVPC(bytes32 modelId, uint256 count) public onlyValidVotes(modelId, 0) onlyPublisher(modelId) returns(bool){
+    /// @notice setVPC (verification pool contract in Fitchain) is called only by the model provider.
+    /// @dev At first It checks if the proof state is created or not, then uses the count to
+    /// reconstruct the right condition key based on the signed agreement
+    /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
+    /// @param count , represents the number of submitted votes by verifiers who testify that they check the existence of proof in Fitchain
+    function setVPC(bytes32 modelId, uint256 count) public onlyValidVotes(modelId, 0, count) onlyPublisher(modelId) returns(bool){
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(modelId, address(this), this.setVPC.selector);
         if (serviceAgreementStorage.hasUnfulfilledDependencies(modelId, condition)){
             emit VerificationCondition(modelId, false);
@@ -253,12 +306,16 @@ contract FitchainConditions{
             emit VerificationCondition(modelId, true);
             return true;
         }
-        serviceAgreementStorage.fulfillCondition(modelId, this.setVPC.selector, keccak256(abi.encodePacked(count)));
+        serviceAgreementStorage.fulfillCondition(modelId, this.setVPC.selector, keccak256(abi.encodePacked(models[modelId].counter[1])));
         emit VerificationCondition(modelId, true);
         models[modelId].isTrained = true;
         return true;
     }
 
+    /// @notice freeMySlots called by verifier in order to be able to deregister
+    /// @dev it checks if the verifier is involved in a testifying game or not
+    /// reconstruct the right condition key based on the signed agreement
+    /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
     function freeMySlots(bytes32 modelId) public onlyVerifiers(modelId) returns(bool){
         uint slots = verifiers[msg.sender].slots;
         if(models[modelId].GPCVerifiers[msg.sender].exists && models[modelId].isTrained){
@@ -273,6 +330,8 @@ contract FitchainConditions{
         return true;
     }
 
+    /// @notice getAvailableVerifiersCount , get the number of available verifiers
+    /// @dev returns the number of available verifiers using registry length
     function getAvailableVerifiersCount() public view returns(uint256){
         return registry.length;
     }
