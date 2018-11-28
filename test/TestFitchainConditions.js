@@ -12,7 +12,7 @@ const web3 = testUtils.getWeb3()
 contract('FitchainConditions', (accounts) => {
     describe('Test Fitchain Conditions', () => {
         let token, market, serviceAgreement, paymentConditions, valuesHashList, serviceId, conditionKeys, templateId
-        let fingerPrints, contracts, serviceAgreementId, slaMsgHash, signature
+        let fingerPrints, contracts, serviceAgreementId, slaMsgHash, signature, fitchainConditions
 
         const publisher = accounts[0]
         const consumer = accounts[1]
@@ -41,7 +41,6 @@ contract('FitchainConditions', (accounts) => {
             await market.requestTokens(testUtils.toBigNumber(1000), { from: verifier1 })
             await market.requestTokens(testUtils.toBigNumber(1000), { from: verifier2 })
             await market.requestTokens(testUtils.toBigNumber(1000), { from: verifier3 })
-
 
             // conditions
             contracts = [paymentConditions.address, fitchainConditions.address, fitchainConditions.address, paymentConditions.address, paymentConditions.address]
@@ -82,15 +81,16 @@ contract('FitchainConditions', (accounts) => {
         it('Data scientist locks payment for the model provider', async () => {
             await token.approve(paymentConditions.address, price, { from: consumer })
             await paymentConditions.lockPayment(serviceId, did, price, { from: consumer })
-//            const locked = await serviceAgreement.getConditionStatus(serviceAgreementId, conditionKeys[0])
-//            assert.strictEqual(locked.toNumber(), 1, 'Error: Unable to lock payment!')
+            //            const locked = await serviceAgreement.getConditionStatus(serviceAgreementId, conditionKeys[0])
+            //            assert.strictEqual(locked.toNumber(), 1, 'Error: Unable to lock payment!')
         })
         it('Verifiers register and stake based on the number of slots', async () => {
             const registerVerifier1 = await fitchainConditions.registerVerifier(slots, { from: verifier1 })
             assert.strictEqual(verifier1, registerVerifier1.logs[0].args.verifier, 'invalid verifier address')
-            assert.strictEqual(verifier1, registerVerifier1.logs[0].args.verifier, 'invalid verifier address')
             const registerVerifier2 = await fitchainConditions.registerVerifier(slots, { from: verifier2 })
+            assert.strictEqual(verifier2, registerVerifier2.logs[0].args.verifier, 'invalid verifier address')
             const registerVerifier3 = await fitchainConditions.registerVerifier(slots, { from: verifier3 })
+            assert.strictEqual(verifier3, registerVerifier3.logs[0].args.verifier, 'invalid verifier address')
         })
         it('Model provider init Proof of Training (PoT)', async () => {
         })
