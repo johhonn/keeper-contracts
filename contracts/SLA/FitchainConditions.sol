@@ -48,14 +48,12 @@ contract FitchainConditions{
     // events
     event VerifierRegistered(address verifier, uint256 slots);
     event VerifierDeregistered(address verifier);
-    event PoTInitialized(address[] verifiers, bool state);
-    event VPCInitialized(address[] verifiers, bool state);
+    event VerifierElected(address verifier, bytes32 serviceAgreementId);
+    event PoTInitialized(bool state);
+    event VPCInitialized(bool state);
     event VerificationCondition(bytes32 serviceAgreementId, bool state);
     event TrainingCondition(bytes32 serviceAgreementId, bool state);
     event FreeSlots(address verifier, uint256 slots);
-
-    //TODO: delete the below line
-    event debugEvent(bool state);
 
     modifier onlyProvider(bytes32 modelId){
         require(models[modelId].exists, 'model does not exist!');
@@ -133,17 +131,23 @@ contract FitchainConditions{
         return true;
     }
 
-    function electRRKVerifiers(uint k) private returns(address[]){
-        address[] storage verifiersSet;
-        if(registry.length < k) return verifiersSet;
-        for(uint256 i=0; i <= k ; i++){
-            if(verifiers[registry[i]].slots == 1){
+    function electRRKVerifiers(bytes32 modelId, uint256 k, uint256 vType, uint256 timeout) private returns(bool){
+        for(uint256 i=0; i < k && i < registry.length ; i++){
+            if(vType == 1){
+                models[modelId].GPCVerifiers[registry[i]] = Verifier(false, false, timeout);
+            }
+            if(vType == 2){
+                models[modelId].VPCVerifiers[registry[i]] = Verifier(false, false, timeout);
+            }
+            verifiers[registry[i]].slots -=1;
+            emit VerifierElected(registry[i], modelId);
+        }
+        for(uint256 j=0; j < registry.length; j++){
+            if(verifiers[registry[i]].slots == 0){
                 removeVerifierFromRegistry(registry[i]);
             }
-            verifiersSet.push(registry[i]);
-            verifiers[registry[i]].slots -=1;
         }
-        return verifiersSet;
+        return true;
     }
 
     function addVerifierToRegistry(address verifier) private returns(bool){
@@ -165,57 +169,29 @@ contract FitchainConditions{
         return false;
     }
 
-    //TODO: delete the below function
-    function debug() public returns(bool){
-        emit debugEvent(true);
-        return true;
-    }
-
-    function initPoTProof(bytes32 modelId, uint256 k) public onlyPublisher(modelId) returns(bool){
-        //TODO: delete the below line
-        debug();
+    function initPoTProof(bytes32 modelId, uint256 k, uint256 timeout) public onlyPublisher(modelId) returns(bool){
         require(k > 0, 'invalid verifiers number');
-//
-        // get k GPC verifiers
-        address[] memory GPCVerifiers = electRRKVerifiers(k);
-//        if(GPCVerifiers.length < k){
-//            emit PoTInitialized(GPCVerifiers, false);
-//            return false;
-//        }
-//
-//        //models[modelId] = Model(true, false, false, k, new uint256[](0), bytes32(0), serviceAgreementStorage.getServiceAgreementConsumer(modelId), serviceAgreementStorage.getAgreementPublisher(modelId));
-//
-//        models[modelId].exists = true;
-//        models[modelId].isTrained = false;
-//        models[modelId].isVerified = false;
-//        models[modelId].Kverifiers = k;
-//        models[modelId].counter = new uint256[](0);
-//        models[modelId].result = bytes32(0);
-//        models[modelId].consumer = serviceAgreementStorage.getServiceAgreementConsumer(modelId);
-//        models[modelId].provider = serviceAgreementStorage.getAgreementPublisher(modelId);
-//        for(uint i=0; i< GPCVerifiers.length; i++){
-//            // set vote false
-//            models[modelId].GPCVerifiers[GPCVerifiers[i]].exists = false;
-//            models[modelId].GPCVerifiers[GPCVerifiers[i]].vote = false;
-//        }
-//        emit PoTInitialized(GPCVerifiers, true);
-        emit PoTInitialized(GPCVerifiers, true);
-        return true;
-    }
-
-    function initVPCProof(bytes32 modelId, uint256 k) public onlyPublisher(modelId) returns(bool){
-        // get k verifiers
-        address[] memory VPCVerifiers = electRRKVerifiers(k);
-        if(VPCVerifiers.length < k){
-            emit VPCInitialized(VPCVerifiers, false);
+        if(registry.length < k){
+            emit PoTInitialized(false);
             return false;
         }
-        for(uint i=0; i< VPCVerifiers.length; i++){
-            // set vote false
-            models[modelId].VPCVerifiers[VPCVerifiers[i]].exists = false;
-            models[modelId].VPCVerifiers[VPCVerifiers[i]].vote = false;
+        // init model
+        models[modelId] = Model(true, false, false, k, new uint256[](0), bytes32(0), serviceAgreementStorage.getServiceAgreementConsumer(modelId), serviceAgreementStorage.getAgreementPublisher(modelId));
+        // get k GPC verifiers
+        require(electRRKVerifiers(modelId, k, 1, timeout), 'unable to allocate resources');
+        emit PoTInitialized(true);
+        return true;
+    }
+
+    function initVPCProof(bytes32 modelId, uint256 k, uint256 timeout) public onlyPublisher(modelId) returns(bool){
+        // get k verifiers
+        require(k > 0, 'invalid verifiers number');
+        if(registry.length < k){
+            emit VPCInitialized(false);
+            return false;
         }
-        emit VPCInitialized(VPCVerifiers, true);
+        require(electRRKVerifiers(modelId, k, 2, timeout), 'unable to allocate resources');
+        emit VPCInitialized(true);
         return true;
     }
 

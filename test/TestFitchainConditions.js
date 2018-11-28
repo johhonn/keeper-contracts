@@ -12,18 +12,18 @@ const web3 = testUtils.getWeb3()
 contract('FitchainConditions', (accounts) => {
     describe('Test Fitchain Conditions', () => {
         let token, market, serviceAgreement, paymentConditions, valuesHashList, serviceId, conditionKeys, templateId
-        let fingerPrints, contracts, serviceAgreementId, slaMsgHash, signature, fitchainConditions
+        let fingerPrints, contracts, serviceAgreementId, slaMsgHash, signature, fitchainConditions, GPCVerifiers, VPCVerifiers
 
         const publisher = accounts[0]
         const consumer = accounts[1]
         const verifier1 = accounts[2]
         const verifier2 = accounts[3]
         const verifier3 = accounts[4]
-
+        const verifier4 = accounts[5]
         const fulfillmentIndices = [3, 4]
         const fulfilmentOperator = 1 // OR
         const dependencies = [0, 1, 4, 16, 3]
-        const slots = 1
+        const slots = 2
         const price = 10 // 10 OCN tokens
         const timeouts = [0, 0, 0, 0, 100]
         const kVerifiers = 3
@@ -39,6 +39,7 @@ contract('FitchainConditions', (accounts) => {
             fitchainConditions = await FitchainConditions.new(serviceAgreement.address, 5)
 
             await market.requestTokens(testUtils.toBigNumber(1000), { from: consumer })
+            await market.requestTokens(testUtils.toBigNumber(1000), { from: publisher })
             await market.requestTokens(testUtils.toBigNumber(1000), { from: verifier1 })
             await market.requestTokens(testUtils.toBigNumber(1000), { from: verifier2 })
             await market.requestTokens(testUtils.toBigNumber(1000), { from: verifier3 })
@@ -87,19 +88,36 @@ contract('FitchainConditions', (accounts) => {
         })
         it('Verifiers register and stake based on the number of slots', async () => {
             const registerVerifier1 = await fitchainConditions.registerVerifier(slots, { from: verifier1 })
-            assert.strictEqual(verifier1, registerVerifier1.logs[0].args.verifier, 'invalid verifier address')
+            assert.strictEqual(verifier1, registerVerifier1.logs[0].args.verifier, 'invalid verifier address 1')
             const registerVerifier2 = await fitchainConditions.registerVerifier(slots, { from: verifier2 })
-            assert.strictEqual(verifier2, registerVerifier2.logs[0].args.verifier, 'invalid verifier address')
+            assert.strictEqual(verifier2, registerVerifier2.logs[0].args.verifier, 'invalid verifier address 2')
             const registerVerifier3 = await fitchainConditions.registerVerifier(slots, { from: verifier3 })
-            assert.strictEqual(verifier3, registerVerifier3.logs[0].args.verifier, 'invalid verifier address')
+            assert.strictEqual(verifier3, registerVerifier3.logs[0].args.verifier, 'invalid verifier address 3')
+            const registerVerifier4 = await fitchainConditions.registerVerifier(slots, { from: verifier4 })
+            assert.strictEqual(verifier4, registerVerifier4.logs[0].args.verifier, 'invalid verifier address 4')
         })
         it('Model provider init Proof of Training (PoT)', async () => {
             const availableSlots = await fitchainConditions.getAvailableVerifiersCount()
-            assert.strictEqual(kVerifiers, availableSlots.toNumber(), 'invalid number of verifiers/slots')
-            const potInit = await fitchainConditions.initPoTProof(serviceAgreementId, kVerifiers, { from: publisher })
-            assert.strictEqual(potInit.logs[0].args.state, true, 'unable to initialize the PoT verification')
+            assert.strictEqual(8, availableSlots.toNumber(), 'invalid number of verifiers/slots')
+            const verifierState = await fitchainConditions.initPoTProof(serviceAgreementId, kVerifiers, 1, { from: publisher })
+            console.log(verifierState.logs)
+
+//            const potInit = await fitchainConditions.initPoTProof(serviceAgreementId, kVerifiers, { from: publisher })
+//            assert.strictEqual(potInit.logs[0].args.state, true, 'unable to initialize the PoT verification')
         })
         it('GPC verifiers submit votes to fulfill Proof of Training condition', async () => {
+//            await fitchainConditions.voteForPoT(serviceAgreementId, true, { from: verifier1 })
+//            await fitchainConditions.voteForPoT(serviceAgreementId, true, { from: verifier2 })
+//            await fitchainConditions.voteForPoT(serviceAgreementId, true, { from: verifier3 })
+        })
+        it('A byzantine GPC verifier fails to submit vote twice', async() => {
+
+        })
+        it('Model provider init verification proof', async() => {
+
+        })
+        it('VPC verifiers submit votes to fulfill the verification game', async() => {
+
         })
         it('Verifiers should able to deregister if their slots are free', async () => {
             const deregisterVerifier1 = await fitchainConditions.deregisterVerifier({ from: verifier1 })
