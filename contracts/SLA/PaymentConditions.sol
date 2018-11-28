@@ -22,7 +22,6 @@ contract PaymentConditions {
     constructor(address _serviceAgreementAddress, address _tokenAddress) public {
         require(_serviceAgreementAddress != address(0), 'invalid contract address');
         require(_tokenAddress != address(0), 'invalid token address');
-
         serviceAgreementStorage = ServiceAgreement(_serviceAgreementAddress);
         token = OceanToken(_tokenAddress);
     }
@@ -76,11 +75,8 @@ contract PaymentConditions {
             return true;
 
         bytes32 valueHash = keccak256(abi.encodePacked(assetId, price));
-
         serviceAgreementStorage.fulfillCondition(serviceId, this.releasePayment.selector, valueHash);
-
-        require(token.approve(address(this), payments[serviceId].amount), 'Can not approve token operation');
-        require(token.transferFrom(payments[serviceId].receiver, msg.sender, payments[serviceId].amount), 'Can not release payment');
+        require(token.transfer(msg.sender, payments[serviceId].amount), 'unable to release payment');
         emit PaymentReleased(serviceId, payments[serviceId].receiver, msg.sender, payments[serviceId].amount);
     }
 
@@ -94,14 +90,9 @@ contract PaymentConditions {
             return true;
 
         bytes32 valueHash = keccak256(abi.encodePacked(assetId, price));
-
         serviceAgreementStorage.fulfillCondition(serviceId, this.refundPayment.selector, valueHash);
         // transfer from this contract to consumer/msg.sender
-        require(token.approve(address(this), payments[serviceId].amount), 'Can not approve token operation');
-        require(
-            token.transferFrom(payments[serviceId].receiver, payments[serviceId].sender, payments[serviceId].amount),
-            'Can not refund payment'
-        );
+        require(token.transfer(payments[serviceId].sender, payments[serviceId].amount), 'Can not refund payment');
         emit PaymentRefund(serviceId, payments[serviceId].receiver, payments[serviceId].sender, payments[serviceId].amount);
     }
 }
