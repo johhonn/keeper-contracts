@@ -54,6 +54,9 @@ contract FitchainConditions{
     event TrainingCondition(bytes32 serviceAgreementId, bool state);
     event FreeSlots(address verifier, uint256 slots);
 
+    //TODO: delete the below line
+    event debugEvent(bool state);
+
     modifier onlyProvider(bytes32 modelId){
         require(models[modelId].exists, 'model does not exist!');
         require(msg.sender == models[modelId].provider, 'invalid model provider');
@@ -130,15 +133,17 @@ contract FitchainConditions{
         return true;
     }
 
-    function electRRKVerifiers(uint k) private returns(address[] verifiersSet){
+    function electRRKVerifiers(uint k) private returns(address[]){
+        address[] storage verifiersSet;
         if(registry.length < k) return verifiersSet;
         for(uint256 i=0; i <= k ; i++){
             if(verifiers[registry[i]].slots == 1){
                 removeVerifierFromRegistry(registry[i]);
             }
-            verifiersSet[i] = registry[i];
+            verifiersSet.push(registry[i]);
             verifiers[registry[i]].slots -=1;
         }
+        return verifiersSet;
     }
 
     function addVerifierToRegistry(address verifier) private returns(bool){
@@ -147,7 +152,7 @@ contract FitchainConditions{
         return true;
     }
 
-    function removeVerifierFromRegistry(address verifier)  private returns(bool) {
+    function removeVerifierFromRegistry(address verifier) private returns(bool) {
         for(uint256 j=0; j<registry.length; j++){
             if(verifier == registry[j]){
                 for (uint i=j; i< registry.length-1; i++){
@@ -160,20 +165,40 @@ contract FitchainConditions{
         return false;
     }
 
+    //TODO: delete the below function
+    function debug() public returns(bool){
+        emit debugEvent(true);
+        return true;
+    }
+
     function initPoTProof(bytes32 modelId, uint256 k) public onlyPublisher(modelId) returns(bool){
+        //TODO: delete the below line
+        debug();
         require(k > 0, 'invalid verifiers number');
+//
         // get k GPC verifiers
         address[] memory GPCVerifiers = electRRKVerifiers(k);
-        if(GPCVerifiers.length < k){
-            emit PoTInitialized(GPCVerifiers, false);
-            return false;
-        }
-        models[modelId] = Model(true, false, false, k, new uint256[](0), bytes32(0), serviceAgreementStorage.getServiceAgreementConsumer(modelId), serviceAgreementStorage.getAgreementPublisher(modelId));
-        for(uint i=0; i< GPCVerifiers.length; i++){
-            // set vote false
-            models[modelId].GPCVerifiers[GPCVerifiers[i]].exists = false;
-            models[modelId].GPCVerifiers[GPCVerifiers[i]].vote = false;
-        }
+//        if(GPCVerifiers.length < k){
+//            emit PoTInitialized(GPCVerifiers, false);
+//            return false;
+//        }
+//
+//        //models[modelId] = Model(true, false, false, k, new uint256[](0), bytes32(0), serviceAgreementStorage.getServiceAgreementConsumer(modelId), serviceAgreementStorage.getAgreementPublisher(modelId));
+//
+//        models[modelId].exists = true;
+//        models[modelId].isTrained = false;
+//        models[modelId].isVerified = false;
+//        models[modelId].Kverifiers = k;
+//        models[modelId].counter = new uint256[](0);
+//        models[modelId].result = bytes32(0);
+//        models[modelId].consumer = serviceAgreementStorage.getServiceAgreementConsumer(modelId);
+//        models[modelId].provider = serviceAgreementStorage.getAgreementPublisher(modelId);
+//        for(uint i=0; i< GPCVerifiers.length; i++){
+//            // set vote false
+//            models[modelId].GPCVerifiers[GPCVerifiers[i]].exists = false;
+//            models[modelId].GPCVerifiers[GPCVerifiers[i]].vote = false;
+//        }
+//        emit PoTInitialized(GPCVerifiers, true);
         emit PoTInitialized(GPCVerifiers, true);
         return true;
     }
@@ -256,5 +281,9 @@ contract FitchainConditions{
         }
         emit FreeSlots(msg.sender, slots);
         return true;
+    }
+
+    function getAvailableVerifiersCount() public view returns(uint256){
+        return registry.length;
     }
 }

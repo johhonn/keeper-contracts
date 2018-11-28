@@ -26,6 +26,7 @@ contract('FitchainConditions', (accounts) => {
         const slots = 1
         const price = 10 // 10 OCN tokens
         const timeouts = [0, 0, 0, 0, 100]
+        const kVerifiers = 3
         const did = testUtils.generateId(web3)
         const serviceTemplateId = testUtils.generateId(web3)
         serviceAgreementId = testUtils.generateId(web3)
@@ -54,8 +55,8 @@ contract('FitchainConditions', (accounts) => {
 
             valuesHashList = [
                 testUtils.valueHash(['bytes32', 'uint256'], [did, price]),
-                testUtils.valueHash(['uint256'], [3]),
-                testUtils.valueHash(['uint256'], [3]),
+                testUtils.valueHash(['uint256'], [kVerifiers]),
+                testUtils.valueHash(['uint256'], [kVerifiers]),
                 testUtils.valueHash(['bytes32', 'uint256'], [did, price]),
                 testUtils.valueHash(['bytes32', 'uint256'], [did, price])
             ]
@@ -81,8 +82,8 @@ contract('FitchainConditions', (accounts) => {
         it('Data scientist locks payment for the model provider', async () => {
             await token.approve(paymentConditions.address, price, { from: consumer })
             await paymentConditions.lockPayment(serviceId, did, price, { from: consumer })
-            //            const locked = await serviceAgreement.getConditionStatus(serviceAgreementId, conditionKeys[0])
-            //            assert.strictEqual(locked.toNumber(), 1, 'Error: Unable to lock payment!')
+            const locked = await serviceAgreement.getConditionStatus(serviceAgreementId, conditionKeys[0])
+            assert.strictEqual(locked.toNumber(), 1, 'Error: Unable to lock payment!')
         })
         it('Verifiers register and stake based on the number of slots', async () => {
             const registerVerifier1 = await fitchainConditions.registerVerifier(slots, { from: verifier1 })
@@ -93,6 +94,10 @@ contract('FitchainConditions', (accounts) => {
             assert.strictEqual(verifier3, registerVerifier3.logs[0].args.verifier, 'invalid verifier address')
         })
         it('Model provider init Proof of Training (PoT)', async () => {
+            const availableSlots = await fitchainConditions.getAvailableVerifiersCount()
+            assert.strictEqual(kVerifiers, availableSlots.toNumber(), 'invalid number of verifiers/slots')
+            const potInit = await fitchainConditions.initPoTProof(serviceAgreementId, kVerifiers, { from: publisher })
+            assert.strictEqual(potInit.logs[0].args.state, true, 'unable to initialize the PoT verification')
         })
         it('GPC verifiers submit votes to fulfill Proof of Training condition', async () => {
         })
