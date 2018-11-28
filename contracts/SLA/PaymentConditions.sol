@@ -59,12 +59,10 @@ contract PaymentConditions {
             return true;
 
         bytes32 valueHash = keccak256(abi.encodePacked(assetId, price));
-        address sender = msg.sender;
-        address receiver = address(this);
         serviceAgreementStorage.fulfillCondition(serviceId, this.lockPayment.selector, valueHash);
-
-        require(token.transferFrom(sender, receiver, price), 'Can not lock payment');
-        payments[serviceId] = Payment(sender, receiver, price);
+        token.allowance(msg.sender, address(this));
+        require(token.transferFrom(msg.sender, address(this), price), 'Can not lock payment');
+        payments[serviceId] = Payment(msg.sender, address(this), price);
         emit PaymentLocked(serviceId, payments[serviceId].sender, payments[serviceId].receiver, payments[serviceId].amount);
     }
 

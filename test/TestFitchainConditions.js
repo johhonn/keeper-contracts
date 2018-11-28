@@ -13,7 +13,7 @@ contract('FitchainConditions', (accounts) => {
     describe('Test Fitchain Conditions', () => {
 
         let token, market, serviceAgreement, paymentConditions, valuesHashList, serviceId, conditionKeys, templateId
-        let funcFingerPrints, contracts, serviceAgreementId, slaMsgHash, signature, algorithmHash
+        let fingerPrints, contracts, serviceAgreementId, slaMsgHash, signature, algorithmHash
 
         const publisher = accounts[0]
         const consumer  = accounts[1]
@@ -38,8 +38,8 @@ contract('FitchainConditions', (accounts) => {
             paymentConditions = await PaymentConditions.deployed(serviceAgreement.address, token.address)
             fitchainConditions = await FitchainConditions.deployed(serviceAgreement.address, 5)
             // conditions
-            contracts = [paymentConditions.address, fitchainConditions.address, fitchainConditions, paymentConditions.address, paymentConditions.address]
-            funcFingerPrints = [
+            contracts = [paymentConditions.address, fitchainConditions.address, fitchainConditions.address, paymentConditions.address, paymentConditions.address]
+            fingerPrints = [
                 testUtils.getSelector(web3, paymentConditions, 'lockPayment'),
                 testUtils.getSelector(web3, fitchainConditions, 'setPoT'),
                 testUtils.getSelector(web3, fitchainConditions, 'setVPC'),
@@ -54,19 +54,49 @@ contract('FitchainConditions', (accounts) => {
                 testUtils.valueHash(['bytes32', 'uint256'], [did, price]),
                 testUtils.valueHash(['bytes32', 'uint256'], [did, price])
             ]
+            // create new on-premise compute template
+            const createAgreementTemplate = await serviceAgreement.setupAgreementTemplate(
+                serviceTemplateId, contracts, fingerPrints, dependencies,
+                web3.utils.fromAscii('fitchain-use-case'), fulfillmentIndices,
+                fulfilmentOperator, { from: publisher }
+            )
             templateId = testUtils.getEventArgsFromTx(createAgreementTemplate, 'SetupAgreementTemplate').serviceTemplateId
             // create new agreement instance
-            conditionKeys = testUtils.generateConditionsKeys(templateId, contracts, funcFingerPrints)
+            conditionKeys = testUtils.generateConditionsKeys(templateId, contracts, fingerPrints)
             slaMsgHash = testUtils.createSLAHash(web3, templateId, conditionKeys, valuesHashList, timeouts, serviceAgreementId)
             signature = await web3.eth.sign(slaMsgHash, consumer)
             serviceId = await testUtils.signAgreement(
                 serviceAgreement, templateId, signature,
-                datascientist, valuesHashList, timeouts,
+                consumer, valuesHashList, timeouts,
                 serviceAgreementId, did, { from: publisher }
             )
             assert.strictEqual(serviceId, serviceAgreementId, 'Error: unable to retrieve service agreement Id')
-            await token.approve(paymentConditions.address, testUtils.toBigNumber(200), { from: consumer })
+            await token.approve(paymentConditions.address, 5, { from: consumer })
         })
 
+        it('Data scientist locks payment for the model provider', async() => {
+            await paymentConditions.lockPayment(serviceId, did, price, { from: consumer })
+            const locked = await serviceAgreement.getConditionStatus(serviceAgreementId, conditionKeys[0])
+            assert.strictEqual(locked.toNumber(), 1, 'Error: Unable to lock payment!')
+        })
+        it('Verifiers register and stake based on the number of slots', async() => {
+            const registerVerifier1 = await fitchainConditions.registerVerifier(slots, { from: verifier1 })
+            assert.strictEqual(verifier1, registerVerifier1.logs[0].args.verifier, 'invalid verifier address')
+            assert.strictEqual(verifier1, registerVerifier1.logs[0].args.verifier, 'invalid verifier address')
+            const registerVerifier2 = await fitchainConditions.registerVerifier(slots, { from: verifier2 })
+            const registerVerifier3 = await fitchainConditions.registerVerifier(slots, { from: verifier3 })
+        })
+        it('Model provider init Proof of Training (PoT)', async() => {
+        })
+        it('GPC verifiers submit votes to fulfill Proof of Training condition', async() => {
+        })
+        it('Verifiers should able to deregister if their slots are free', async() => {
+            const deregisterVerifier1 = await fitchainConditions.deregisterVerifier({from: verifier1})
+            const deregisterVerifier2 = await fitchainConditions.deregisterVerifier({from: verifier2})
+            const deregisterVerifier3 = await fitchainConditions.deregisterVerifier({from: verifier3})
+            assert.strictEqual(verifier1, deregisterVerifier1.logs[0].args.verifier, 'unable to deregister')
+            assert.strictEqual(verifier2, deregisterVerifier2.logs[0].args.verifier, 'unable to deregister')
+            assert.strictEqual(verifier3, deregisterVerifier3.logs[0].args.verifier, 'unable to deregister')
+        })
     })
 })

@@ -125,8 +125,9 @@ contract FitchainConditions{
     function deregisterVerifier() public onlyFreeSlots() returns(bool) {
         if(removeVerifierFromRegistry(msg.sender)){
             verifiers[msg.sender].isStaking = false;
+            //TODO: send back stake to verifier
+            verifiers[msg.sender].amount = 0;
         }
-        //TODO: send back stake to verifier
         emit VerifierDeregistered(msg.sender);
         return true;
     }
