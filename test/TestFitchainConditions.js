@@ -30,6 +30,7 @@ contract('FitchainConditions', (accounts) => {
         const did = testUtils.generateId(web3)
         const serviceTemplateId = testUtils.generateId(web3)
         serviceAgreementId = testUtils.generateId(web3)
+        GPCVerifiers = []
 
         before(async () => {
             token = await OceanToken.deployed()
@@ -100,10 +101,10 @@ contract('FitchainConditions', (accounts) => {
             const availableSlots = await fitchainConditions.getAvailableVerifiersCount()
             assert.strictEqual(8, availableSlots.toNumber(), 'invalid number of verifiers/slots')
             const verifierState = await fitchainConditions.initPoTProof(serviceAgreementId, kVerifiers, 1, { from: publisher })
-            console.log(verifierState.logs)
-
-//            const potInit = await fitchainConditions.initPoTProof(serviceAgreementId, kVerifiers, { from: publisher })
-//            assert.strictEqual(potInit.logs[0].args.state, true, 'unable to initialize the PoT verification')
+            for(i=0; i < verifierState.logs.length-1 ; i++){
+                GPCVerifiers[i] = verifierState.logs[i].args.verifier
+            }
+            assert.strictEqual(verifierState.logs[verifierState.logs.length-1].args.state, true, 'unable to initialize the PoT verification')
         })
         it('GPC verifiers submit votes to fulfill Proof of Training condition', async () => {
 //            await fitchainConditions.voteForPoT(serviceAgreementId, true, { from: verifier1 })
