@@ -24,19 +24,25 @@ contract('FitchainConditions', (accounts) => {
         const fulfilmentOperator = 1 // OR
         const dependencies = [0, 1, 4, 16, 3]
         const slots = 1
-        const price = 5 // 5 OCN tokens
+        const price = 10 // 10 OCN tokens
         const timeouts = [0, 0, 0, 0, 100]
         const did = testUtils.generateId(web3)
         const serviceTemplateId = testUtils.generateId(web3)
         serviceAgreementId = testUtils.generateId(web3)
 
         before(async () => {
-            token = await OceanToken.new()
-            await token.setReceiver(accounts[0])
-            market = await OceanMarket.deployed()
+            token = await OceanToken.deployed()
+            market = await OceanMarket.deployed(token.address)
             serviceAgreement = await ServiceAgreement.deployed()
             paymentConditions = await PaymentConditions.deployed(serviceAgreement.address, token.address)
-            fitchainConditions = await FitchainConditions.deployed(serviceAgreement.address, 5)
+            fitchainConditions = await FitchainConditions.new(serviceAgreement.address, 5)
+
+            await market.requestTokens(testUtils.toBigNumber(1000), { from: consumer })
+            await market.requestTokens(testUtils.toBigNumber(1000), { from: verifier1 })
+            await market.requestTokens(testUtils.toBigNumber(1000), { from: verifier2 })
+            await market.requestTokens(testUtils.toBigNumber(1000), { from: verifier3 })
+
+
             // conditions
             contracts = [paymentConditions.address, fitchainConditions.address, fitchainConditions.address, paymentConditions.address, paymentConditions.address]
             fingerPrints = [
@@ -57,7 +63,7 @@ contract('FitchainConditions', (accounts) => {
             // create new on-premise compute template
             const createAgreementTemplate = await serviceAgreement.setupAgreementTemplate(
                 serviceTemplateId, contracts, fingerPrints, dependencies,
-                web3.utils.fromAscii('fitchain-use-case'), fulfillmentIndices,
+                web3.utils.fromAscii('fitchain'), fulfillmentIndices,
                 fulfilmentOperator, { from: publisher }
             )
             templateId = testUtils.getEventArgsFromTx(createAgreementTemplate, 'SetupAgreementTemplate').serviceTemplateId
@@ -70,21 +76,11 @@ contract('FitchainConditions', (accounts) => {
                 consumer, valuesHashList, timeouts,
                 serviceAgreementId, did, { from: publisher }
             )
-            assert.strictEqual(serviceId, serviceAgreementId, 'Error: unable to retrieve service agreement Id')
-            // transfer token to actors
-            await token.transfer(consumer, 100, {from: accounts[0]})
-            assert.strictEqual(100, web3.utils.toDecimal(await token.balanceOf(consumer)), 'invalid transfer')
-            await token.transfer(verifier1, 100, {from: accounts[0]})
-            assert.strictEqual(100, web3.utils.toDecimal(await token.balanceOf(verifier1)), 'invalid transfer')
-            await token.transfer(verifier2, 100, {from: accounts[0]})
-            assert.strictEqual(100, web3.utils.toDecimal(await token.balanceOf(verifier2)), 'invalid transfer')
-            await token.transfer(verifier3, 100, {from: accounts[0]})
-            assert.strictEqual(100, web3.utils.toDecimal(await token.balanceOf(consumer)), 'invalid transfer')
-            await token.approve(paymentConditions.address, price, { from: consumer })
             // TODO: verifiers approve token for fitchain staking
         })
 
         it('Data scientist locks payment for the model provider', async () => {
+            await token.approve(paymentConditions.address, price, { from: consumer })
             await paymentConditions.lockPayment(serviceId, did, price, { from: consumer })
 //            const locked = await serviceAgreement.getConditionStatus(serviceAgreementId, conditionKeys[0])
 //            assert.strictEqual(locked.toNumber(), 1, 'Error: Unable to lock payment!')
