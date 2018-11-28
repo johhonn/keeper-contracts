@@ -12,7 +12,7 @@ const web3 = testUtils.getWeb3()
 contract('FitchainConditions', (accounts) => {
     describe('Test Fitchain Conditions', () => {
         let token, market, serviceAgreement, paymentConditions, valuesHashList, serviceId, conditionKeys, templateId
-        let fingerPrints, contracts, serviceAgreementId, slaMsgHash, signature, fitchainConditions, GPCVerifiers, VPCVerifiers
+        let fingerPrints, contracts, serviceAgreementId, slaMsgHash, signature, fitchainConditions, GPCVerifiers, VPCVerifiers, i
 
         const publisher = accounts[0]
         const consumer = accounts[1]
@@ -23,7 +23,7 @@ contract('FitchainConditions', (accounts) => {
         const fulfillmentIndices = [3, 4]
         const fulfilmentOperator = 1 // OR
         const dependencies = [0, 1, 4, 16, 3]
-        const slots = 2
+        const slots = 1
         const price = 10 // 10 OCN tokens
         const timeouts = [0, 0, 0, 0, 100]
         const kVerifiers = 3
@@ -31,7 +31,7 @@ contract('FitchainConditions', (accounts) => {
         const serviceTemplateId = testUtils.generateId(web3)
         serviceAgreementId = testUtils.generateId(web3)
         GPCVerifiers = []
-
+        VPCVerifiers = []
         before(async () => {
             token = await OceanToken.deployed()
             market = await OceanMarket.deployed(token.address)
@@ -44,6 +44,7 @@ contract('FitchainConditions', (accounts) => {
             await market.requestTokens(testUtils.toBigNumber(1000), { from: verifier1 })
             await market.requestTokens(testUtils.toBigNumber(1000), { from: verifier2 })
             await market.requestTokens(testUtils.toBigNumber(1000), { from: verifier3 })
+            await market.requestTokens(testUtils.toBigNumber(1000), { from: verifier4 })
 
             // conditions
             contracts = [paymentConditions.address, fitchainConditions.address, fitchainConditions.address, paymentConditions.address, paymentConditions.address]
@@ -97,28 +98,54 @@ contract('FitchainConditions', (accounts) => {
             const registerVerifier4 = await fitchainConditions.registerVerifier(slots, { from: verifier4 })
             assert.strictEqual(verifier4, registerVerifier4.logs[0].args.verifier, 'invalid verifier address 4')
         })
-        it('Model provider init Proof of Training (PoT)', async () => {
+        it('Model provider init Training proof (PoT)', async () => {
             const availableSlots = await fitchainConditions.getAvailableVerifiersCount()
-            assert.strictEqual(8, availableSlots.toNumber(), 'invalid number of verifiers/slots')
+            assert.strictEqual(4, availableSlots.toNumber(), 'invalid number of verifiers/slots')
             const verifierState = await fitchainConditions.initPoTProof(serviceAgreementId, kVerifiers, 1, { from: publisher })
-            for(i=0; i < verifierState.logs.length-1 ; i++){
+            for (i = 0; i < verifierState.logs.length - 1; i++) {
                 GPCVerifiers[i] = verifierState.logs[i].args.verifier
             }
-            assert.strictEqual(verifierState.logs[verifierState.logs.length-1].args.state, true, 'unable to initialize the PoT verification')
+            assert.strictEqual(verifierState.logs[verifierState.logs.length - 1].args.state, true, 'unable to initialize the PoT verification')
         })
         it('GPC verifiers submit votes to fulfill Proof of Training condition', async () => {
-//            await fitchainConditions.voteForPoT(serviceAgreementId, true, { from: verifier1 })
-//            await fitchainConditions.voteForPoT(serviceAgreementId, true, { from: verifier2 })
-//            await fitchainConditions.voteForPoT(serviceAgreementId, true, { from: verifier3 })
+            for (i = 0; i < GPCVerifiers.length; i++) {
+                await fitchainConditions.voteForPoT(serviceAgreementId, true, { from: GPCVerifiers[i] })
+            }
         })
-        it('A byzantine GPC verifier fails to submit vote twice', async() => {
-
+        it('Model provider fulfill the PoT condition', async () => {
+            const PoTstate = await fitchainConditions.setPoT(serviceAgreementId, kVerifiers, { from: publisher })
+            assert.strictEqual(true, PoTstate.logs[0].args.state, 'unable to fulfill the proof of training condition')
         })
-        it('Model provider init verification proof', async() => {
-
+        it('A byzantine GPC verifier fails to submit vote twice', async () => {
+            try {
+                await fitchainConditions.voteForPoT(serviceAgreementId, true, { from: GPCVerifiers[0] })
+            } catch (error) {
+                return error
+            }
         })
-        it('VPC verifiers submit votes to fulfill the verification game', async() => {
-
+        it('GPC verifiers release their slots after voting', async () => {
+            for (i = 0; i < GPCVerifiers.length; i++) {
+                await fitchainConditions.freeMySlots(serviceAgreementId, { from: GPCVerifiers[i] })
+            }
+        })
+        it('Model provider init verification proof', async () => {
+            const verifierState = await fitchainConditions.initVPCProof(serviceAgreementId, kVerifiers, 1, { from: publisher })
+            for (i = 0; i < verifierState.logs.length - 1; i++) {
+                VPCVerifiers[i] = verifierState.logs[i].args.verifier
+            }
+            assert.strictEqual(verifierState.logs[verifierState.logs.length - 1].args.state, true, 'unable to initialize the PoT verification')
+        })
+        it('VPC verifiers submit votes to fulfill the verification game', async () => {
+            for (i = 0; i < VPCVerifiers.length; i++) {
+                await fitchainConditions.voteForVPC(serviceAgreementId, true, { from: VPCVerifiers[i] })
+            }
+        })
+        it('Model provider fulfill the PoT condition', async () => {
+            const VPCstate = await fitchainConditions.setVPC(serviceAgreementId, kVerifiers, { from: publisher })
+            assert.strictEqual(true, VPCstate.logs[0].args.state, 'unable to fulfill the proof of training condition')
+            for (i = 0; i < VPCVerifiers.length; i++) {
+                await fitchainConditions.freeMySlots(serviceAgreementId, { from: VPCVerifiers[i] })
+            }
         })
         it('Verifiers should able to deregister if their slots are free', async () => {
             const deregisterVerifier1 = await fitchainConditions.deregisterVerifier({ from: verifier1 })

@@ -5,7 +5,7 @@ import './ServiceAgreement.sol';
 
 /// @title Fitchain conditions
 /// @author Ocean Protocol Team
-/// @notice This contract is WIP, don't use if for production
+/// @notice This contract is WIP, don't use it for production
 /// @dev All function calls are currently implement with some side effects
 
 /// TODO: Implementing commit-reveal approach to avoid the front-running
@@ -16,6 +16,7 @@ contract FitchainConditions{
     struct Verifier{
         bool exists;
         bool vote;
+        bool nonce;
         uint256 timeout;
     }
 
@@ -54,6 +55,7 @@ contract FitchainConditions{
     event VerificationCondition(bytes32 serviceAgreementId, bool state);
     event TrainingCondition(bytes32 serviceAgreementId, bool state);
     event FreeSlots(address verifier, uint256 slots);
+    event VotesSubmitted(bytes32 serviceAgreementId, address Publisher, uint256 voteType);
 
     modifier onlyProvider(bytes32 modelId){
         require(models[modelId].exists, 'model does not exist!');
@@ -104,6 +106,11 @@ contract FitchainConditions{
         _;
     }
 
+    modifier onlyValidVotes(bytes32 modelId, uint256 votType){
+        require(models[modelId].counter[votType] == models[modelId].Kverifiers, 'it did not reach the total votes');
+        _;
+    }
+
     constructor(address serviceAgreementAddress, uint256 _stake) public {
         require(serviceAgreementAddress != address(0), 'invalid service agreement contract address');
         require(_stake > 0, 'invalid staking amount');
@@ -134,10 +141,10 @@ contract FitchainConditions{
     function electRRKVerifiers(bytes32 modelId, uint256 k, uint256 vType, uint256 timeout) private returns(bool){
         for(uint256 i=0; i < k && i < registry.length ; i++){
             if(vType == 1){
-                models[modelId].GPCVerifiers[registry[i]] = Verifier(false, false, timeout);
+                models[modelId].GPCVerifiers[registry[i]] = Verifier(true, false, false, timeout);
             }
             if(vType == 2){
-                models[modelId].VPCVerifiers[registry[i]] = Verifier(false, false, timeout);
+                models[modelId].VPCVerifiers[registry[i]] = Verifier(true, false, false, timeout);
             }
             verifiers[registry[i]].slots -=1;
             emit VerifierElected(registry[i], modelId);
@@ -177,6 +184,8 @@ contract FitchainConditions{
         }
         // init model
         models[modelId] = Model(true, false, false, k, new uint256[](0), bytes32(0), serviceAgreementStorage.getServiceAgreementConsumer(modelId), serviceAgreementStorage.getAgreementPublisher(modelId));
+        models[modelId].counter.push(0);
+        models[modelId].counter.push(0);
         // get k GPC verifiers
         require(electRRKVerifiers(modelId, k, 1, timeout), 'unable to allocate resources');
         emit PoTInitialized(true);
@@ -196,52 +205,57 @@ contract FitchainConditions{
     }
 
     function voteForPoT(bytes32 modelId, bool vote) public onlyGPCVerifier(modelId) returns(bool){
-        require(!models[modelId].GPCVerifiers[msg.sender].exists, 'avoid replay attack');
+        require(!models[modelId].isTrained, 'avoid replay attack');
+        require(!models[modelId].GPCVerifiers[msg.sender].nonce, 'avoid replay attack');
         models[modelId].GPCVerifiers[msg.sender].vote = vote;
-        models[modelId].GPCVerifiers[msg.sender].exists = true;
+        models[modelId].GPCVerifiers[msg.sender].nonce = true;
         if(models[modelId].GPCVerifiers[msg.sender].vote) models[modelId].counter[0] +=1;
-        if(models[modelId].counter[0] == models[modelId].Kverifiers) setPoT(modelId, models[modelId].counter[0]);
+        if(models[modelId].counter[1] == models[modelId].Kverifiers) {
+            emit VotesSubmitted(modelId, serviceAgreementStorage.getAgreementPublisher(modelId), 1);
+        }
         return true;
     }
 
     function voteForVPC(bytes32 modelId, bool vote) public onlyVPCVerifier(modelId) returns(bool){
-        require(!models[modelId].VPCVerifiers[msg.sender].exists, 'avoid replay attack');
+        require(!models[modelId].isVerified, 'avoid replay attack');
+        require(!models[modelId].isVerified, 'avoid replay attack');
+        require(!models[modelId].VPCVerifiers[msg.sender].nonce, 'avoid replay attack');
         models[modelId].VPCVerifiers[msg.sender].vote = vote;
-        models[modelId].VPCVerifiers[msg.sender].exists = true;
+        models[modelId].VPCVerifiers[msg.sender].nonce = true;
         if(models[modelId].VPCVerifiers[msg.sender].vote) models[modelId].counter[1] +=1;
-        if(models[modelId].counter[1] == models[modelId].Kverifiers) setVPC(modelId, models[modelId].counter[1]);
+        if(models[modelId].counter[1] == models[modelId].Kverifiers) emit VotesSubmitted(modelId, serviceAgreementStorage.getAgreementPublisher(modelId), 2);
         return true;
     }
 
-    function setPoT(bytes32 serviceAgreementId, uint256 count) public onlyThisContract() returns(bool){
-        bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceAgreementId, address(this), this.setPoT.selector);
-        if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceAgreementId, condition)){
-            emit TrainingCondition(serviceAgreementId, false);
+    function setPoT(bytes32 modelId, uint256 count) public onlyValidVotes(modelId, 0) onlyPublisher(modelId) returns(bool){
+        bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(modelId, address(this), this.setPoT.selector);
+        if (serviceAgreementStorage.hasUnfulfilledDependencies(modelId, condition)){
+            emit TrainingCondition(modelId, false);
             return false;
         }
-        if (serviceAgreementStorage.getConditionStatus(serviceAgreementId, condition) == 1) {
-            emit TrainingCondition(serviceAgreementId, true);
+        if (serviceAgreementStorage.getConditionStatus(modelId, condition) == 1) {
+            emit TrainingCondition(modelId, true);
             return true;
         }
-        serviceAgreementStorage.fulfillCondition(serviceAgreementId, this.setPoT.selector, keccak256(abi.encodePacked(count)));
-        emit TrainingCondition(serviceAgreementId, true);
-        models[serviceAgreementId].isTrained = true;
+        serviceAgreementStorage.fulfillCondition(modelId, this.setPoT.selector, keccak256(abi.encodePacked(count)));
+        emit TrainingCondition(modelId, true);
+        models[modelId].isTrained = true;
         return true;
     }
 
-    function setVPC(bytes32 serviceAgreementId, uint256 count) public onlyThisContract() returns(bool){
-        bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceAgreementId, address(this), this.setVPC.selector);
-        if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceAgreementId, condition)){
-            emit VerificationCondition(serviceAgreementId, false);
+    function setVPC(bytes32 modelId, uint256 count) public onlyValidVotes(modelId, 0) onlyPublisher(modelId) returns(bool){
+        bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(modelId, address(this), this.setVPC.selector);
+        if (serviceAgreementStorage.hasUnfulfilledDependencies(modelId, condition)){
+            emit VerificationCondition(modelId, false);
             return false;
         }
-        if (serviceAgreementStorage.getConditionStatus(serviceAgreementId, condition) == 1) {
-            emit VerificationCondition(serviceAgreementId, true);
+        if (serviceAgreementStorage.getConditionStatus(modelId, condition) == 1) {
+            emit VerificationCondition(modelId, true);
             return true;
         }
-        serviceAgreementStorage.fulfillCondition(serviceAgreementId, this.setVPC.selector, keccak256(abi.encodePacked(count)));
-        emit VerificationCondition(serviceAgreementId, true);
-        models[serviceAgreementId].isTrained = true;
+        serviceAgreementStorage.fulfillCondition(modelId, this.setVPC.selector, keccak256(abi.encodePacked(count)));
+        emit VerificationCondition(modelId, true);
+        models[modelId].isTrained = true;
         return true;
     }
 
