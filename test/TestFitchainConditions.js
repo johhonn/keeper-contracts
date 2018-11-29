@@ -81,7 +81,7 @@ contract('FitchainConditions', (accounts) => {
             )
             // TODO: verifiers approve token for fitchain staking
         })
-        it('should be able to get maximum number of slots', async() => {
+        it('should be able to get maximum number of slots', async () => {
             const maxSlotsNumber = await fitchainConditions.getMaximumNumberOfSlots()
             assert.strictEqual(1, maxSlotsNumber.toNumber(), 'invalid maximum slots number value')
         })

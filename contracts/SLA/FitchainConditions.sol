@@ -110,6 +110,7 @@ contract FitchainConditions{
     constructor(address serviceAgreementAddress, uint256 _stake, uint256 _maxSlots) public {
         require(serviceAgreementAddress != address(0), 'invalid service agreement contract address');
         require(_stake > 0, 'invalid staking amount');
+        require(_maxSlots > 0, 'invalid slots number');
         serviceAgreementStorage = ServiceAgreement(serviceAgreementAddress);
         stake = _stake;
         maxSlots = _maxSlots;
