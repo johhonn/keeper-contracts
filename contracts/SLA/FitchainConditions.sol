@@ -246,7 +246,7 @@ contract FitchainConditions{
         //TODO: the losers. They might be verifiers or model provider
         //TODO: commit-reveal scheme to be implemented!
         if(models[modelId].GPCVerifiers[msg.sender].vote) models[modelId].counter[0] +=1;
-        if(models[modelId].counter[1] == models[modelId].Kverifiers) {
+        if(models[modelId].counter[0] == models[modelId].Kverifiers) {
             emit VotesSubmitted(modelId, serviceAgreementStorage.getAgreementPublisher(modelId), 1);
         }
         return true;
