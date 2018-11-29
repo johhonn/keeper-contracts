@@ -37,7 +37,7 @@ contract('FitchainConditions', (accounts) => {
             market = await OceanMarket.deployed(token.address)
             serviceAgreement = await ServiceAgreement.deployed()
             paymentConditions = await PaymentConditions.deployed(serviceAgreement.address, token.address)
-            fitchainConditions = await FitchainConditions.new(serviceAgreement.address, 5)
+            fitchainConditions = await FitchainConditions.new(serviceAgreement.address, price, 1)
 
             await market.requestTokens(testUtils.toBigNumber(1000), { from: consumer })
             await market.requestTokens(testUtils.toBigNumber(1000), { from: publisher })
@@ -81,7 +81,10 @@ contract('FitchainConditions', (accounts) => {
             )
             // TODO: verifiers approve token for fitchain staking
         })
-
+        it('should be able to get maximum number of slots', async() => {
+            const maxSlotsNumber = await fitchainConditions.getMaximumNumberOfSlots()
+            assert.strictEqual(1, maxSlotsNumber.toNumber(), 'invalid maximum slots number value')
+        })
         it('Data scientist locks payment for the model provider', async () => {
             await token.approve(paymentConditions.address, price, { from: consumer })
             await paymentConditions.lockPayment(serviceId, did, price, { from: consumer })

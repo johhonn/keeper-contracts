@@ -44,6 +44,7 @@ contract FitchainConditions{
     mapping(bytes32 => Model) models;
     mapping(address => Actor) verifiers;
     uint256 private stake;
+    uint256 private maxSlots;
     ServiceAgreement private serviceAgreementStorage;
 
     // events
@@ -90,14 +91,8 @@ contract FitchainConditions{
         _;
     }
 
-    modifier onlyValidStakeValue(uint256 slots){
-        require(slots > 0, 'invalid slots value');
-        // TODO: check if verifier has the same amount of tokens
-        _;
-    }
-
-    modifier onlyThisContract(){
-        require(msg.sender == address(this), 'invalid internal call');
+    modifier onlyValidSlotsValue(uint256 slots){
+        require(slots > 0 && slots <= maxSlots, 'invalid slots value');
         _;
     }
 
@@ -112,18 +107,19 @@ contract FitchainConditions{
         _;
     }
 
-    constructor(address serviceAgreementAddress, uint256 _stake) public {
+    constructor(address serviceAgreementAddress, uint256 _stake, uint256 _maxSlots) public {
         require(serviceAgreementAddress != address(0), 'invalid service agreement contract address');
         require(_stake > 0, 'invalid staking amount');
         serviceAgreementStorage = ServiceAgreement(serviceAgreementAddress);
         stake = _stake;
+        maxSlots = _maxSlots;
     }
 
     /// @notice registerVerifier called by any verifier in order to register
     /// @dev any verifier is able to register with a certain number of slots,
     /// staking will be implemented later
     /// @param slots , number of pools that a verifier can offer to join multiple games at a time
-    function registerVerifier(uint256 slots) public onlyValidStakeValue(slots) returns(bool){
+    function registerVerifier(uint256 slots) public onlyValidSlotsValue(slots) returns(bool){
         // TODO: cut this stake from the verifier's balance
         verifiers[msg.sender] = Actor(true, stake * slots, slots, slots);
         for(uint256 i=0; i < slots; i++)
@@ -171,6 +167,9 @@ contract FitchainConditions{
         return true;
     }
 
+    /// @notice addVerifierToRegistry private function maintains the verifiers registry
+    /// @dev add verifiers to the registry, and updates the slots number
+    /// @param verifier , verifier address
     function addVerifierToRegistry(address verifier) private returns(bool){
         registry.push(verifier);
         verifiers[verifier].slots +=1;
@@ -181,6 +180,7 @@ contract FitchainConditions{
     /// @dev remove verifiers from registry if there is no available slots to serve more verification games
     /// @param verifier , verifier address
     function removeVerifierFromRegistry(address verifier) private returns(bool) {
+        //TODO: this function needs to be refactored (it is prone to gas limit failure due to expensive computation)
         for(uint256 j=0; j<registry.length; j++){
             if(verifier == registry[j]){
                 for (uint i=j; i< registry.length-1; i++){
@@ -334,5 +334,11 @@ contract FitchainConditions{
     /// @dev returns the number of available verifiers using registry length
     function getAvailableVerifiersCount() public view returns(uint256){
         return registry.length;
+    }
+
+    /// @notice getMaximumNumberOfSlots, view function returns max number of slots
+    /// @dev verifiers will not be able to register if they are supplying slots > maxSlots
+    function getMaximumNumberOfSlots() public view returns(uint256){
+        return maxSlots;
     }
 }
