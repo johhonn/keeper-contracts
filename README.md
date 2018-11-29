@@ -136,16 +136,17 @@ The transaction should show up on the account: `0x90eE7A30339D05E07d9c6e65747132
 
 The contract addresses deployed on Ocean POA testnet:
 
-| Contract          | Version | Address                                      |
-|-------------------|---------|----------------------------------------------|
-| AccessConditions  | v0.4.0  | `0x31a64a1DCdD9e1b8db84ef94431a61C6B462Ad0c` |
-| ComputeConditions | v0.4.0  | `0xb28BC9489c55be810858F206602cf91c83DF816f` |
-| DIDRegistry       | v0.4.0  | `0xBDFeAc66c022165Bdb320264398977bf8A54e3C0` |
-| OceanAuth         | v0.4.0  | `0x0C84ECe5A68059220ff114de2b11457Fa7d7Fc45` |
-| OceanMarket       | v0.4.0  | `0x0959092E0D313F0BD3a6441151B2E2685d7350b5` |
-| OceanToken        | v0.4.0  | `0x8cCD9073B23689ca2BB76a049Eb33dfF5e16228D` |
-| PaymentConditions | v0.4.0  | `0x78D2CA96F19e0e5b97Ca19Da179CEBF0fC5101BC` |
-| ServiceAgreement  | v0.4.0  | `0xCa925335D4EC611f35388eEeA9b9F7B0a6947d32` |
+| Contract           | Version | Address                                      |
+|--------------------|---------|----------------------------------------------|
+| AccessConditions   | v0.4.2  | `0x38ba43fFa8C7715F0f2A5d52E78a392d2bD71176` |
+| ComputeConditions  | v0.4.2  | `0x771136ebC55A1747B52722D1bb95323D98550293` |
+| DIDRegistry        | v0.4.2  | `0xe6CeA58707df303b6d9D1DF5BA8Bf88fF4A5920D` |
+| FitchainConditions | v0.4.2  | `0x4563092EE6736a5D920882D2c39c91EAf7956f07` |
+| OceanAuth          | v0.4.2  | `0xfC6DB8141144831a8B7d858f356D0d1148d8F11d` |
+| OceanMarket        | v0.4.2  | `0x8c4a2cC4572B6CD68c58BFc220f04CD1143230a0` |
+| OceanToken         | v0.4.2  | `0x5e29AcdE5285E24eb7A211d9F4313E5a9Ed07F36` |
+| PaymentConditions  | v0.4.2  | `0xdAAb92eABB4F2D7fC51948E44A88aa4fd986EDa9` |
+| ServiceAgreement   | v0.4.2  | `0xb8D436b29CBF1ef690DD3b0972Cce2090ECb09bc` |
 
 #### Kovan Testnet
 
