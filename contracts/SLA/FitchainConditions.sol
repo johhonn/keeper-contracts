@@ -259,7 +259,6 @@ contract FitchainConditions{
     /// @param vote , the result of isVerified in Fitchain (T/F)
     function voteForVPC(bytes32 modelId, bool vote) public onlyVPCVerifier(modelId) returns(bool){
         require(!models[modelId].isVerified, 'avoid replay attack');
-        require(!models[modelId].isVerified, 'avoid replay attack');
         require(!models[modelId].VPCVerifiers[msg.sender].nonce, 'avoid replay attack');
         models[modelId].VPCVerifiers[msg.sender].vote = vote;
         models[modelId].VPCVerifiers[msg.sender].nonce = true;
