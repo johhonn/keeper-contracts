@@ -50,7 +50,7 @@ before_install:
       echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
       version_line=$(cat .bumpversion.cfg | grep current_version)
       release_version=${version_line##* }
-      export $release_version
+      export release_version
       echo $release_version
     fi
 
