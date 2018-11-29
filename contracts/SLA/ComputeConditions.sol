@@ -5,7 +5,7 @@ import './ServiceAgreement.sol';
 
 /// @title On-premise compute conditions
 /// @author Ocean Protocol Team
-/// @notice This contract is WIP, don't use if for production
+/// @notice This contract is WIP, don't use it for production
 /// @dev All function calls are currently implement without side effects
 
 contract ComputeConditions {
