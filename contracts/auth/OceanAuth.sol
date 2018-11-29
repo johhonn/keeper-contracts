@@ -1,7 +1,7 @@
-pragma solidity 0.4.24;
+pragma solidity 0.4.25;
 
 import '../OceanMarket.sol';
-import '../dispute/OceanDispute.sol';
+
 /**
 @title Ocean Protocol Authorization Contract
 @author Team: Fang Gong, Ahmed Ali, Sebastian Gerske, Samer Sallam
@@ -12,7 +12,6 @@ contract OceanAuth {
     // DATA STRUCTURES:
     // ============
     OceanMarket private market;
-    OceanDispute private dispute;
 
     // Sevice level agreement published on immutable storage
     struct AccessAgreement {
@@ -85,21 +84,18 @@ contract OceanAuth {
     event AccessRequestRevoked(address indexed _consumer, address indexed _provider, bytes32 indexed _id);
     event EncryptedTokenPublished(bytes32 indexed _id, bytes _encryptedAccessToken);
     event AccessRequestDelivered(address indexed _consumer, address indexed _provider, bytes32 indexed _id);
-    event AccessRequestDisputeExist(bytes32 indexed _id, bool _dispute);
 
     /**
     * @dev OceanAuth Constructor
     * @param _marketAddress The deployed contract address of Ocean marketplace
     * Runs only on initial contract creation.
     */
-    constructor(address _marketAddress, address _disputeAddress) public {
+    constructor(address _marketAddress) public {
         require(_marketAddress != address(0), 'Market address cannot be 0x0');
         // instance of Market
         market = OceanMarket(_marketAddress);
         // add auth contract to access list in market contract - function in market contract
         market.addAuthAddress();
-        // instance of dispute
-        dispute = OceanDispute(_disputeAddress);
     }
 
     /**
@@ -253,11 +249,6 @@ contract OceanAuth {
     */
     function verifyAccessTokenDelivery(bytes32 id, address _addr, bytes32 msgHash, uint8 v, bytes32 r, bytes32 s) public
     onlyProvider(id) isAccessDelivered(id) returns (bool) {
-        // if dispute exists, cannot release the payment before dispute is resolved
-        if (dispute.disputeExist(id) == true) {
-            emit AccessRequestDisputeExist(id, true);
-            return false;
-        }
         // verify signature from consumer
         if (verifySignature(_addr, msgHash, v, r, s)) {
             // send money to provider

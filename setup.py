@@ -3,7 +3,7 @@
 
 """The setup script."""
 
-from setuptools import setup, find_packages
+from setuptools import setup
 import os
 from glob import glob
 
@@ -11,13 +11,19 @@ from glob import glob
 with open('README.md') as readme_file:
     readme = readme_file.read()
 
-os.system("truffle compile")
-
 requirements = []
 
 setup_requirements = []
 
+
 test_requirements = []
+artifact_folder = 'artifacts'
+print("Adding all files in /{}".format(artifact_folder))
+data_files = [(artifact_folder, [f for f in glob(os.path.join(artifact_folder, '*'))])]
+
+print("data_files=")
+for df in data_files:
+    print(df)
 
 setup(
     author="leucothia",
@@ -32,9 +38,7 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     description=" 🐳 Integration of TCRs, CPM and Ocean Tokens in Solidity",
-    data_files=[
-        ('contracts', glob('build/contracts/*.json')),
-    ],
+    data_files=data_files,
     install_requires=requirements,
     license="Apache Software License 2.0",
     long_description=readme,
@@ -45,8 +49,7 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/oceanprotocol/keeper-contracts',
-    version='0.1.1',
+    version='0.5.0',
     zip_safe=False,
 )
 
-os.system("rm -rf ./build")

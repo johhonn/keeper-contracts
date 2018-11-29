@@ -1,15 +1,13 @@
 /* eslint-env mocha */
-/* global artifacts */
+/* eslint-disable no-console */
+/* global assert */
+const Web3 = require('web3')
 
 const Eth = require('ethjs')
 const HttpProvider = require('ethjs-provider-http')
 const abi = require('ethereumjs-abi')
 
 const ethQuery = new Eth(new HttpProvider('http://localhost:7545'))
-
-const PLCRVoting = artifacts.require('PLCRVoting.sol')
-const Registry = artifacts.require('OceanRegistry.sol')
-const Token = artifacts.require('ERC20.sol')
 
 const BN = small => new Eth.BN(small.toString(10), 10)
 
@@ -18,22 +16,17 @@ const utils = {
         `0x${abi.soliditySHA3(['uint', 'uint'], [vote, salt]).toString('hex')}`
     ),
 
+    getWeb3: () => {
+        const nodeUrl = `http://localhost:${process.env.PORT ? process.env.PORT : '8545'}`
+        return new Web3(new Web3.providers.HttpProvider(nodeUrl))
+    },
+
     getListingHash: domain => (
         `0x${abi.soliditySHA3(['string'], [domain]).toString('hex')}`
     ),
 
-    approvePLCR: async (address, adtAmount) => {
-        const registry = await Registry.deployed()
-        const plcrAddr = await registry.voting.call()
-        const token = await Token.deployed()
-        await token.approve(plcrAddr, adtAmount, { from: address })
-    },
-
-    addToWhitelist: async (domain, deposit, actor) => {
-        const registry = await Registry.deployed()
-        await utils.as(actor, registry.apply, domain, deposit, '')
-        await utils.increaseTime(2000)
-        await utils.as(actor, registry.updateStatus, domain)
+    generateId: (web3) => {
+        return web3.utils.sha3(Math.random().toString())
     },
 
     as: (actor, fn, ...args) => {
@@ -69,30 +62,6 @@ const utils = {
         .then(num => ethQuery.getBlockByNumber(num, true))
         .then(block => block.timestamp.toString(10)),
 
-    getUnstakedDeposit: async (domain) => {
-        const registry = await Registry.deployed()
-        // get the struct in the mapping
-        const listing = await registry.listings.call(domain)
-        // get the unstaked deposit amount from the listing struct
-        const unstakedDeposit = await listing[3]
-        return unstakedDeposit.toString()
-    },
-
-    challengeAndGetPollID: async (domain, actor) => {
-        const registry = await Registry.deployed()
-        const receipt = await utils.as(actor, registry.challenge, domain, '')
-        return receipt.logs[0].args.challengeID
-    },
-
-    commitVote: async (pollID, voteOption, tokensArg, salt, voter) => {
-        const voting = await PLCRVoting.deployed()
-        const hash = utils.getVoteSaltHash(voteOption, salt)
-        await utils.as(voter, voting.requestVotingRights, tokensArg)
-
-        const prevPollID = await voting.getInsertPointForNumTokens.call(voter, tokensArg, pollID)
-        await utils.as(voter, voting.commitVote, pollID, hash, tokensArg, prevPollID)
-    },
-
     divideAndGetWei: (numerator, denominator) => {
         const weiNumerator = Eth.toWei(BN(numerator), 'gwei')
         return weiNumerator.div(BN(denominator))
@@ -109,6 +78,88 @@ const utils = {
     multiplyByPercentage: (x, y, z = 100) => {
         const weiQuotient = utils.divideAndGetWei(y, z)
         return utils.multiplyFromWei(x, weiQuotient)
+    },
+
+    assertEmitted: (result, n, name, payload) => {
+        var gotEvents = 0
+        for (var i = 0; i < result.logs.length; i++) {
+            const ev = result.logs[i]
+            if (ev.event === name) {
+                gotEvents++
+            }
+        }
+        assert.strictEqual(n, gotEvents)
+    },
+
+    toBigNumber: (num) => {
+        // return new BigNumber(num)
+        return num
+    },
+
+    generateConditionsKeys: (slaTemplateId, contracts, fingerprints) => {
+        const conditions = []
+        for (let i = 0; i < contracts.length; i++) {
+            conditions.push('0x' + abi.soliditySHA3(
+                ['bytes32', 'address', 'bytes4'],
+                [slaTemplateId, contracts[i], fingerprints[i]]
+            ).toString('hex'))
+        }
+        return conditions
+    },
+
+    createSLAHash: (web3, slaTemplateId, conditionsKeys, hashes, timeouts, serviceAgreementId) => {
+        return web3.utils.soliditySha3(
+            { type: 'bytes32', value: slaTemplateId },
+            { type: 'bytes32[]', value: conditionsKeys },
+            { type: 'bytes32[]', value: hashes },
+            { type: 'uint256[]', value: timeouts },
+            { type: 'bytes32', value: serviceAgreementId }
+        ).toString('hex')
+    },
+
+    getEventArgsFromTx: (txReceipt, eventName) => {
+        return txReceipt.logs.filter((log) => {
+            return log.event === eventName
+        })[0].args
+    },
+
+    getSelector: (web3, contract, name) => {
+        for (var i = 0; i < contract.abi.length; i++) {
+            const meta = contract.abi[i]
+            if (meta.name === name) {
+                let argsStr = ''
+                for (let input of meta.inputs) {
+                    argsStr += input.type + ','
+                }
+                return web3.utils.sha3(`${name}(${argsStr.slice(0, -1)})`).slice(0, 10)
+            }
+        }
+
+        throw new Error('function with the given name not found in the given contact')
+    },
+
+    valueHash: (types, values) => {
+        return '0x' + abi.soliditySHA3(types, values).toString('hex')
+    },
+
+    signAgreement: async (agreement, templateId, signature, consumer, hashes, timeouts, serviceAgreementId, did, args = {}) => {
+        const result = await agreement.executeAgreement(
+            templateId,
+            signature,
+            consumer,
+            hashes,
+            timeouts,
+            serviceAgreementId,
+            did,
+            args
+        )
+
+        return result.logs.filter((log) => {
+            return log.event === 'ExecuteAgreement'
+        })[0].args.serviceAgreementId
+    },
+    sleep: (millis) => {
+        return new Promise(resolve => setTimeout(resolve, millis))
     }
 }
 

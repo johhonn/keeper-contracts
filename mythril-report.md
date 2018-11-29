@@ -32,6 +32,9 @@ No issues found.
 # Analysis result for OceanRegistry
 
 No issues found.
+# Analysis result for OceanExchange
+
+No issues found.
 # Analysis results for OceanAuth.sol
 
 ## Message call to external contract
@@ -44,7 +47,7 @@ No issues found.
 ### Description
 
 This contract executes a message call to to another contract. Make sure that the called contract is trusted and does not execute user-supplied code.
-In file: OceanAuth.sol:62
+In file: OceanAuth.sol:63
 
 ### Code
 
@@ -64,27 +67,6 @@ No issues found.
 # Analysis result for StandardToken
 
 No issues found.
-# Analysis results for EIP20.sol
-
-## Integer Overflow
-
-- Type: Warning
-- Contract: EIP20
-- Function name: `fallback`
-- PC address: 814
-
-### Description
-
-A possible integer overflow exists in the function `fallback`.
-The addition or multiplication may result in a value higher than the maximum representable integer.
-In file: EIP20.sol:20
-
-### Code
-
-```
-string public name
-```
-
 # Analysis results for OceanMarket.sol
 
 ## Integer Overflow
@@ -92,13 +74,13 @@ string public name
 - Type: Warning
 - Contract: OceanMarket
 - Function name: `generateId(bytes)`
-- PC address: 373
+- PC address: 326
 
 ### Description
 
 A possible integer overflow exists in the function `generateId(bytes)`.
 The addition or multiplication may result in a value higher than the maximum representable integer.
-In file: OceanMarket.sol:289
+In file: OceanMarket.sol:295
 
 ### Code
 
@@ -109,35 +91,17 @@ function generateId(string contents) public pure returns (bytes32) {
     }
 ```
 
-## Message call to external contract
-
-- Type: Informational
-- Contract: OceanMarket
-- Function name: `fallback`
-- PC address: 1070
-
-### Description
-
-This contract executes a message call to to another contract. Make sure that the called contract is trusted and does not execute user-supplied code.
-In file: OceanMarket.sol:256
-
-### Code
-
-```
-tcr.isWhitelisted(listing)
-```
-
 ## Exception state
 
 - Type: Informational
 - Contract: OceanMarket
 - Function name: `verifyPaymentReceived(bytes32)`
-- PC address: 1400
+- PC address: 1210
 
 ### Description
 
 A reachable exception (opcode 0xfe) has been detected. This can be caused by type errors, division by zero, out-of-bounds array access, or assert violations. This is acceptable in most situations. Note however that `assert()` should only be used to check invariants. Use `require()` for regular input checking.
-In file: OceanMarket.sol:199
+In file: OceanMarket.sol:205
 
 ### Code
 

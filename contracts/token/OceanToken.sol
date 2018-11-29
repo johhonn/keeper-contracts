@@ -1,6 +1,6 @@
-pragma solidity ^0.4.24;
+pragma solidity 0.4.25;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol';
+import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
 /**
@@ -8,23 +8,23 @@ import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 @author Team: Fang Gong
 */
 
-contract OceanToken is StandardToken {
+contract OceanToken is ERC20 {
 
     using SafeMath for uint256;
 
     // ============
     // DATA STRUCTURES:
     // ============
-    string public constant name = 'OceanToken';                         // Set the token name for display
-    string public constant symbol = 'OCN';                              // Set the token symbol for display
+    string public constant name = 'OceanToken';                      // Set the token name for display
+    string public constant symbol = 'OCN';                           // Set the token symbol for display
 
     // SUPPLY
-    uint8 public constant decimals = 18;                               // Set the number of decimals for display
-    uint256 public constant TOTAL_SUPPLY = 1400000000 * 10 ** 18;      // OceanToken total supply
+    uint8 public constant decimals = 18;                             // Set the number of decimals for display
+    uint256 public constant TOTAL_SUPPLY = 1400000000 * 10 ** 18;    // OceanToken total supply
 
     // EMIT TOKENS
-    address public _receiver = 0x0;                                   // address to receive TOKENS
-    uint256 public totalSupply;                                       // total supply of Ocean tokens including initial tokens plus block rewards
+    address public _receiver = address(0);                           // address to receive TOKENS
+    uint256 public totalSupply;                                      // total supply of Ocean tokens including initial tokens plus block rewards
 
     /**
     * @dev OceanToken Constructor
@@ -40,11 +40,12 @@ contract OceanToken is StandardToken {
     * @return success setting is successful.
     */
     function setReceiver(address _to) public returns (bool success){
-        require(_receiver == address(0), 'Receiver address is not 0x0.');
-        _receiver = _to;
+        // make sure receiver is not set already
+        require(_receiver == address(0), 'Receiver address already set.');
         // Creator address is assigned initial available tokens
-        balances[_receiver] = TOTAL_SUPPLY;
-        emit Transfer(0x0, _receiver, TOTAL_SUPPLY);
+        super._mint(_to, TOTAL_SUPPLY);
+        // set receiver
+        _receiver = _to;
         return true;
     }
 

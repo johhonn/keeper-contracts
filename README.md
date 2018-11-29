@@ -27,6 +27,8 @@ Ocean Keeper implementation where we put the following modules together:
      - [Docker](#docker)
      - [Local development](#local-development)
      - [Testnet deployment](#testnet-deployment)
+        - [Ocean POA Testnet](#ocean-poa-testnet)
+        - [Kovan Testnet](#kovan-testnet)
   - [Libraries](#libraries)
   - [Testing](#testing)
      - [Code Linting](#code-linting)
@@ -54,6 +56,13 @@ cd keeper-contracts/
 
 docker build -t oceanprotocol/keeper-contracts:0.1 .
 docker run -d -p 8545:8545 oceanprotocol/keeper-contracts:0.1
+```
+
+or simply pull it from docker hub:
+
+```bash
+docker pull oceanprotocol/keeper-contracts
+docker run -d -p 8545:8545 oceanprotocol/keeper-contracts 
 ```
 
 Which will expose the Ethereum RPC client with all contracts loaded under localhost:8545, which you can add to your `truffle.js`:
@@ -94,7 +103,7 @@ npm install -g ganache-cli
 Compile the solidity contracts:
 
 ```bash
-truffle compile
+npm run compile
 ```
 
 In a new terminal, launch an Ethereum RPC client, e.g. [ganache-cli](https://github.com/trufflesuite/ganache-cli):
@@ -106,36 +115,66 @@ ganache-cli
 Switch back to your other terminal and deploy the contracts:
 
 ```bash
-truffle migrate
+npm run migrate
 
 # for redeployment run this instead
-truffle migrate --reset
+npm run migrate -- --reset
 ```
 
 ### Testnet deployment
 
-Follow the steps for local deployment. Make sure that the address `0x2c0d5f47374b130ee398f4c34dbe8168824a8616` is having enough (~1) Ether.
+#### Ocean POA Testnet
+
+Follow the steps for local deployment. Make sure that the address `0x90eE7A30339D05E07d9c6e65747132933ff6e624` is having enough (~1) Ether.
+
+```bash
+export POA_NMEMORIC=<your poa nmemoric>
+npm run migrate:poa_aws
+```
+
+The transaction should show up on the account: `0x90eE7A30339D05E07d9c6e65747132933ff6e624`
+
+The contract addresses deployed on Ocean POA testnet:
+
+| Contract           | Version | Address                                      |
+|--------------------|---------|----------------------------------------------|
+| AccessConditions   | v0.5.0  | `0x38ba43fFa8C7715F0f2A5d52E78a392d2bD71176` |
+| ComputeConditions  | v0.5.0  | `0x771136ebC55A1747B52722D1bb95323D98550293` |
+| DIDRegistry        | v0.5.0  | `0xe6CeA58707df303b6d9D1DF5BA8Bf88fF4A5920D` |
+| FitchainConditions | v0.5.0  | `0x4563092EE6736a5D920882D2c39c91EAf7956f07` |
+| OceanAuth          | v0.5.0  | `0xfC6DB8141144831a8B7d858f356D0d1148d8F11d` |
+| OceanMarket        | v0.5.0  | `0x8c4a2cC4572B6CD68c58BFc220f04CD1143230a0` |
+| OceanToken         | v0.5.0  | `0x5e29AcdE5285E24eb7A211d9F4313E5a9Ed07F36` |
+| PaymentConditions  | v0.5.0  | `0xdAAb92eABB4F2D7fC51948E44A88aa4fd986EDa9` |
+| ServiceAgreement   | v0.5.0  | `0xb8D436b29CBF1ef690DD3b0972Cce2090ECb09bc` |
+
+#### Kovan Testnet
+
+Follow the steps for local deployment. Make sure that the address [0x2c0d5f47374b130ee398f4c34dbe8168824a8616](https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616) is having enough (~1) Ether.
 
 If you managed to deploy the contracts locally do:
 
 ```bash
 export INFURA_TOKEN=<your infura token>
 export KOVAN_NMEMORIC=<your kovan nmemoric>
-truffle migrate --network kovan
+npm run migrate:kovan
 ```
 
 The transaction should show up on: `https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616`
 
 The contract addresses deployed on Kovan testnet:
 
-| Contract | Address |
-|---|---|
-| OceanMarket | `0x35a9207ae77cb19bd59cf0bf932ce3a510286ccf` |
-| OceanAuth   | `0x830d15f45ecff8b786f5685f6e18625721cf3148` |
-| OceanToken  | `0x08500f6cc30cb737c15a011adce47baa71cc99ac` |
-| OceanRegistry  | `0x4bf0a92cb7151f11913c479dc22df8f064d936c7` |
-
-
+| Contract           | Version | Address                                      |
+|--------------------|---------|----------------------------------------------|
+| AccessConditions   | v0.5.0  | `0x0aF8734b1DB51464a01F83FE4167054a2f7F6794` |
+| ComputeConditions  | v0.5.0  | `0x138F020dDdd65cA6Ce4E799adFD32cbfEbE384f6` |
+| DIDRegistry        | v0.5.0  | `0x6DCbE42F6bF7c350F5A8a86FC5fCfea0b3EDe9f6` |
+| FitchainConditions | v0.5.0  | `0xE4498F5B1a9E890F3A0A4Bbd6aF4fCC8b54D96ff` |
+| OceanAuth          | v0.5.0  | `0x094E34848e884411684BDC5422BAcF251d046D8B` |
+| OceanMarket        | v0.5.0  | `0xb5bEfAB48835547Ac3A22608c74CFe2ce973d110` |
+| OceanToken         | v0.5.0  | `0x63A94230DA3aa27E5f68F22F8854CE3FcA702695` |
+| PaymentConditions  | v0.5.0  | `0x34D6dFB10fb29441Ee6B053f86AE58D3A8a7D869` |
+| ServiceAgreement   | v0.5.0  | `0xd13998e9c0B40c0028412b59e36213f5cAaA9C6E` |
 
 ## Libraries
 
@@ -145,14 +184,14 @@ The libraries provided currently are:
 
 * JavaScript npm package - As part of the [@oceanprotocol npm organization](https://www.npmjs.com/settings/oceanprotocol/packages), the [npm keeper-contracts package](https://www.npmjs.com/package/@oceanprotocol/keeper-contracts) provides the ABI's to be imported from your JavaScript code.
 * Python Pypi package - The [Pypi keeper-contracts package](https://pypi.org/project/keeper-contracts/) provides the same ABI's to be used from Python.
-
+* Java Maven package - It's possible to generate the maven stubs to interact with the smart contracts. It's necessary to have locally web3j and run the `scripts/maven.sh` script
 
 ## Testing
 
-Run tests with `truffle test`, e.g.:
+Run tests with `npm test`, e.g.:
 
 ```bash
-truffle test test/TestAuth.js
+npm test -- test/Auth.Test.js
 ```
 
 ### Code Linting
@@ -245,7 +284,7 @@ await auth.verifyAccessTokenDelivery(accessId, accounts[1], fixedMsgSha, sig.v, 
 
 ## New Version
 
-The `bumpversion.sh` script helps to bump the project version. You can execute the script using as first argument {major|minor|patch} to bump accordingly the version.
+The `bumpversion.sh` script helps to bump the project version. You can execute the script using as first argument {major|minor|patch} to bump accordingly the version. Also you can provide the option `--tag` to automatically create the version tag.
 
 ## Contributing
 

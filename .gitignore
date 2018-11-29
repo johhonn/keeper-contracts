@@ -10,3 +10,5 @@ venv
 ganache-cli.log
 target/
 .python-version
+artifacts/*.development.json
+.eggs/

@@ -4,7 +4,6 @@ const { saveDefinition } = require('./helper')
 
 const oceanToken = async (deployer, network) => {
     await deployer.deploy(OceanToken)
-
     saveDefinition(network, OceanToken)
 }
 
