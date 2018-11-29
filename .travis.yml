@@ -48,6 +48,10 @@ before_install:
       bash -x scripts/maven.sh
       echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
       echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+      version_line=$(cat .bumpversion.cfg | grep current_version)
+      release_version=${version_line##* }
+      export $release_version
+      echo $release_version
     fi
 
 before_script:
@@ -95,8 +99,16 @@ deploy:
       all_branches: true
       condition: $DEPLOY_PACKAGE = true
 
-#  - provider: releases
-#    api_key: ${GITHUB_OAUTH_TOKEN}
-#    skip_cleanup: true
-#    on:
-#      tags: true
+- provider: releases
+  skip_cleanup: true
+  api_key:
+      secure: E0N2DcmVXjwmp7EwSxTjQv1dbrro/DMqWx29Tp6DYGlcCv8yhVwX18DjJYb5GPQFQCl8BDYIIcmTodQxMmPlHkNFzU05s95zvIc2losZVoszQ30sT3HK2O9GaSGCMXKL0urJou4u3eX8v/HKf/LXWr5nHvNuTS/5RCpqthyqg8dH/+9Jd6xqBZtCYK9i5RHKrysnmWveLVuk+XUkYhm4XcgRJkaGmAzGk1TRjGIcsYMTlPHq6sVahXlUkySua2EnB+UJJABaFU2G2P5SkUJUuI7rqYDkZ+PXcCzJByd8m2v9oNlcMdizM/e/cajuZUDlSCgLbhfZVDXzKN3rL3w+vsIzjvBaLdazBlEd6Rhr9tbF/xOeURDzuSRElIttgn1oKFEzjKY2bg9v+OKQTXmQHdpbCUDHaOznODN9U+dYQSod7neWPim8ny6lQkq4ypKPLXOhhAOkkKcPoZ1YYBv0aHuRup0aWmj7AS1mifGtqeRZbMPZPbI6Bq+ISBbpdMnkhtwj2R91m5c47I3s+kX3MQ6rgxkVJ7h2SvPLSB1djC/4XfGMFvLUt+0jTY/FqnK7X8ieVMekuwMcew5nWa/QukZmD6jjxHk+v2YFSWsDu7YFe6gEjaLUON23ZMIDqNJbxQrO0vnlioaA8kAKPhGiEYdtF3uYhJn3ff76MSuGRy8=
+  # file:
+  # - oceanprotocol-keeper-contracts-$release_version.tgz.jar
+  # - dist/keeper_contracts-$release_version-py2.py3-none-any.jar
+  # - target/keeper-contracts-$release_version.jar
+  name: "$release_version"
+  on:
+      tags: true
+      all_branches: true
+      condition: $DEPLOY_PACKAGE = true
