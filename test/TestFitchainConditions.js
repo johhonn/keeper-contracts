@@ -37,7 +37,7 @@ contract('FitchainConditions', (accounts) => {
             market = await OceanMarket.deployed(token.address)
             serviceAgreement = await ServiceAgreement.deployed()
             paymentConditions = await PaymentConditions.deployed(serviceAgreement.address, token.address)
-            fitchainConditions = await FitchainConditions.new(serviceAgreement.address, price, 1)
+            fitchainConditions = await FitchainConditions.new(serviceAgreement.address, price, slots)
 
             await market.requestTokens(testUtils.toBigNumber(1000), { from: consumer })
             await market.requestTokens(testUtils.toBigNumber(1000), { from: publisher })
@@ -85,7 +85,7 @@ contract('FitchainConditions', (accounts) => {
             const maxSlotsNumber = await fitchainConditions.getMaximumNumberOfSlots()
             assert.strictEqual(1, maxSlotsNumber.toNumber(), 'invalid maximum slots number value')
         })
-        it('should data scientist locks payment for the model provider', async () => {
+        it('should data scientist locks payment for the data-compute provider', async () => {
             await token.approve(paymentConditions.address, price, { from: consumer })
             await paymentConditions.lockPayment(serviceId, did, price, { from: consumer })
             const locked = await serviceAgreement.getConditionStatus(serviceAgreementId, conditionKeys[0])
@@ -101,7 +101,7 @@ contract('FitchainConditions', (accounts) => {
             const registerVerifier4 = await fitchainConditions.registerVerifier(slots, { from: verifier4 })
             assert.strictEqual(verifier4, registerVerifier4.logs[0].args.verifier, 'invalid verifier address 4')
         })
-        it('should model provider init Training proof (PoT)', async () => {
+        it('should data-compute provider init Training proof (PoT)', async () => {
             const availableSlots = await fitchainConditions.getAvailableVerifiersCount()
             assert.strictEqual(4, availableSlots.toNumber(), 'invalid number of verifiers/slots')
             const verifierState = await fitchainConditions.initPoT(serviceAgreementId, kVerifiers, 1, { from: publisher })
@@ -115,7 +115,7 @@ contract('FitchainConditions', (accounts) => {
                 await fitchainConditions.voteForPoT(serviceAgreementId, true, { from: GPCVerifiers[i] })
             }
         })
-        it('should model provider fulfill the PoT condition', async () => {
+        it('should data-compute provider fulfill the PoT condition', async () => {
             const PoTstate = await fitchainConditions.setPoT(serviceAgreementId, kVerifiers, { from: publisher })
             assert.strictEqual(true, PoTstate.logs[0].args.state, 'unable to fulfill the proof of training condition')
         })
@@ -161,7 +161,7 @@ contract('FitchainConditions', (accounts) => {
         it('should verifier able to get his free slots count', async () => {
             for (i = 0; i < VPCVerifiers.length; i++) {
                 myFreeSlots = await fitchainConditions.getMyFreeSlots({ from: VPCVerifiers[i] })
-                assert(slots, myFreeSlots, 'invalid free slots')
+                assert.strictEqual(slots, myFreeSlots.toNumber(), 'invalid free slots')
             }
         })
     })
