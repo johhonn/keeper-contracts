@@ -209,9 +209,7 @@ contract FitchainConditions{
             return false;
         }
         // init model
-        models[modelId] = Model(true, false, false, k, new uint256[](0), bytes32(0), serviceAgreementStorage.getServiceAgreementConsumer(modelId), serviceAgreementStorage.getAgreementPublisher(modelId));
-        models[modelId].voteCount.push(0);
-        models[modelId].voteCount.push(0);
+        models[modelId] = Model(true, false, false, k, new uint256[](2), bytes32(0), serviceAgreementStorage.getServiceAgreementConsumer(modelId), serviceAgreementStorage.getAgreementPublisher(modelId));
         // get k GPC verifiers
         require(electRRKVerifiers(modelId, k, 1, timeout), 'unable to allocate resources');
         emit PoTInitialized(true);
