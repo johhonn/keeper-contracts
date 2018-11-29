@@ -164,16 +164,17 @@ The transaction should show up on: `https://kovan.etherscan.io/address/0x2c0d5f4
 
 The contract addresses deployed on Kovan testnet:
 
-| Contract          | Version | Address                                      |
-|-------------------|---------|----------------------------------------------|
-| AccessConditions  | v0.4.0  | `0x4496ccb14Df6c89507790cD1e8A167a24651bA14` |
-| ComputeConditions | v0.4.0  | `0xe6011045985ABC6A6D8C8Cf2Bc3A67Cc8a48C9F0` |
-| DIDRegistry       | v0.4.0  | `0x0669e2375C062d1c2e96c89bBbDaAEa8738B871F` |
-| OceanAuth         | v0.4.0  | `0xfA2C96dF49939adb6bF2EFC9acC2c089cbF9cdf7` |
-| OceanMarket       | v0.4.0  | `0x22cc24DD3BC978322cB81eB396438Ad0797c1b78` |
-| OceanToken        | v0.4.0  | `0x4446D7800a0CaD304D3bf41F9CE2eBc0330D7e6b` |
-| PaymentConditions | v0.4.0  | `0xF7eDd0D99Cae3fcFf358E4C3c48352b8a1fac36d` |
-| ServiceAgreement  | v0.4.0  | `0x2946fe1f5d48d0664e2251251d92cf9600e9BE24` |
+| Contract           | Version | Address                                      |
+|--------------------|---------|----------------------------------------------|
+| AccessConditions   | v0.4.2  | `0x0aF8734b1DB51464a01F83FE4167054a2f7F6794` |
+| ComputeConditions  | v0.4.2  | `0x138F020dDdd65cA6Ce4E799adFD32cbfEbE384f6` |
+| DIDRegistry        | v0.4.2  | `0x6DCbE42F6bF7c350F5A8a86FC5fCfea0b3EDe9f6` |
+| FitchainConditions | v0.4.2  | `0xE4498F5B1a9E890F3A0A4Bbd6aF4fCC8b54D96ff` |
+| OceanAuth          | v0.4.2  | `0x094E34848e884411684BDC5422BAcF251d046D8B` |
+| OceanMarket        | v0.4.2  | `0xb5bEfAB48835547Ac3A22608c74CFe2ce973d110` |
+| OceanToken         | v0.4.2  | `0x63A94230DA3aa27E5f68F22F8854CE3FcA702695` |
+| PaymentConditions  | v0.4.2  | `0x34D6dFB10fb29441Ee6B053f86AE58D3A8a7D869` |
+| ServiceAgreement   | v0.4.2  | `0xd13998e9c0B40c0028412b59e36213f5cAaA9C6E` |
 
 ## Libraries
 
