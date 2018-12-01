@@ -30,6 +30,7 @@ contract('AccessConditions', (accounts) => {
     let consumer
     let contracts
     let fingerprints
+    let dependenciesBits
     let valueHashes
     let timeoutValues
     let serviceAgreementId
@@ -40,6 +41,12 @@ contract('AccessConditions', (accounts) => {
         return web3.eth.sign(hash, consumer)
     }
 
+    async function initAgreement() {
+        const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
+        await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, dependenciesBits, templateId, [0], 0, { from: accounts[0] })
+        await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+    }
+
     beforeEach(async () => {
         agreement = await ServiceAgreement.new({ from: accounts[0] })
         contract = await AccessConditions.new(agreement.address, { from: accounts[0] })
@@ -47,6 +54,7 @@ contract('AccessConditions', (accounts) => {
         consumer = accounts[1]
         contracts = [contract.address]
         fingerprints = [utils.getSelector(web3, AccessConditions, 'grantAccess')]
+        dependenciesBits = [0]
         valueHashes = utils.valueHash(['bytes32', 'bytes32'], [assetId, assetId])
         timeoutValues = [0]
         serviceAgreementId = utils.generateId(web3)
@@ -55,9 +63,7 @@ contract('AccessConditions', (accounts) => {
     describe('grantAccess', () => {
         it('Should not grant access when sender is not published', async () => {
             // arrange
-            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            await initAgreement()
 
             // act-assert
             try {
@@ -71,14 +77,12 @@ contract('AccessConditions', (accounts) => {
 
         it('Should grant access', async () => {
             // arrange
-            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            await initAgreement()
 
             // act
             const result = await contract.grantAccess(serviceAgreementId, assetId, assetId, { from: accounts[0] })
 
-            // // assert
+            // assert
             utils.assertEmitted(result, 1, 'AccessGranted')
             const hasPermission = await contract.checkPermissions(consumer, assetId, { from: accounts[0] })
             assert.strictEqual(hasPermission, true)
@@ -86,9 +90,8 @@ contract('AccessConditions', (accounts) => {
 
         it('Should not grant access when unfilfilled dependencies exist', async () => {
             // arrange
-            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [1], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            dependenciesBits = [1]
+            await initAgreement()
 
             // act
             const result = await contract.grantAccess(serviceAgreementId, assetId, assetId, { from: accounts[0] })

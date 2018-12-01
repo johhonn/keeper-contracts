@@ -24,16 +24,24 @@ contract('OceanAuth constructor', (accounts) => {
     })
 })
 
-async function createAccessRequest(contract, resourceId, provider, timeout, from) {
-    const result = await contract.initiateAccessRequest(resourceId, provider, 'pk', timeout, { from: from })
-    return result.logs.find(i => i.event === 'AccessConsentRequested').args._id
-}
-
 contract('OceanAuth', (accounts) => {
     let token
     let market
     let contract
     let assetId
+
+    async function createAccessRequest(contract, resourceId, provider, timeout, from) {
+        const result = await contract.initiateAccessRequest(resourceId, provider, 'pk', timeout, { from: from })
+        return result.logs.find(i => i.event === 'AccessConsentRequested').args._id
+    }
+
+    async function prepareAccessRequestWithToken() {
+        const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
+        await contract.commitAccessRequest(requestId, true, 10000000000, '', '', '', '', { from: accounts[1] })
+        await market.sendPayment(requestId, accounts[1], 0, 300, { from: accounts[0] })
+        await contract.deliverAccessToken(requestId, '0x10', { from: accounts[1] })
+        return requestId
+    }
 
     beforeEach(async () => {
         token = await OceanToken.new({ from: accounts[0] })
@@ -237,7 +245,6 @@ contract('OceanAuth', (accounts) => {
 
             // act-assert
             try {
-                // await contract.deliverAccessToken(requestId, '0x1a2e', { from: accounts[0] })
                 await contract.verifyAccessTokenDelivery(requestId, '0x0', emptyBytes32, 0, emptyBytes32, emptyBytes32, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Sender is not Provider.')
@@ -262,10 +269,7 @@ contract('OceanAuth', (accounts) => {
 
         it('Should revoke access request if signature is not valid', async () => {
             // arrange
-            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
-            await contract.commitAccessRequest(requestId, true, 10000000000, '', '', '', '', { from: accounts[1] })
-            await market.sendPayment(requestId, accounts[1], 0, 300, { from: accounts[0] })
-            await contract.deliverAccessToken(requestId, '0x10', { from: accounts[1] })
+            const requestId = await prepareAccessRequestWithToken()
 
             // act
             const result = await contract.verifyAccessTokenDelivery(requestId, accounts[0], emptyBytes32, 0, emptyBytes32, emptyBytes32, { from: accounts[1] })
@@ -282,11 +286,7 @@ contract('OceanAuth', (accounts) => {
             const signature = await web3.eth.sign(`0x${Buffer.from(msg).toString('hex')}`, accounts[0])
             const sig = ethers.utils.splitSignature(signature)
             const fixedMsgSha = web3.utils.sha3(`\x19Ethereum Signed Message:\n${msg.length}${msg}`)
-
-            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
-            await contract.commitAccessRequest(requestId, true, 10000000000, '', '', '', '', { from: accounts[1] })
-            await market.sendPayment(requestId, accounts[1], 0, 300, { from: accounts[0] })
-            await contract.deliverAccessToken(requestId, '0x10', { from: accounts[1] })
+            const requestId = await prepareAccessRequestWithToken()
 
             // act
             const result = await contract.verifyAccessTokenDelivery(requestId, accounts[0], fixedMsgSha, sig.v, sig.r, sig.s, { from: accounts[1] })
@@ -365,12 +365,9 @@ contract('OceanAuth', (accounts) => {
             assert.fail('Expected revert not received')
         })
 
-        it('Should return encripted access token', async () => {
+        it('Should return encrypted access token', async () => {
             // arrange
-            const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
-            await contract.commitAccessRequest(requestId, true, 10000000000, '', '', '', '', { from: accounts[1] })
-            await market.sendPayment(requestId, accounts[1], 0, 300, { from: accounts[0] })
-            await contract.deliverAccessToken(requestId, '0x10', { from: accounts[1] })
+            const requestId = await prepareAccessRequestWithToken()
 
             // act
             const result = await contract.getEncryptedAccessToken(requestId, { from: accounts[0] })
