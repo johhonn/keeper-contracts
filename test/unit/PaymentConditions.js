@@ -47,6 +47,7 @@ contract('PaymentConditions', (accounts) => {
     let consumer
     let contracts
     let fingerprints
+    let dependenciesBits
     let valueHashes
     let timeoutValues
     let serviceAgreementId
@@ -55,6 +56,12 @@ contract('PaymentConditions', (accounts) => {
         const conditionKeys = utils.generateConditionsKeys(templateId, contracts, fingerprints)
         const hash = utils.createSLAHash(web3, templateId, conditionKeys, valueHashes, timeoutValues, serviceAgreementId)
         return web3.eth.sign(hash, consumer)
+    }
+
+    async function initAgreement() {
+        const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
+        await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, dependenciesBits, templateId, [0], 0, { from: accounts[0] })
+        await agreement.executeAgreement(templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
     }
 
     beforeEach(async () => {
@@ -66,7 +73,8 @@ contract('PaymentConditions', (accounts) => {
         consumer = accounts[1]
         contracts = [contract.address]
         fingerprints = [utils.getSelector(web3, PaymentConditions, 'lockPayment')]
-        valueHashes = utils.valueHash(['bytes32', 'uint256'], [assetId, price])
+        dependenciesBits = [0]
+        valueHashes = [utils.valueHash(['bytes32', 'uint256'], [assetId, price])]
         timeoutValues = [0]
         serviceAgreementId = utils.generateId(web3)
     })
@@ -74,9 +82,7 @@ contract('PaymentConditions', (accounts) => {
     describe('lockPayment', () => {
         it('Should not lock payment when sender is not consumer', async () => {
             // arrange
-            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            await initAgreement()
 
             // act-assert
             try {
@@ -90,9 +96,7 @@ contract('PaymentConditions', (accounts) => {
 
         it('Should lock payment', async () => {
             // arrange
-            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            await initAgreement()
             await token.setReceiver(consumer, { from: accounts[0] })
             await token.approve(contract.address, price, { from: consumer })
 
@@ -105,9 +109,8 @@ contract('PaymentConditions', (accounts) => {
 
         it('Should not lock payment when exist unfulfilled dependencies', async () => {
             // arrang
-            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [1], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            dependenciesBits = [1]
+            await initAgreement()
 
             // act
             const result = await contract.lockPayment(serviceAgreementId, assetId, price, { from: consumer })
@@ -118,9 +121,7 @@ contract('PaymentConditions', (accounts) => {
 
         it('Should not lock payment twice', async () => {
             // arrange
-            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            await initAgreement()
             await token.setReceiver(consumer, { from: accounts[0] })
             await token.approve(contract.address, price, { from: consumer })
             await contract.lockPayment(serviceAgreementId, assetId, price, { from: consumer })
@@ -136,9 +137,7 @@ contract('PaymentConditions', (accounts) => {
     describe('releasePayment', () => {
         it('Should not release payment when sender is not publisher', async () => {
             // arrange
-            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            await initAgreement()
 
             // act-assert
             try {
@@ -153,10 +152,8 @@ contract('PaymentConditions', (accounts) => {
         it('Should release payment', async () => {
             // arrang
             fingerprints = [utils.getSelector(web3, PaymentConditions, 'releasePayment')]
-            valueHashes = utils.valueHash(['bytes32', 'uint256'], [assetId, price])
-            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            valueHashes = [utils.valueHash(['bytes32', 'uint256'], [assetId, price])]
+            await initAgreement()
 
             // act
             const result = await contract.releasePayment(serviceAgreementId, assetId, price, { from: accounts[0] })
@@ -167,9 +164,8 @@ contract('PaymentConditions', (accounts) => {
 
         it('Should not release payment when exist unfulfilled dependencies', async () => {
             // arrang
-            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [1], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            dependenciesBits = [1]
+            await initAgreement()
 
             // act
             const result = await contract.releasePayment(serviceAgreementId, assetId, price, { from: accounts[0] })
@@ -181,10 +177,8 @@ contract('PaymentConditions', (accounts) => {
         it('Should not release payment twice', async () => {
             // arrang
             fingerprints = [utils.getSelector(web3, PaymentConditions, 'releasePayment')]
-            valueHashes = utils.valueHash(['bytes32', 'uint256'], [assetId, price])
-            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            valueHashes = [utils.valueHash(['bytes32', 'uint256'], [assetId, price])]
+            await initAgreement()
             await contract.releasePayment(serviceAgreementId, assetId, price, { from: accounts[0] })
 
             // act
@@ -198,9 +192,7 @@ contract('PaymentConditions', (accounts) => {
     describe('refundPayment', () => {
         it('Should not refund payment when sender is not consumer', async () => {
             // arrange
-            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            await initAgreement()
 
             // act-assert
             try {
@@ -216,11 +208,10 @@ contract('PaymentConditions', (accounts) => {
             // arrang
             contracts.push(contract.address)
             fingerprints.push(utils.getSelector(web3, PaymentConditions, 'refundPayment'))
+            dependenciesBits = [0, 0]
+            valueHashes.push(utils.valueHash(['bytes32', 'uint256'], [assetId, price]))
             timeoutValues.push(0)
-            const hashes = utils.valueHash(['bytes32', 'uint256'], [assetId, price])
-            const signature = await createSignature(contracts, fingerprints, [valueHashes, hashes], timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [0, 0], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes, hashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            await initAgreement()
             await token.setReceiver(consumer, { from: accounts[0] })
             await token.approve(contract.address, price, { from: consumer })
             await contract.lockPayment(serviceAgreementId, assetId, price, { from: consumer })
@@ -236,11 +227,10 @@ contract('PaymentConditions', (accounts) => {
             // arrang
             contracts.push(contract.address)
             fingerprints.push(utils.getSelector(web3, PaymentConditions, 'refundPayment'))
+            dependenciesBits = [0, 1]
+            valueHashes.push(utils.valueHash(['bytes32', 'uint256'], [assetId, price]))
             timeoutValues.push(0)
-            const hashes = utils.valueHash(['bytes32', 'uint256'], [assetId, price])
-            const signature = await createSignature(contracts, fingerprints, [valueHashes, hashes], timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [0, 1], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes, hashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            await initAgreement()
             await token.setReceiver(consumer, { from: accounts[0] })
             await token.approve(contract.address, price, { from: consumer })
             await contract.lockPayment(serviceAgreementId, assetId, price, { from: consumer })

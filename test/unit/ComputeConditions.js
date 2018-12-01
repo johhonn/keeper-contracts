@@ -29,6 +29,7 @@ contract('ComputeConditions', (accounts) => {
     let consumer
     let contracts
     let fingerprints
+    let dependenciesBits
     let valueHashes
     let timeoutValues
     let serviceAgreementId
@@ -43,6 +44,12 @@ contract('ComputeConditions', (accounts) => {
         return web3.eth.sign(hash, consumer)
     }
 
+    async function initAgreement() {
+        const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
+        await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, dependenciesBits, templateId, [0], 0, { from: accounts[0] })
+        await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+    }
+
     beforeEach(async () => {
         agreement = await ServiceAgreement.new({ from: accounts[0] })
         contract = await ComputeConditions.new(agreement.address, { from: accounts[0] })
@@ -50,6 +57,7 @@ contract('ComputeConditions', (accounts) => {
         consumer = accounts[1]
         contracts = [contract.address]
         fingerprints = [utils.getSelector(web3, ComputeConditions, 'fulfillUpload')]
+        dependenciesBits = [0]
         valueHashes = utils.valueHash(['bool'], [true])
         timeoutValues = [0]
         serviceAgreementId = utils.generateId(web3)
@@ -69,9 +77,7 @@ contract('ComputeConditions', (accounts) => {
 
         it('Should submit', async () => {
             // arrange
-            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            await initAgreement()
 
             // act
             const result = await contract.submitHashSignature(serviceAgreementId, emptyBytes32, { from: consumer })
@@ -82,9 +88,7 @@ contract('ComputeConditions', (accounts) => {
 
         it('Should re-submit when call submit twice', async () => {
             // arrange
-            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            await initAgreement()
             await contract.submitHashSignature(serviceAgreementId, emptyBytes32, { from: consumer })
 
             // act
@@ -110,9 +114,7 @@ contract('ComputeConditions', (accounts) => {
 
         it('Should submit', async () => {
             // arrange
-            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            await initAgreement()
 
             // act
             const result = await contract.submitAlgorithmHash(serviceAgreementId, emptyBytes32, { from: accounts[0] })
@@ -123,9 +125,7 @@ contract('ComputeConditions', (accounts) => {
 
         it('Should re-submit when call submit twice', async () => {
             // arrange
-            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            await initAgreement()
             await contract.submitAlgorithmHash(serviceAgreementId, emptyBytes32, { from: accounts[0] })
 
             // act
@@ -151,9 +151,7 @@ contract('ComputeConditions', (accounts) => {
 
         it('Should fulfill upload when hash is absent', async () => { // IMO the scenario looks strange, I expect another behavior
             // arrange
-            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            await initAgreement()
 
             // act
             const result = await contract.fulfillUpload(serviceAgreementId, emptyBytes32, { from: accounts[0] })
@@ -164,9 +162,7 @@ contract('ComputeConditions', (accounts) => {
 
         it('Should not fulfill upload when hash exists, signature is not valid', async () => {
             // arrange
-            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            await initAgreement()
             await contract.submitHashSignature(serviceAgreementId, emptyBytes32, { from: consumer })
 
             // act
@@ -178,9 +174,8 @@ contract('ComputeConditions', (accounts) => {
 
         it('Should not fulfill upload when unfulfilled dependencies exist', async () => {
             // arrange
-            const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [1], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            dependenciesBits = [1]
+            await initAgreement()
             await contract.submitHashSignature(serviceAgreementId, emptyBytes32, { from: consumer })
 
             // act
