@@ -1,9 +1,12 @@
 pragma solidity 0.4.25;
 
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
-
 import '../token/OceanToken.sol';
 import './ServiceAgreement.sol';
+
+/// @title Payment Conditions Contract
+/// @author Ocean Protocol Team
+/// @dev All function calls are currently implement without side effects
 
 contract PaymentConditions {
 
@@ -19,7 +22,6 @@ contract PaymentConditions {
     constructor(address _serviceAgreementAddress, address _tokenAddress) public {
         require(_serviceAgreementAddress != address(0), 'invalid contract address');
         require(_tokenAddress != address(0), 'invalid token address');
-
         serviceAgreementStorage = ServiceAgreement(_serviceAgreementAddress);
         token = OceanToken(_tokenAddress);
     }
@@ -56,12 +58,10 @@ contract PaymentConditions {
             return true;
 
         bytes32 valueHash = keccak256(abi.encodePacked(assetId, price));
-        address sender = msg.sender;
-        address receiver = address(this);
-        serviceAgreementStorage.fulfillCondition(serviceId, this.lockPayment.selector, valueHash);
-
-        require(token.transferFrom(sender, receiver, price), 'Can not lock payment');
-        payments[serviceId] = Payment(sender, receiver, price);
+        require(serviceAgreementStorage.fulfillCondition(serviceId, this.lockPayment.selector, valueHash), 'unable to not lock payment because token transfer failed');
+        token.allowance(msg.sender, address(this));
+        require(token.transferFrom(msg.sender, address(this), price), 'Can not lock payment');
+        payments[serviceId] = Payment(msg.sender, address(this), price);
         emit PaymentLocked(serviceId, payments[serviceId].sender, payments[serviceId].receiver, payments[serviceId].amount);
     }
 
@@ -75,11 +75,8 @@ contract PaymentConditions {
             return true;
 
         bytes32 valueHash = keccak256(abi.encodePacked(assetId, price));
-
         serviceAgreementStorage.fulfillCondition(serviceId, this.releasePayment.selector, valueHash);
-
-        require(token.approve(address(this), payments[serviceId].amount), 'Can not approve token operation');
-        require(token.transferFrom(payments[serviceId].receiver, msg.sender, payments[serviceId].amount), 'Can not release payment');
+        require(token.transfer(msg.sender, payments[serviceId].amount), 'unable to release payment because token transfer failed');
         emit PaymentReleased(serviceId, payments[serviceId].receiver, msg.sender, payments[serviceId].amount);
     }
 
@@ -93,14 +90,9 @@ contract PaymentConditions {
             return true;
 
         bytes32 valueHash = keccak256(abi.encodePacked(assetId, price));
-
         serviceAgreementStorage.fulfillCondition(serviceId, this.refundPayment.selector, valueHash);
         // transfer from this contract to consumer/msg.sender
-        require(token.approve(address(this), payments[serviceId].amount), 'Can not approve token operation');
-        require(
-            token.transferFrom(payments[serviceId].receiver, payments[serviceId].sender, payments[serviceId].amount),
-            'Can not refund payment'
-        );
+        require(token.transfer(payments[serviceId].sender, payments[serviceId].amount), 'unable to refund payment because token transfer failed');
         emit PaymentRefund(serviceId, payments[serviceId].receiver, payments[serviceId].sender, payments[serviceId].amount);
     }
 }
