@@ -27,7 +27,7 @@ contract('OceanMarket', (accounts) => {
     beforeEach(async () => {
         token = await OceanToken.new({ from: accounts[0] })
         contract = await OceanMarket.new(token.address, { from: accounts[0] })
-        id = await contract.generateId('test')
+        id = await contract.methods['generateId(string)']('test')
     })
 
     describe('register', () => {
@@ -380,7 +380,7 @@ contract('OceanMarket', (accounts) => {
     describe('generateId', () => {
         it('Should generate id from string', async () => {
             // act
-            const id = await contract.generateId('test', { from: accounts[0] })
+            const id = await contract.methods['generateId(string)']('test', { from: accounts[0] })
 
             // assert
             assert.strictEqual(id, '0x9c22ff5f21f0b81b113e63f7db6da94fedef11b2119b4088b89664fb9a3cb658')
@@ -388,10 +388,10 @@ contract('OceanMarket', (accounts) => {
 
         it('Should generate id from bytes', async () => {
             // act
-            const id = await contract.generateId('0xff', { from: accounts[0] }) // not possible to call function generateId(bytes) with truffle, it call generateId(string)
+            const id = await contract.methods['generateId(bytes)']('0xff', { from: accounts[0] })
 
             // assert
-            assert.strictEqual(id, '0x420daffad4b177bce28bead5f76f7bc97ef63c3aae74c496db8ce6aafe9e6513')
+            assert.strictEqual(id, '0x8b1a944cf13a9a1c08facb2c9e98623ef3254d2ddb48113885c3e8e97fec8db9')
         })
     })
 })
