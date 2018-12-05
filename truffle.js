@@ -24,13 +24,13 @@ module.exports = {
             gasPrice: 0x01
         },
         // only used locally, i.e. docker
-        ocean_poa_net_local: {
+        ocean_poa_net_local_new: {
             provider: () => new HDWalletProvider(process.env.POA_NMEMORIC, url || `http://localhost:8545`),
             // poa from docker usually
             network_id: 0x2324,
             gas: 4500000
         },
-        ocean_poa_net_docker: {
+        ocean_poa_net_local: {
             host: rpcHost,
             port: rpcPort,
             // poa from docker usually
