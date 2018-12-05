@@ -30,6 +30,14 @@ module.exports = {
             network_id: 0x2324,
             gas: 4500000
         },
+        ocean_poa_net_docker: {
+            host: rpcHost,
+            port: rpcPort,
+            // poa from docker usually
+            network_id: 0x2324,
+            gas: 4500000,
+            from: '0x00bd138abd70e2f00903268f3db08f2d25677c9e'
+        },
         // new aws instance of POA
         ocean_poa_aws: {
             provider: () => new HDWalletProvider(process.env.POA_NMEMORIC, url || `http://52.1.94.55:8545`),
