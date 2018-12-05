@@ -127,7 +127,6 @@ contract OceanMarket is Ownable {
         return true;
     }
 
-
     /**
     * @dev the consumer release payment to receiver
     * @param _paymentId the integer identifier of payment

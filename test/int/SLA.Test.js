@@ -6,7 +6,7 @@ const OceanMarket = artifacts.require('OceanMarket.sol')
 const SLA = artifacts.require('ServiceAgreement.sol')
 const PaymentCtrl = artifacts.require('PaymentConditions.sol')
 const AccessCtrl = artifacts.require('AccessConditions.sol')
-const testUtils = require('./utils')
+const testUtils = require('../utils')
 
 const web3 = testUtils.getWeb3()
 
