@@ -47,7 +47,7 @@ contract('OceanAuth', (accounts) => {
         token = await OceanToken.new({ from: accounts[0] })
         market = await OceanMarket.new(token.address, { from: accounts[0] })
         contract = await OceanAuth.new(market.address, { from: accounts[0] })
-        assetId = await market.generateId('test asset')
+        assetId = await market.methods['generateId(string)']('test asset')
     })
 
     describe('initiateAccessRequest', () => {
