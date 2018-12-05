@@ -3,7 +3,7 @@
 /* global artifacts, assert, contract, describe, it */
 
 const DIDRegistry = artifacts.require('DIDRegistry.sol')
-const utils = require('./utils.js')
+const utils = require('../utils.js')
 
 const web3 = utils.getWeb3()
 
