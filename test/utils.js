@@ -34,15 +34,15 @@ const utils = {
             function hasOwnProperty(obj, prop) {
                 const proto = obj.constructor.prototype
                 return (prop in obj) &&
-          (!(prop in proto) || proto[prop] !== obj[prop])
+                    (!(prop in proto) || proto[prop] !== obj[prop])
             }
             if (typeof potentialSendObj !== 'object') { return undefined }
             if (
                 hasOwnProperty(potentialSendObj, 'from') ||
-        hasOwnProperty(potentialSendObj, 'to') ||
-        hasOwnProperty(potentialSendObj, 'gas') ||
-        hasOwnProperty(potentialSendObj, 'gasPrice') ||
-        hasOwnProperty(potentialSendObj, 'value')
+                hasOwnProperty(potentialSendObj, 'to') ||
+                hasOwnProperty(potentialSendObj, 'gas') ||
+                hasOwnProperty(potentialSendObj, 'gasPrice') ||
+                hasOwnProperty(potentialSendObj, 'value')
             ) {
                 throw new Error('It is unsafe to use "as" with custom send objects')
             }

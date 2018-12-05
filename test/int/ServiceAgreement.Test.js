@@ -3,7 +3,7 @@
 
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
 const abi = require('ethereumjs-abi')
-const utils = require('./utils')
+const utils = require('../utils')
 
 const web3 = utils.getWeb3()
 

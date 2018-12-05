@@ -70,22 +70,4 @@ contract OceanToken is ERC20 {
         return super.transferFrom(_from, _to, _value);
     }
 
-    /**
-    * @dev Aprove the passed address to spend the specified amount of tokens on behalf of msg.sender when not paused.
-    * @param _spender The address which will spend the funds.
-    * @param _value The amount of tokens to be spent.
-    */
-    function approve(address _spender, uint256 _value) public returns (bool) {
-        return super.approve(_spender, _value);
-    }
-
-    /**
-    * @dev Gets the allowance amount of the specified address.
-    * @param _owner The address to query the the allowance of.
-    * @return An uint256 representing the amount allowance of the passed address.
-    */
-    function allowance(address _owner, address _spender) public view returns (uint256) {
-        return super.allowance(_owner, _spender);
-    }
-
 }
