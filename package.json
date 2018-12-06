@@ -10,9 +10,8 @@
   "scripts": {
     "compile": "truffle compile",
     "migrate": "truffle migrate",
-    "migrate:poa_local": "npm run migrate -- --network ocean_poa_net_local",
-    "migrate:poa_net": "npm run migrate -- --network ocean_poa_net",
-    "migrate:poa_aws": "npm run migrate -- --network ocean_poa_aws",
+    "migrate:spree": "npm run migrate -- --network spree",
+    "migrate:nile": "npm run migrate -- --network nile",
     "migrate:kovan": "npm run migrate -- --network kovan",
     "migrate:rinkeby": "npm run migrate -- --network rinkeby",
     "migrate:mainnet": "npm run migrate ----network mainnet",

@@ -60,7 +60,8 @@ script:
 - npm run migrate
 - git status
 - git add package-lock.json
-- git add ./artifacts/*.ocean_poa_aws.json
+- git add ./artifacts/*.spree.json
+- git add ./artifacts/*.nile.json
 - git diff-index --quiet HEAD || git commit -m "Travis update"
 
 after_script:
