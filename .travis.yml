@@ -60,6 +60,7 @@ script:
 - npm run migrate
 - git status
 - git add package-lock.json
+- rm -f ./artifacts/*.development.json
 - git add ./artifacts/*.json
 - git diff-index --quiet HEAD || git commit -m "Travis update"
 
