@@ -27,7 +27,7 @@ Ocean Keeper implementation where we put the following modules together:
      - [Docker](#docker)
      - [Local development](#local-development)
      - [Testnet deployment](#testnet-deployment)
-        - [Ocean POA Testnet](#ocean-poa-testnet)
+        - [Nile Testnet](#nile-testnet)
         - [Kovan Testnet](#kovan-testnet)
   - [Libraries](#libraries)
   - [Testing](#testing)
@@ -123,18 +123,18 @@ npm run migrate -- --reset
 
 ### Testnet deployment
 
-#### Ocean POA Testnet
+#### Nile Testnet
 
 Follow the steps for local deployment. Make sure that the address `0x90eE7A30339D05E07d9c6e65747132933ff6e624` is having enough (~1) Ether.
 
 ```bash
-export POA_NMEMORIC=<your poa nmemoric>
-npm run migrate:poa_aws
+export NMEMORIC=<your nile nmemoric>
+npm run migrate:nile
 ```
 
 The transaction should show up on the account: `0x90eE7A30339D05E07d9c6e65747132933ff6e624`
 
-The contract addresses deployed on Ocean POA testnet:
+The contract addresses deployed on Ocean Nile testnet:
 
 | Contract           | Version | Address                                      |
 |--------------------|---------|----------------------------------------------|
@@ -156,7 +156,7 @@ If you managed to deploy the contracts locally do:
 
 ```bash
 export INFURA_TOKEN=<your infura token>
-export KOVAN_NMEMORIC=<your kovan nmemoric>
+export NMEMORIC=<your kovan nmemoric>
 npm run migrate:kovan
 ```
 
@@ -288,11 +288,7 @@ The `bumpversion.sh` script helps to bump the project version. You can execute t
 
 ## Contributing
 
-We use GitHub as a means for maintaining and tracking issues and source code development.
-
-If you would like to contribute, please fork this repository, do work in a feature branch, and finally open a pull request for maintainers to review your changes.
-
-Ocean Protocol uses [C4 Standard process](https://github.com/unprotocols/rfc/blob/master/1/README.md) to manage changes in the source code.  Find here more details about [Ocean C4 OEP](https://github.com/oceanprotocol/OEPs/tree/master/1).
+See the page titled "[Ways to Contribute](https://docs.oceanprotocol.com/concepts/contributing/)" in the Ocean Protocol documentation.
 
 ## Prior Art
 
@@ -301,7 +297,6 @@ This project builds on top of the work done in open source projects:
 - [ConsenSys/PLCRVoting](https://github.com/ConsenSys/PLCRVoting)
 - [skmgoldin/tcr](https://github.com/skmgoldin/tcr)
 - [OpenZeppelin/openzeppelin-solidity](https://github.com/OpenZeppelin/openzeppelin-solidity)
-
 
 ## License
 
