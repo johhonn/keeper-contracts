@@ -179,7 +179,7 @@ contract ServiceAgreement {
         require(
             isValidSignature(ECDSA.toEthSignedMessageHash(agreementHash), signature, consumer) ||
             isValidSignature(agreementHash, signature, consumer),
-            'Agreement signature failed verification.'
+            'Invalid consumer signature of service agreement'
         );
         agreements[serviceAgreementId] = Agreement(
             false, true, false, new uint8[](0), new uint8[](0), templateId, consumer, msg.sender, new bytes32[](0), new uint256[](0), did
