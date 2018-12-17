@@ -6,7 +6,7 @@ const OceanMarket = artifacts.require('OceanMarket.sol')
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const FitchainConditions = artifacts.require('FitchainConditions.sol')
-const testUtils = require('./utils')
+const testUtils = require('../utils')
 const web3 = testUtils.getWeb3()
 
 contract('FitchainConditions', (accounts) => {
