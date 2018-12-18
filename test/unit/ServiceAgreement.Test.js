@@ -4,6 +4,8 @@
 
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
 const utils = require('../utils.js')
+/* eslint-disable-next-line security/detect-child-process */
+const { execSync } = require('child_process')
 
 const web3 = utils.getWeb3()
 
@@ -19,6 +21,7 @@ contract('ServiceAgreement', (accounts) => {
     let valueHashes
     let timeoutValues
     let serviceAgreementId
+    let debug = ' -s'
 
     function createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer) {
         const conditionKeys = utils.generateConditionsKeys(templateId, contracts, fingerprints)
@@ -33,7 +36,8 @@ contract('ServiceAgreement', (accounts) => {
     }
 
     beforeEach(async () => {
-        contract = await ServiceAgreement.new({ from: accounts[0] })
+        let address = execSync('npx zos create ServiceAgreement' + debug).toString().trim()
+        contract = await ServiceAgreement.at(address)
         /* eslint-disable-next-line prefer-destructuring */
         consumer = accounts[1]
         contracts = [accounts[2]]

@@ -5,21 +5,10 @@
 const AccessConditions = artifacts.require('AccessConditions.sol')
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
 const utils = require('../utils.js')
+/* eslint-disable-next-line security/detect-child-process */
+const { execSync } = require('child_process')
 
 const web3 = utils.getWeb3()
-
-contract('AccessConditions constructor', (accounts) => {
-    it('Should not deploy when agreement is empty', async () => {
-        // act-assert
-        try {
-            await AccessConditions.new(0x0, { from: accounts[0] })
-        } catch (e) {
-            assert.strictEqual(e.reason, 'invalid address')
-            return
-        }
-        assert.fail('Expected revert not received')
-    })
-})
 
 contract('AccessConditions', (accounts) => {
     const assetId = '0x0000000000000000000000000000000000000000000000000000000000000001'
@@ -34,6 +23,7 @@ contract('AccessConditions', (accounts) => {
     let valueHashes
     let timeoutValues
     let serviceAgreementId
+    let debug = ' -v'
 
     function createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer) {
         const conditionKeys = utils.generateConditionsKeys(templateId, contracts, fingerprints)
@@ -48,8 +38,11 @@ contract('AccessConditions', (accounts) => {
     }
 
     beforeEach(async () => {
-        agreement = await ServiceAgreement.new({ from: accounts[0] })
-        contract = await AccessConditions.new(agreement.address, { from: accounts[0] })
+        let serviceAddress = execSync('npx zos create ServiceAgreement' + debug).toString().trim()
+        let accessAddress = execSync('npx zos create AccessConditions --init initialize --args ' + serviceAddress + debug).toString().trim()
+        agreement = await ServiceAgreement.at(serviceAddress)
+        contract = await AccessConditions.at(accessAddress)
+
         /* eslint-disable-next-line prefer-destructuring */
         consumer = accounts[1]
         contracts = [contract.address]

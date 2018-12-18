@@ -1,12 +1,13 @@
 pragma solidity 0.4.25;
 
 import './ServiceAgreement.sol';
+import "zos-lib/contracts/Initializable.sol";
 
 /// @title Secret Store Access Control
 /// @author Ocean Protocol Team
 /// @dev All function calls are currently implement without side effects
 
-contract AccessConditions{
+contract AccessConditions is Initializable{
 
     mapping(bytes32 => mapping(address => bool)) private assetPermissions;
 
@@ -18,7 +19,7 @@ contract AccessConditions{
         _;
     }
 
-    constructor(address _serviceAgreementAddress) public {
+    function initialize(address _serviceAgreementAddress) public initializer() {
         require(_serviceAgreementAddress != address(0), 'invalid contract address');
         serviceAgreementStorage = ServiceAgreement(_serviceAgreementAddress);
     }

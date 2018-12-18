@@ -6,35 +6,10 @@ const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 const utils = require('../utils.js')
+/* eslint-disable-next-line security/detect-child-process */
+const { execSync } = require('child_process')
 
 const web3 = utils.getWeb3()
-
-contract('PaymentConditions constructor', (accounts) => {
-    it('Should not deploy when agreement is empty', async () => {
-        // act-assert
-        try {
-            await PaymentConditions.new(0x0, 0x0, { from: accounts[0] })
-        } catch (e) {
-            assert.strictEqual(e.reason, 'invalid address')
-            return
-        }
-        assert.fail('Expected revert not received')
-    })
-
-    it('Should not deploy when token is empty', async () => {
-        // arrange
-        const dummyAddress = '0x1111aaaaeeeeffffcccc22223333444455556666'
-
-        // act-assert
-        try {
-            await PaymentConditions.new(dummyAddress, 0x0, { from: accounts[0] })
-        } catch (e) {
-            assert.strictEqual(e.reason, 'invalid address')
-            return
-        }
-        assert.fail('Expected revert not received')
-    })
-})
 
 contract('PaymentConditions', (accounts) => {
     const assetId = '0x0000000000000000000000000000000000000000000000000000000000000001'
@@ -51,6 +26,7 @@ contract('PaymentConditions', (accounts) => {
     let valueHashes
     let timeoutValues
     let serviceAgreementId
+    let debug = ' -s'
 
     function createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer) {
         const conditionKeys = utils.generateConditionsKeys(templateId, contracts, fingerprints)
@@ -65,9 +41,14 @@ contract('PaymentConditions', (accounts) => {
     }
 
     beforeEach(async () => {
-        agreement = await ServiceAgreement.new({ from: accounts[0] })
-        token = await OceanToken.new({ from: accounts[0] })
-        contract = await PaymentConditions.new(agreement.address, token.address, { from: accounts[0] })
+        let tokenAddress = execSync('npx zos create OceanToken --init' + debug).toString().trim()
+        let agreementAddress = execSync('npx zos create ServiceAgreement ' + debug).toString().trim()
+        let paymentAddress = execSync('npx zos create PaymentConditions --init initialize --args ' + agreementAddress + ',' + tokenAddress + ' + debug').toString().trim()
+
+        token = await OceanToken.at(tokenAddress)
+        agreement = await ServiceAgreement.at(agreementAddress)
+        contract = await PaymentConditions.at(paymentAddress)
+
         price = 1
         /* eslint-disable-next-line prefer-destructuring */
         consumer = accounts[1]

@@ -1,7 +1,7 @@
 pragma solidity 0.4.25;
 
-import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
-import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
+import 'openzeppelin-eth/contracts/math/SafeMath.sol';
+import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
 import './token/OceanToken.sol';
 
@@ -39,8 +39,8 @@ contract OceanMarket is Ownable {
 
     // limit period for reques of tokens
     mapping(address => uint256) private tokenRequest; // mapping from address to last time of request
-    uint256 maxAmount = 10000 * 10 ** 18;         // max amount of tokens user can get for each request
-    uint256 minPeriod = 0;                        // min amount of time to wait before request token again
+    uint256 maxAmount;         // max amount of tokens user can get for each request
+    uint256 minPeriod;                        // min amount of time to wait before request token again
 
     // limit access to refund payment
     address private authAddress;
@@ -79,16 +79,21 @@ contract OceanMarket is Ownable {
     }
 
     /**
-    * @dev OceanMarket Constructor
+    * @dev OceanMarket Initializer
     * @param _tokenAddress The deployed contract address of OceanToken
-    * Runs only on initial contract creation.
+    * Runs only on initial contract deployment.
     */
-    constructor(address _tokenAddress) public {
+    function initialize(address _tokenAddress) public initializer() {
         require(_tokenAddress != address(0x0), 'Token address is 0x0.');
         // instantiate Ocean token contract
         mToken = OceanToken(_tokenAddress);
         // set the token receiver to be marketplace
         mToken.setReceiver(address(this));
+        // max amount of tokens user can get for each request
+        maxAmount = 10000 * 10 ** 18;
+        // min amount of time to wait before request token again
+        minPeriod = 0;
+
     }
 
     /**

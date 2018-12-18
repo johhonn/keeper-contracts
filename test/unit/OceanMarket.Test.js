@@ -5,28 +5,22 @@
 const OceanMarket = artifacts.require('OceanMarket.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 const utils = require('../utils.js')
-
-contract('OceanMarket constructor', (accounts) => {
-    it('Should not deploy if token is empty', async () => {
-        // act-assert
-        try {
-            await OceanMarket.new(0x0, { from: accounts[0] })
-        } catch (e) {
-            assert.strictEqual(e.reason, 'invalid address')
-            return
-        }
-        assert.fail('Expected revert not received')
-    })
-})
+/* eslint-disable-next-line security/detect-child-process */
+const { execSync } = require('child_process')
 
 contract('OceanMarket', (accounts) => {
     let token
     let contract
     let id
+    let debug = ' -s'
 
     beforeEach(async () => {
-        token = await OceanToken.new({ from: accounts[0] })
-        contract = await OceanMarket.new(token.address, { from: accounts[0] })
+        // Create instances with zos
+        let tokenAddres = execSync('npx zos create OceanToken --init' + debug).toString().trim()
+        let marketAddres = execSync('npx zos create OceanMarket --init initialize --args ' + tokenAddres + debug).toString().trim()
+        contract = await OceanMarket.at(marketAddres)
+        token = await OceanToken.at(tokenAddres)
+
         id = await contract.methods['generateId(string)']('test')
     })
 

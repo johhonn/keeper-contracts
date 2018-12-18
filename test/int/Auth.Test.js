@@ -11,6 +11,7 @@ const EthCrypto = require('eth-crypto')
 const EthjsUtil = require('ethereumjs-util')
 const ethers = require('ethers')
 const utils = require('../utils.js')
+const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
 
 const web3 = utils.getWeb3()
 const { BN } = web3.utils
@@ -26,9 +27,11 @@ contract('OceanAuth', (accounts) => {
     let consumer
 
     before(async () => {
-        token = await OceanToken.deployed()
-        market = await OceanMarket.deployed()
-        auth = await OceanAuth.deployed()
+        let zos = new ZeppelinHelper('OceanAuth')
+        await zos.initialize(accounts)
+        auth = await OceanAuth.at(zos.proxyAddress)
+        token = await OceanToken.at(await zos.getInstance('OceanToken'))
+        market = await OceanMarket.at(await zos.getInstance('OceanMarket'))
     })
 
     describe('Test On-chain Authorization', () => {

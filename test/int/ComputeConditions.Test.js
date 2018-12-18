@@ -9,6 +9,8 @@ const AccessConditions = artifacts.require('AccessConditions.sol')
 const ComputeConditions = artifacts.require('ComputeConditions.sol')
 const testUtils = require('../utils')
 const web3 = testUtils.getWeb3()
+/* eslint-disable-next-line security/detect-child-process */
+const { execSync } = require('child_process')
 
 contract('ComputeConditions', (accounts) => {
     describe('Test On-Premise Compute Service Use Case', () => {
@@ -26,14 +28,23 @@ contract('ComputeConditions', (accounts) => {
         const serviceTemplateId = testUtils.generateId(web3)
         serviceAgreementId = testUtils.generateId(web3)
         const algorithm = 'THIS IS FAKE CODE foo=Hello World!'
+        const debug = ' -s'
 
         before(async () => {
-            token = await OceanToken.deployed()
-            market = await OceanMarket.deployed(token.address)
-            serviceAgreement = await ServiceAgreement.deployed()
-            paymentConditions = await PaymentConditions.deployed(serviceAgreement.address, token.address)
-            accessConditions = await AccessConditions.deployed(serviceAgreement.address)
-            computeConditions = await ComputeConditions.deployed(serviceAgreement.address)
+            let tokenAddress = execSync('npx zos create OceanToken --init' + debug).toString().trim()
+            let marketAddress = execSync('npx zos create OceanMarket --init initialize --args ' + tokenAddress + debug).toString().trim()
+            let agreementAddress = execSync('npx zos create ServiceAgreement ' + debug).toString().trim()
+            let paymentAddress = execSync('npx zos create PaymentConditions --init initialize --args ' + agreementAddress + ',' + tokenAddress + ' + debug').toString().trim()
+            let accessAddress = execSync('npx zos create AccessConditions --init initialize --args ' + agreementAddress + debug).toString().trim()
+            let computeAddress = execSync('npx zos create ComputeConditions --init initialize --args ' + agreementAddress + ' + debug').toString().trim()
+
+            token = await OceanToken.at(tokenAddress)
+            market = await OceanMarket.at(marketAddress)
+            serviceAgreement = await ServiceAgreement.at(agreementAddress)
+            paymentConditions = await PaymentConditions.at(paymentAddress)
+            accessConditions = await AccessConditions.at(accessAddress)
+            computeConditions = await ComputeConditions.at(computeAddress)
+
             await market.requestTokens(testUtils.toBigNumber(1000), { from: datascientist })
             // conditions
             contracts = [paymentConditions.address, computeConditions.address, accessConditions.address, paymentConditions.address, paymentConditions.address]
