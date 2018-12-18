@@ -277,7 +277,7 @@ contract ServiceAgreement {
         return templates[templateId].owner;
     }
 
-    function getServiceAgreementConsumer(bytes32 serviceId) public view returns (address consumer){
+    function getAgreementConsumer(bytes32 serviceId) public view returns (address consumer){
         return agreements[serviceId].consumer;
     }
 
