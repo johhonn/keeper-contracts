@@ -132,7 +132,7 @@ contract('SLA', (accounts) => {
             const hash = utils.createSLAHash(web3, templateId, condKeys, valHashList, timeoutValues, serviceAgreementId)
             const signature = await web3.eth.sign(hash, consumer)
             const val = await sla.executeAgreement(templateId, signature, consumer, [ valHashList[0], valHashList[1], valHashList[2], valHashList[3] ], timeoutValues, serviceAgreementId, did, { from: SLATemplateOwner })
-            assert.strictEqual(val.logs[4].args.state, true, 'Execute Agreement should return true')
+            assert.strictEqual(val.logs[4].args.serviceAgreementId, serviceAgreementId, 'Execute Agreement event not emitted.')
             console.log('\x1b[36m%s\x1b[0m', '\t >> Service Agreement ID: ', val.logs[4].args.serviceAgreementId, ' ... Done!')
 
             console.log('\x1b[36m%s\x1b[0m', '\t >> Set 3rd condition status to 1 by contract address: ', contract3, ' Fingerprint: ', fingerprint3)

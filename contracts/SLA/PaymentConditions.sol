@@ -48,7 +48,7 @@ contract PaymentConditions {
     );
 
     function lockPayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
-        require(serviceAgreementStorage.getServiceAgreementConsumer(serviceId) == msg.sender, 'Only consumer can trigger lockPayment.');
+        require(serviceAgreementStorage.getAgreementConsumer(serviceId) == msg.sender, 'Only consumer can trigger lockPayment.');
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.lockPayment.selector);
 
         if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition))
