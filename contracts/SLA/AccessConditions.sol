@@ -38,7 +38,7 @@ contract AccessConditions{
             serviceAgreementStorage.fulfillCondition(serviceId, this.grantAccess.selector, valueHash),
             'Cannot fulfill grantAccess condition'
         );
-        address consumer = serviceAgreementStorage.getServiceAgreementConsumer(serviceId);
+        address consumer = serviceAgreementStorage.getAgreementConsumer(serviceId);
         assetPermissions[documentKeyId][consumer] = true;
         emit AccessGranted(serviceId, assetId);
     }
