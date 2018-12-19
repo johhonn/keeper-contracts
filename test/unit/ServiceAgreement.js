@@ -137,6 +137,18 @@ contract('ServiceAgreement', (accounts) => {
         })
     })
 
+    describe('getAgreement', () => {
+        it('Should return an agreement with agreementId', async () => {
+            // arrange
+            await initAgreement()
+
+            // act-assert
+            const agreement = await contract.getAgreement(serviceAgreementId, { from: accounts[1] })
+            console.log(agreement)
+            assert.strictEqual(agreement.id = serviceAgreementId)
+        })
+    })
+
     describe('executeAgreement', () => {
         it('Should execute exist agreement only', async () => {
             // act-aassert
