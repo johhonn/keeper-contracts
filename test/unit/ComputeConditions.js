@@ -14,7 +14,7 @@ contract('ComputeConditions constructor', (accounts) => {
         try {
             await ComputeConditions.new(0x0, { from: accounts[0] })
         } catch (e) {
-            assert.strictEqual(e.reason, 'invalid service agreement contract address')
+            assert.strictEqual(e.reason, 'invalid address')
             return
         }
         assert.fail('Expected revert not received')
