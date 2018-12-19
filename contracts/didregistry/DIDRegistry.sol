@@ -30,10 +30,6 @@ contract DIDRegistry is Ownable {
 
     mapping(bytes32 => DIDRegister) private didRegister;
 
-    constructor() Ownable() public {
-    }
-
-
     /// @notice registerAttribute is called only by DID owner.
     /// @dev this function registers DID attributes by storing them in
     /// the system
