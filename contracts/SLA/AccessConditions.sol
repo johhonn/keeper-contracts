@@ -23,14 +23,23 @@ contract AccessConditions{
         serviceAgreementStorage = ServiceAgreement(_serviceAgreementAddress);
     }
 
+    /// @notice checkPermissions is called by secret store cluster.
+    /// @dev this function checks if the consumer can get decryption key for published asset
+    /// @param consumer , consumer's address
+    /// @param documentKeyId , the document key mainly is the asset DID
     function checkPermissions(address consumer, bytes32 documentKeyId) public view  returns(bool) {
         return assetPermissions[documentKeyId][consumer];
     }
 
+    /// @notice grantAccess called by asset publisher in order to delegate access to consumer
+    /// @dev it is in charge of fulfilling the secret store access condition in service agreement
+    /// @param serviceId , service agreement instance ID
+    /// @param assetId , the asset DID
+    //  @param documentKeyId, the asset DID ?? NEED TO BE CHECKED -- REDUNDANCY
     function grantAccess(bytes32 serviceId, bytes32 assetId, bytes32 documentKeyId) public onlySLAPublisher(serviceId, msg.sender) returns (bool) {
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.grantAccess.selector);
-        bool allgood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition);
-        if (!allgood)
+        bool allGood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition);
+        if (!allGood)
             return;
 
         bytes32 valueHash = keccak256(abi.encodePacked(assetId, documentKeyId));
