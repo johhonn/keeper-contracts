@@ -52,17 +52,17 @@ contract ServiceAgreement {
 
     // check if the no longer pending unfulfilled conditions in the SLA
     modifier noPendingFulfillments(bytes32 serviceId){
-        if(templates[getTemplateId(serviceId)].fulfillmentOperator == 0){
-            for (uint256 i=0; i < templates[getTemplateId(serviceId)].fulfillmentIndices.length; i++) {
+        if (templates[getTemplateId(serviceId)].fulfillmentOperator == 0) {
+            for (uint256 i = 0; i < templates[getTemplateId(serviceId)].fulfillmentIndices.length; i++) {
                 require(agreements[serviceId].conditionsState[templates[getTemplateId(serviceId)].fulfillmentIndices[i]] == 1, 'Indicating one of the fulfillment conditions is false');
             }
         }
         else {
             uint8 N = 0;
-            for(uint256 j=0; j < templates[getTemplateId(serviceId)].fulfillmentIndices.length; j++) {
-                if(agreements[serviceId].conditionsState[templates[getTemplateId(serviceId)].fulfillmentIndices[j]] == 1) N += 1;
+            for (uint256 j = 0; j < templates[getTemplateId(serviceId)].fulfillmentIndices.length; j++) {
+                if (agreements[serviceId].conditionsState[templates[getTemplateId(serviceId)].fulfillmentIndices[j]] == 1) N += 1;
             }
-            if(templates[getTemplateId(serviceId)].fulfillmentOperator == 1) {
+            if (templates[getTemplateId(serviceId)].fulfillmentOperator == 1) {
                 // OR operator (1 of M), N =1
                 require(N == 1, 'Indicating all fulfillment conditions are false');
             }
@@ -173,11 +173,11 @@ contract ServiceAgreement {
         bytes32 agreementHash = keccak256(abi.encodePacked(templateId, slaTemplate.conditionKeys, valueHashes, timeoutValues, serviceAgreementId));
         // verify consumer's signature and trigger the execution of agreement
         if (consumer == ECDSA.recover(ECDSA.toEthSignedMessageHash(agreementHash), signature)) {
-        agreements[serviceAgreementId] = Agreement (
-            false, true, false, new uint8[](0), new uint8[](0), templateId, consumer, msg.sender, new bytes32[](0), new uint256[](0), did
-        );
-        require(initConditions(templateId, serviceAgreementId, valueHashes, timeoutValues, did), 'unable to init conditions');
-        templateId2Agreements[templateId].push(serviceAgreementId);
+            agreements[serviceAgreementId] = Agreement(
+                false, true, false, new uint8[](0), new uint8[](0), templateId, consumer, msg.sender, new bytes32[](0), new uint256[](0), did
+            );
+            require(initConditions(templateId, serviceAgreementId, valueHashes, timeoutValues, did), 'unable to init conditions');
+            templateId2Agreements[templateId].push(serviceAgreementId);
             emit ExecuteAgreement(serviceAgreementId, templateId, did, false, slaTemplate.owner, consumer, true);
         } else {
             emit ExecuteAgreement(serviceAgreementId, templateId, did, false, slaTemplate.owner, consumer, false);
@@ -281,7 +281,7 @@ contract ServiceAgreement {
         return keccak256(abi.encodePacked(getTemplateId(serviceId), _contract, fingerprint));
     }
 
-    function isAgreementTerminated(bytes32 serviceAgreementId) public view returns(bool) {
+    function isAgreementTerminated(bytes32 serviceAgreementId) public view returns (bool) {
         return agreements[serviceAgreementId].terminated;
     }
 
