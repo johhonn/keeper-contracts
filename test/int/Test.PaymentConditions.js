@@ -81,6 +81,7 @@ contract('PaymentConditions', (accounts) => {
             const grantAccessHash = utils.valueHash(['bytes32', 'bytes32'], [asset, asset])
 
             hashes = [grantAccessHash, lockPaymentHash, releasePaymentHash]
+            await token.approve(paymentConditions.address, price, { from: consumer })
         })
 
         async function signAgreement(serviceAgreementId) {
@@ -140,7 +141,7 @@ contract('PaymentConditions', (accounts) => {
                 asset,
                 asset
             )
-
+            await token.approve(paymentConditions.address, price, { from: consumer })
             await paymentConditions.lockPayment(serviceId, asset, price)
             walletBalance += price
             assert.strictEqual(
@@ -174,6 +175,8 @@ contract('PaymentConditions', (accounts) => {
                 asset,
                 asset
             )
+
+            await token.approve(paymentConditions.address, price, { from: consumer })
             await paymentConditions.lockPayment(serviceId, asset, price)
             walletBalance += price
 
@@ -193,6 +196,7 @@ contract('PaymentConditions', (accounts) => {
                 asset,
                 asset
             )
+            await token.approve(paymentConditions.address, price, { from: consumer })
             await paymentConditions.lockPayment(serviceId, asset, price)
             walletBalance += price
 

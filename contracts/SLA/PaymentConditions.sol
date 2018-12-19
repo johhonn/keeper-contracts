@@ -47,6 +47,11 @@ contract PaymentConditions {
         uint256 amount
     );
 
+    /// @notice lockPayment is called by consumer.
+    /// @dev mainly it is part of escrow payment (a condition fulfillment function)
+    /// @param serviceId , service agreement instance ID
+    /// @param assetId , published or registered asset DID
+    /// @param price , asset price in OCN token
     function lockPayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
         require(serviceAgreementStorage.getAgreementConsumer(serviceId) == msg.sender, 'Only consumer can trigger lockPayment.');
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.lockPayment.selector);
@@ -59,12 +64,16 @@ contract PaymentConditions {
 
         bytes32 valueHash = keccak256(abi.encodePacked(assetId, price));
         require(serviceAgreementStorage.fulfillCondition(serviceId, this.lockPayment.selector, valueHash), 'unable to not lock payment because token transfer failed');
-        token.allowance(msg.sender, address(this));
         require(token.transferFrom(msg.sender, address(this), price), 'Can not lock payment');
         payments[serviceId] = Payment(msg.sender, address(this), price);
         emit PaymentLocked(serviceId, payments[serviceId].sender, payments[serviceId].receiver, payments[serviceId].amount);
     }
 
+    /// @notice releasePayment is called by anyone but mainly asset publisher.
+    /// @dev usually payment is released once the service agreement is fulfilled.
+    /// @param serviceId , service agreement instance ID
+    /// @param assetId , published or registered asset DID
+    /// @param price , asset price in OCN token
     function releasePayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
         require(serviceAgreementStorage.getAgreementPublisher(serviceId) == msg.sender, 'Only service agreement publisher can trigger releasePayment.');
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.releasePayment.selector);
@@ -80,6 +89,11 @@ contract PaymentConditions {
         emit PaymentReleased(serviceId, payments[serviceId].receiver, msg.sender, payments[serviceId].amount);
     }
 
+    /// @notice releasePayment is called by consumer.
+    /// @dev consumers are able to make refund in case of the service agreement is not fulfilled
+    /// @param serviceId , service agreement instance ID
+    /// @param assetId , published or registered asset DID
+    /// @param price , asset price in OCN token
     function refundPayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
         require(payments[serviceId].sender == msg.sender, 'Only consumer can trigger refundPayment.');
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.refundPayment.selector);
