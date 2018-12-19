@@ -10,10 +10,10 @@ const EthEcies = require('eth-ecies')
 const EthCrypto = require('eth-crypto')
 const EthjsUtil = require('ethereumjs-util')
 const ethers = require('ethers')
+const BigNumber = require('bignumber.js')
 const utils = require('../utils.js')
 
 const web3 = utils.getWeb3()
-const { BN } = web3.utils
 
 contract('OceanAuth', (accounts) => {
     const scale = 10 ** 18
@@ -34,16 +34,16 @@ contract('OceanAuth', (accounts) => {
             const resourceId = await market.generateId(web3.utils.fromAscii(str), { from: accounts[0] })
             const resourcePrice = 100 * scale
             // 1. provider register dataset
-            await market.register(resourceId, new BN(resourcePrice.toString()), { from: accounts[0] })
+            await market.register(resourceId, new BigNumber(resourcePrice), { from: accounts[0] })
             console.log('publisher registers asset with id = ', resourceId)
 
             // consumer accounts[1] request initial funds to play
             console.log(accounts[1])
-            await market.requestTokens(new BN((1000 * scale).toString()), { from: accounts[1] })
+            await market.requestTokens(new BigNumber(1000 * scale), { from: accounts[1] })
             const bal = await token.balanceOf.call(accounts[1])
             console.log(`consumer has balance := ${bal.valueOf() / scale} now`)
             // consumer approve market to withdraw amount of token from his account
-            await token.approve(market.address, new BN((300 * scale).toString()), { from: accounts[1] })
+            await token.approve(market.address, new BigNumber(300 * scale), { from: accounts[1] })
 
             // 2. consumer initiate an access request
             const key = EthCrypto.createIdentity()
