@@ -98,11 +98,13 @@ contract ServiceAgreement {
         _;
     }
 
+    // check if template id is not exist
     modifier isValidTemplateId(bytes32 templateId) {
         require(!templates[templateId].state, 'Template ID already exists');
         _;
     }
 
+    // check if the condition key is already exist on the service execution agreement instance
     modifier onlyExistConditionKey(bytes32 serviceAgreementId, bytes32 condition){
         require(templates[agreements[serviceAgreementId].templateId].conditionKeys[conditionKeyToIndex[condition]] == condition, 'Invalid condition key');
         _;
@@ -149,6 +151,7 @@ contract ServiceAgreement {
     /// @param hash , hash of the message
     /// @param signature , signed hash
     /// @param consumer , the consumer or the actor address
+    /// @return true if the signature is valid
     function isValidSignature(bytes32 hash, bytes signature, address consumer) public pure returns (bool){
         return (consumer == ECDSA.recover(hash, signature));
     }
@@ -161,6 +164,7 @@ contract ServiceAgreement {
     /// @param valueHash , the hash of all values in the DID document
     /// @param timeoutValues , time out values if exist (0 is default)
     /// @param did , registered DID document
+    /// @return true if the condition initialization goes well
     function initConditions(bytes32 templateId, bytes32 serviceAgreementId, bytes32[] valueHash, uint256[] timeoutValues, bytes32 did) private returns (bool) {
         for (uint256 i = 0; i < templates[templateId].conditionKeys.length; i++) {
             if (timeoutValues[i] != 0) {
@@ -196,6 +200,7 @@ contract ServiceAgreement {
     /// @param valueHashes , the hash of all values in the DID document
     /// @param timeoutValues , time values if exist (zero is the default value)
     /// @param serviceAgreementId , service agreement instance ID
+    /// @return true if the service execution template instantiation goes well
     function executeAgreement(bytes32 templateId, bytes signature, address consumer, bytes32[] valueHashes, uint256[] timeoutValues, bytes32 serviceAgreementId, bytes32 did) public
     isValidExecuteRequest(templateId, serviceAgreementId) returns (bool) {
         require(timeoutValues.length == templates[templateId].conditionKeys.length, 'invalid timeout values length');
@@ -215,6 +220,9 @@ contract ServiceAgreement {
         return true;
     }
 
+    /// @notice fulfillAgreement fulfils the agreement if all conditions are met
+    /// @param serviceId , service execution agreement instance ID
+    /// @return true if the all the conditions are met in a particular service execution agreement
     function fulfillAgreement(bytes32 serviceId) public noPendingFulfillments(serviceId) returns (bool){
         agreements[serviceId].state = true;
         agreements[serviceId].terminated = true;
@@ -222,6 +230,11 @@ contract ServiceAgreement {
         return true;
     }
 
+    /// @notice fulfillCondition fulfils condition if everything is valid
+    /// @param serviceId , service execution agreement instance ID
+    /// @param fingerprint , 4 bytes function selector (only solidity external/public functions)
+    /// @param valueHash , the keccak256 of the all values that have been used to fulfill the condition
+    /// @return true if the value hash and the condition key constructed using the right values
     function fulfillCondition(bytes32 serviceId, bytes4 fingerprint, bytes32 valueHash)
     public isValidControllerHandler(serviceId, fingerprint, valueHash) returns (bool){
         bytes32 conditionKey = keccak256(abi.encodePacked(agreements[serviceId].templateId, msg.sender, fingerprint));
@@ -240,9 +253,9 @@ contract ServiceAgreement {
     }
 
     /// @notice getBitValue is a utility function runs bitwise operation to extracts the condition parameter value
-    /// @param value ,
-    /// @param i ,
-    /// @param bitPosition ,
+    /// @param value , dependencies values
+    /// @param i , condition index
+    /// @param bitPosition , which bit position will be checked
     /// @param numBits , currently the number of bits used in this implementation is 2 but it might be extended in the future to hold more features
     function getBitValue(uint256 value, uint16 i, uint16 bitPosition, uint16 numBits) private pure returns (uint8 bitValue) {
         return uint8(value & (2 ** uint256((i * numBits) + bitPosition))) == 0 ? uint8(0) : uint8(1);
@@ -267,6 +280,7 @@ contract ServiceAgreement {
     /// @notice hasUnfulfilledDependencies returns true if all dependency conditions of this condition are fully fulfilled
     /// @param serviceId , service execution agreement instance ID
     /// @param condition , condition key (not condition instance)
+    /// @return true if all dependency conditions of this condition are fully fulfilled
     function hasUnfulfilledDependencies(bytes32 serviceId, bytes32 condition) public view returns (bool status) {
         uint dependenciesValue = templates[agreements[serviceId].templateId].dependenciesBits[conditionKeyToIndex[condition]];
         // check the dependency conditions
