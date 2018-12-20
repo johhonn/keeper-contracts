@@ -3,7 +3,7 @@
 /* global artifacts, assert, contract, describe, it */
 
 const ComputeConditions = artifacts.require('ComputeConditions.sol')
-const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
+const ServiceAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const utils = require('../utils.js')
 
 const web3 = utils.getWeb3()
@@ -46,8 +46,13 @@ contract('ComputeConditions', (accounts) => {
 
     async function initAgreement() {
         const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-        await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, dependenciesBits, templateId, [0], 0, { from: accounts[0] })
-        await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+        await agreement.setupTemplate(
+            templateId,
+            contracts,
+            fingerprints,
+            dependenciesBits,
+            [0], 0, { from: accounts[0] })
+        await agreement.executeServiceAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
     }
 
     beforeEach(async () => {
@@ -188,8 +193,12 @@ contract('ComputeConditions', (accounts) => {
         it('Should fulfill upload when hash is valid', async () => {
             // arrange
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            await agreement.setupTemplate(
+                templateId,
+                contracts,
+                fingerprints,
+                [0], [0], 0, { from: accounts[0] })
+            await agreement.executeServiceAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
             const hash = getMessageHash(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId)
             await contract.submitAlgorithmHash(serviceAgreementId, hash, { from: accounts[0] })
 
@@ -203,8 +212,12 @@ contract('ComputeConditions', (accounts) => {
         it('Should not when proof is valid', async () => {
             // arrange
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            await agreement.setupTemplate(
+                templateId,
+                contracts,
+                fingerprints,
+                [0], [0], 0, { from: accounts[0] })
+            await agreement.executeServiceAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
             const hash = getMessageHash(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId)
             await contract.submitAlgorithmHash(serviceAgreementId, hash, { from: accounts[0] })
             await contract.submitHashSignature(serviceAgreementId, signature, { from: consumer })

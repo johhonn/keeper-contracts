@@ -3,7 +3,7 @@
 /* global artifacts, assert, contract, describe, it */
 
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
-const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
+const ServiceAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 const utils = require('../utils.js')
 
@@ -60,8 +60,13 @@ contract('PaymentConditions', (accounts) => {
 
     async function initAgreement() {
         const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-        await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, dependenciesBits, templateId, [0], 0, { from: accounts[0] })
-        await agreement.executeAgreement(templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+        await agreement.setupTemplate(
+            templateId,
+            contracts,
+            fingerprints,
+            dependenciesBits,
+            [0], 0, { from: accounts[0] })
+        await agreement.executeServiceAgreement(templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
     }
 
     beforeEach(async () => {

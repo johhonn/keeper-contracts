@@ -3,7 +3,7 @@
 const AccessConditions = artifacts.require('AccessConditions.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
-const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
+const ServiceAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const utils = require('../utils.js')
 
 const web3 = utils.getWeb3()
@@ -65,12 +65,11 @@ contract('PaymentConditions', (accounts) => {
             const fulfillmentIndices = [0] // Root Condition
             const fulfilmentOperator = 0 // AND
 
-            const result = await agreement.setupAgreementTemplate(
+            const result = await agreement.setupTemplate(
                 serviceTemplateId,
                 contracts,
                 fingerprints,
                 dependencies,
-                web3.utils.fromAscii('test-payment-conditions'),
                 fulfillmentIndices,
                 fulfilmentOperator
             )
@@ -92,7 +91,7 @@ contract('PaymentConditions', (accounts) => {
                 serviceAgreementId
             )
             signature = await web3.eth.sign(hash, consumer)
-            const result = await agreement.executeAgreement(
+            const result = await agreement.executeServiceAgreement(
                 templateId,
                 signature,
                 consumer,

@@ -3,14 +3,14 @@
 
 const OceanToken = artifacts.require('OceanToken.sol')
 const OceanMarket = artifacts.require('OceanMarket.sol')
-const SLA = artifacts.require('ServiceAgreement.sol')
+const SLA = artifacts.require('ServiceExecutionAgreement.sol')
 const PaymentCtrl = artifacts.require('PaymentConditions.sol')
 const AccessCtrl = artifacts.require('AccessConditions.sol')
 const testUtils = require('../utils')
 
 const web3 = testUtils.getWeb3()
 
-contract('ServiceAgreement', (accounts) => {
+contract('ServiceExecutionAgreement', (accounts) => {
     describe('Test On-chain Authorization', () => {
         let token, market, sla, paymentConditions, accessConditions, resourceId, valuesHashList, serviceId, conditionKeys, templateId
 
@@ -57,13 +57,17 @@ contract('ServiceAgreement', (accounts) => {
                 testUtils.valueHash(['bytes32', 'uint256'], [resourceId, resourcePrice])]
             console.log('conditions control contracts', contracts)
             console.log('functions: ', funcFingerPrints, valuesHashList)
-            const setupTx = await sla.setupAgreementTemplate(
-                serviceTemplateId, contracts, funcFingerPrints, dependencies,
-                web3.utils.fromAscii(serviceName), fulfillmentIndices,
-                fulfilmentOperator, fromProvider
+            const setupTx = await sla.setupTemplate(
+                serviceTemplateId,
+                contracts,
+                funcFingerPrints,
+                dependencies,
+                fulfillmentIndices,
+                fulfilmentOperator,
+                fromProvider
             )
-            // Grab `SetupAgreementTemplate` event to fetch the serviceTemplateId
-            templateId = testUtils.getEventArgsFromTx(setupTx, 'SetupAgreementTemplate').serviceTemplateId
+            // Grab `TemplateSetup` event to fetch the serviceTemplateId
+            templateId = testUtils.getEventArgsFromTx(setupTx, 'TemplateSetup').serviceTemplateId
 
             // console.log('templateid: ', templateId)
             conditionKeys = testUtils.generateConditionsKeys(templateId, contracts, funcFingerPrints)

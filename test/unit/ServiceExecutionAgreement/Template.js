@@ -29,7 +29,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
         serviceAgreementId = utils.generateId(web3)
     })
 
-    describe('setupAgreementTemplate', () => {
+    describe('setupTemplate', () => {
         it('Should setup agreement without contracts', async () => {
             // act
             const result = await contract.setupTemplate(

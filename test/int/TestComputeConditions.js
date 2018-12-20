@@ -3,7 +3,7 @@
 
 const OceanToken = artifacts.require('OceanToken.sol')
 const OceanMarket = artifacts.require('OceanMarket.sol')
-const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
+const ServiceAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const AccessConditions = artifacts.require('AccessConditions.sol')
 const ComputeConditions = artifacts.require('ComputeConditions.sol')
@@ -52,12 +52,15 @@ contract('ComputeConditions', (accounts) => {
                 testUtils.valueHash(['bytes32', 'uint256'], [did, price])
             ]
             // create new on-premise compute template
-            const createAgreementTemplate = await serviceAgreement.setupAgreementTemplate(
-                serviceTemplateId, contracts, funcFingerPrints, dependencies,
-                web3.utils.fromAscii('on-premise-compute'), fulfillmentIndices,
+            const createAgreementTemplate = await serviceAgreement.setupTemplate(
+                serviceTemplateId,
+                contracts,
+                funcFingerPrints,
+                dependencies,
+                fulfillmentIndices,
                 fulfilmentOperator, { from: publisher }
             )
-            templateId = testUtils.getEventArgsFromTx(createAgreementTemplate, 'SetupAgreementTemplate').serviceTemplateId
+            templateId = testUtils.getEventArgsFromTx(createAgreementTemplate, 'TemplateSetup').serviceTemplateId
             // create new agreement instance
 
             conditionKeys = testUtils.generateConditionsKeys(templateId, contracts, funcFingerPrints)

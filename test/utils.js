@@ -148,7 +148,7 @@ const utils = {
     },
 
     signAgreement: async (agreement, templateId, signature, consumer, hashes, timeouts, serviceAgreementId, did, args = {}) => {
-        const result = await agreement.executeAgreement(
+        const result = await agreement.executeServiceAgreement(
             templateId,
             signature,
             consumer,
@@ -160,7 +160,7 @@ const utils = {
         )
 
         return result.logs.filter((log) => {
-            return log.event === 'ExecuteAgreement'
+            return log.event === 'ServiceAgreementExecuted'
         })[0].args.serviceAgreementId
     },
     sleep: (millis) => {

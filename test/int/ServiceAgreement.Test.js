@@ -1,7 +1,7 @@
 /* global artifacts, assert, contract, describe, it */
 /* eslint-disable no-console, max-len */
 
-const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
+const ServiceAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const abi = require('ethereumjs-abi')
 const utils = require('../utils')
 
@@ -91,12 +91,11 @@ contract('SLA', (accounts) => {
             const fingerprints = [fingerprint1, fingerprint2, fingerprint3, fingerprint4]
             // setup service level agreement template
             console.log('\t >> Create service level agreement template')
-            const result = await sla.setupAgreementTemplate(
+            const result = await sla.setupTemplate(
                 serviceTemplateId,
                 contracts,
                 fingerprints,
                 dependencies,
-                serviceTemplateId,
                 [0], 0,
                 { from: SLATemplateOwner })
 
@@ -131,7 +130,7 @@ contract('SLA', (accounts) => {
             const serviceAgreementId = utils.generateId(web3)
             const hash = utils.createSLAHash(web3, templateId, condKeys, valHashList, timeoutValues, serviceAgreementId)
             const signature = await web3.eth.sign(hash, consumer)
-            const val = await sla.executeAgreement(templateId, signature, consumer, [ valHashList[0], valHashList[1], valHashList[2], valHashList[3] ], timeoutValues, serviceAgreementId, did, { from: SLATemplateOwner })
+            const val = await sla.executeServiceAgreement(templateId, signature, consumer, [ valHashList[0], valHashList[1], valHashList[2], valHashList[3] ], timeoutValues, serviceAgreementId, did, { from: SLATemplateOwner })
             assert.strictEqual(val.logs[4].args.serviceAgreementId, serviceAgreementId, 'Execute Agreement event not emitted.')
             console.log('\x1b[36m%s\x1b[0m', '\t >> Service Agreement ID: ', val.logs[4].args.serviceAgreementId, ' ... Done!')
 

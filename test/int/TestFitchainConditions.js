@@ -3,7 +3,7 @@
 
 const OceanToken = artifacts.require('OceanToken.sol')
 const OceanMarket = artifacts.require('OceanMarket.sol')
-const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
+const ServiceAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const FitchainConditions = artifacts.require('FitchainConditions.sol')
 const testUtils = require('../utils')
@@ -64,12 +64,15 @@ contract('FitchainConditions', (accounts) => {
                 testUtils.valueHash(['bytes32', 'uint256'], [did, price])
             ]
             // create new on-premise compute template
-            const createAgreementTemplate = await serviceAgreement.setupAgreementTemplate(
-                serviceTemplateId, contracts, fingerPrints, dependencies,
-                web3.utils.fromAscii('fitchain'), fulfillmentIndices,
+            const createAgreementTemplate = await serviceAgreement.setupTemplate(
+                serviceTemplateId,
+                contracts,
+                fingerPrints,
+                dependencies,
+                fulfillmentIndices,
                 fulfilmentOperator, { from: publisher }
             )
-            templateId = testUtils.getEventArgsFromTx(createAgreementTemplate, 'SetupAgreementTemplate').serviceTemplateId
+            templateId = testUtils.getEventArgsFromTx(createAgreementTemplate, 'TemplateSetup').serviceTemplateId
             // create new agreement instance
             conditionKeys = testUtils.generateConditionsKeys(templateId, contracts, fingerPrints)
             slaMsgHash = testUtils.createSLAHash(web3, templateId, conditionKeys, valuesHashList, timeouts, serviceAgreementId)
