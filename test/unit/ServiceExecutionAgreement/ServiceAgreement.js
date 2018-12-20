@@ -296,8 +296,8 @@ contract('ServiceExecutionAgreement', (accounts) => {
             utils.assertEmitted(result, 1, 'ServiceAgreementFulfilled')
             const isTerminated = await contract.isServiceAgreementTerminated(serviceAgreementId, { from: accounts[0] })
             assert.strictEqual(isTerminated, true)
-            const agreementState = await contract.getServiceAgreementState(serviceAgreementId, { from: accounts[0] })
-            assert.strictEqual(agreementState, true)
+            const agreementAvailable = await contract.isServiceAgreementAvailable(serviceAgreementId, { from: accounts[0] })
+            assert.strictEqual(agreementAvailable, true)
         })
 
         it('Should not fulfill agreement with pending conditions', async () => {

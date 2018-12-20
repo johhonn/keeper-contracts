@@ -432,13 +432,6 @@ contract ServiceExecutionAgreement {
         return serviceAgreements[serviceAgreementId].isTerminated;
     }
 
-    /// @notice deprecated use isServiceAgreementAvailable instead
-    function getServiceAgreementState(bytes32 serviceAgreementId)
-    public view
-    returns (bool state){
-        return isServiceAgreementAvailable(serviceAgreementId);
-    }
-
     function isServiceAgreementAvailable(bytes32 serviceAgreementId)
     public view
     returns (bool isAvailable){
