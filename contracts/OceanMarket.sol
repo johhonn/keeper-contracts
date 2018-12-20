@@ -5,10 +5,9 @@ import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
 import './token/OceanToken.sol';
 
-/**
-@title Ocean Protocol Marketplace Contract
-@author Team: Fang Gong, Samer Sallam, Ahmed Ali, Sebastian Gerske
-*/
+/// @title Ocean Protocol Marketplace Contract
+/// @author Ocean Protocol Team
+
 
 contract OceanMarket is Ownable {
 
@@ -78,11 +77,9 @@ contract OceanMarket is Ownable {
         _;
     }
 
-    /**
-    * @dev OceanMarket Constructor
-    * @param _tokenAddress The deployed contract address of OceanToken
-    * Runs only on initial contract creation.
-    */
+    /// @dev OceanMarket Constructor
+    /// @param _tokenAddress The deployed contract address of OceanToken
+    /// Runs only on initial contract creation.
     constructor(address _tokenAddress) public {
         require(_tokenAddress != address(0x0), 'Token address is 0x0.');
         // instantiate Ocean token contract
@@ -91,12 +88,10 @@ contract OceanMarket is Ownable {
         mToken.setReceiver(address(this));
     }
 
-    /**
-    * @dev provider register the new asset
-    * @param assetId the integer identifier of new asset
-    * @param price the integer representing price of new asset
-    * @return valid Boolean indication of registration of new asset
-    */
+    /// @dev provider register the new asset
+    /// @param assetId the integer identifier of new asset
+    /// @param price the integer representing price of new asset
+    /// @return valid Boolean indication of registration of new asset
     function register(bytes32 assetId, uint256 price) public validAddress(msg.sender) returns (bool success) {
         require(mAssets[assetId].owner == address(0), 'Owner address is not 0x0.');
         mAssets[assetId] = Asset(msg.sender, price, false);
@@ -106,14 +101,12 @@ contract OceanMarket is Ownable {
         return true;
     }
 
-    /**
-    * @dev sender tranfer payment to OceanMarket contract
-    * @param _paymentId the integer identifier of payment
-    * @param _receiver the address of receiver
-    * @param _amount the payment amount
-    * @param _expire the expiration time in seconds
-    * @return valid Boolean indication of payment is transferred
-    */
+    /// @dev sender tranfer payment to OceanMarket contract
+    /// @param _paymentId the integer identifier of payment
+    /// @param _receiver the address of receiver
+    /// @param _amount the payment amount
+    /// @param _expire the expiration time in seconds
+    /// @return valid Boolean indication of payment is transferred
     function sendPayment(
         bytes32 _paymentId,
         address _receiver,
@@ -127,11 +120,9 @@ contract OceanMarket is Ownable {
         return true;
     }
 
-    /**
-    * @dev the consumer release payment to receiver
-    * @param _paymentId the integer identifier of payment
-    * @return valid Boolean indication of payment is released
-    */
+    /// @dev the consumer release payment to receiver
+    /// @param _paymentId the integer identifier of payment
+    /// @return valid Boolean indication of payment is released
     function releasePayment(bytes32 _paymentId) public isLocked(_paymentId) isAuthContract() returns (bool) {
         // update state to avoid re-entry attack
         mPayments[_paymentId].state = PaymentState.Released;
@@ -140,11 +131,9 @@ contract OceanMarket is Ownable {
         return true;
     }
 
-    /**
-    * @dev the consumer get refunded payment from OceanMarket contract
-    * @param _paymentId the integer identifier of payment
-    * @return valid Boolean indication of payment is refunded
-    */
+    /// @dev the consumer get refunded payment from OceanMarket contract
+    /// @param _paymentId the integer identifier of payment
+    /// @return valid Boolean indication of payment is refunded
     function refundPayment(bytes32 _paymentId) public isLocked(_paymentId) isAuthContract() returns (bool) {
         // refund payment to consumer
         mPayments[_paymentId].state = PaymentState.Refunded;
@@ -153,11 +142,9 @@ contract OceanMarket is Ownable {
         return true;
     }
 
-    /**
-    * @dev verify the payment of consumer is received by OceanMarket
-    * @param _paymentId the integer identifier of payment
-    * @return valid Boolean indication of payment is received
-    */
+    /// @dev verify the payment of consumer is received by OceanMarket
+    /// @param _paymentId the integer identifier of payment
+    /// @return valid Boolean indication of payment is received
     function verifyPaymentReceived(bytes32 _paymentId) public view returns (bool) {
         if (mPayments[_paymentId].state == PaymentState.Locked) {
             return true;
@@ -165,11 +152,9 @@ contract OceanMarket is Ownable {
         return false;
     }
 
-    /**
-    * @dev user can request some tokens for testing
-    * @param amount the amount of tokens to be requested
-    * @return valid Boolean indication of tokens are requested
-    */
+    /// @dev user can request some tokens for testing
+    /// @param amount the amount of tokens to be requested
+    /// @return valid Boolean indication of tokens are requested
     function requestTokens(uint256 amount) public validAddress(msg.sender) returns (bool) {
         /* solium-disable-next-line security/no-block-members */
         if (block.timestamp < tokenRequest[msg.sender] + minPeriod) {
@@ -188,11 +173,9 @@ contract OceanMarket is Ownable {
         return true;
     }
 
-    /**
-    * @dev Owner can limit the amount and time for token request in Testing
-    * @param _amount the max amount of tokens that can be requested
-    * @param _period the min amount of time before next request
-    */
+    /// @dev Owner can limit the amount and time for token request in Testing
+    /// @param _amount the max amount of tokens that can be requested
+    /// @param _period the min amount of time before next request
     function limitTokenRequest(uint _amount, uint _period) public onlyOwner() {
         // set min period of time before next request (in seconds)
         minPeriod = _period;
@@ -200,21 +183,17 @@ contract OceanMarket is Ownable {
         maxAmount = _amount;
     }
 
-    /**
-    * @dev OceanRegistry changes the asset status according to the voting result
-    * @param assetId the integer identifier of asset in the voting
-    * @return valid Boolean indication of asset is whitelisted
-    */
+    /// @dev OceanRegistry changes the asset status according to the voting result
+    /// @param assetId the integer identifier of asset in the voting
+    /// @return valid Boolean indication of asset is whitelisted
     function deactivateAsset(bytes32 assetId) public returns (bool){
         // disable asset if it is not whitelisted in the registry
         mAssets[assetId].active = false;
         return true;
     }
 
-    /**
-    * @dev OceanMarket add the deployed address of OceanAuth contract
-    * @return valid Boolean indication of contract address is updated
-    */
+    /// @dev OceanMarket add the deployed address of OceanAuth contract
+    /// @return valid Boolean indication of contract address is updated
     function addAuthAddress() public validAddress(msg.sender) returns (bool) {
         // authAddress can only be set at deployment of Auth contract - only once
         require(authAddress == address(0), 'authAddress is not 0x0');
@@ -222,42 +201,33 @@ contract OceanMarket is Ownable {
         return true;
     }
 
-    /**
-    * @dev OceanMarket generates bytes32 identifier for asset
-    * @param contents the meta data information of asset as string
-    * @return bytes32 as the identifier of asset
-    */
+    /// @dev OceanMarket generates bytes32 identifier for asset
+    /// @param contents the meta data information of asset as string
+    /// @return bytes32 as the identifier of asset
     function generateId(string contents) public pure returns (bytes32) {
         // Generate the hash of input string
         return bytes32(keccak256(abi.encodePacked(contents)));
     }
 
-    /**
-    * @dev OceanMarket generates bytes32 identifier for asset
-    * @param contents the meta data information of asset as bytes
-    * @return bytes32 as the identifier of asset
-    */
+    /// @dev OceanMarket generates bytes32 identifier for asset
+    /// @param contents the meta data information of asset as bytes
+    /// @return bytes32 as the identifier of asset
     function generateId(bytes contents) public pure returns (bytes32) {
         // Generate the hash of input bytes
         return bytes32(keccak256(abi.encodePacked(contents)));
     }
 
-    /**
-    * @dev OceanMarket check status of asset
-    * @param assetId the integer identifier of asset
-    * @return valid Boolean indication of asset is active or not
-    */
+    /// @dev OceanMarket check status of asset
+    /// @param assetId the integer identifier of asset
+    /// @return valid Boolean indication of asset is active or not
     function checkAsset(bytes32 assetId) public view returns (bool) {
         return mAssets[assetId].active;
     }
 
-    /**
-    * @dev OceanMarket check price of asset
-    * @param assetId the integer identifier of asset
-    * @return integer as price of asset
-    */
+    /// @dev OceanMarket check price of asset
+    /// @param assetId the integer identifier of asset
+    /// @return integer as price of asset
     function getAssetPrice(bytes32 assetId) public view returns (uint256) {
         return mAssets[assetId].price;
     }
-
 }
