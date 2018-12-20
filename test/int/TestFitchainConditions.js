@@ -3,7 +3,7 @@
 
 const OceanToken = artifacts.require('OceanToken.sol')
 const OceanMarket = artifacts.require('OceanMarket.sol')
-const ServiceAgreement = artifacts.require('ServiceExecutionAgreement.sol')
+const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const FitchainConditions = artifacts.require('FitchainConditions.sol')
 const testUtils = require('../utils')
@@ -33,10 +33,10 @@ contract('FitchainConditions', (accounts) => {
         GPCVerifiers = []
         VPCVerifiers = []
         before(async () => {
-            token = await OceanToken.deployed()
-            market = await OceanMarket.deployed(token.address)
-            serviceAgreement = await ServiceAgreement.deployed()
-            paymentConditions = await PaymentConditions.deployed(serviceAgreement.address, token.address)
+            serviceAgreement = await ServiceExecutionAgreement.new({ from: accounts[0] })
+            token = await OceanToken.new({ from: accounts[0] })
+            market = await OceanMarket.new(token.address, { from: accounts[0] })
+            paymentConditions = await PaymentConditions.new(serviceAgreement.address, token.address, { from: accounts[0] })
             fitchainConditions = await FitchainConditions.new(serviceAgreement.address, price, slots)
 
             await market.requestTokens(testUtils.toBigNumber(1000), { from: consumer })

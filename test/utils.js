@@ -22,7 +22,7 @@ const utils = {
     ),
 
     getWeb3: () => {
-        const nodeUrl = `http://localhost:${process.env.PORT ? process.env.PORT : '8545'}`
+        const nodeUrl = 'http://localhost:8545'
         return new Web3(new Web3.providers.HttpProvider(nodeUrl))
     },
 

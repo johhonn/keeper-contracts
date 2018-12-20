@@ -1,7 +1,7 @@
-/* global artifacts, assert, contract, describe, it */
+/* global artifacts, assert, contract, describe, it, before */
 /* eslint-disable no-console, max-len */
 
-const ServiceAgreement = artifacts.require('ServiceExecutionAgreement.sol')
+const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const abi = require('ethereumjs-abi')
 const utils = require('../utils')
 
@@ -37,9 +37,15 @@ function sleep(millis) {
 }
 
 contract('SLA', (accounts) => {
+    let sla
+
+    before(async () => {
+        sla = await ServiceExecutionAgreement.new({ from: accounts[0] })
+        /* eslint-disable-next-line prefer-destructuring */
+    })
+
     describe('Test Service Level Agreement', () => {
         it('should be able to run through the full lifecycle of fulfilling SLA', async () => {
-            const sla = await ServiceAgreement.deployed()
             const consumer = accounts[0]
             const SLATemplateOwner = accounts[1]
 
@@ -197,12 +203,12 @@ contract('SLA', (accounts) => {
             }
 
             console.info('\t >> fulfill agreement')
-            const fulfilled = await sla.fulfillAgreement(serviceAgreementId, { from: accounts[8] })
+            const fulfilled = await sla.fulfillServiceAgreement(serviceAgreementId, { from: accounts[8] })
             console.log('\t >> Agreement ', fulfilled.logs[0].args.serviceAgreementId, ' has been fulfilled')
 
             console.log('\t >> Fulfill agreement: ', serviceAgreementId)
             try {
-                await sla.fulfillAgreement(serviceAgreementId, { from: accounts[8] })
+                await sla.fulfillServiceAgreement(serviceAgreementId, { from: accounts[8] })
                 console.log('\t >> Done!')
             } catch (error) {
                 console.log('\t >> Unable to fulfill agreement!')

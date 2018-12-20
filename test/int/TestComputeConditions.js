@@ -3,7 +3,7 @@
 
 const OceanToken = artifacts.require('OceanToken.sol')
 const OceanMarket = artifacts.require('OceanMarket.sol')
-const ServiceAgreement = artifacts.require('ServiceExecutionAgreement.sol')
+const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const AccessConditions = artifacts.require('AccessConditions.sol')
 const ComputeConditions = artifacts.require('ComputeConditions.sol')
@@ -28,12 +28,12 @@ contract('ComputeConditions', (accounts) => {
         const algorithm = 'THIS IS FAKE CODE foo=Hello World!'
 
         before(async () => {
-            token = await OceanToken.deployed()
-            market = await OceanMarket.deployed(token.address)
-            serviceAgreement = await ServiceAgreement.deployed()
-            paymentConditions = await PaymentConditions.deployed(serviceAgreement.address, token.address)
-            accessConditions = await AccessConditions.deployed(serviceAgreement.address)
-            computeConditions = await ComputeConditions.deployed(serviceAgreement.address)
+            serviceAgreement = await ServiceExecutionAgreement.new({ from: accounts[0] })
+            token = await OceanToken.new({ from: accounts[0] })
+            market = await OceanMarket.new(token.address, { from: accounts[0] })
+            paymentConditions = await PaymentConditions.new(serviceAgreement.address, token.address, { from: accounts[0] })
+            accessConditions = await AccessConditions.new(serviceAgreement.address, { from: accounts[0] })
+            computeConditions = await ComputeConditions.new(serviceAgreement.address, { from: accounts[0] })
             await market.requestTokens(testUtils.toBigNumber(1000), { from: datascientist })
             // conditions
             contracts = [paymentConditions.address, computeConditions.address, accessConditions.address, paymentConditions.address, paymentConditions.address]
@@ -116,8 +116,8 @@ contract('ComputeConditions', (accounts) => {
         })
 
         it('Service agreement should be fulfilled', async () => {
-            await serviceAgreement.fulfillAgreement(serviceAgreementId, { from: publisher })
-            const agreementTerminated = await serviceAgreement.isAgreementTerminated(serviceAgreementId, { from: publisher })
+            await serviceAgreement.fulfillServiceAgreement(serviceAgreementId, { from: publisher })
+            const agreementTerminated = await serviceAgreement.isServiceAgreementTerminated(serviceAgreementId, { from: publisher })
             assert.strictEqual(agreementTerminated, true, 'Error: unable to fulfill or terminate the agreement')
         })
     })
