@@ -10,7 +10,7 @@ import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
 contract ServiceExecutionAgreement {
 
     struct Template {
-        bool state; // 1 -> Available 0 -> revoked template
+        bool isAvailable; // 1 -> Available 0 -> revoked template
         address owner; // template owner
         bytes32[] conditionKeys; // preserving the order in the condition state
         uint256[] dependenciesBits; // 1st bit --> dependency, 2nd bit --> timeout flag (enabled/disabled)
@@ -18,13 +18,13 @@ contract ServiceExecutionAgreement {
         uint8 fulfillmentOperator; // 0 --> AND, 1--> OR, N--> M-of-N
     }
 
-    mapping(bytes32 => Template) templates;
+    mapping(bytes32 => Template) private templates;
     // instances of SLA template
 
     struct ServiceAgreement {
-        bool state; // instance of SLA status
-        bool nonce; // avoid replay attack
-        bool terminated;
+        bool isAvailable; // instance of SLA status
+        bool isExisting; // avoid replay attack
+        bool isTerminated; // is this service agreement terminated or not
         uint8[] conditionsState; // maps the condition status in the template
         uint8[] conditionLockedState; // maps the condition status in the template
         bytes32 templateId; // refers to SLA template id
@@ -35,21 +35,21 @@ contract ServiceExecutionAgreement {
         bytes32 did; // Decentralized Identifier
     }
 
-    mapping(bytes32 => ServiceAgreement) serviceAgreements;
+    mapping(bytes32 => ServiceAgreement) private serviceAgreements;
 
     // map template Id to a list of agreement instances
-    mapping(bytes32 => bytes32[]) templateIdToServiceAgreements;
+    mapping(bytes32 => bytes32[]) private templateIdToServiceAgreements;
 
     // conditions id (templateId, contract address , function fingerprint)
     // it maps condition id to dependencies [uint256 is a compressed version]
-    mapping(bytes32 => uint256) conditionKeyToIndex;
+    mapping(bytes32 => uint256) private conditionKeyToIndex;
 
     // is able to revoke agreement template (template is no longer accessible)
     modifier canRevokeTemplate(bytes32 templateId){
         bytes32[] storage serviceAgreementIds = templateIdToServiceAgreements[templateId];
         for (uint256 i = 0; i < serviceAgreementIds.length; i++) {
             require(
-                serviceAgreements[serviceAgreementIds[i]].state == true,
+                serviceAgreements[serviceAgreementIds[i]].isAvailable == true,
                 'Owner can not revoke template!');
         }
         _;
@@ -123,17 +123,17 @@ contract ServiceExecutionAgreement {
     modifier isValidExecuteRequest(bytes32 templateId,
                                    bytes32 serviceAgreementId) {
         require(
-            templates[templateId].state == true,
+            templates[templateId].isAvailable == true,
             'Template is revoked');
         require(
-            !serviceAgreements[serviceAgreementId].nonce,
-            'Indicating Replay attack');
+            !serviceAgreements[serviceAgreementId].isExisting,
+            'Service Agreement ist already existing, Indicating Replay attack');
         _;
     }
 
     modifier isValidTemplateId(bytes32 templateId) {
         require(
-            !templates[templateId].state,
+            !templates[templateId].isAvailable,
             'Template ID already exists');
         _;
     }
@@ -155,7 +155,7 @@ contract ServiceExecutionAgreement {
 
     event TemplateRevoked(
         bytes32 templateId,
-        bool state);
+        bool isAvailable);
 
     event ConditionSetup(
         bytes32 serviceTemplate,
@@ -196,7 +196,7 @@ contract ServiceExecutionAgreement {
                            uint8[] fulfillmentIndices,
                            uint8 fulfillmentOperator)
     public isValidTemplateId(templateId)
-    returns (bool){
+    returns (bool templateSetup){
         // TODO: whitelisting the contracts/fingerprints
         require(
             contracts.length == fingerprints.length,
@@ -231,9 +231,10 @@ contract ServiceExecutionAgreement {
 
     function revokeTemplate(bytes32 templateId)
     public isTemplateOwner(templateId) canRevokeTemplate(templateId)
-    returns (bool) {
-        templates[templateId].state = false;
+    returns (bool templateRevoked) {
+        templates[templateId].isAvailable = false;
         emit TemplateRevoked(templateId, true);
+        return true;
     }
 
     function getTemplateOwner(bytes32 templateId)
@@ -248,10 +249,17 @@ contract ServiceExecutionAgreement {
         return serviceAgreements[serviceAgreementId].templateId;
     }
 
+    /// @notice deprecated use isTemplateAvailable instead
     function getTemplateStatus(bytes32 templateId)
     public view
     returns (bool status){
-        return templates[templateId].state;
+        return isTemplateAvailable(templateId);
+    }
+
+    function isTemplateAvailable(bytes32 templateId)
+    public view
+    returns (bool status){
+        return templates[templateId].isAvailable;
     }
 
     function initConditions(bytes32 templateId,
@@ -260,7 +268,7 @@ contract ServiceExecutionAgreement {
                             uint256[] timeoutValues,
                             bytes32 did)
     private
-    returns (bool) {
+    returns (bool conditionInitiated) {
         ServiceAgreement storage serviceAgreement = serviceAgreements[serviceAgreementId];
 
         for (uint256 i = 0; i < templates[templateId].conditionKeys.length; i++) {
@@ -297,7 +305,7 @@ contract ServiceExecutionAgreement {
     function hashCondition(bytes32 conditionKey,
                            bytes32 valueHash)
     public pure
-    returns (bytes32){
+    returns (bytes32 conditionHash){
         return keccak256(abi.encodePacked(conditionKey, valueHash));
     }
 
@@ -305,7 +313,7 @@ contract ServiceExecutionAgreement {
                                   address contractAddress,
                                   bytes4 fingerprint)
     public pure
-    returns (bytes32){
+    returns (bytes32 conditionKey){
         return keccak256(abi.encodePacked(templateId, contractAddress, fingerprint));
     }
 
@@ -313,7 +321,7 @@ contract ServiceExecutionAgreement {
                                        address contractAddress,
                                        bytes4 fingerprint)
     public view
-    returns (bytes32) {
+    returns (bytes32 conditionKey) {
         return generateConditionKey(
             getTemplateId(serviceAgreementId),
             contractAddress,
@@ -323,7 +331,7 @@ contract ServiceExecutionAgreement {
     function getConditionStatus(bytes32 serviceAgreementId,
                                 bytes32 condition)
     public onlyExistConditionKey(serviceAgreementId, condition) view
-    returns (uint8){
+    returns (uint8 conditionStatus){
         return serviceAgreements[serviceAgreementId]
             .conditionsState[conditionKeyToIndex[condition]];
     }
@@ -336,7 +344,7 @@ contract ServiceExecutionAgreement {
                                      bytes32 serviceAgreementId,
                                      bytes32 did)
     public isValidExecuteRequest(templateId, serviceAgreementId)
-    returns (bool) {
+    returns (bool serviceAgreementExecuted) {
         require(
             timeoutValues.length == templates[templateId].conditionKeys.length,
             'invalid timeout values length');
@@ -392,10 +400,10 @@ contract ServiceExecutionAgreement {
 
     function fulfillServiceAgreement(bytes32 serviceAgreementId)
     public noPendingFulfillments(serviceAgreementId)
-    returns (bool){
+    returns (bool serviceAgreementFulfilled){
         ServiceAgreement storage serviceAgreement = serviceAgreements[serviceAgreementId];
-        serviceAgreement.state = true;
-        serviceAgreement.terminated = true;
+        serviceAgreement.isAvailable = true;
+        serviceAgreement.isTerminated = true;
         emit ServiceAgreementFulfilled(
             serviceAgreementId,
             serviceAgreement.templateId,
@@ -409,7 +417,7 @@ contract ServiceExecutionAgreement {
                                   uint256[] timeoutValues,
                                   bytes32 serviceAgreementId)
     public pure
-    returns (bytes32){
+    returns (bytes32 serviceAgreementHash){
         return keccak256(abi.encodePacked(
             templateId,
             conditionKeys,
@@ -420,14 +428,21 @@ contract ServiceExecutionAgreement {
 
     function isServiceAgreementTerminated(bytes32 serviceAgreementId)
     public view
-    returns(bool) {
-        return serviceAgreements[serviceAgreementId].terminated;
+    returns(bool isTerminated) {
+        return serviceAgreements[serviceAgreementId].isTerminated;
     }
 
+    /// @notice deprecated use isServiceAgreementAvailable instead
     function getServiceAgreementState(bytes32 serviceAgreementId)
     public view
-    returns (bool){
-        return serviceAgreements[serviceAgreementId].state;
+    returns (bool state){
+        return isServiceAgreementAvailable(serviceAgreementId);
+    }
+
+    function isServiceAgreementAvailable(bytes32 serviceAgreementId)
+    public view
+    returns (bool isAvailable){
+        return serviceAgreements[serviceAgreementId].isAvailable;
     }
 
     function getServiceAgreementPublisher(bytes32 serviceAgreementId)
@@ -448,7 +463,7 @@ contract ServiceExecutionAgreement {
     public isValidControllerHandler(serviceAgreementId,
                                     fingerprint,
                                     valueHash)
-    returns (bool){
+    returns (bool isConditionFulfilled){
 
         ServiceAgreement storage serviceAgreement = serviceAgreements[serviceAgreementId];
         bytes32 conditionKey = generateConditionKey(serviceAgreement.templateId, msg.sender, fingerprint);
@@ -489,15 +504,17 @@ contract ServiceExecutionAgreement {
     function hasUnfulfilledDependencies(bytes32 serviceAgreementId,
                                         bytes32 condition)
     public view
-    returns (bool status) {
+    returns (bool) {
         ServiceAgreement storage serviceAgreement = serviceAgreements[serviceAgreementId];
         Template storage template = templates[serviceAgreement.templateId];
         uint dependenciesValue = template
             .dependenciesBits[conditionKeyToIndex[condition]];
+
         // check the dependency conditions
         if (dependenciesValue == 0) {
             return false;
         }
+
         for (uint16 i = 0; i < template.conditionKeys.length; i++) {
             if (getBitValue(dependenciesValue, i, 0, 2) != 0) {
                 uint8 timeoutFlag = getBitValue(dependenciesValue, i, 1, 2);
@@ -516,7 +533,7 @@ contract ServiceExecutionAgreement {
 
     function conditionTimedOut(bytes32 serviceAgreementId, bytes32 condition)
     public view
-    returns (bool){
+    returns (bool timedOut){
         if (block.timestamp > serviceAgreements[serviceAgreementId]
             .timeoutValues[conditionKeyToIndex[condition]])
             return true;
@@ -525,26 +542,25 @@ contract ServiceExecutionAgreement {
 
     function getCurrentBlockNumber()
     public view
-    returns (uint){
+    returns (uint blockNumber){
         return block.number;
     }
 
     function prefixHash(bytes32 hash)
     public pure
-    returns (bytes32){
+    returns (bytes32 prefixedHash){
         return ECDSA.toEthSignedMessageHash(hash);
     }
 
-
     function isValidSignature(bytes32 hash, bytes signature, address consumer)
     public pure
-    returns (bool){
+    returns (bool isValid){
         return (consumer == recoverAddress(hash, signature));
     }
 
     function recoverAddress(bytes32 hash, bytes signature)
     public pure
-    returns (address){
+    returns (address recoveredAddress){
         return ECDSA.recover(hash, signature);
     }
 
