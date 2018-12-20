@@ -2,6 +2,9 @@ pragma solidity 0.4.25;
 
 import './ServiceAgreement.sol';
 
+/// @title Secret Store Access Control
+/// @author Ocean Protocol Team
+/// @dev All function calls are currently implement without side effects
 
 contract AccessConditions{
 
@@ -35,7 +38,7 @@ contract AccessConditions{
             serviceAgreementStorage.fulfillCondition(serviceId, this.grantAccess.selector, valueHash),
             'Cannot fulfill grantAccess condition'
         );
-        address consumer = serviceAgreementStorage.getServiceAgreementConsumer(serviceId);
+        address consumer = serviceAgreementStorage.getAgreementConsumer(serviceId);
         assetPermissions[documentKeyId][consumer] = true;
         emit AccessGranted(serviceId, assetId);
     }

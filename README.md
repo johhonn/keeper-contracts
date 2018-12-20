@@ -27,6 +27,8 @@ Ocean Keeper implementation where we put the following modules together:
      - [Docker](#docker)
      - [Local development](#local-development)
      - [Testnet deployment](#testnet-deployment)
+        - [Nile Testnet](#nile-testnet)
+        - [Kovan Testnet](#kovan-testnet)
   - [Libraries](#libraries)
   - [Testing](#testing)
      - [Code Linting](#code-linting)
@@ -42,7 +44,7 @@ Ocean Keeper implementation where we put the following modules together:
 
 ## Get Started
 
-For local developmenty you can either use Docker, or setup the development environment on your machine.
+For local development you can either use Docker, or setup the development environment on your machine.
 
 ### Docker
 
@@ -121,13 +123,40 @@ npm run migrate -- --reset
 
 ### Testnet deployment
 
+#### Nile Testnet
+
+Follow the steps for local deployment. Make sure that the address `0x90eE7A30339D05E07d9c6e65747132933ff6e624` is having enough (~1) Ether.
+
+```bash
+export NMEMORIC=<your nile nmemoric>
+npm run migrate:nile
+```
+
+The transaction should show up on the account: `0x90eE7A30339D05E07d9c6e65747132933ff6e624`
+
+The contract addresses deployed on Ocean Nile testnet:
+
+| Contract           | Version | Address                                      |
+|--------------------|---------|----------------------------------------------|
+| AccessConditions   | v0.5.0  | `0x38ba43fFa8C7715F0f2A5d52E78a392d2bD71176` |
+| ComputeConditions  | v0.5.0  | `0x771136ebC55A1747B52722D1bb95323D98550293` |
+| DIDRegistry        | v0.5.0  | `0xe6CeA58707df303b6d9D1DF5BA8Bf88fF4A5920D` |
+| FitchainConditions | v0.5.0  | `0x4563092EE6736a5D920882D2c39c91EAf7956f07` |
+| OceanAuth          | v0.5.0  | `0xfC6DB8141144831a8B7d858f356D0d1148d8F11d` |
+| OceanMarket        | v0.5.0  | `0x8c4a2cC4572B6CD68c58BFc220f04CD1143230a0` |
+| OceanToken         | v0.5.0  | `0x5e29AcdE5285E24eb7A211d9F4313E5a9Ed07F36` |
+| PaymentConditions  | v0.5.0  | `0xdAAb92eABB4F2D7fC51948E44A88aa4fd986EDa9` |
+| ServiceAgreement   | v0.5.0  | `0xb8D436b29CBF1ef690DD3b0972Cce2090ECb09bc` |
+
+#### Kovan Testnet
+
 Follow the steps for local deployment. Make sure that the address [0x2c0d5f47374b130ee398f4c34dbe8168824a8616](https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616) is having enough (~1) Ether.
 
 If you managed to deploy the contracts locally do:
 
 ```bash
 export INFURA_TOKEN=<your infura token>
-export KOVAN_NMEMORIC=<your kovan nmemoric>
+export NMEMORIC=<your kovan nmemoric>
 npm run migrate:kovan
 ```
 
@@ -135,15 +164,17 @@ The transaction should show up on: `https://kovan.etherscan.io/address/0x2c0d5f4
 
 The contract addresses deployed on Kovan testnet:
 
-| Contract      | Address                                      |
-|---------------|----------------------------------------------|
-| OceanAuth     | `0xfA65f2662224Dd340a2dea0972E70BA450E94e3C` |
-| OceanDispute  | `0x6071e51DB7a3CCc81e0ae1D05908c6F958a59f5B` |
-| OceanExchange | `0x018F8A880A11f8c7Ec4112D9CA20D9256e7d64CD` |
-| OceanMarket   | `0xb8277FC2A46C11235775BEC194BD8C12ed92343C` |
-| OceanRegistry | `0xD9Ca6e9aD36E70A0a2A995a7BDD02017459dD45b` |
-| OceanToken    | `0x656f2Ab5D4C4bC2D5821fd959B083fd50273C2f1` |
-
+| Contract           | Version | Address                                      |
+|--------------------|---------|----------------------------------------------|
+| AccessConditions   | v0.5.0  | `0x0aF8734b1DB51464a01F83FE4167054a2f7F6794` |
+| ComputeConditions  | v0.5.0  | `0x138F020dDdd65cA6Ce4E799adFD32cbfEbE384f6` |
+| DIDRegistry        | v0.5.0  | `0x6DCbE42F6bF7c350F5A8a86FC5fCfea0b3EDe9f6` |
+| FitchainConditions | v0.5.0  | `0xE4498F5B1a9E890F3A0A4Bbd6aF4fCC8b54D96ff` |
+| OceanAuth          | v0.5.0  | `0x094E34848e884411684BDC5422BAcF251d046D8B` |
+| OceanMarket        | v0.5.0  | `0xb5bEfAB48835547Ac3A22608c74CFe2ce973d110` |
+| OceanToken         | v0.5.0  | `0x63A94230DA3aa27E5f68F22F8854CE3FcA702695` |
+| PaymentConditions  | v0.5.0  | `0x34D6dFB10fb29441Ee6B053f86AE58D3A8a7D869` |
+| ServiceAgreement   | v0.5.0  | `0xd13998e9c0B40c0028412b59e36213f5cAaA9C6E` |
 
 ## Libraries
 
@@ -257,11 +288,7 @@ The `bumpversion.sh` script helps to bump the project version. You can execute t
 
 ## Contributing
 
-We use GitHub as a means for maintaining and tracking issues and source code development.
-
-If you would like to contribute, please fork this repository, do work in a feature branch, and finally open a pull request for maintainers to review your changes.
-
-Ocean Protocol uses [C4 Standard process](https://github.com/unprotocols/rfc/blob/master/1/README.md) to manage changes in the source code.  Find here more details about [Ocean C4 OEP](https://github.com/oceanprotocol/OEPs/tree/master/1).
+See the page titled "[Ways to Contribute](https://docs.oceanprotocol.com/concepts/contributing/)" in the Ocean Protocol documentation.
 
 ## Prior Art
 
@@ -270,7 +297,6 @@ This project builds on top of the work done in open source projects:
 - [ConsenSys/PLCRVoting](https://github.com/ConsenSys/PLCRVoting)
 - [skmgoldin/tcr](https://github.com/skmgoldin/tcr)
 - [OpenZeppelin/openzeppelin-solidity](https://github.com/OpenZeppelin/openzeppelin-solidity)
-
 
 ## License
 

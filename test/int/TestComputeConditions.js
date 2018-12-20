@@ -7,7 +7,7 @@ const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const AccessConditions = artifacts.require('AccessConditions.sol')
 const ComputeConditions = artifacts.require('ComputeConditions.sol')
-const testUtils = require('./utils')
+const testUtils = require('../utils')
 const web3 = testUtils.getWeb3()
 
 contract('ComputeConditions', (accounts) => {

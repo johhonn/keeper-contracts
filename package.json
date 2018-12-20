@@ -1,6 +1,6 @@
 {
   "name": "@oceanprotocol/keeper-contracts",
-  "version": "0.4.0",
+  "version": "0.5.1",
   "description": "Integration of TCRs, CPM and Ocean Tokens in Solidity",
   "bugs": {
     "url": "https://github.com/oceanprotocol/keeper-contracts/issues"
@@ -10,9 +10,8 @@
   "scripts": {
     "compile": "truffle compile",
     "migrate": "truffle migrate",
-    "migrate:poa_local": "npm run migrate -- --network ocean_poa_net_local",
-    "migrate:poa_net": "npm run migrate -- --network ocean_poa_net",
-    "migrate:poa_aws": "npm run migrate -- --network ocean_poa_aws",
+    "migrate:spree": "npm run migrate -- --network spree",
+    "migrate:nile": "npm run migrate -- --network nile",
     "migrate:kovan": "npm run migrate -- --network kovan",
     "migrate:rinkeby": "npm run migrate -- --network rinkeby",
     "migrate:mainnet": "npm run migrate ----network mainnet",
@@ -54,7 +53,7 @@
     "eth-ecies": "^1.0.3",
     "ethereumjs-abi": "^0.6.5",
     "ethereumjs-util": "^6.0.0",
-    "ethers": "^4.0.13",
+    "ethers": "^4.0.17",
     "ethjs": "^0.4.0",
     "ethjs-abi": "^0.2.1",
     "ethjs-provider-http": "^0.1.6",
@@ -64,7 +63,7 @@
     "solium": "^1.1.8",
     "truffle": "^5.0.0-user-level-mnemonic.0",
     "truffle-config": "^1.0.4",
-    "truffle-expect": "0.0.4",
+    "truffle-expect": "0.0.5",
     "truffle-hdwallet-provider": "^1.0.0-web3one.2",
     "web3": "1.0.0-beta.36",
     "web3-eth-abi": "^1.0.0-beta.36",
