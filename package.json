@@ -17,6 +17,7 @@
     "migrate:mainnet": "npm run migrate ----network mainnet",
     "test": "truffle test",
     "test:cover": "solidity-coverage",
+    "report-coverage": "cat ./coverage/lcov.info | codacy-coverage --token b95545c0da4b45848cc5eef363c2711e",
     "release": "./bumpversion.sh patch",
     "clean": "rm -rf ./build/ && rm -rf ./artifacts/*.development.json",
     "lint": "npm run lint:eslint && npm run lint:solium",
