@@ -12,6 +12,11 @@ const ethQuery = new Eth(new HttpProvider('http://localhost:7545'))
 const BN = small => new Eth.BN(small.toString(10), 10)
 
 const utils = {
+
+    emptyBytes32: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    templateId: '0x0000000000000000000000000000000000000000000000000000000000000001',
+    dummyAddress: '0x1111aaaaeeeeffffcccc22223333444455556666',
+
     getVoteSaltHash: (vote, salt) => (
         `0x${abi.soliditySHA3(['uint', 'uint'], [vote, salt]).toString('hex')}`
     ),
@@ -81,8 +86,8 @@ const utils = {
     },
 
     assertEmitted: (result, n, name, payload) => {
-        var gotEvents = 0
-        for (var i = 0; i < result.logs.length; i++) {
+        let gotEvents = 0
+        for (let i = 0; i < result.logs.length; i++) {
             const ev = result.logs[i]
             if (ev.event === name) {
                 gotEvents++

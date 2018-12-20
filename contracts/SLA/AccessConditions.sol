@@ -1,6 +1,6 @@
 pragma solidity 0.4.25;
 
-import './ServiceAgreement.sol';
+import './ServiceExecutionAgreement.sol';
 
 /// @title Secret Store Access Control
 /// @author Ocean Protocol Team
@@ -10,17 +10,17 @@ contract AccessConditions{
 
     mapping(bytes32 => mapping(address => bool)) private assetPermissions;
 
-    ServiceAgreement private serviceAgreementStorage;
+    ServiceExecutionAgreement private serviceAgreementStorage;
     event AccessGranted(bytes32 serviceId, bytes32 asset);
 
     modifier onlySLAPublisher(bytes32 serviceId, address publisher) {
-        require(serviceAgreementStorage.getAgreementPublisher(serviceId) == publisher, 'Restricted access - only SLA publisher');
+        require(serviceAgreementStorage.getServiceAgreementPublisher(serviceId) == publisher, 'Restricted access - only SLA publisher');
         _;
     }
 
     constructor(address _serviceAgreementAddress) public {
         require(_serviceAgreementAddress != address(0), 'invalid contract address');
-        serviceAgreementStorage = ServiceAgreement(_serviceAgreementAddress);
+        serviceAgreementStorage = ServiceExecutionAgreement(_serviceAgreementAddress);
     }
 
     function checkPermissions(address consumer, bytes32 documentKeyId) public view  returns(bool) {
@@ -28,7 +28,7 @@ contract AccessConditions{
     }
 
     function grantAccess(bytes32 serviceId, bytes32 assetId, bytes32 documentKeyId) public onlySLAPublisher(serviceId, msg.sender) returns (bool) {
-        bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.grantAccess.selector);
+        bytes32 condition = serviceAgreementStorage.generateConditionKeyForId(serviceId, address(this), this.grantAccess.selector);
         bool allgood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition);
         if (!allgood)
             return;
@@ -38,7 +38,7 @@ contract AccessConditions{
             serviceAgreementStorage.fulfillCondition(serviceId, this.grantAccess.selector, valueHash),
             'Cannot fulfill grantAccess condition'
         );
-        address consumer = serviceAgreementStorage.getAgreementConsumer(serviceId);
+        address consumer = serviceAgreementStorage.getServiceAgreementConsumer(serviceId);
         assetPermissions[documentKeyId][consumer] = true;
         emit AccessGranted(serviceId, assetId);
     }

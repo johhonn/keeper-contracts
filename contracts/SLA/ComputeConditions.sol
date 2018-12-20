@@ -1,7 +1,7 @@
 pragma solidity ^0.4.25;
 
 import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
-import './ServiceAgreement.sol';
+import './ServiceExecutionAgreement.sol';
 
 /// @title On-premise compute conditions
 /// @author Ocean Protocol Team
@@ -19,7 +19,7 @@ contract ComputeConditions {
         bytes algorithmHashSignature;
     }
 
-    ServiceAgreement private serviceAgreementStorage;
+    ServiceExecutionAgreement private serviceAgreementStorage;
     mapping (bytes32 => ProofOfUpload) proofs;
 
     //events
@@ -29,25 +29,25 @@ contract ComputeConditions {
     event ProofOfUploadInvalid(bytes32 serviceAgreementId, address dataScientist, address publisher);
 
     modifier onlyDataConsumer(bytes32 serviceAgreementId) {
-        require(msg.sender == serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), 'Invalid data scientist address!');
+        require(msg.sender == serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), 'Invalid data scientist address!');
         _;
     }
 
     modifier onlyComputePublisher(bytes32 serviceAgreementId) {
-        require(msg.sender == serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), 'Invalid publisher address');
+        require(msg.sender == serviceAgreementStorage.getServiceAgreementPublisher(serviceAgreementId), 'Invalid publisher address');
         _;
 
     }
 
     modifier onlyStakeholders(bytes32 serviceAgreementId) {
-        require(msg.sender == serviceAgreementStorage.getAgreementPublisher(serviceAgreementId) || msg.sender == serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), 'Access denied');
+        require(msg.sender == serviceAgreementStorage.getServiceAgreementPublisher(serviceAgreementId) || msg.sender == serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), 'Access denied');
         require(!proofs[serviceAgreementId].isValid, 'avoid replay attack');
         _;
     }
 
     constructor(address serviceAgreementAddress) public {
         require(serviceAgreementAddress != address(0), 'invalid service agreement contract address');
-        serviceAgreementStorage = ServiceAgreement(serviceAgreementAddress);
+        serviceAgreementStorage = ServiceExecutionAgreement(serviceAgreementAddress);
     }
 
     /// @notice submitHashSignature is called only by the data-scientist address.
@@ -59,16 +59,16 @@ contract ComputeConditions {
     function submitHashSignature(bytes32 serviceAgreementId, bytes signature) public onlyDataConsumer(serviceAgreementId) returns(bool status) {
         if(proofs[serviceAgreementId].exists){
             if(proofs[serviceAgreementId].isLocked) { // avoid race conditions
-                emit HashSignatureSubmitted(serviceAgreementId, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), false);
+                emit HashSignatureSubmitted(serviceAgreementId, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getServiceAgreementPublisher(serviceAgreementId), false);
                 return false;
             }
             proofs[serviceAgreementId].isLocked = true;
             proofs[serviceAgreementId].algorithmHashSignature = signature;
             fulfillUpload(serviceAgreementId, true);
         }else{
-            proofs[serviceAgreementId] = ProofOfUpload(true, false, true, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), bytes32(0), signature);
+            proofs[serviceAgreementId] = ProofOfUpload(true, false, true, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), bytes32(0), signature);
         }
-        emit HashSignatureSubmitted(serviceAgreementId, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), true);
+        emit HashSignatureSubmitted(serviceAgreementId, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getServiceAgreementPublisher(serviceAgreementId), true);
         proofs[serviceAgreementId].isLocked = false;
         return true;
 
@@ -83,16 +83,16 @@ contract ComputeConditions {
     function submitAlgorithmHash(bytes32 serviceAgreementId, bytes32 hash) public onlyComputePublisher(serviceAgreementId) returns(bool status) {
         if(proofs[serviceAgreementId].exists){
             if(proofs[serviceAgreementId].isLocked) { // avoid race conditions
-                emit HashSubmitted(serviceAgreementId, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), false);
+                emit HashSubmitted(serviceAgreementId, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getServiceAgreementPublisher(serviceAgreementId), false);
                 return false;
             }
             proofs[serviceAgreementId].isLocked = true;
             proofs[serviceAgreementId].algorithmHash = hash;
             fulfillUpload(serviceAgreementId, true);
         }else{
-            proofs[serviceAgreementId] = ProofOfUpload(true, false, true, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), hash, new bytes(0));
+            proofs[serviceAgreementId] = ProofOfUpload(true, false, true, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), hash, new bytes(0));
         }
-        emit HashSubmitted(serviceAgreementId, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), true);
+        emit HashSubmitted(serviceAgreementId, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getServiceAgreementPublisher(serviceAgreementId), true);
         proofs[serviceAgreementId].isLocked = false;
         return true;
     }
@@ -104,24 +104,24 @@ contract ComputeConditions {
     /// @param serviceAgreementId the service level agreement Id
     /// @param state get be used fo input value hash for this condition indicating the state of verification
     function fulfillUpload(bytes32 serviceAgreementId, bool state) public onlyStakeholders(serviceAgreementId) returns(bool status) {
-        bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceAgreementId, address(this), this.fulfillUpload.selector);
+        bytes32 condition = serviceAgreementStorage.generateConditionKeyForId(serviceAgreementId, address(this), this.fulfillUpload.selector);
         if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceAgreementId, condition)){
-            emit ProofOfUploadInvalid(serviceAgreementId, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId));
+            emit ProofOfUploadInvalid(serviceAgreementId, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getServiceAgreementPublisher(serviceAgreementId));
             return false;
         }
 
         if (serviceAgreementStorage.getConditionStatus(serviceAgreementId, condition) == 1) {
-            emit ProofOfUploadValid(serviceAgreementId, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId));
+            emit ProofOfUploadValid(serviceAgreementId, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getServiceAgreementPublisher(serviceAgreementId));
             return true;
         }
 
         if(proofs[serviceAgreementId].dataConsumer == ECDSA.recover(ECDSA.toEthSignedMessageHash(proofs[serviceAgreementId].algorithmHash), proofs[serviceAgreementId].algorithmHashSignature)) {
             serviceAgreementStorage.fulfillCondition(serviceAgreementId, this.fulfillUpload.selector, keccak256(abi.encodePacked(state)));
-            emit ProofOfUploadValid(serviceAgreementId, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId));
+            emit ProofOfUploadValid(serviceAgreementId, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getServiceAgreementPublisher(serviceAgreementId));
             proofs[serviceAgreementId].isValid = true;
             return true;
         }
-        emit ProofOfUploadInvalid(serviceAgreementId, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId));
+        emit ProofOfUploadInvalid(serviceAgreementId, serviceAgreementStorage.getServiceAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getServiceAgreementPublisher(serviceAgreementId));
         return false;
     }
 

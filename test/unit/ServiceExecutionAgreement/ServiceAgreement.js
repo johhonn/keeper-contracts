@@ -2,15 +2,12 @@
 /* eslint-disable no-console */
 /* global artifacts, assert, contract, describe, it */
 
-const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
-const utils = require('../utils.js')
+const ServiceAgreement = artifacts.require('ServiceExecutionAgreement.sol')
+const utils = require('../../utils.js')
 
 const web3 = utils.getWeb3()
 
-contract('ServiceAgreement', (accounts) => {
-    const emptyBytes32 = '0x0000000000000000000000000000000000000000000000000000000000000000'
-    const templateId = '0x0000000000000000000000000000000000000000000000000000000000000001'
-    const dummyAddress = '0x1111aaaaeeeeffffcccc22223333444455556666'
+contract('ServiceExecutionAgreement', (accounts) => {
     let contract
     let consumer
     let contracts
@@ -21,15 +18,43 @@ contract('ServiceAgreement', (accounts) => {
     let serviceAgreementId
 
     function createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer) {
-        const conditionKeys = utils.generateConditionsKeys(templateId, contracts, fingerprints)
-        const hash = utils.createSLAHash(web3, templateId, conditionKeys, valueHashes, timeoutValues, serviceAgreementId)
+        const conditionKeys = utils.generateConditionsKeys(
+            utils.templateId,
+            contracts,
+            fingerprints)
+        const hash = utils.createSLAHash(
+            web3,
+            utils.templateId,
+            conditionKeys,
+            valueHashes,
+            timeoutValues,
+            serviceAgreementId)
         return web3.eth.sign(hash, consumer)
     }
 
     async function initAgreement() {
-        const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-        await contract.setupAgreementTemplate(templateId, contracts, fingerprints, dependenciesBits, templateId, [0], 0, { from: accounts[0] })
-        await contract.executeAgreement(templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+        const signature = await createSignature(
+            contracts,
+            fingerprints,
+            valueHashes,
+            timeoutValues,
+            serviceAgreementId,
+            consumer)
+        await contract.setupTemplate(
+            utils.templateId,
+            contracts,
+            fingerprints,
+            dependenciesBits,
+            [0], 0, { from: accounts[0] })
+        await contract.executeServiceAgreement(
+            utils.templateId,
+            signature,
+            consumer,
+            valueHashes,
+            timeoutValues,
+            serviceAgreementId,
+            utils.templateId,
+            { from: accounts[0] })
     }
 
     beforeEach(async () => {
@@ -44,116 +69,18 @@ contract('ServiceAgreement', (accounts) => {
         serviceAgreementId = utils.generateId(web3)
     })
 
-    describe('setupAgreementTemplate', () => {
-        it('Should setup agreement without contracts', async () => {
-            // act
-            const result = await contract.setupAgreementTemplate(templateId, [], [], [], emptyBytes32, [], 0, { from: accounts[0] })
-
-            // aassert
-            utils.assertEmitted(result, 1, 'SetupAgreementTemplate')
-            const status = await contract.getTemplateStatus(templateId)
-            assert.strictEqual(status, true)
-        })
-
-        it('Should not accept different amount of contracts and fingerprints', async () => {
-            // act-assert
-            try {
-                await contract.setupAgreementTemplate(templateId, [], ['0x1234'], [], emptyBytes32, [], 0, { from: accounts[0] })
-            } catch (e) {
-                assert.strictEqual(e.reason, 'fingerprints and contracts length do not match')
-                return
-            }
-            assert.fail('Expected revert not received')
-        })
-
-        it('Should not accept different amount of contracts and dependencies', async () => {
-            // act-assert
-            try {
-                await contract.setupAgreementTemplate(templateId, [dummyAddress], ['0x1234'], [], emptyBytes32, [], 0, { from: accounts[0] })
-            } catch (e) {
-                assert.strictEqual(e.reason, 'contracts and dependencies do not match')
-                return
-            }
-            assert.fail('Expected revert not received')
-        })
-
-        it('Should not accept less amount of contracts than fulfillment indices', async () => {
-            // act-assert
-            try {
-                await contract.setupAgreementTemplate(templateId, [dummyAddress], ['0x1234'], [1], emptyBytes32, [1, 2], 0, { from: accounts[0] })
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid fulfillment indices')
-                return
-            }
-            assert.fail('Expected revert not received')
-        })
-
-        it('Should not accept less amount of fulfillment indices than fulfillment operators', async () => {
-            // act-assert
-            try {
-                await contract.setupAgreementTemplate(templateId, [dummyAddress], ['0x1234'], [1], emptyBytes32, [1], 2, { from: accounts[0] })
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid fulfillment operator')
-                return
-            }
-            assert.fail('Expected revert not received')
-        })
-
-        it('Should setup agreement with contracts', async () => {
-            // act
-            const result = await contract.setupAgreementTemplate(templateId, [dummyAddress], ['0x1234'], [1], emptyBytes32, [1], 1, { from: accounts[0] })
-
-            // aassert
-            utils.assertEmitted(result, 1, 'SetupCondition')
-            utils.assertEmitted(result, 1, 'SetupAgreementTemplate')
-            const status = await contract.getTemplateStatus(templateId)
-            assert.strictEqual(status, true)
-        })
-
-        it('Should setup unique agreement only', async () => {
-            // arrange
-            await contract.setupAgreementTemplate(templateId, [], [], [], emptyBytes32, [], 0, { from: accounts[0] })
-
-            // act-aassert
-            try {
-                await contract.setupAgreementTemplate(templateId, [], [], [], emptyBytes32, [], 0, { from: accounts[0] })
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Template ID already exists')
-                return
-            }
-            assert.fail('Expected revert not received')
-        })
-
-        it('should generate correct condition keys', async () => {
-            const conditionKey = await contract.generateConditionKey(
-                '0x044852b2a670ade5407e78fb2863c51de9fcb96542a07186fe3aeda6bb8a116d',
-                '0x9C7cf913DFb7346B267857D5f60fA6983e5eC1A9',
-                '0x668453f0'
-            )
-            assert.strictEqual(
-                await conditionKey,
-                '0x14d19d3bab42c7847d73f351b9d9b251a364c50d1d1df4135293fb34ee26022e'
-            )
-        })
-    })
-
-    describe('getAgreement', () => {
-        it('Should return an agreement with agreementId', async () => {
-            // arrange
-            await initAgreement()
-
-            // act-assert
-            const agreement = await contract.getAgreement(serviceAgreementId, { from: accounts[1] })
-            console.log(agreement)
-            assert.strictEqual(agreement.id = serviceAgreementId)
-        })
-    })
-
-    describe('executeAgreement', () => {
+    describe('executeServiceAgreement', () => {
         it('Should execute exist agreement only', async () => {
             // act-aassert
             try {
-                await contract.executeAgreement(templateId, '0x10', dummyAddress, [], [], emptyBytes32, emptyBytes32, { from: accounts[0] })
+                await contract.executeServiceAgreement(
+                    utils.templateId,
+                    '0x10',
+                    utils.dummyAddress,
+                    [], [],
+                    utils.emptyBytes32,
+                    utils.emptyBytes32,
+                    { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Template is revoked')
                 return
@@ -163,11 +90,22 @@ contract('ServiceAgreement', (accounts) => {
 
         it('Should not execute agreement with invalid timeout length', async () => {
             // arrange
-            await contract.setupAgreementTemplate(templateId, [dummyAddress], ['0x1234'], [1], emptyBytes32, [1], 1, { from: accounts[0] })
+            await contract.setupTemplate(
+                utils.templateId,
+                [utils.dummyAddress],
+                ['0x1234'],
+                [1], [1], 1, { from: accounts[0] })
 
             // act-assert
             try {
-                await contract.executeAgreement(templateId, '0x10', dummyAddress, [], [], emptyBytes32, emptyBytes32, { from: accounts[0] })
+                await contract.executeServiceAgreement(
+                    utils.templateId,
+                    '0x10',
+                    utils.dummyAddress,
+                    [], [],
+                    utils.emptyBytes32,
+                    utils.emptyBytes32,
+                    { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'invalid timeout values length')
                 return
@@ -177,11 +115,18 @@ contract('ServiceAgreement', (accounts) => {
 
         it('Should not execute agreement (revert) when signature is not valid', async () => {
             // arrange
-            await contract.setupAgreementTemplate(templateId, [], [], [], emptyBytes32, [], 0, { from: accounts[0] })
+            await contract.setupTemplate(utils.templateId, [], [], [], [], 0, { from: accounts[0] })
 
             // act-assert
             try {
-                await contract.executeAgreement(templateId, '0x10', dummyAddress, [], [], emptyBytes32, emptyBytes32, { from: accounts[0] })
+                await contract.executeServiceAgreement(
+                    utils.templateId,
+                    '0x10',
+                    utils.dummyAddress,
+                    [], [],
+                    utils.emptyBytes32,
+                    utils.emptyBytes32,
+                    { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Invalid consumer signature of service agreement')
                 return
@@ -190,7 +135,7 @@ contract('ServiceAgreement', (accounts) => {
         })
 
         it('Should generate correct SA hash', async () => {
-            const hash = await contract.generateHash(
+            const hash = await contract.hashServiceAgreement(
                 '0x044852b2a670ade5407e78fb2863c51de9fcb96542a07186fe3aeda6bb8a116d',
                 [
                     '0x313d20f9cda19e1f5702af79e5ebfa7cb434918722f9b334000ea71cdaac1614',
@@ -242,25 +187,26 @@ contract('ServiceAgreement', (accounts) => {
         it('Should execute condition when signature is valid', async () => {
             // arrange
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
+            await contract.setupTemplate(
+                utils.templateId, contracts, fingerprints, [0], [0], 0, { from: accounts[0] })
 
             // act
-            const result = await contract.executeAgreement(templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            const result = await contract.executeServiceAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, utils.templateId, { from: accounts[0] })
 
             // assert
-            utils.assertEmitted(result, 1, 'ExecuteCondition')
-            utils.assertEmitted(result, 1, 'ExecuteAgreement')
+            utils.assertEmitted(result, 1, 'ConditionExecuted')
+            utils.assertEmitted(result, 1, 'ServiceAgreementExecuted')
         })
 
         it('Should revert when timeout can lead to race condition', async () => {
             // arrange
             timeoutValues = [1]
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
+            await contract.setupTemplate(utils.templateId, contracts, fingerprints, [0], [0], 0, { from: accounts[0] })
 
             // act-assert
             try {
-                await contract.executeAgreement(templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+                await contract.executeServiceAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, utils.templateId, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'invalid timeout with a margin (~ 30 to 40 seconds = 2 blocks intervals) to avoid race conditions')
                 return
@@ -272,14 +218,14 @@ contract('ServiceAgreement', (accounts) => {
             // arrange
             timeoutValues = [3]
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
+            await contract.setupTemplate(utils.templateId, contracts, fingerprints, [0], [0], 0, { from: accounts[0] })
 
             // act
-            const result = await contract.executeAgreement(templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            const result = await contract.executeServiceAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, utils.templateId, { from: accounts[0] })
 
             // assert
-            utils.assertEmitted(result, 1, 'ExecuteCondition')
-            utils.assertEmitted(result, 1, 'ExecuteAgreement')
+            utils.assertEmitted(result, 1, 'ConditionExecuted')
+            utils.assertEmitted(result, 1, 'ServiceAgreementExecuted')
         })
     })
 
@@ -337,21 +283,21 @@ contract('ServiceAgreement', (accounts) => {
         })
     })
 
-    describe('fulfillAgreement', () => {
-        it('Should fulfill agreement with non pending conditions', async () => {
+    describe('fulfillServiceAgreement', () => {
+        it('Should fulfill agreement without pending conditions', async () => {
             // arrange
             await initAgreement()
             await contract.fulfillCondition(serviceAgreementId, fingerprints[0], valueHashes[0], { from: accounts[2] })
 
             // act
-            const result = await contract.fulfillAgreement(serviceAgreementId, { from: accounts[0] })
+            const result = await contract.fulfillServiceAgreement(serviceAgreementId, { from: accounts[0] })
 
             // assert
-            utils.assertEmitted(result, 1, 'AgreementFulfilled')
-            const isTerminated = await contract.isAgreementTerminated(serviceAgreementId, { from: accounts[0] })
+            utils.assertEmitted(result, 1, 'ServiceAgreementFulfilled')
+            const isTerminated = await contract.isServiceAgreementTerminated(serviceAgreementId, { from: accounts[0] })
             assert.strictEqual(isTerminated, true)
-            const agreementStatus = await contract.getAgreementStatus(serviceAgreementId, { from: accounts[0] })
-            assert.strictEqual(agreementStatus, true)
+            const agreementState = await contract.getServiceAgreementState(serviceAgreementId, { from: accounts[0] })
+            assert.strictEqual(agreementState, true)
         })
 
         it('Should not fulfill agreement with pending conditions', async () => {
@@ -360,7 +306,7 @@ contract('ServiceAgreement', (accounts) => {
 
             // act-assert
             try {
-                await contract.fulfillAgreement(serviceAgreementId, { from: accounts[0] })
+                await contract.fulfillServiceAgreement(serviceAgreementId, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Indicating one of the fulfillment conditions is false')
                 return
@@ -371,12 +317,12 @@ contract('ServiceAgreement', (accounts) => {
         it('Should not fulfill agreement with pending conditions when single operator', async () => {
             // arrange
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 1, { from: accounts[0] })
-            await contract.executeAgreement(templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            await contract.setupTemplate(utils.templateId, contracts, fingerprints, [0], [0], 1, { from: accounts[0] })
+            await contract.executeServiceAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, utils.templateId, { from: accounts[0] })
 
             // act-assert
             try {
-                await contract.fulfillAgreement(serviceAgreementId, { from: accounts[0] })
+                await contract.fulfillServiceAgreement(serviceAgreementId, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Indicating all fulfillment conditions are false')
                 return
@@ -391,12 +337,12 @@ contract('ServiceAgreement', (accounts) => {
             valueHashes = [utils.valueHash(['bool'], [true]), utils.valueHash(['bool'], [true])]
             timeoutValues = [0, 0]
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0, 0], templateId, [0, 1], 2, { from: accounts[0] })
-            await contract.executeAgreement(templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+            await contract.setupTemplate(utils.templateId, contracts, fingerprints, [0, 0], [0, 1], 2, { from: accounts[0] })
+            await contract.executeServiceAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, utils.templateId, { from: accounts[0] })
 
             // act-assert
             try {
-                await contract.fulfillAgreement(serviceAgreementId, { from: accounts[0] })
+                await contract.fulfillServiceAgreement(serviceAgreementId, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Indicating N of M fulfillment conditions are false')
                 return
@@ -405,14 +351,14 @@ contract('ServiceAgreement', (accounts) => {
         })
     })
 
-    describe('revokeAgreementTemplate', () => {
+    describe('revokeTemplate', () => {
         it('Should not revoke by non template owner', async () => {
             // arrange
-            await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
+            await contract.setupTemplate(utils.templateId, contracts, fingerprints, [0], [0], 0, { from: accounts[0] })
 
             // act-assert
             try {
-                await contract.revokeAgreementTemplate(templateId, { from: accounts[2] })
+                await contract.revokeTemplate(utils.templateId, { from: accounts[2] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Not a template owner')
                 return
@@ -426,7 +372,7 @@ contract('ServiceAgreement', (accounts) => {
 
             // act-assert
             try {
-                await contract.revokeAgreementTemplate(templateId, { from: accounts[0] })
+                await contract.revokeTemplate(utils.templateId, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Owner can not revoke template!')
                 return
@@ -436,14 +382,14 @@ contract('ServiceAgreement', (accounts) => {
 
         it('Should revoke template', async () => {
             // arrange
-            await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
+            await contract.setupTemplate(utils.templateId, contracts, fingerprints, [0], [0], 0, { from: accounts[0] })
 
             // act
-            const result = await contract.revokeAgreementTemplate(templateId, { from: accounts[0] })
+            const result = await contract.revokeTemplate(utils.templateId, { from: accounts[0] })
 
             // assert
-            utils.assertEmitted(result, 1, 'SLATemplateRevoked')
-            const status = await contract.getTemplateStatus(templateId)
+            utils.assertEmitted(result, 1, 'TemplateRevoked')
+            const status = await contract.getTemplateStatus(utils.templateId)
             assert.strictEqual(status, false)
         })
     })
@@ -456,7 +402,7 @@ contract('ServiceAgreement', (accounts) => {
 
             // act-assert
             try {
-                await contract.getConditionStatus(serviceAgreementId, emptyBytes32, { from: accounts[0] })
+                await contract.getConditionStatus(serviceAgreementId, utils.emptyBytes32, { from: accounts[0] })
             } catch (e) {
                 return
             }
@@ -467,7 +413,7 @@ contract('ServiceAgreement', (accounts) => {
             // arrange
             dependenciesBits = [3]
             await initAgreement()
-            const conditionKey = await contract.getConditionByFingerprint(serviceAgreementId, contracts[0], fingerprints[0], { from: accounts[0] })
+            const conditionKey = await contract.generateConditionKeyForId(serviceAgreementId, contracts[0], fingerprints[0], { from: accounts[0] })
 
             // act
             const result = await contract.getConditionStatus(serviceAgreementId, conditionKey, { from: accounts[0] })
@@ -482,7 +428,7 @@ contract('ServiceAgreement', (accounts) => {
             // arrange
             dependenciesBits = [3]
             await initAgreement()
-            const conditionKey = await contract.getConditionByFingerprint(serviceAgreementId, contracts[0], fingerprints[0], { from: accounts[0] })
+            const conditionKey = await contract.generateConditionKeyForId(serviceAgreementId, contracts[0], fingerprints[0], { from: accounts[0] })
 
             // act
             const result = await contract.conditionTimedOut(serviceAgreementId, conditionKey, { from: accounts[0] })
@@ -496,7 +442,7 @@ contract('ServiceAgreement', (accounts) => {
             timeoutValues = [100]
             dependenciesBits = [3]
             await initAgreement()
-            const conditionKey = await contract.getConditionByFingerprint(serviceAgreementId, contracts[0], fingerprints[0], { from: accounts[0] })
+            const conditionKey = await contract.generateConditionKeyForId(serviceAgreementId, contracts[0], fingerprints[0], { from: accounts[0] })
 
             // act
             const result = await contract.conditionTimedOut(serviceAgreementId, conditionKey, { from: accounts[0] })
@@ -513,17 +459,6 @@ contract('ServiceAgreement', (accounts) => {
 
             // assert
             assert.isOk(result > 0)
-        })
-
-        it('Should return tempalte owner', async () => {
-            // arrange
-            await contract.setupAgreementTemplate(templateId, contracts, fingerprints, [0], templateId, [0], 0, { from: accounts[0] })
-
-            // act
-            const result = await contract.getTemplateOwner(templateId, { from: accounts[0] })
-
-            // assert
-            assert.strictEqual(result, accounts[0])
         })
     })
 })

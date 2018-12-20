@@ -1,7 +1,7 @@
 pragma solidity ^0.4.25;
 
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
-import './ServiceAgreement.sol';
+import './ServiceExecutionAgreement.sol';
 
 /// @title Fitchain conditions
 /// @author Ocean Protocol Team
@@ -48,7 +48,7 @@ contract FitchainConditions{
     mapping(address => Actor) private verifiers;
     uint256 private stake;
     uint256 private maxSlots;
-    ServiceAgreement private serviceAgreementStorage;
+    ServiceExecutionAgreement private serviceAgreementStorage;
 
     // events
     event VerifierRegistered(address verifier, uint256 slots);
@@ -64,12 +64,12 @@ contract FitchainConditions{
     modifier onlyProvider(bytes32 modelId){
         require(models[modelId].exists, 'model does not exist!');
         require(msg.sender == models[modelId].provider, 'invalid data-compute provider');
-        require(serviceAgreementStorage.getAgreementPublisher(modelId) == msg.sender, 'service provider has to be provider');
+        require(serviceAgreementStorage.getServiceAgreementPublisher(modelId) == msg.sender, 'service provider has to be provider');
         _;
     }
 
     modifier onlyPublisher(bytes32 modelId){
-        require(serviceAgreementStorage.getAgreementPublisher(modelId) == msg.sender, 'service provider has to be publisher');
+        require(serviceAgreementStorage.getServiceAgreementPublisher(modelId) == msg.sender, 'service provider has to be publisher');
         _;
     }
 
@@ -114,7 +114,7 @@ contract FitchainConditions{
         require(serviceAgreementAddress != address(0), 'invalid service agreement contract address');
         require(_stake > 0, 'invalid staking amount');
         require(_maxSlots > 0, 'invalid slots number');
-        serviceAgreementStorage = ServiceAgreement(serviceAgreementAddress);
+        serviceAgreementStorage = ServiceExecutionAgreement(serviceAgreementAddress);
         stake = _stake;
         maxSlots = _maxSlots;
     }
@@ -209,7 +209,7 @@ contract FitchainConditions{
             return false;
         }
         // init model
-        models[modelId] = Model(true, false, false, k, new uint256[](2), bytes32(0), serviceAgreementStorage.getAgreementConsumer(modelId), serviceAgreementStorage.getAgreementPublisher(modelId));
+        models[modelId] = Model(true, false, false, k, new uint256[](2), bytes32(0), serviceAgreementStorage.getServiceAgreementConsumer(modelId), serviceAgreementStorage.getServiceAgreementPublisher(modelId));
         // get k GPC verifiers
         require(electRRKVerifiers(modelId, k, 1, timeout), 'unable to allocate resources');
         emit PoTInitialized(true);
@@ -248,7 +248,7 @@ contract FitchainConditions{
         //TODO: commit-reveal scheme to be implemented!
         if(models[modelId].GPCVerifiers[msg.sender].vote) models[modelId].voteCount[0] +=1;
         if(models[modelId].voteCount[0] == models[modelId].Kverifiers) {
-            emit VotesSubmitted(modelId, serviceAgreementStorage.getAgreementPublisher(modelId), 1);
+            emit VotesSubmitted(modelId, serviceAgreementStorage.getServiceAgreementPublisher(modelId), 1);
         }
         return true;
     }
@@ -267,7 +267,7 @@ contract FitchainConditions{
         //TODO: They might be verifiers or compute-data provider
         //TODO: commit-reveal scheme to be implemented!
         if(models[modelId].VPCVerifiers[msg.sender].vote) models[modelId].voteCount[1] +=1;
-        if(models[modelId].voteCount[1] == models[modelId].Kverifiers) emit VotesSubmitted(modelId, serviceAgreementStorage.getAgreementPublisher(modelId), 2);
+        if(models[modelId].voteCount[1] == models[modelId].Kverifiers) emit VotesSubmitted(modelId, serviceAgreementStorage.getServiceAgreementPublisher(modelId), 2);
         return true;
     }
 
@@ -277,7 +277,7 @@ contract FitchainConditions{
     /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
     /// @param count , represents the number of submitted votes by verifiers who testify that they check the existence of proof in Fitchain
     function setPoT(bytes32 modelId, uint256 count) public onlyValidVotes(modelId, 0, count) onlyPublisher(modelId) returns(bool){
-        bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(modelId, address(this), this.setPoT.selector);
+        bytes32 condition = serviceAgreementStorage.generateConditionKeyForId(modelId, address(this), this.setPoT.selector);
         if (serviceAgreementStorage.hasUnfulfilledDependencies(modelId, condition)){
             emit TrainingConditionState(modelId, false);
             return false;
@@ -298,7 +298,7 @@ contract FitchainConditions{
     /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
     /// @param count , represents the number of submitted votes by verifiers who testify that they check the existence of proof in Fitchain
     function setVPC(bytes32 modelId, uint256 count) public onlyValidVotes(modelId, 1, count) onlyPublisher(modelId) returns(bool){
-        bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(modelId, address(this), this.setVPC.selector);
+        bytes32 condition = serviceAgreementStorage.generateConditionKeyForId(modelId, address(this), this.setVPC.selector);
         if (serviceAgreementStorage.hasUnfulfilledDependencies(modelId, condition)){
             emit VerificationConditionState(modelId, false);
             return false;
