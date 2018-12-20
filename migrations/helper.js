@@ -1,4 +1,5 @@
 const fs = require('fs')
+const pkg = require('./../package.json')
 
 module.exports = {
     saveDefinition(network, artifact) {
@@ -13,7 +14,8 @@ module.exports = {
             JSON.stringify({
                 abi: artifact.abi,
                 bytecode: artifact.bytecode,
-                address: artifact.address
+                address: artifact.address,
+                version: `v${pkg.version}`
             }, null, 2)
         )
     }
