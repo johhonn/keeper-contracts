@@ -107,7 +107,7 @@ contract('SLA', (accounts) => {
 
             // msg.sender, service, dependencies.length, contracts.length
 
-            const templateId = result.logs[4].args.serviceTemplateId
+            const templateId = result.logs[4].args.templateId
             assert.strictEqual(templateId, serviceTemplateId, 'Template Id should match indicating creating of agreement template')
             console.log('\x1b[36m%s\x1b[0m', '\t >> Template ID:', templateId, '... Done!')
             console.log('\t >> Execute service level agreement')
@@ -133,19 +133,19 @@ contract('SLA', (accounts) => {
             */
 
             // generate template fingerprint including all the conditions and
-            const serviceAgreementId = utils.generateId(web3)
-            const hash = utils.createSLAHash(web3, templateId, condKeys, valHashList, timeoutValues, serviceAgreementId)
+            const agreementId = utils.generateId(web3)
+            const hash = utils.createSLAHash(web3, templateId, condKeys, valHashList, timeoutValues, agreementId)
             const signature = await web3.eth.sign(hash, consumer)
-            const val = await sla.executeServiceAgreement(templateId, signature, consumer, [ valHashList[0], valHashList[1], valHashList[2], valHashList[3] ], timeoutValues, serviceAgreementId, did, { from: SLATemplateOwner })
-            assert.strictEqual(val.logs[4].args.serviceAgreementId, serviceAgreementId, 'Execute Agreement event not emitted.')
-            console.log('\x1b[36m%s\x1b[0m', '\t >> Service Agreement ID: ', val.logs[4].args.serviceAgreementId, ' ... Done!')
+            const val = await sla.executeAgreement(templateId, signature, consumer, [ valHashList[0], valHashList[1], valHashList[2], valHashList[3] ], timeoutValues, agreementId, did, { from: SLATemplateOwner })
+            assert.strictEqual(val.logs[4].args.agreementId, agreementId, 'Execute Agreement event not emitted.')
+            console.log('\x1b[36m%s\x1b[0m', '\t >> Service Agreement ID: ', val.logs[4].args.agreementId, ' ... Done!')
 
             console.log('\x1b[36m%s\x1b[0m', '\t >> Set 3rd condition status to 1 by contract address: ', contract3, ' Fingerprint: ', fingerprint3)
             console.log('\t >> Reconstruct condition-3 authorized hash')
             const condition3 = '0x' + abi.soliditySHA3([ 'bytes32', 'bytes32' ], [ condKeys[2], valHashList[2] ]).toString('hex')
             console.log('\t >> Hash(ConditionKey, ValueHash): ', condition3)
-            await sla.fulfillCondition(serviceAgreementId, fingerprint3, valHashList[2], { from: contract3 })
-            const conditionIdStatus = await sla.getConditionStatus(serviceAgreementId, condKeys[2])
+            await sla.fulfillCondition(agreementId, fingerprint3, valHashList[2], { from: contract3 })
+            const conditionIdStatus = await sla.getConditionStatus(agreementId, condKeys[2])
             assert.strictEqual(1, conditionIdStatus.toNumber(), 'Invalid condition state')
             console.log('\x1b[36m%s\x1b[0m', '\t >> Condition 3 status: ', conditionIdStatus.toNumber())
 
@@ -153,15 +153,15 @@ contract('SLA', (accounts) => {
             console.log('\t >> Reconstruct condition-2 authorized hash')
             const condition2 = '0x' + abi.soliditySHA3([ 'bytes32', 'bytes32' ], [ condKeys[1], valHashList[1] ]).toString('hex')
             console.log('\t >> Hash(ConditionKey, ValueHash): ', condition2)
-            await sla.fulfillCondition(serviceAgreementId, fingerprint2, valHashList[1], { from: contract2 })
-            const conditionId2Status = await sla.getConditionStatus(serviceAgreementId, condKeys[1])
+            await sla.fulfillCondition(agreementId, fingerprint2, valHashList[1], { from: contract2 })
+            const conditionId2Status = await sla.getConditionStatus(agreementId, condKeys[1])
             assert.strictEqual(1, conditionId2Status.toNumber(), 'Invalid condition state')
             console.log('\x1b[36m%s\x1b[0m', '\t >> Condition 2 status: ', conditionId2Status.toNumber())
 
             console.warn('\t >> Try to change the state of condition 4')
             console.info('\t >> wait for 2 sec condition 3 timeout')
             await sleep(2000)
-            if (await sla.conditionTimedOut(serviceAgreementId, condKeys[3])) {
+            if (await sla.conditionTimedOut(agreementId, condKeys[3])) {
                 console.info('yes')
             } else {
                 console.warn('\t >> Condition-3 is not timed out yet')
@@ -170,8 +170,8 @@ contract('SLA', (accounts) => {
                     console.log('\t >> Reconstruct condition-4 authorized hash')
                     const condition4 = '0x' + abi.soliditySHA3([ 'bytes32', 'bytes32' ], [ condKeys[3], valHashList[3] ]).toString('hex')
                     console.log('\t >> Hash(ConditionKey, ValueHash): ', condition4)
-                    await sla.fulfillCondition(serviceAgreementId, fingerprint4, valHashList[3], { from: contract4 })
-                    const conditionId4Status = await sla.getConditionStatus(serviceAgreementId, condKeys[3])
+                    await sla.fulfillCondition(agreementId, fingerprint4, valHashList[3], { from: contract4 })
+                    const conditionId4Status = await sla.getConditionStatus(agreementId, condKeys[3])
                     assert.strictEqual(1, conditionId4Status.toNumber(), 'Invalid condition state')
                     console.log('\x1b[36m%s\x1b[0m', '\t >> Condition 4 status: ', conditionId4Status.toNumber())
                 } catch (err) {
@@ -182,8 +182,8 @@ contract('SLA', (accounts) => {
             console.info('\t >> wait for 3 sec, the actual condition 3 timeout')
             await sleep(3000)
 
-            if (await sla.conditionTimedOut(serviceAgreementId, condKeys[3])) {
-                const conditionId4Status = await sla.getConditionStatus(serviceAgreementId, condKeys[3])
+            if (await sla.conditionTimedOut(agreementId, condKeys[3])) {
+                const conditionId4Status = await sla.getConditionStatus(agreementId, condKeys[3])
                 console.log('\x1b[36m%s\x1b[0m', '\t >> Condition 4 status: ', conditionId4Status.toNumber())
 
                 if ((conditionId4Status.toNumber() === -1 || conditionId4Status.toNumber() === 0) && conditionId2Status.toNumber() === 1) {
@@ -191,8 +191,8 @@ contract('SLA', (accounts) => {
                     console.log('\t >> Reconstruct condition-1 authorized hash')
                     const condition1 = '0x' + abi.soliditySHA3([ 'bytes32', 'bytes32' ], [ condKeys[0], valHashList[0] ]).toString('hex')
                     console.log('\t >> Hash(ConditionKey, ValueHash): ', condition1)
-                    await sla.fulfillCondition(serviceAgreementId, fingerprint1, valHashList[0], { from: contract1 })
-                    const conditionId1Status = await sla.getConditionStatus(serviceAgreementId, condKeys[0])
+                    await sla.fulfillCondition(agreementId, fingerprint1, valHashList[0], { from: contract1 })
+                    const conditionId1Status = await sla.getConditionStatus(agreementId, condKeys[0])
                     assert.strictEqual(1, conditionId1Status.toNumber(), 'Invalid condition state')
                     console.log('\x1b[36m%s\x1b[0m', '\t >> Condition 1 status: ', conditionId1Status.toNumber())
                 } else {
@@ -203,12 +203,12 @@ contract('SLA', (accounts) => {
             }
 
             console.info('\t >> fulfill agreement')
-            const fulfilled = await sla.fulfillServiceAgreement(serviceAgreementId, { from: accounts[8] })
-            console.log('\t >> Agreement ', fulfilled.logs[0].args.serviceAgreementId, ' has been fulfilled')
+            const fulfilled = await sla.fulfillAgreement(agreementId, { from: accounts[8] })
+            console.log('\t >> Agreement ', fulfilled.logs[0].args.agreementId, ' has been fulfilled')
 
-            console.log('\t >> Fulfill agreement: ', serviceAgreementId)
+            console.log('\t >> Fulfill agreement: ', agreementId)
             try {
-                await sla.fulfillServiceAgreement(serviceAgreementId, { from: accounts[8] })
+                await sla.fulfillAgreement(agreementId, { from: accounts[8] })
                 console.log('\t >> Done!')
             } catch (error) {
                 console.log('\t >> Unable to fulfill agreement!')

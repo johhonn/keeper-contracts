@@ -16,83 +16,195 @@ contract PaymentConditions {
         uint256 amount;
     }
 
-    ServiceExecutionAgreement private serviceAgreementStorage;
+    ServiceExecutionAgreement private agreementStorage;
     ERC20 private token;
 
-    constructor(address _serviceAgreementAddress, address _tokenAddress) public {
-        require(_serviceAgreementAddress != address(0), 'invalid contract address');
-        require(_tokenAddress != address(0), 'invalid token address');
-        serviceAgreementStorage = ServiceExecutionAgreement(_serviceAgreementAddress);
+    constructor(
+        address _agreementAddress,
+        address _tokenAddress
+    )
+        public
+    {
+        require(
+            _agreementAddress != address(0),
+            'invalid contract address'
+        );
+        require(
+            _tokenAddress != address(0),
+            'invalid token address'
+        );
+        agreementStorage = ServiceExecutionAgreement(_agreementAddress);
         token = OceanToken(_tokenAddress);
     }
 
     mapping(bytes32 => Payment) private payments;
 
     event PaymentLocked(
-        bytes32 indexed serviceId,
+        bytes32 indexed agreementId,
         address sender,
         address receiver,
         uint256 amount
     );
     event PaymentReleased(
-        bytes32 indexed serviceId,
+        bytes32 indexed agreementId,
         address sender,
         address receiver,
         uint256 amount
     );
     event PaymentRefund(
-        bytes32 indexed serviceId,
+        bytes32 indexed agreementId,
         address sender,
         address receiver,
         uint256 amount
     );
 
-    function lockPayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
-        require(serviceAgreementStorage.getServiceAgreementConsumer(serviceId) == msg.sender, 'Only consumer can trigger lockPayment.');
-        bytes32 condition = serviceAgreementStorage.generateConditionKeyForId(serviceId, address(this), this.lockPayment.selector);
+    function lockPayment(
+        bytes32 agreementId,
+        bytes32 assetId,
+        uint256 price
+    )
+        public
+        returns (bool)
+    {
+        require(
+            agreementStorage.getAgreementConsumer(agreementId) == msg.sender,
+            'Only consumer can trigger lockPayment.'
+        );
+        bytes32 condition = agreementStorage.generateConditionKeyForId(
+            agreementId,
+            address(this),
+            this.lockPayment.selector
+        );
 
-        if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition))
+        if (agreementStorage.hasUnfulfilledDependencies(agreementId, condition))
             return false;
 
-        if (serviceAgreementStorage.getConditionStatus(serviceId, condition) == 1)
+        if (agreementStorage.getConditionStatus(agreementId, condition) == 1)
             return true;
 
-        bytes32 valueHash = keccak256(abi.encodePacked(assetId, price));
-        require(serviceAgreementStorage.fulfillCondition(serviceId, this.lockPayment.selector, valueHash), 'unable to not lock payment because token transfer failed');
+        bytes32 valueHash = hashValues(assetId, price);
+        require(
+            agreementStorage.fulfillCondition(
+                agreementId,
+                this.lockPayment.selector,
+                valueHash
+            ),
+            'unable to not lock payment because token transfer failed'
+        );
+
         token.allowance(msg.sender, address(this));
-        require(token.transferFrom(msg.sender, address(this), price), 'Can not lock payment');
-        payments[serviceId] = Payment(msg.sender, address(this), price);
-        emit PaymentLocked(serviceId, payments[serviceId].sender, payments[serviceId].receiver, payments[serviceId].amount);
+        require(
+            token.transferFrom(msg.sender, address(this), price),
+            'Can not lock payment');
+        payments[agreementId] = Payment(msg.sender, address(this), price);
+        emit PaymentLocked(
+            agreementId,
+            payments[agreementId].sender,
+            payments[agreementId].receiver,
+            payments[agreementId].amount
+        );
     }
 
-    function releasePayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
-        require(serviceAgreementStorage.getServiceAgreementPublisher(serviceId) == msg.sender, 'Only service agreement publisher can trigger releasePayment.');
-        bytes32 condition = serviceAgreementStorage.generateConditionKeyForId(serviceId, address(this), this.releasePayment.selector);
-        if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition))
+    function releasePayment(
+        bytes32 agreementId,
+        bytes32 assetId,
+        uint256 price
+    )
+        public
+        returns (bool)
+    {
+        require(
+            agreementStorage.getAgreementPublisher(agreementId) == msg.sender,
+            'Only service agreement publisher can trigger releasePayment.'
+        );
+
+        bytes32 condition = agreementStorage.generateConditionKeyForId(
+            agreementId,
+            address(this),
+            this.releasePayment.selector
+        );
+
+        if (agreementStorage.hasUnfulfilledDependencies(agreementId, condition))
             return false;
 
-        if (serviceAgreementStorage.getConditionStatus(serviceId, condition) == 1)
+        if (agreementStorage.getConditionStatus(agreementId, condition) == 1)
             return true;
 
-        bytes32 valueHash = keccak256(abi.encodePacked(assetId, price));
-        serviceAgreementStorage.fulfillCondition(serviceId, this.releasePayment.selector, valueHash);
-        require(token.transfer(msg.sender, payments[serviceId].amount), 'unable to release payment because token transfer failed');
-        emit PaymentReleased(serviceId, payments[serviceId].receiver, msg.sender, payments[serviceId].amount);
+        bytes32 valueHash = hashValues(assetId, price);
+        agreementStorage.fulfillCondition(
+            agreementId,
+            this.releasePayment.selector,
+            valueHash
+        );
+        require(
+            token.transfer(msg.sender, payments[agreementId].amount),
+            'unable to release payment because token transfer failed'
+        );
+        emit PaymentReleased(
+            agreementId,
+            payments[agreementId].receiver,
+            msg.sender,
+            payments[agreementId].amount
+        );
     }
 
-    function refundPayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
-        require(payments[serviceId].sender == msg.sender, 'Only consumer can trigger refundPayment.');
-        bytes32 condition = serviceAgreementStorage.generateConditionKeyForId(serviceId, address(this), this.refundPayment.selector);
-        if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition))
+    function refundPayment(
+        bytes32 agreementId,
+        bytes32 assetId,
+        uint256 price
+    )
+        public
+        returns (bool)
+    {
+        require(
+            payments[agreementId].sender == msg.sender,
+            'Only consumer can trigger refundPayment.'
+        );
+
+        bytes32 condition = agreementStorage.generateConditionKeyForId(
+            agreementId,
+            address(this),
+            this.refundPayment.selector
+        );
+        if (agreementStorage.hasUnfulfilledDependencies(agreementId, condition))
             return false;
 
-        if (serviceAgreementStorage.getConditionStatus(serviceId, condition) == 1)
+        if (agreementStorage.getConditionStatus(agreementId, condition) == 1)
             return true;
 
-        bytes32 valueHash = keccak256(abi.encodePacked(assetId, price));
-        serviceAgreementStorage.fulfillCondition(serviceId, this.refundPayment.selector, valueHash);
+        bytes32 valueHash = hashValues(assetId, price);
+        agreementStorage.fulfillCondition(
+            agreementId,
+            this.refundPayment.selector,
+            valueHash
+        );
         // transfer from this contract to consumer/msg.sender
-        require(token.transfer(payments[serviceId].sender, payments[serviceId].amount), 'unable to refund payment because token transfer failed');
-        emit PaymentRefund(serviceId, payments[serviceId].receiver, payments[serviceId].sender, payments[serviceId].amount);
+        require(
+            token.transfer(payments[agreementId].sender, payments[agreementId].amount),
+            'unable to refund payment because token transfer failed'
+        );
+        emit PaymentRefund(
+            agreementId,
+            payments[agreementId].receiver,
+            payments[agreementId].sender,
+            payments[agreementId].amount
+        );
+    }
+
+    function hashValues(
+        bytes32 assetId,
+        uint256 price
+    )
+        public pure
+        returns (
+            bytes32 valueHash
+        )
+    {
+        return keccak256(
+            abi.encodePacked(
+                assetId,
+                price
+            )
+        );
     }
 }

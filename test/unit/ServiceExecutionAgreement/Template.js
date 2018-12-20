@@ -15,7 +15,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
     let dependenciesBits
     let valueHashes
     let timeoutValues
-    let serviceAgreementId
+    let agreementId
 
     beforeEach(async () => {
         contract = await ServiceExecutionAgreement.new({ from: accounts[0] })
@@ -26,7 +26,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
         dependenciesBits = [0]
         valueHashes = [utils.valueHash(['bool'], [true])]
         timeoutValues = [0]
-        serviceAgreementId = utils.generateId(web3)
+        agreementId = utils.generateId(web3)
     })
 
     describe('setupTemplate', () => {

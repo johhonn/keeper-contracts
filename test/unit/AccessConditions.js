@@ -3,7 +3,7 @@
 /* global artifacts, assert, contract, describe, it */
 
 const AccessConditions = artifacts.require('AccessConditions.sol')
-const ServiceAgreement = artifacts.require('ServiceExecutionAgreement.sol')
+const Agreement = artifacts.require('ServiceExecutionAgreement.sol')
 const utils = require('../utils.js')
 
 const web3 = utils.getWeb3()
@@ -33,27 +33,27 @@ contract('AccessConditions', (accounts) => {
     let dependenciesBits
     let valueHashes
     let timeoutValues
-    let serviceAgreementId
+    let agreementId
 
-    function createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer) {
+    function createSignature(contracts, fingerprints, valueHashes, timeoutValues, agreementId, consumer) {
         const conditionKeys = utils.generateConditionsKeys(templateId, contracts, fingerprints)
-        const hash = utils.createSLAHash(web3, templateId, conditionKeys, valueHashes, timeoutValues, serviceAgreementId)
+        const hash = utils.createSLAHash(web3, templateId, conditionKeys, valueHashes, timeoutValues, agreementId)
         return web3.eth.sign(hash, consumer)
     }
 
     async function initAgreement() {
-        const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
+        const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, agreementId, consumer)
         await agreement.setupTemplate(
             templateId,
             contracts,
             fingerprints,
             dependenciesBits,
             [0], 0, { from: accounts[0] })
-        await agreement.executeServiceAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+        await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, agreementId, templateId, { from: accounts[0] })
     }
 
     beforeEach(async () => {
-        agreement = await ServiceAgreement.new({ from: accounts[0] })
+        agreement = await Agreement.new({ from: accounts[0] })
         contract = await AccessConditions.new(agreement.address, { from: accounts[0] })
         /* eslint-disable-next-line prefer-destructuring */
         consumer = accounts[1]
@@ -62,7 +62,7 @@ contract('AccessConditions', (accounts) => {
         dependenciesBits = [0]
         valueHashes = utils.valueHash(['bytes32', 'bytes32'], [assetId, assetId])
         timeoutValues = [0]
-        serviceAgreementId = utils.generateId(web3)
+        agreementId = utils.generateId(web3)
     })
 
     describe('grantAccess', () => {
@@ -72,7 +72,7 @@ contract('AccessConditions', (accounts) => {
 
             // act-assert
             try {
-                await contract.grantAccess(serviceAgreementId, emptyBytes32, emptyBytes32, { from: consumer })
+                await contract.grantAccess(agreementId, emptyBytes32, emptyBytes32, { from: consumer })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Restricted access - only SLA publisher')
                 return
@@ -85,7 +85,7 @@ contract('AccessConditions', (accounts) => {
             await initAgreement()
 
             // act
-            const result = await contract.grantAccess(serviceAgreementId, assetId, assetId, { from: accounts[0] })
+            const result = await contract.grantAccess(agreementId, assetId, assetId, { from: accounts[0] })
 
             // assert
             utils.assertEmitted(result, 1, 'AccessGranted')
@@ -99,7 +99,7 @@ contract('AccessConditions', (accounts) => {
             await initAgreement()
 
             // act
-            const result = await contract.grantAccess(serviceAgreementId, assetId, assetId, { from: accounts[0] })
+            const result = await contract.grantAccess(agreementId, assetId, assetId, { from: accounts[0] })
 
             // assert
             utils.assertEmitted(result, 0, 'AccessGranted')

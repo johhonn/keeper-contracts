@@ -3,7 +3,7 @@
 const AccessConditions = artifacts.require('AccessConditions.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
-const ServiceAgreement = artifacts.require('ServiceExecutionAgreement.sol')
+const Agreement = artifacts.require('ServiceExecutionAgreement.sol')
 const utils = require('../utils.js')
 
 const web3 = utils.getWeb3()
@@ -33,7 +33,7 @@ contract('PaymentConditions', (accounts) => {
         const asset = web3.utils.fromAscii('my-asset')
         const price = 10
 
-        var walletBalance = 0
+        let walletBalance = 0
 
         before(async () => {
             token = await OceanToken.new()
@@ -41,7 +41,7 @@ contract('PaymentConditions', (accounts) => {
             await token.setReceiver(consumer)
             await token.approve(consumer, await token.totalSupply.call())
 
-            agreement = await ServiceAgreement.new()
+            agreement = await Agreement.new()
 
             paymentConditions = await PaymentConditions.new(
                 agreement.address, token.address
@@ -73,7 +73,7 @@ contract('PaymentConditions', (accounts) => {
                 fulfillmentIndices,
                 fulfilmentOperator
             )
-            templateId = result.logs[3].args.serviceTemplateId
+            templateId = result.logs[3].args.templateId
 
             const lockPaymentHash = utils.valueHash(['bytes32', 'uint256'], [asset, price])
             const releasePaymentHash = utils.valueHash(['bytes32', 'uint256'], [asset, price])
@@ -82,32 +82,32 @@ contract('PaymentConditions', (accounts) => {
             hashes = [grantAccessHash, lockPaymentHash, releasePaymentHash]
         })
 
-        async function signAgreement(serviceAgreementId) {
+        async function signAgreement(agreementId) {
             const hash = utils.createSLAHash(
                 web3, templateId,
                 utils.generateConditionsKeys(templateId, contracts, fingerprints),
                 hashes,
                 timeouts,
-                serviceAgreementId
+                agreementId
             )
             signature = await web3.eth.sign(hash, consumer)
-            const result = await agreement.executeServiceAgreement(
+            const result = await agreement.executeAgreement(
                 templateId,
                 signature,
                 consumer,
                 hashes,
                 timeouts,
-                serviceAgreementId,
+                agreementId,
                 did
             )
 
-            return result.logs[3].args.serviceAgreementId
+            return result.logs[3].args.agreementId
         }
 
         it('Rejects to lock payments if conditions are not met', async () => {
-            const serviceId = await signAgreement(utils.generateId(web3))
+            const agreementId = await signAgreement(utils.generateId(web3))
 
-            await paymentConditions.lockPayment(serviceId, asset, price)
+            await paymentConditions.lockPayment(agreementId, asset, price)
             assert.strictEqual(
                 0,
                 web3.utils.toDecimal(await token.balanceOf.call(paymentConditions.address))
@@ -115,15 +115,15 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Locks payment if conditions are met', async () => {
-            const serviceId = await signAgreement(utils.generateId(web3))
+            const agreementId = await signAgreement(utils.generateId(web3))
 
             await accessConditions.grantAccess(
-                serviceId,
+                agreementId,
                 asset,
                 asset
             )
 
-            await paymentConditions.lockPayment(serviceId, asset, price)
+            await paymentConditions.lockPayment(agreementId, asset, price)
             walletBalance += price
             assert.strictEqual(
                 walletBalance,
@@ -132,15 +132,15 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Does not lock twice', async () => {
-            const serviceId = await signAgreement(utils.generateId(web3))
+            const agreementId = await signAgreement(utils.generateId(web3))
 
             await accessConditions.grantAccess(
-                serviceId,
+                agreementId,
                 asset,
                 asset
             )
 
-            await paymentConditions.lockPayment(serviceId, asset, price)
+            await paymentConditions.lockPayment(agreementId, asset, price)
             walletBalance += price
             assert.strictEqual(
                 walletBalance,
@@ -148,7 +148,7 @@ contract('PaymentConditions', (accounts) => {
             )
 
             // Try to lock again, the balance must not change.
-            await paymentConditions.lockPayment(serviceId, asset, price)
+            await paymentConditions.lockPayment(agreementId, asset, price)
             assert.strictEqual(
                 walletBalance,
                 web3.utils.toDecimal(await token.balanceOf.call(paymentConditions.address))
@@ -156,9 +156,9 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Rejects to release payment if conditions are not met', async () => {
-            const serviceId = await signAgreement(utils.generateId(web3))
+            const agreementId = await signAgreement(utils.generateId(web3))
 
-            await paymentConditions.releasePayment(serviceId, asset, price)
+            await paymentConditions.releasePayment(agreementId, asset, price)
             assert.strictEqual(
                 0,
                 web3.utils.toDecimal(await token.balanceOf.call(agreement.address))
@@ -166,17 +166,17 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Releases payment if conditions are met', async () => {
-            const serviceId = await signAgreement(utils.generateId(web3))
+            const agreementId = await signAgreement(utils.generateId(web3))
 
             await accessConditions.grantAccess(
-                serviceId,
+                agreementId,
                 asset,
                 asset
             )
-            await paymentConditions.lockPayment(serviceId, asset, price)
+            await paymentConditions.lockPayment(agreementId, asset, price)
             walletBalance += price
 
-            await paymentConditions.releasePayment(serviceId, asset, price)
+            await paymentConditions.releasePayment(agreementId, asset, price)
             walletBalance -= price
             assert.strictEqual(
                 walletBalance,
@@ -185,17 +185,17 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Does not release twice', async () => {
-            const serviceId = await signAgreement(utils.generateId(web3))
+            const agreementId = await signAgreement(utils.generateId(web3))
 
             await accessConditions.grantAccess(
-                serviceId,
+                agreementId,
                 asset,
                 asset
             )
-            await paymentConditions.lockPayment(serviceId, asset, price)
+            await paymentConditions.lockPayment(agreementId, asset, price)
             walletBalance += price
 
-            await paymentConditions.releasePayment(serviceId, asset, price)
+            await paymentConditions.releasePayment(agreementId, asset, price)
             walletBalance -= price
             assert.strictEqual(
                 walletBalance,
@@ -203,7 +203,7 @@ contract('PaymentConditions', (accounts) => {
             )
 
             // Try to release again, the balance must not change.
-            await paymentConditions.releasePayment(serviceId, asset, price)
+            await paymentConditions.releasePayment(agreementId, asset, price)
             assert.strictEqual(
                 walletBalance,
                 web3.utils.toDecimal(await token.balanceOf.call(paymentConditions.address))
