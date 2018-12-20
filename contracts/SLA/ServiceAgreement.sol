@@ -128,6 +128,7 @@ contract ServiceAgreement {
     /// @param service , hash of service agreement name (defined in off-chain DID document)
     /// @param fulfillmentIndices , fulfillment indices include which conditions are in charge to make the agreement fulfilled
     /// @param fulfillmentOperator , the relation between conditions in the fulfillment indices
+    /// @return true if the setup of the service execution agreement goes well
     function setupAgreementTemplate(bytes32 templateId, address[] contracts, bytes4[] fingerprints, uint256[] dependenciesBits, bytes32 service, uint8[] fulfillmentIndices, uint8 fulfillmentOperator)
     public isValidTemplateId(templateId) returns (bool){
         // TODO: whitelisting the contracts/fingerprints
@@ -257,6 +258,7 @@ contract ServiceAgreement {
     /// @param i , condition index
     /// @param bitPosition , which bit position will be checked
     /// @param numBits , currently the number of bits used in this implementation is 2 but it might be extended in the future to hold more features
+    /// @return the bit value (either 0 nothing to do or 1 indicating existing timeout or dependency)
     function getBitValue(uint256 value, uint16 i, uint16 bitPosition, uint16 numBits) private pure returns (uint8 bitValue) {
         return uint8(value & (2 ** uint256((i * numBits) + bitPosition))) == 0 ? uint8(0) : uint8(1);
     }
@@ -302,86 +304,102 @@ contract ServiceAgreement {
         return false;
     }
 
-    /// @notice conditionTimedOut returns true if the condition timeout
+    /// @notice conditionTimedOut checks the condition timeout
     /// @param serviceId , service execution agreement instance ID
     /// @param condition , condition key (not condition instance)
+    /// @return true if the condition is timed out
     function conditionTimedOut(bytes32 serviceId, bytes32 condition) public view returns (bool){
         if (block.timestamp > agreements[serviceId].timeoutValues[conditionKeyToIndex[condition]]) return true;
         return false;
     }
 
-    /// @notice getCurrentBlockNumber returns the current block number in ocean network
+    /// @notice getCurrentBlockNumber checks the block number in ocean network
+    /// @return the current block number
     function getCurrentBlockNumber() public view returns (uint){
         return block.number;
     }
 
-    /// @notice getConditionStatus returns condition status
+    /// @notice getConditionStatus checks the condition status (fulfilled or not)
     /// @param serviceId , service execution agreement instance ID
     /// @param condition , condition key (not condition instance)
+    /// @return condition status
     function getConditionStatus(bytes32 serviceId, bytes32 condition) public onlyExistConditionKey(serviceId, condition) view returns (uint8){
         return agreements[serviceId].conditionsState[conditionKeyToIndex[condition]];
     }
 
-    /// @notice getAgreementStatus returns service execution agreement status
+    /// @notice getAgreementStatus checks the service execution agreement status
     /// @param serviceId , service execution agreement instance ID
+    /// @return true if service execution agreement exists
     function getAgreementStatus(bytes32 serviceId) public view returns (bool){
         return agreements[serviceId].state;
     }
 
-    /// @notice getAgreementPublisher returns publisher address in a service execution agreement
+    /// @notice getAgreementPublisher gets the address of the publisher for a particular service execution agreement
     /// @param serviceId , service agreement instance ID
+    /// @return publisher address in a service execution agreement
     function getAgreementPublisher(bytes32 serviceId) public view returns (address publisher) {
         return agreements[serviceId].publisher;
     }
 
-    /// @notice getTemplateOwner returns address of the service execution agreement template owner
+    /// @notice getTemplateOwner checks the template owner
     /// @param templateId , service execution agreement template ID
+    /// @return address of the service execution agreement template owner
     function getTemplateOwner(bytes32 templateId) public view returns (address owner) {
         return templates[templateId].owner;
     }
 
-    /// @notice getAgreementConsumer returns the address of service execution agreement consumer
+    /// @notice getAgreementConsumer checks the service execution agreement consumer
     /// @param serviceId , service agreement instance ID
+    /// @return the service execution agreement consumers address
     function getAgreementConsumer(bytes32 serviceId) public view returns (address consumer){
         return agreements[serviceId].consumer;
     }
 
-    /// @notice getConditionByFingerprint returns condition key
+    /// @notice getConditionByFingerprint reconstruct the conditon key using the fingerprint, contract and service execution agreement instance ID
     /// @param serviceId , service agreement instance ID
     /// @param _contract , condition fulfillment contract address
     /// @param fingerprint , condition fulfillment function fingerprint (4 bytes) ONLY external or public fulfillment functions
+    /// @return condition key
     function getConditionByFingerprint(bytes32 serviceId, address _contract, bytes4 fingerprint) public view returns (bytes32) {
         return keccak256(abi.encodePacked(getTemplateId(serviceId), _contract, fingerprint));
     }
 
     /// @notice isAgreementTerminated returns service execution agreement status
     /// @param serviceAgreementId , service agreement instance ID
+    /// @return true if the service execution agreement terminated (either it is fulfilled or not)
     function isAgreementTerminated(bytes32 serviceAgreementId) public view returns(bool) {
         return agreements[serviceAgreementId].terminated;
     }
 
-    /// @notice getTemplateStatus returns service execution agreement status
+    /// @notice getTemplateStatus indicating the current status of service execution agreement
     /// @param templateId , service execution agreement template ID
+    /// @return true if the template still exists
     function getTemplateStatus(bytes32 templateId) public view returns (bool status){
         return templates[templateId].state;
     }
 
     /// @notice revokeAgreementTemplate revokes the template agreement, so it is no longer will be used in the future
     /// @param templateId , service execution agreement template ID
+    /// @return true if the service execution agreement template was revoked
     function revokeAgreementTemplate(bytes32 templateId) public isTemplateOwner(templateId) canRevokeTemplate(templateId) returns (bool) {
         templates[templateId].state = false;
         emit SLATemplateRevoked(templateId, true);
+        return true;
     }
 
-    /// @notice revokeAgreementTemplate revokes the template agreement, so it is no longer will be used in the future
+    /// @notice getTemplateConditionKey gets the condition key using its index for a specific template
     /// @param templateId , service execution agreement template ID
+    /// @param index , condition index in the service execution agreement template
+    /// @return condition key (bytes32)
     function getTemplateConditionKey(bytes32 templateId, uint index) view public returns (bytes32) {
         require(index < templates[templateId].conditionKeys.length);
         return templates[templateId].conditionKeys[index];
     }
 
-    /// @notice revokeAgreementTemplate revokes the template agreement, so it is no longer will be used in the future
+    /// @notice getTemplateDependencies is used to get the dependency bits of a registered service execution agreement template
     /// @param templateId , service execution agreement template ID
+    /// @param index , condition index in the service execution agreement template
+    /// @return the template dependency bits using the condition index
     function getTemplateDependencies(bytes32 templateId, uint index) view public returns (uint256) {
         require(index < templates[templateId].dependenciesBits.length);
         return templates[templateId].dependenciesBits[index];

@@ -45,15 +45,15 @@ contract DIDRegistry is Ownable {
     }
 
     /// @notice getUpdateAt is called anyone.
-    /// @dev a view function returns last modified (update) time of a DID
     /// @param _did , Dencentralized Identifier (a byte32 length ID)
+    /// @return last modified (update) time of a DID
     function getUpdateAt(bytes32 _did) public view returns(uint) {
         return didRegister[_did].updateAt;
     }
 
     /// @notice getOwner is called anyone.
-    /// @dev a view function returns DID owner address
     /// @param _did , Dencentralized Identifier (a byte32 length ID)
+    /// @return the address of the owner
     function getOwner(bytes32 _did) public view returns(address) {
         return didRegister[_did].owner;
     }

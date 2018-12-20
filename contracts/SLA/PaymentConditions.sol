@@ -52,6 +52,7 @@ contract PaymentConditions {
     /// @param serviceId , service agreement instance ID
     /// @param assetId , published or registered asset DID
     /// @param price , asset price in OCN token
+    /// @return true if the payment get locked to the payment contract
     function lockPayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
         require(serviceAgreementStorage.getAgreementConsumer(serviceId) == msg.sender, 'Only consumer can trigger lockPayment.');
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.lockPayment.selector);
@@ -74,6 +75,7 @@ contract PaymentConditions {
     /// @param serviceId , service agreement instance ID
     /// @param assetId , published or registered asset DID
     /// @param price , asset price in OCN token
+    /// @return true if the publisher is able to release and receive the locked payment
     function releasePayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
         require(serviceAgreementStorage.getAgreementPublisher(serviceId) == msg.sender, 'Only service agreement publisher can trigger releasePayment.');
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.releasePayment.selector);
@@ -94,6 +96,7 @@ contract PaymentConditions {
     /// @param serviceId , service agreement instance ID
     /// @param assetId , published or registered asset DID
     /// @param price , asset price in OCN token
+    /// @return true if the consumer is able to make refund
     function refundPayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
         require(payments[serviceId].sender == msg.sender, 'Only consumer can trigger refundPayment.');
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.refundPayment.selector);

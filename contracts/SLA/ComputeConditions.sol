@@ -28,6 +28,7 @@ contract ComputeConditions {
     event ProofOfUploadValid(bytes32 serviceAgreementId, address dataScientist, address publisher);
     event ProofOfUploadInvalid(bytes32 serviceAgreementId, address dataScientist, address publisher);
 
+    // modifiers
     modifier onlyDataConsumer(bytes32 serviceAgreementId) {
         require(msg.sender == serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), 'Invalid data scientist address!');
         _;
@@ -56,6 +57,7 @@ contract ComputeConditions {
     /// the message integrity and proof that both parties agree on the same algorithm file/s
     /// @param serviceAgreementId , the service level agreement Id
     /// @param signature data scientist signature = signed_hash(uploaded_algorithm_file/s)
+    /// @return true if the hash is submitted by the consumer
     function submitHashSignature(bytes32 serviceAgreementId, bytes signature) public onlyDataConsumer(serviceAgreementId) returns(bool status) {
         if(proofs[serviceAgreementId].exists){
             if(proofs[serviceAgreementId].isLocked) { // avoid race conditions
@@ -80,6 +82,7 @@ contract ComputeConditions {
     /// the message integrity and proof that both parties agree on the same algorithm file/s
     /// @param serviceAgreementId the service level agreement Id
     /// @param hash = kekccak(uploaded_algorithm_file/s)
+    /// @return false if the proof is locked to avoid the race condition otherwise, it return true
     function submitAlgorithmHash(bytes32 serviceAgreementId, bytes32 hash) public onlyComputePublisher(serviceAgreementId) returns(bool status) {
         if(proofs[serviceAgreementId].exists){
             if(proofs[serviceAgreementId].isLocked) { // avoid race conditions
@@ -103,6 +106,7 @@ contract ComputeConditions {
     /// fulfillCondition in service level agreement storage contract
     /// @param serviceAgreementId the service level agreement Id
     /// @param state get be used fo input value hash for this condition indicating the state of verification
+    /// @return true if the proof it is able to fulfill the condition otherwise return false
     function fulfillUpload(bytes32 serviceAgreementId, bool state) public onlyStakeholders(serviceAgreementId) returns(bool status) {
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceAgreementId, address(this), this.fulfillUpload.selector);
         if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceAgreementId, condition)){
