@@ -11,7 +11,6 @@ const { initializeAgreement } = require('../../helpers/initializeAgreement.js')
 
 const web3 = utils.getWeb3()
 
-
 contract('PaymentConditions', (accounts) => {
     const assetId = '0x0000000000000000000000000000000000000000000000000000000000000001'
     let sea
