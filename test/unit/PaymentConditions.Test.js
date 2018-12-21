@@ -37,9 +37,10 @@ contract('PaymentConditions', (accounts) => {
     const assetId = '0x0000000000000000000000000000000000000000000000000000000000000001'
     let agreement
     let token
-    let contract
+    let paymentConditions
     let price
-    let consumer
+    /* eslint-disable-next-line prefer-destructuring */
+    const consumer = accounts[1]
     let contracts
     let fingerprints
     let dependenciesBits
@@ -67,16 +68,14 @@ contract('PaymentConditions', (accounts) => {
     beforeEach(async () => {
         agreement = await Agreement.new({ from: accounts[0] })
         token = await OceanToken.new({ from: accounts[0] })
-        contract = await PaymentConditions.new(agreement.address, token.address, { from: accounts[0] })
+        paymentConditions = await PaymentConditions.new(agreement.address, token.address, { from: accounts[0] })
         price = 1
-        /* eslint-disable-next-line prefer-destructuring */
-        consumer = accounts[1]
-        contracts = [contract.address]
+        contracts = [paymentConditions.address]
         fingerprints = [utils.getSelector(web3, PaymentConditions, 'lockPayment')]
         dependenciesBits = [0]
         valueHashes = [utils.valueHash(['bytes32', 'uint256'], [assetId, price])]
         timeoutValues = [0]
-        agreementId = utils.generateId(web3)
+        agreementId = utils.generateId()
     })
 
     describe('lockPayment', () => {
@@ -86,7 +85,7 @@ contract('PaymentConditions', (accounts) => {
 
             // act-assert
             try {
-                await contract.lockPayment(agreementId, utils.emptyBytes32, 1, { from: accounts[0] })
+                await paymentConditions.lockPayment(agreementId, utils.emptyBytes32, 1, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Only consumer can trigger lockPayment.')
                 return
@@ -98,10 +97,10 @@ contract('PaymentConditions', (accounts) => {
             // arrange
             await initAgreement()
             await token.setReceiver(consumer, { from: accounts[0] })
-            await token.approve(contract.address, price, { from: consumer })
+            await token.approve(paymentConditions.address, price, { from: consumer })
 
             // act
-            const result = await contract.lockPayment(agreementId, assetId, price, { from: consumer })
+            const result = await paymentConditions.lockPayment(agreementId, assetId, price, { from: consumer })
 
             // assert
             utils.assertEmitted(result, 1, 'PaymentLocked')
@@ -113,7 +112,7 @@ contract('PaymentConditions', (accounts) => {
             await initAgreement()
 
             // act
-            const result = await contract.lockPayment(agreementId, assetId, price, { from: consumer })
+            const result = await paymentConditions.lockPayment(agreementId, assetId, price, { from: consumer })
 
             // assert
             utils.assertEmitted(result, 0, 'PaymentLocked')
@@ -123,11 +122,11 @@ contract('PaymentConditions', (accounts) => {
             // arrange
             await initAgreement()
             await token.setReceiver(consumer, { from: accounts[0] })
-            await token.approve(contract.address, price, { from: consumer })
-            await contract.lockPayment(agreementId, assetId, price, { from: consumer })
+            await token.approve(paymentConditions.address, price, { from: consumer })
+            await paymentConditions.lockPayment(agreementId, assetId, price, { from: consumer })
 
             // act
-            const result = await contract.lockPayment(agreementId, assetId, price, { from: consumer })
+            const result = await paymentConditions.lockPayment(agreementId, assetId, price, { from: consumer })
 
             // assert
             utils.assertEmitted(result, 0, 'PaymentLocked')
@@ -141,7 +140,7 @@ contract('PaymentConditions', (accounts) => {
 
             // act-assert
             try {
-                await contract.releasePayment(agreementId, utils.emptyBytes32, 1, { from: consumer })
+                await paymentConditions.releasePayment(agreementId, utils.emptyBytes32, 1, { from: consumer })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Only service agreement publisher can trigger releasePayment.')
                 return
@@ -156,7 +155,7 @@ contract('PaymentConditions', (accounts) => {
             await initAgreement()
 
             // act
-            const result = await contract.releasePayment(agreementId, assetId, price, { from: accounts[0] })
+            const result = await paymentConditions.releasePayment(agreementId, assetId, price, { from: accounts[0] })
 
             // assert
             utils.assertEmitted(result, 1, 'PaymentReleased')
@@ -168,7 +167,7 @@ contract('PaymentConditions', (accounts) => {
             await initAgreement()
 
             // act
-            const result = await contract.releasePayment(agreementId, assetId, price, { from: accounts[0] })
+            const result = await paymentConditions.releasePayment(agreementId, assetId, price, { from: accounts[0] })
 
             // assert
             utils.assertEmitted(result, 0, 'PaymentReleased')
@@ -179,10 +178,10 @@ contract('PaymentConditions', (accounts) => {
             fingerprints = [utils.getSelector(web3, PaymentConditions, 'releasePayment')]
             valueHashes = [utils.valueHash(['bytes32', 'uint256'], [assetId, price])]
             await initAgreement()
-            await contract.releasePayment(agreementId, assetId, price, { from: accounts[0] })
+            await paymentConditions.releasePayment(agreementId, assetId, price, { from: accounts[0] })
 
             // act
-            const result = await contract.releasePayment(agreementId, assetId, price, { from: accounts[0] })
+            const result = await paymentConditions.releasePayment(agreementId, assetId, price, { from: accounts[0] })
 
             // assert
             utils.assertEmitted(result, 0, 'PaymentReleased')
@@ -196,7 +195,7 @@ contract('PaymentConditions', (accounts) => {
 
             // act-assert
             try {
-                await contract.refundPayment(agreementId, utils.emptyBytes32, 1, { from: accounts[0] })
+                await paymentConditions.refundPayment(agreementId, utils.emptyBytes32, 1, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Only consumer can trigger refundPayment.')
                 return
@@ -206,18 +205,18 @@ contract('PaymentConditions', (accounts) => {
 
         it('Should refund payment', async () => {
             // arrang
-            contracts.push(contract.address)
+            contracts.push(paymentConditions.address)
             fingerprints.push(utils.getSelector(web3, PaymentConditions, 'refundPayment'))
             dependenciesBits = [0, 0]
             valueHashes.push(utils.valueHash(['bytes32', 'uint256'], [assetId, price]))
             timeoutValues.push(0)
             await initAgreement()
             await token.setReceiver(consumer, { from: accounts[0] })
-            await token.approve(contract.address, price, { from: consumer })
-            await contract.lockPayment(agreementId, assetId, price, { from: consumer })
+            await token.approve(paymentConditions.address, price, { from: consumer })
+            await paymentConditions.lockPayment(agreementId, assetId, price, { from: consumer })
 
             // act
-            const result = await contract.refundPayment(agreementId, assetId, price, { from: consumer })
+            const result = await paymentConditions.refundPayment(agreementId, assetId, price, { from: consumer })
 
             // assert
             utils.assertEmitted(result, 1, 'PaymentRefund')
@@ -225,19 +224,19 @@ contract('PaymentConditions', (accounts) => {
 
         it('Should not refund payment twice', async () => {
             // arrang
-            contracts.push(contract.address)
+            contracts.push(paymentConditions.address)
             fingerprints.push(utils.getSelector(web3, PaymentConditions, 'refundPayment'))
             dependenciesBits = [0, 1]
             valueHashes.push(utils.valueHash(['bytes32', 'uint256'], [assetId, price]))
             timeoutValues.push(0)
             await initAgreement()
             await token.setReceiver(consumer, { from: accounts[0] })
-            await token.approve(contract.address, price, { from: consumer })
-            await contract.lockPayment(agreementId, assetId, price, { from: consumer })
-            await contract.refundPayment(agreementId, assetId, price, { from: consumer })
+            await token.approve(paymentConditions.address, price, { from: consumer })
+            await paymentConditions.lockPayment(agreementId, assetId, price, { from: consumer })
+            await paymentConditions.refundPayment(agreementId, assetId, price, { from: consumer })
 
             // act
-            const result = await contract.refundPayment(agreementId, assetId, price, { from: consumer })
+            const result = await paymentConditions.refundPayment(agreementId, assetId, price, { from: consumer })
 
             // assert
             utils.assertEmitted(result, 0, 'PaymentRefund')

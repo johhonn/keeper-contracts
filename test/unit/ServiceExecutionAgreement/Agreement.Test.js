@@ -28,7 +28,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
         dependenciesBits = [0]
         valueHashes = [utils.valueHash(['bool'], [true])]
         timeoutValues = [0]
-        agreementId = utils.generateId(web3)
+        agreementId = utils.generateId()
     })
 
     async function initializeAgreementWithValues() {

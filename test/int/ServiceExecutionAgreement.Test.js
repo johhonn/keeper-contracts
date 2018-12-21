@@ -133,7 +133,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             */
 
             // generate template fingerprint including all the conditions and
-            const agreementId = utils.generateId(web3)
+            const agreementId = utils.generateId()
             const hash = utils.createSLAHash(web3, templateId, condKeys, valHashList, timeoutValues, agreementId)
             const signature = await web3.eth.sign(hash, consumer)
             const val = await sla.initializeAgreement(templateId, signature, consumer, [ valHashList[0], valHashList[1], valHashList[2], valHashList[3] ], timeoutValues, agreementId, did, { from: SLATemplateOwner })
@@ -280,7 +280,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
         })
 
         it('Consume asset happy path', async () => {
-            const serviceAgreementId = utils.generateId(web3)
+            const serviceAgreementId = utils.generateId()
             const slaMsgHash = utils.createSLAHash(
                 web3, testTemplateId, conditionKeys,
                 valuesHashList, timeouts,
@@ -334,7 +334,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
         })
 
         it('Consume asset with Refund', async () => {
-            const serviceAgreementId = utils.generateId(web3)
+            const serviceAgreementId = utils.generateId()
             const slaMsgHash = utils.createSLAHash(
                 web3,
                 testTemplateId,
