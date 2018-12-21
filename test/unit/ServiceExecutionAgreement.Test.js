@@ -226,7 +226,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             // arrange
             timeoutValues = [1]
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-            await contract.setupTemplate(utils.templateId, contracts, fingerprints, [0], utils.templateId, [0], 0, { from: accounts[0] })
+            await contract.setupTemplate(utils.templateId, contracts, fingerprints, [0], [0], 0, { from: accounts[0] })
 
             // act-assert
             try {
