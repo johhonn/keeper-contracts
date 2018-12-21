@@ -22,7 +22,6 @@ contract('PaymentConditions constructor', (accounts) => {
     })
 
     it('Should not deploy when token is empty', async () => {
-
         // act-assert
         try {
             await PaymentConditions.new(utils.dummyAddress, 0x0, { from: accounts[0] })
@@ -49,20 +48,20 @@ contract('PaymentConditions', (accounts) => {
     let agreementId
 
     function createSignature(contracts, fingerprints, valueHashes, timeoutValues, agreementId, consumer) {
-        const conditionKeys = utils.generateConditionsKeys(templateId, contracts, fingerprints)
-        const hash = utils.createSLAHash(web3, templateId, conditionKeys, valueHashes, timeoutValues, agreementId)
+        const conditionKeys = utils.generateConditionsKeys(utils.templateId, contracts, fingerprints)
+        const hash = utils.createSLAHash(web3, utils.templateId, conditionKeys, valueHashes, timeoutValues, agreementId)
         return web3.eth.sign(hash, consumer)
     }
 
     async function initAgreement() {
         const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, agreementId, consumer)
         await agreement.setupTemplate(
-            templateId,
+            utils.templateId,
             contracts,
             fingerprints,
             dependenciesBits,
             [0], 0, { from: accounts[0] })
-        await agreement.executeAgreement(templateId, signature, consumer, valueHashes, timeoutValues, agreementId, templateId, { from: accounts[0] })
+        await agreement.executeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
     }
 
     beforeEach(async () => {
