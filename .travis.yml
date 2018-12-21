@@ -48,6 +48,10 @@ before_install:
           bash -x scripts/maven.sh
           echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
           echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+          version_line=$(cat .bumpversion.cfg | grep current_version)
+          release_version=${version_line##* }
+          export release_version
+          echo $release_version
         fi
 
 before_script:
@@ -95,8 +99,16 @@ deploy:
           all_branches: true
           condition: $DEPLOY_PACKAGE = true
 
-#   - provider: releases
-#     api_key: ${GITHUB_OAUTH_TOKEN}
-#     skip_cleanup: true
-#     on:
-#         tags: true
+
+    - provider: releases
+      skip_cleanup: true
+      api_key: $GITHUB_TOKEN
+      # file:
+      # - oceanprotocol-keeper-contracts-$release_version.tgz.jar
+      # - dist/keeper_contracts-$release_version-py2.py3-none-any.jar
+      # - target/keeper-contracts-$release_version.jar
+      name: "$release_version"
+      on:
+          tags: true
+          all_branches: true
+          condition: $DEPLOY_PACKAGE = true
