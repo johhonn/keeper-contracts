@@ -29,6 +29,7 @@ matrix:
 before_install:
     - npm install -g npm
     - npm install -g ganache-cli@~6.1.8 release-it greenkeeper-lockfile codacy-coverage
+    - docker pull chainsecurity/securify
     - |
         if [ "${DEPLOY_PACKAGE}" = "true" ]; then
           sudo apt-get -y install python3-pip gnupg-agent
@@ -62,6 +63,7 @@ script:
     - git status
     - git add package-lock.json
     - git diff-index --quiet HEAD || git commit -m "Travis update"
+    - docker run -v $(pwd):/project chainsecurity/securify
 
 after_script:
     - greenkeeper-lockfile-upload
