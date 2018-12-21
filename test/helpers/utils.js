@@ -15,8 +15,8 @@ const utils = {
         return new Web3(new Web3.providers.HttpProvider(nodeUrl))
     },
 
-    generateId: (web3) => {
-        return (web3 || utils.getWeb3()).utils.sha3(Math.random().toString())
+    generateId: () => {
+        return utils.getWeb3().utils.sha3(Math.random().toString())
     },
 
     assertEmitted: (result, n, name, payload) => {

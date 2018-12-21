@@ -106,7 +106,7 @@ contract('PaymentConditions', (accounts) => {
         }
 
         it('Rejects to lock payments if conditions are not met', async () => {
-            const agreementId = await signAgreement(utils.generateId(web3))
+            const agreementId = await signAgreement(utils.generateId())
 
             await paymentConditions.lockPayment(agreementId, asset, price)
             assert.strictEqual(
@@ -116,7 +116,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Locks payment if conditions are met', async () => {
-            const agreementId = await signAgreement(utils.generateId(web3))
+            const agreementId = await signAgreement(utils.generateId())
 
             await accessConditions.grantAccess(
                 agreementId,
@@ -133,7 +133,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Does not lock twice', async () => {
-            const agreementId = await signAgreement(utils.generateId(web3))
+            const agreementId = await signAgreement(utils.generateId())
 
             await accessConditions.grantAccess(
                 agreementId,
@@ -157,7 +157,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Rejects to release payment if conditions are not met', async () => {
-            const agreementId = await signAgreement(utils.generateId(web3))
+            const agreementId = await signAgreement(utils.generateId())
 
             await paymentConditions.releasePayment(agreementId, asset, price)
             assert.strictEqual(
@@ -167,7 +167,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Releases payment if conditions are met', async () => {
-            const agreementId = await signAgreement(utils.generateId(web3))
+            const agreementId = await signAgreement(utils.generateId())
 
             await accessConditions.grantAccess(
                 agreementId,
@@ -186,7 +186,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Does not release twice', async () => {
-            const agreementId = await signAgreement(utils.generateId(web3))
+            const agreementId = await signAgreement(utils.generateId())
 
             await accessConditions.grantAccess(
                 agreementId,

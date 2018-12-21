@@ -22,9 +22,9 @@ contract('ComputeConditions', (accounts) => {
         const dependencies = [0, 1, 4, 16, 3]
         const price = 5 // 5 OCN tokens
         const timeouts = [0, 0, 0, 0, 100]
-        const did = testUtils.generateId(web3)
-        const serviceTemplateId = testUtils.generateId(web3)
-        agreementId = testUtils.generateId(web3)
+        const did = testUtils.generateId()
+        const serviceTemplateId = testUtils.generateId()
+        agreementId = testUtils.generateId()
         const algorithm = 'THIS IS FAKE CODE foo=Hello World!'
 
         before(async () => {
