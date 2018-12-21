@@ -5,7 +5,6 @@
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const utils = require('../../../helpers/utils.js')
 const { initializeAgreement } = require('../../../helpers/initializeAgreement')
-const web3 = utils.getWeb3()
 
 contract('ServiceExecutionAgreement', (accounts) => {
     let contract,
