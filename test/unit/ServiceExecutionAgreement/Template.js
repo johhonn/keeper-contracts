@@ -12,7 +12,6 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
     beforeEach(async () => {
         contract = await ServiceExecutionAgreement.new({ from: accounts[0] })
-        /* eslint-disable-next-line prefer-destructuring */
         contracts = [accounts[2]]
         fingerprints = ['0x2e0a37a5']
     })

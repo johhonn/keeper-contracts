@@ -42,7 +42,6 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
     before(async () => {
         sla = await ServiceExecutionAgreement.new({ from: accounts[0] })
-        /* eslint-disable-next-line prefer-destructuring */
     })
 
     describe('Test Service Level Agreement', () => {
