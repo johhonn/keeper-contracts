@@ -7,8 +7,6 @@ const utils = require('../../helpers/utils.js')
 const { signAgreement } = require('../../helpers/signAgreement.js')
 const { initializeAgreement } = require('../../helpers/initializeAgreement.js')
 
-const web3 = utils.getWeb3()
-
 contract('ServiceExecutionAgreement', (accounts) => {
     let contract
     let consumer
