@@ -39,12 +39,12 @@ contract('FitchainConditions', (accounts) => {
             paymentConditions = await PaymentConditions.new(agreement.address, token.address, { from: accounts[0] })
             fitchainConditions = await FitchainConditions.new(agreement.address, price, slots)
 
-            await market.requestTokens(testUtils.toBigNumber(1000), { from: consumer })
-            await market.requestTokens(testUtils.toBigNumber(1000), { from: publisher })
-            await market.requestTokens(testUtils.toBigNumber(1000), { from: verifier1 })
-            await market.requestTokens(testUtils.toBigNumber(1000), { from: verifier2 })
-            await market.requestTokens(testUtils.toBigNumber(1000), { from: verifier3 })
-            await market.requestTokens(testUtils.toBigNumber(1000), { from: verifier4 })
+            await market.requestTokens(1000, { from: consumer })
+            await market.requestTokens(1000, { from: publisher })
+            await market.requestTokens(1000, { from: verifier1 })
+            await market.requestTokens(1000, { from: verifier2 })
+            await market.requestTokens(1000, { from: verifier3 })
+            await market.requestTokens(1000, { from: verifier4 })
 
             // conditions
             contracts = [paymentConditions.address, fitchainConditions.address, fitchainConditions.address, paymentConditions.address, paymentConditions.address]

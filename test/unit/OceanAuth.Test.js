@@ -245,9 +245,9 @@ contract('OceanAuth', (accounts) => {
 
             // act-assert
             try {
-                await contract.verifyAccessTokenDelivery(requestId, '0x0', emptyBytes32, 0, emptyBytes32, emptyBytes32, { from: accounts[0] })
+                await contract.verifyAccessTokenDelivery(requestId, utils.dummyAddress, emptyBytes32, 0, emptyBytes32, emptyBytes32, { from: accounts[0] })
             } catch (e) {
-                assert.strictEqual(e.reason, 'invalid address')
+                assert.strictEqual(e.reason, 'Sender is not Provider.')
                 return
             }
             assert.fail('Expected revert not received')
@@ -259,9 +259,9 @@ contract('OceanAuth', (accounts) => {
 
             // act-assert
             try {
-                await contract.verifyAccessTokenDelivery(requestId, '0x0', emptyBytes32, 0, emptyBytes32, emptyBytes32, { from: accounts[1] })
+                await contract.verifyAccessTokenDelivery(requestId, utils.dummyAddress, emptyBytes32, 0, emptyBytes32, emptyBytes32, { from: accounts[1] })
             } catch (e) {
-                assert.strictEqual(e.reason, 'invalid address')
+                assert.strictEqual(e.reason, 'Status not Delivered.')
                 return
             }
             assert.fail('Expected revert not received')
