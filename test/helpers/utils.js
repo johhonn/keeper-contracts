@@ -59,7 +59,7 @@ const utils = {
     },
 
     getSelector: (web3, contract, name) => {
-        for (var i = 0; i < contract.abi.length; i++) {
+        for (let i = 0; i < contract.abi.length; i++) {
             const meta = contract.abi[i]
             if (meta.name === name) {
                 let argsStr = ''

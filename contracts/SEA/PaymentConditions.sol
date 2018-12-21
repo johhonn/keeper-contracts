@@ -1,7 +1,7 @@
 pragma solidity 0.4.25;
 
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
-import '../token/OceanToken.sol';
+import '../OceanToken.sol';
 import './ServiceExecutionAgreement.sol';
 
 /// @title Payment Conditions Contract

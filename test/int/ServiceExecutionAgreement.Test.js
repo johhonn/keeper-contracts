@@ -12,7 +12,7 @@ const utils = require('../helpers/utils')
 
 const web3 = utils.getWeb3()
 
-var colorSet = {
+let colorSet = {
     Reset: '\x1b[0m',
     Red: '\x1b[31m',
     Green: '\x1b[32m',
@@ -21,15 +21,15 @@ var colorSet = {
     Magenta: '\x1b[35m'
 }
 
-var funcNames = ['info', 'log', 'warn', 'error']
-var colors = [colorSet.Green, colorSet.Blue, colorSet.Yellow, colorSet.Red]
+let funcNames = ['info', 'log', 'warn', 'error']
+let colors = [colorSet.Green, colorSet.Blue, colorSet.Yellow, colorSet.Red]
 
-for (var i = 0; i < funcNames.length; i++) {
+for (let i = 0; i < funcNames.length; i++) {
     let funcName = funcNames[i]
     let color = colors[i]
     let oldFunc = console[funcName]
     console[funcName] = function() {
-        var args = Array.prototype.slice.call(arguments)
+        let args = Array.prototype.slice.call(arguments)
         if (args.length) args = [color + args[0]].concat(args.slice(1), colorSet.Reset)
         oldFunc.apply(null, args)
     }
