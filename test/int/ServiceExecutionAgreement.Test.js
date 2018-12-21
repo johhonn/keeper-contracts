@@ -37,10 +37,6 @@ for (var i = 0; i < funcNames.length; i++) {
 
 // console coloring source code here: https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color
 
-function sleep(millis) {
-    return new Promise(resolve => setTimeout(resolve, millis))
-}
-
 contract('ServiceExecutionAgreement', (accounts) => {
     let sla
 
@@ -165,7 +161,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
             console.warn('\t >> Try to change the state of condition 4')
             console.info('\t >> wait for 2 sec condition 3 timeout')
-            await sleep(2000)
+            await utils.sleep(2000)
             if (await sla.conditionTimedOut(agreementId, condKeys[3])) {
                 console.info('yes')
             } else {
@@ -185,7 +181,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             }
 
             console.info('\t >> wait for 3 sec, the actual condition 3 timeout')
-            await sleep(3000)
+            await utils.sleep(3000)
 
             if (await sla.conditionTimedOut(agreementId, condKeys[3])) {
                 const conditionId4Status = await sla.getConditionStatus(agreementId, condKeys[3])
