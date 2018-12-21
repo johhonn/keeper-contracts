@@ -11,35 +11,90 @@ contract AccessConditions{
     mapping(bytes32 => mapping(address => bool)) private assetPermissions;
 
     ServiceExecutionAgreement private agreementStorage;
-    event AccessGranted(bytes32 serviceId, bytes32 asset);
+    event AccessGranted(
+        bytes32 agreementId, 
+        bytes32 asset
+    );
 
-    modifier onlySLAPublisher(bytes32 serviceId, address publisher) {
-        require(agreementStorage.getAgreementPublisher(serviceId) == publisher, 'Restricted access - only SLA publisher');
+    modifier onlySLAPublisher(
+        bytes32 agreementId,
+        address publisher)
+    {
+        require(
+            agreementStorage.getAgreementPublisher(agreementId) == publisher,
+            'Restricted access - only SLA publisher'
+        );
         _;
     }
 
-    constructor(address _agreementAddress) public {
-        require(_agreementAddress != address(0), 'invalid contract address');
+    constructor(
+        address _agreementAddress
+    )
+        public
+    {
+        require(
+            _agreementAddress != address(0),
+            'invalid contract address'
+        );
         agreementStorage = ServiceExecutionAgreement(_agreementAddress);
     }
 
-    function checkPermissions(address consumer, bytes32 documentKeyId) public view  returns(bool) {
+    function checkPermissions(
+        address consumer,
+        bytes32 documentKeyId
+    )
+        public view
+        returns(bool)
+    {
         return assetPermissions[documentKeyId][consumer];
     }
 
-    function grantAccess(bytes32 serviceId, bytes32 assetId, bytes32 documentKeyId) public onlySLAPublisher(serviceId, msg.sender) returns (bool) {
-        bytes32 condition = agreementStorage.generateConditionKeyForId(serviceId, address(this), this.grantAccess.selector);
-        bool allgood = !agreementStorage.hasUnfulfilledDependencies(serviceId, condition);
-        if (!allgood)
+    function grantAccess(
+        bytes32 agreementId,
+        bytes32 assetId,
+        bytes32 documentKeyId
+    )
+        public
+        onlySLAPublisher(agreementId, msg.sender)
+        returns (bool)
+    {
+        bytes32 condition = agreementStorage.generateConditionKeyForId(
+            agreementId,
+            address(this),
+            this.grantAccess.selector
+        );
+
+        if (agreementStorage.hasUnfulfilledDependencies(agreementId, condition))
             return;
 
-        bytes32 valueHash = keccak256(abi.encodePacked(assetId, documentKeyId));
+        bytes32 valueHash = hashValues(assetId, documentKeyId);
         require(
-            agreementStorage.fulfillCondition(serviceId, this.grantAccess.selector, valueHash),
+            agreementStorage.fulfillCondition(
+                agreementId,
+                this.grantAccess.selector,
+                valueHash
+            ),
             'Cannot fulfill grantAccess condition'
         );
-        address consumer = agreementStorage.getAgreementConsumer(serviceId);
+        address consumer = agreementStorage.getAgreementConsumer(agreementId);
         assetPermissions[documentKeyId][consumer] = true;
-        emit AccessGranted(serviceId, assetId);
+        emit AccessGranted(agreementId, assetId);
+    }
+
+    function hashValues(
+        bytes32 assetId,
+        bytes32 documentKeyId
+    )
+        public pure
+        returns (
+            bytes32 valueHash
+        )
+    {
+        return keccak256(
+            abi.encodePacked(
+                assetId,
+                documentKeyId
+            )
+        );
     }
 }

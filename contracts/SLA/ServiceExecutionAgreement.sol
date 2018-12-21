@@ -598,7 +598,8 @@ contract ServiceExecutionAgreement {
                         timeoutFlag == 1 &&
                         conditionTimedOut(agreementId, condition)
                     ),
-                    'Invalid state, child dependency expected to be fulfilled or parent timeout occurred.');
+                    'Invalid state, child dependency expected to be fulfilled or parent timeout occurred.'
+                );
                 agreement.conditionLockedState[i] = 1;
             }
         }
