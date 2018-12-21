@@ -22,12 +22,10 @@ contract('PaymentConditions constructor', (accounts) => {
     })
 
     it('Should not deploy when token is empty', async () => {
-        // arrange
-        const dummyAddress = '0x1111aaaaeeeeffffcccc22223333444455556666'
 
         // act-assert
         try {
-            await PaymentConditions.new(dummyAddress, 0x0, { from: accounts[0] })
+            await PaymentConditions.new(utils.dummyAddress, 0x0, { from: accounts[0] })
         } catch (e) {
             assert.strictEqual(e.reason, 'invalid address')
             return
@@ -38,8 +36,6 @@ contract('PaymentConditions constructor', (accounts) => {
 
 contract('PaymentConditions', (accounts) => {
     const assetId = '0x0000000000000000000000000000000000000000000000000000000000000001'
-    const templateId = '0x0000000000000000000000000000000000000000000000000000000000000002'
-    const emptyBytes32 = '0x0000000000000000000000000000000000000000000000000000000000000000'
     let agreement
     let token
     let contract
@@ -91,7 +87,7 @@ contract('PaymentConditions', (accounts) => {
 
             // act-assert
             try {
-                await contract.lockPayment(agreementId, emptyBytes32, 1, { from: accounts[0] })
+                await contract.lockPayment(agreementId, utils.emptyBytes32, 1, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Only consumer can trigger lockPayment.')
                 return
@@ -146,7 +142,7 @@ contract('PaymentConditions', (accounts) => {
 
             // act-assert
             try {
-                await contract.releasePayment(agreementId, emptyBytes32, 1, { from: consumer })
+                await contract.releasePayment(agreementId, utils.emptyBytes32, 1, { from: consumer })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Only service agreement publisher can trigger releasePayment.')
                 return
@@ -201,7 +197,7 @@ contract('PaymentConditions', (accounts) => {
 
             // act-assert
             try {
-                await contract.refundPayment(agreementId, emptyBytes32, 1, { from: accounts[0] })
+                await contract.refundPayment(agreementId, utils.emptyBytes32, 1, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Only consumer can trigger refundPayment.')
                 return

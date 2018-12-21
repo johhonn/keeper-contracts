@@ -158,8 +158,7 @@ contract('OceanAuth', (accounts) => {
             console.log('provider has delivered token to on-chain')
 
             // 6. provider send wrong token to ACL contract for verification
-            const emptyBytes32 = '0x0000000000000000000000000000000000000000000000000000000000000000'
-            await auth.verifyAccessTokenDelivery(access2Id, consumer, web3.utils.sha3('test'), 28, emptyBytes32, emptyBytes32, { from: publisher })
+            await auth.verifyAccessTokenDelivery(access2Id, consumer, web3.utils.sha3('test'), 28, utils.emptyBytes32, utils.emptyBytes32, { from: publisher })
             console.log('provider fail verification the delivery and refund payment')
 
             // check balance

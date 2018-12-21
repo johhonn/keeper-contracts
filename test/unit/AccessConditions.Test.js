@@ -14,7 +14,7 @@ contract('AccessConditions constructor', (accounts) => {
         try {
             await AccessConditions.new(0x0, { from: accounts[0] })
         } catch (e) {
-            assert.strictEqual(e.reason, 'invalid contract address')
+            assert.strictEqual(e.reason, 'invalid address')
             return
         }
         assert.fail('Expected revert not received')
@@ -23,8 +23,6 @@ contract('AccessConditions constructor', (accounts) => {
 
 contract('AccessConditions', (accounts) => {
     const assetId = '0x0000000000000000000000000000000000000000000000000000000000000001'
-    const templateId = '0x0000000000000000000000000000000000000000000000000000000000000002'
-    const emptyBytes32 = '0x0000000000000000000000000000000000000000000000000000000000000000'
     let agreement
     let contract
     let consumer
@@ -36,20 +34,20 @@ contract('AccessConditions', (accounts) => {
     let agreementId
 
     function createSignature(contracts, fingerprints, valueHashes, timeoutValues, agreementId, consumer) {
-        const conditionKeys = utils.generateConditionsKeys(templateId, contracts, fingerprints)
-        const hash = utils.createSLAHash(web3, templateId, conditionKeys, valueHashes, timeoutValues, agreementId)
+        const conditionKeys = utils.generateConditionsKeys(utils.templateId, contracts, fingerprints)
+        const hash = utils.createSLAHash(web3, utils.templateId, conditionKeys, valueHashes, timeoutValues, agreementId)
         return web3.eth.sign(hash, consumer)
     }
 
     async function initAgreement() {
         const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, agreementId, consumer)
         await agreement.setupTemplate(
-            templateId,
+            utils.templateId,
             contracts,
             fingerprints,
             dependenciesBits,
             [0], 0, { from: accounts[0] })
-        await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, agreementId, templateId, { from: accounts[0] })
+        await agreement.executeAgreement(utils.templateId, signature, consumer, [valueHashes], timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
     }
 
     beforeEach(async () => {
@@ -72,7 +70,7 @@ contract('AccessConditions', (accounts) => {
 
             // act-assert
             try {
-                await contract.grantAccess(agreementId, emptyBytes32, emptyBytes32, { from: consumer })
+                await contract.grantAccess(agreementId, utils.emptyBytes32, utils.emptyBytes32, { from: consumer })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Restricted access - only SLA publisher')
                 return

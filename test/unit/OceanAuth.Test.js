@@ -237,15 +237,13 @@ contract('OceanAuth', (accounts) => {
     })
 
     describe('verifyAccessTokenDelivery', () => {
-        const emptyBytes32 = '0x0000000000000000000000000000000000000000000000000000000000000000'
-
         it('Should allow verify access token by provider only', async () => {
             // arrange
             const requestId = await createAccessRequest(contract, assetId, accounts[1], 100, accounts[0])
 
             // act-assert
             try {
-                await contract.verifyAccessTokenDelivery(requestId, utils.dummyAddress, emptyBytes32, 0, emptyBytes32, emptyBytes32, { from: accounts[0] })
+                await contract.verifyAccessTokenDelivery(requestId, utils.dummyAddress, utils.emptyBytes32, 0, utils.emptyBytes32, utils.emptyBytes32, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Sender is not Provider.')
                 return
@@ -259,7 +257,7 @@ contract('OceanAuth', (accounts) => {
 
             // act-assert
             try {
-                await contract.verifyAccessTokenDelivery(requestId, utils.dummyAddress, emptyBytes32, 0, emptyBytes32, emptyBytes32, { from: accounts[1] })
+                await contract.verifyAccessTokenDelivery(requestId, utils.dummyAddress, utils.emptyBytes32, 0, utils.emptyBytes32, utils.emptyBytes32, { from: accounts[1] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Status not Delivered.')
                 return
@@ -272,7 +270,7 @@ contract('OceanAuth', (accounts) => {
             const requestId = await prepareAccessRequestWithToken()
 
             // act
-            const result = await contract.verifyAccessTokenDelivery(requestId, accounts[0], emptyBytes32, 0, emptyBytes32, emptyBytes32, { from: accounts[1] })
+            const result = await contract.verifyAccessTokenDelivery(requestId, accounts[0], utils.emptyBytes32, 0, utils.emptyBytes32, utils.emptyBytes32, { from: accounts[1] })
 
             // assert
             utils.assertEmitted(result, 1, 'AccessRequestRevoked')

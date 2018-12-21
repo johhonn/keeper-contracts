@@ -14,7 +14,7 @@ contract('ComputeConditions constructor', (accounts) => {
         try {
             await ComputeConditions.new(0x0, { from: accounts[0] })
         } catch (e) {
-            assert.strictEqual(e.reason, 'invalid contract address')
+            assert.strictEqual(e.reason, 'invalid address')
             return
         }
         assert.fail('Expected revert not received')
@@ -22,8 +22,6 @@ contract('ComputeConditions constructor', (accounts) => {
 })
 
 contract('ComputeConditions', (accounts) => {
-    const templateId = '0x0000000000000000000000000000000000000000000000000000000000000002'
-    const emptyBytes32 = '0x0000000000000000000000000000000000000000000000000000000000000000'
     let agreement
     let contract
     let consumer
@@ -35,8 +33,8 @@ contract('ComputeConditions', (accounts) => {
     let agreementId
 
     function getMessageHash(contracts, fingerprints, valueHashes, timeoutValues, agreementId) {
-        const conditionKeys = utils.generateConditionsKeys(templateId, contracts, fingerprints)
-        return utils.createSLAHash(web3, templateId, conditionKeys, valueHashes, timeoutValues, agreementId)
+        const conditionKeys = utils.generateConditionsKeys(utils.templateId, contracts, fingerprints)
+        return utils.createSLAHash(web3, utils.templateId, conditionKeys, valueHashes, timeoutValues, agreementId)
     }
 
     function createSignature(contracts, fingerprints, valueHashes, timeoutValues, agreementId, consumer) {
@@ -47,12 +45,12 @@ contract('ComputeConditions', (accounts) => {
     async function initAgreement() {
         const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, agreementId, consumer)
         await agreement.setupTemplate(
-            templateId,
+            utils.templateId,
             contracts,
             fingerprints,
             dependenciesBits,
             [0], 0, { from: accounts[0] })
-        await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, agreementId, templateId, { from: accounts[0] })
+        await agreement.executeAgreement(utils.templateId, signature, consumer, [valueHashes], timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
     }
 
     beforeEach(async () => {
@@ -72,9 +70,9 @@ contract('ComputeConditions', (accounts) => {
         it('Should not submit when sender is not consumer', async () => {
             // act-assert
             try {
-                await contract.submitHashSignature(agreementId, emptyBytes32, { from: accounts[0] })
+                await contract.submitHashSignature(agreementId, utils.emptyBytes32, { from: accounts[0] })
             } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid consumer address!')
+                assert.strictEqual(e.reason, 'Invalid data consumer address!')
                 return
             }
             assert.fail('Expected revert not received')
@@ -85,7 +83,7 @@ contract('ComputeConditions', (accounts) => {
             await initAgreement()
 
             // act
-            const result = await contract.submitHashSignature(agreementId, emptyBytes32, { from: consumer })
+            const result = await contract.submitHashSignature(agreementId, utils.emptyBytes32, { from: consumer })
 
             // assert
             utils.assertEmitted(result, 1, 'HashSignatureSubmitted')
@@ -94,10 +92,10 @@ contract('ComputeConditions', (accounts) => {
         it('Should re-submit when call submit twice', async () => {
             // arrange
             await initAgreement()
-            await contract.submitHashSignature(agreementId, emptyBytes32, { from: consumer })
+            await contract.submitHashSignature(agreementId, utils.emptyBytes32, { from: consumer })
 
             // act
-            const result = await contract.submitHashSignature(agreementId, emptyBytes32, { from: consumer })
+            const result = await contract.submitHashSignature(agreementId, utils.emptyBytes32, { from: consumer })
 
             // assert
             utils.assertEmitted(result, 1, 'HashSignatureSubmitted')
@@ -109,7 +107,7 @@ contract('ComputeConditions', (accounts) => {
         it('Should not submit when sender is not publisher', async () => {
             // act-assert
             try {
-                await contract.submitAlgorithmHash(agreementId, emptyBytes32, { from: consumer })
+                await contract.submitAlgorithmHash(agreementId, utils.emptyBytes32, { from: consumer })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Invalid publisher address')
                 return
@@ -122,7 +120,7 @@ contract('ComputeConditions', (accounts) => {
             await initAgreement()
 
             // act
-            const result = await contract.submitAlgorithmHash(agreementId, emptyBytes32, { from: accounts[0] })
+            const result = await contract.submitAlgorithmHash(agreementId, utils.emptyBytes32, { from: accounts[0] })
 
             // assert
             utils.assertEmitted(result, 1, 'HashSubmitted')
@@ -131,10 +129,10 @@ contract('ComputeConditions', (accounts) => {
         it('Should re-submit when call submit twice', async () => {
             // arrange
             await initAgreement()
-            await contract.submitAlgorithmHash(agreementId, emptyBytes32, { from: accounts[0] })
+            await contract.submitAlgorithmHash(agreementId, utils.emptyBytes32, { from: accounts[0] })
 
             // act
-            const result = await contract.submitAlgorithmHash(agreementId, emptyBytes32, { from: accounts[0] })
+            const result = await contract.submitAlgorithmHash(agreementId, utils.emptyBytes32, { from: accounts[0] })
 
             // assert
             utils.assertEmitted(result, 1, 'HashSubmitted')
@@ -146,7 +144,7 @@ contract('ComputeConditions', (accounts) => {
         it('Should not fulfill upload when sender is not publisher or consumer', async () => {
             // act-assert
             try {
-                await contract.fulfillUpload(agreementId, emptyBytes32, { from: accounts[2] })
+                await contract.fulfillUpload(agreementId, utils.emptyBytes32, { from: accounts[2] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Access denied')
                 return
@@ -159,7 +157,7 @@ contract('ComputeConditions', (accounts) => {
             await initAgreement()
 
             // act
-            const result = await contract.fulfillUpload(agreementId, emptyBytes32, { from: accounts[0] })
+            const result = await contract.fulfillUpload(agreementId, utils.emptyBytes32, { from: accounts[0] })
 
             // assert
             utils.assertEmitted(result, 1, 'ProofOfUploadValid')
@@ -168,10 +166,10 @@ contract('ComputeConditions', (accounts) => {
         it('Should not fulfill upload when hash exists, signature is not valid', async () => {
             // arrange
             await initAgreement()
-            await contract.submitHashSignature(agreementId, emptyBytes32, { from: consumer })
+            await contract.submitHashSignature(agreementId, utils.emptyBytes32, { from: consumer })
 
             // act
-            const result = await contract.fulfillUpload(agreementId, emptyBytes32, { from: accounts[0] })
+            const result = await contract.fulfillUpload(agreementId, utils.emptyBytes32, { from: accounts[0] })
 
             // assert
             utils.assertEmitted(result, 1, 'ProofOfUploadInvalid')
@@ -181,10 +179,10 @@ contract('ComputeConditions', (accounts) => {
             // arrange
             dependenciesBits = [1]
             await initAgreement()
-            await contract.submitHashSignature(agreementId, emptyBytes32, { from: consumer })
+            await contract.submitHashSignature(agreementId, utils.emptyBytes32, { from: consumer })
 
             // act
-            const result = await contract.fulfillUpload(agreementId, emptyBytes32, { from: accounts[0] })
+            const result = await contract.fulfillUpload(agreementId, utils.emptyBytes32, { from: accounts[0] })
 
             // assert
             utils.assertEmitted(result, 1, 'ProofOfUploadInvalid')
@@ -194,11 +192,11 @@ contract('ComputeConditions', (accounts) => {
             // arrange
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, agreementId, consumer)
             await agreement.setupTemplate(
-                templateId,
+                utils.templateId,
                 contracts,
                 fingerprints,
                 [0], [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, agreementId, templateId, { from: accounts[0] })
+            await agreement.executeAgreement(utils.templateId, signature, consumer, [valueHashes], timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
             const hash = getMessageHash(contracts, fingerprints, valueHashes, timeoutValues, agreementId)
             await contract.submitAlgorithmHash(agreementId, hash, { from: accounts[0] })
 
@@ -213,18 +211,18 @@ contract('ComputeConditions', (accounts) => {
             // arrange
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, agreementId, consumer)
             await agreement.setupTemplate(
-                templateId,
+                utils.templateId,
                 contracts,
                 fingerprints,
                 [0], [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, agreementId, templateId, { from: accounts[0] })
+            await agreement.executeAgreement(utils.templateId, signature, consumer, [valueHashes], timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
             const hash = getMessageHash(contracts, fingerprints, valueHashes, timeoutValues, agreementId)
             await contract.submitAlgorithmHash(agreementId, hash, { from: accounts[0] })
             await contract.submitHashSignature(agreementId, signature, { from: consumer })
 
             // act-assert
             try {
-                await contract.fulfillUpload(agreementId, emptyBytes32, { from: accounts[0] })
+                await contract.fulfillUpload(agreementId, utils.emptyBytes32, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'avoid replay attack')
                 return
