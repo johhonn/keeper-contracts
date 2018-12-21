@@ -1,5 +1,4 @@
 /* global artifacts */
-
 const DIDRegistry = artifacts.require('DIDRegistry.sol')
 const { saveDefinition } = require('./helper')
 

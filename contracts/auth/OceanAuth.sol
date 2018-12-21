@@ -76,9 +76,7 @@ contract OceanAuth {
     // ============
     // EVENTS:
     // ============
-    /* solium-disable-next-line max-len */
     event AccessConsentRequested(bytes32 _id, address indexed _consumer, address indexed _provider, bytes32 indexed _resourceId, uint _timeout, string _pubKey);
-    /* solium-disable-next-line max-len */
     event AccessRequestCommitted(bytes32 indexed _id, uint256 _expirationDate, string _discovery, string _permissions, string _accessAgreementRef);
     event AccessRequestRejected(address indexed _consumer, address indexed _provider, bytes32 indexed _id);
     event AccessRequestRevoked(address indexed _consumer, address indexed _provider, bytes32 indexed _id);

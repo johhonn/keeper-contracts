@@ -127,7 +127,8 @@ contract ServiceExecutionAgreement {
     modifier isValidExecuteRequest(
         bytes32 templateId,
         bytes32 agreementId
-    ) {
+    )
+    {
         require(
             templates[templateId].isAvailable == true,
             'Template is revoked');
@@ -458,6 +459,7 @@ contract ServiceExecutionAgreement {
                     timeoutValues[i] > 2,
                     'invalid timeout with a margin (~ 30 to 40 seconds = 2 blocks intervals) to avoid race conditions'
                 );
+                /* solium-disable-next-line security/no-block-members */
                 agreement.timeoutValues.push(block.timestamp + timeoutValues[i]);
             } else {
                 agreement.timeoutValues.push(0);
@@ -644,6 +646,7 @@ contract ServiceExecutionAgreement {
         public view
         returns (bool timedOut)
     {
+        /* solium-disable-next-line security/no-block-members */
         if (block.timestamp > agreements[agreementId]
             .timeoutValues[conditionKeyToIndex[condition]])
             return true;
