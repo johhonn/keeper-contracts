@@ -16,7 +16,7 @@ const utils = {
     },
 
     generateId: (web3) => {
-        return web3.utils.sha3(Math.random().toString())
+        return (web3 || utils.getWeb3()).utils.sha3(Math.random().toString())
     },
 
     assertEmitted: (result, n, name, payload) => {
@@ -27,7 +27,7 @@ const utils = {
                 gotEvents++
             }
         }
-        assert.strictEqual(n, gotEvents)
+        assert.strictEqual(n, gotEvents, `Event ${name} was not emitted.`)
     },
 
     generateConditionsKeys: (slaTemplateId, contracts, fingerprints) => {
@@ -42,7 +42,7 @@ const utils = {
     },
 
     createSLAHash: (web3, slaTemplateId, conditionsKeys, hashes, timeouts, agreementId) => {
-        console.log(web3, slaTemplateId, conditionsKeys, hashes, timeouts, agreementId)
+        // console.log(web3, slaTemplateId, conditionsKeys, hashes, timeouts, agreementId)
         return web3.utils.soliditySha3(
             { type: 'bytes32', value: slaTemplateId },
             { type: 'bytes32[]', value: conditionsKeys },

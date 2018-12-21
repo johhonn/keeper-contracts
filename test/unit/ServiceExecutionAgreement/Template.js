@@ -5,28 +5,16 @@
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const utils = require('../../utils.js')
 
-const web3 = utils.getWeb3()
-
 contract('ServiceExecutionAgreement', (accounts) => {
     let contract
-    let consumer
     let contracts
     let fingerprints
-    let dependenciesBits
-    let valueHashes
-    let timeoutValues
-    let agreementId
 
     beforeEach(async () => {
         contract = await ServiceExecutionAgreement.new({ from: accounts[0] })
         /* eslint-disable-next-line prefer-destructuring */
-        consumer = accounts[1]
         contracts = [accounts[2]]
         fingerprints = ['0x2e0a37a5']
-        dependenciesBits = [0]
-        valueHashes = [utils.valueHash(['bool'], [true])]
-        timeoutValues = [0]
-        agreementId = utils.generateId(web3)
     })
 
     describe('setupTemplate', () => {

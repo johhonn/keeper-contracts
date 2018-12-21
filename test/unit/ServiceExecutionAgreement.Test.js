@@ -69,7 +69,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
                 [], [], [], [], 0, { from: accounts[0] })
 
             // aassert
-            utils.assertEmitted(result, 1, 'SetupAgreementTemplate')
+            utils.assertEmitted(result, 1, 'TemplateSetup')
             const status = await contract.getTemplateStatus(utils.templateId)
             assert.strictEqual(status, true)
         })
@@ -141,7 +141,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
             // aassert
             utils.assertEmitted(result, 1, 'SetupCondition')
-            utils.assertEmitted(result, 1, 'SetupAgreementTemplate')
+            utils.assertEmitted(result, 1, 'TemplateSetup')
             const status = await contract.getTemplateStatus(utils.templateId)
             assert.strictEqual(status, true)
         })
@@ -421,6 +421,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
         })
 
         it('Should revoke template', async () => {
+            const templateId = utils.generateId()
             // arrange
             await contract.setupTemplate(
                 utils.templateId,
