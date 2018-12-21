@@ -4,7 +4,7 @@
 
 const OceanMarket = artifacts.require('OceanMarket.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
-const utils = require('../utils.js')
+const utils = require('../helpers/utils.js')
 
 contract('OceanMarket constructor', (accounts) => {
     it('Should not deploy if token is empty', async () => {

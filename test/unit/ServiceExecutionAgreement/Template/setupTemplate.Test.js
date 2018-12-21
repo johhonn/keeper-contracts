@@ -3,17 +3,15 @@
 /* global artifacts, assert, contract, describe, it */
 
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
-const utils = require('../../utils.js')
+const utils = require('../../../helpers/utils.js')
 
 contract('ServiceExecutionAgreement', (accounts) => {
     let contract
-    let contracts
     let fingerprints
 
     beforeEach(async () => {
         contract = await ServiceExecutionAgreement.new({ from: accounts[0] })
         /* eslint-disable-next-line prefer-destructuring */
-        contracts = [accounts[2]]
         fingerprints = ['0x2e0a37a5']
     })
 
@@ -137,7 +135,11 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
         it('Should return template owner', async () => {
             // arrange
-            await contract.setupTemplate(utils.templateId, contracts, fingerprints, [0], [0], 0, { from: accounts[0] })
+            await contract.setupTemplate(
+                utils.templateId,
+                [utils.dummyAddress],
+                fingerprints,
+                [0], [0], 0, { from: accounts[0] })
 
             // act
             const result = await contract.getTemplateOwner(utils.templateId, { from: accounts[0] })

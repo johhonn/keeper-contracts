@@ -4,7 +4,7 @@
 
 const AccessConditions = artifacts.require('AccessConditions.sol')
 const Agreement = artifacts.require('ServiceExecutionAgreement.sol')
-const utils = require('../utils.js')
+const utils = require('../helpers/utils.js')
 
 const web3 = utils.getWeb3()
 

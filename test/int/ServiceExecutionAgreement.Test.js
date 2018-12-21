@@ -8,7 +8,7 @@ const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const AccessConditions = artifacts.require('AccessConditions.sol')
 
 const abi = require('ethereumjs-abi')
-const utils = require('../utils')
+const utils = require('../helpers/utils')
 
 const web3 = utils.getWeb3()
 

@@ -7,7 +7,7 @@ const ethers = require('ethers')
 const OceanMarket = artifacts.require('OceanMarket.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 const OceanAuth = artifacts.require('OceanAuth.sol')
-const utils = require('../utils.js')
+const utils = require('../helpers/utils.js')
 
 const web3 = utils.getWeb3()
 

@@ -10,7 +10,7 @@ const EthEcies = require('eth-ecies')
 const EthCrypto = require('eth-crypto')
 const EthjsUtil = require('ethereumjs-util')
 const ethers = require('ethers')
-const utils = require('../utils.js')
+const utils = require('../helpers/utils.js')
 
 const web3 = utils.getWeb3()
 const { BN } = web3.utils
