@@ -285,7 +285,7 @@ contract ServiceExecutionAgreement {
         return templates[templateId].isAvailable;
     }
 
-    function executeAgreement(
+    function initializeAgreement(
         bytes32 templateId,
         bytes signature,
         address consumer,
@@ -338,7 +338,7 @@ contract ServiceExecutionAgreement {
             did);
 
         require(
-            executeConditions(
+            initializeConditions(
                 templateId,
                 agreementId,
                 valueHashes,
@@ -437,7 +437,7 @@ contract ServiceExecutionAgreement {
         return agreements[agreementId].isAvailable;
     }
 
-    function executeConditions(
+    function initializeConditions(
         bytes32 templateId,
         bytes32 agreementId,
         bytes32[] valueHash,

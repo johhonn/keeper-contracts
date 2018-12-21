@@ -46,7 +46,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             fingerprints,
             dependenciesBits,
             [0], 0, { from: accounts[0] })
-        await contract.executeAgreement(
+        await contract.initializeAgreement(
             utils.templateId,
             signature,
             consumer,
@@ -69,11 +69,11 @@ contract('ServiceExecutionAgreement', (accounts) => {
         agreementId = utils.generateId(web3)
     })
 
-    describe('execute', () => {
-        it('Should execute exist agreement only', async () => {
+    describe('initialize', () => {
+        it('Should initialize existing template only', async () => {
             // act-aassert
             try {
-                await contract.executeAgreement(
+                await contract.initializeAgreement(
                     utils.templateId,
                     '0x10',
                     utils.dummyAddress,
@@ -88,7 +88,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             assert.fail('Expected revert not received')
         })
 
-        it('Should not execute agreement with invalid timeout length', async () => {
+        it('Should not initialize agreement with invalid timeout length', async () => {
             // arrange
             await contract.setupTemplate(
                 utils.templateId,
@@ -98,7 +98,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
             // act-assert
             try {
-                await contract.executeAgreement(
+                await contract.initializeAgreement(
                     utils.templateId,
                     '0x10',
                     utils.dummyAddress,
@@ -113,13 +113,13 @@ contract('ServiceExecutionAgreement', (accounts) => {
             assert.fail('Expected revert not received')
         })
 
-        it('Should not execute agreement (revert) when signature is not valid', async () => {
+        it('Should not initialize agreement (revert) when signature is not valid', async () => {
             // arrange
             await contract.setupTemplate(utils.templateId, [], [], [], [], 0, { from: accounts[0] })
 
             // act-assert
             try {
-                await contract.executeAgreement(
+                await contract.initializeAgreement(
                     utils.templateId,
                     '0x10',
                     utils.dummyAddress,
@@ -184,14 +184,14 @@ contract('ServiceExecutionAgreement', (accounts) => {
             )
         })
 
-        it('Should execute condition when signature is valid', async () => {
+        it('Should initialize condition when signature is valid', async () => {
             // arrange
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, agreementId, consumer)
             await contract.setupTemplate(
                 utils.templateId, contracts, fingerprints, [0], [0], 0, { from: accounts[0] })
 
             // act
-            const result = await contract.executeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
+            const result = await contract.initializeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
 
             // assert
             utils.assertEmitted(result, 1, 'ConditionExecuted')
@@ -206,7 +206,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
             // act-assert
             try {
-                await contract.executeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
+                await contract.initializeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'invalid timeout with a margin (~ 30 to 40 seconds = 2 blocks intervals) to avoid race conditions')
                 return
@@ -214,14 +214,14 @@ contract('ServiceExecutionAgreement', (accounts) => {
             assert.fail('Expected revert not received')
         })
 
-        it('Should execute condition when signature is valid and safe timeout', async () => {
+        it('Should initialize condition when signature is valid and safe timeout', async () => {
             // arrange
             timeoutValues = [3]
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, agreementId, consumer)
             await contract.setupTemplate(utils.templateId, contracts, fingerprints, [0], [0], 0, { from: accounts[0] })
 
             // act
-            const result = await contract.executeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
+            const result = await contract.initializeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
 
             // assert
             utils.assertEmitted(result, 1, 'ConditionExecuted')
@@ -318,7 +318,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             // arrange
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, agreementId, consumer)
             await contract.setupTemplate(utils.templateId, contracts, fingerprints, [0], [0], 1, { from: accounts[0] })
-            await contract.executeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
+            await contract.initializeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
 
             // act-assert
             try {
@@ -338,7 +338,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             timeoutValues = [0, 0]
             const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, agreementId, consumer)
             await contract.setupTemplate(utils.templateId, contracts, fingerprints, [0, 0], [0, 1], 2, { from: accounts[0] })
-            await contract.executeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
+            await contract.initializeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
 
             // act-assert
             try {

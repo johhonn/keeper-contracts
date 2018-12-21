@@ -78,7 +78,7 @@ const utils = {
     },
 
     signAgreement: async (agreement, templateId, signature, consumer, hashes, timeouts, agreementId, did, args = {}) => {
-        const result = await agreement.executeAgreement(
+        const result = await agreement.initializeAgreement(
             templateId,
             signature,
             consumer,
