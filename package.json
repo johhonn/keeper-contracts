@@ -50,8 +50,6 @@
     "ethereumjs-abi": "^0.6.5",
     "ethereumjs-util": "^6.0.0",
     "ethers": "^4.0.20",
-    "ethjs": "^0.4.0",
-    "ethjs-provider-http": "^0.1.6",
     "openzeppelin-solidity": "^2.0.0",
     "solidity-coverage": "^0.5.11",
     "solium": "^1.1.8",
