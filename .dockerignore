@@ -6,8 +6,6 @@
 .soliumignore
 .soliumrc.json
 .travis.yml
-node_modules
-build
-coverage
-package-lock.json
-
+node_modules/
+build/
+coverage/
