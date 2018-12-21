@@ -19,8 +19,8 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
     beforeEach(async () => {
         contract = await ServiceExecutionAgreement.new({ from: accounts[0] })
-        contracts = [accounts[2]]
-        fingerprints = ['0x2e0a37a5']
+        contracts = [utils.dummyAddress]
+        fingerprints = [utils.emptyBytes32]
         dependenciesBits = [0]
         valueHashes = [utils.valueHash(['bool'], [true])]
         timeoutValues = [0]
