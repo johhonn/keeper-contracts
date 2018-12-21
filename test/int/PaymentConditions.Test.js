@@ -92,7 +92,7 @@ contract('PaymentConditions', (accounts) => {
                 agreementId
             )
             signature = await web3.eth.sign(hash, consumer)
-            const result = await agreement.executeAgreement(
+            const result = await agreement.initializeAgreement(
                 testTemplateId,
                 signature,
                 consumer,

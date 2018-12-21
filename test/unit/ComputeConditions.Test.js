@@ -50,7 +50,7 @@ contract('ComputeConditions', (accounts) => {
             fingerprints,
             dependenciesBits,
             [0], 0, { from: accounts[0] })
-        await agreement.executeAgreement(utils.templateId, signature, consumer, [valueHashes], timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
+        await agreement.initializeAgreement(utils.templateId, signature, consumer, [valueHashes], timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
     }
 
     beforeEach(async () => {
@@ -196,7 +196,7 @@ contract('ComputeConditions', (accounts) => {
                 contracts,
                 fingerprints,
                 [0], [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(utils.templateId, signature, consumer, [valueHashes], timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
+            await agreement.initializeAgreement(utils.templateId, signature, consumer, [valueHashes], timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
             const hash = getMessageHash(contracts, fingerprints, valueHashes, timeoutValues, agreementId)
             await contract.submitAlgorithmHash(agreementId, hash, { from: accounts[0] })
 
@@ -215,7 +215,7 @@ contract('ComputeConditions', (accounts) => {
                 contracts,
                 fingerprints,
                 [0], [0], 0, { from: accounts[0] })
-            await agreement.executeAgreement(utils.templateId, signature, consumer, [valueHashes], timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
+            await agreement.initializeAgreement(utils.templateId, signature, consumer, [valueHashes], timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
             const hash = getMessageHash(contracts, fingerprints, valueHashes, timeoutValues, agreementId)
             await contract.submitAlgorithmHash(agreementId, hash, { from: accounts[0] })
             await contract.submitHashSignature(agreementId, signature, { from: consumer })

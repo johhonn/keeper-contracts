@@ -137,7 +137,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             const agreementId = utils.generateId(web3)
             const hash = utils.createSLAHash(web3, templateId, condKeys, valHashList, timeoutValues, agreementId)
             const signature = await web3.eth.sign(hash, consumer)
-            const val = await sla.executeAgreement(templateId, signature, consumer, [ valHashList[0], valHashList[1], valHashList[2], valHashList[3] ], timeoutValues, agreementId, did, { from: SLATemplateOwner })
+            const val = await sla.initializeAgreement(templateId, signature, consumer, [ valHashList[0], valHashList[1], valHashList[2], valHashList[3] ], timeoutValues, agreementId, did, { from: SLATemplateOwner })
             assert.strictEqual(val.logs[4].args.agreementId, agreementId, 'Execute Agreement event not emitted.')
             console.log('\x1b[36m%s\x1b[0m', '\t >> Service Agreement ID: ', val.logs[4].args.agreementId, ' ... Done!')
 
