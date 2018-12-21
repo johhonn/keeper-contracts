@@ -169,8 +169,8 @@ contract('ServiceExecutionAgreement', (accounts) => {
             const result = await contract.initializeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
 
             // assert
-            utils.assertEmitted(result, 1, 'ConditionExecuted')
-            utils.assertEmitted(result, 1, 'AgreementExecuted')
+            utils.assertEmitted(result, 1, 'ConditionInitialized')
+            utils.assertEmitted(result, 1, 'AgreementInitialized')
         })
 
         it('Should revert when timeout can lead to race condition', async () => {
@@ -199,8 +199,8 @@ contract('ServiceExecutionAgreement', (accounts) => {
             const result = await contract.initializeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
 
             // assert
-            utils.assertEmitted(result, 1, 'ConditionExecuted')
-            utils.assertEmitted(result, 1, 'AgreementExecuted')
+            utils.assertEmitted(result, 1, 'ConditionInitialized')
+            utils.assertEmitted(result, 1, 'AgreementInitialized')
         })
     })
 

@@ -175,7 +175,7 @@ contract ServiceExecutionAgreement {
         address provider
     );
 
-    event ConditionExecuted(
+    event ConditionInitialized(
         bytes32 agreementId,
         bytes32 condition,
         bytes32 did,
@@ -190,7 +190,7 @@ contract ServiceExecutionAgreement {
         bytes32 condition
     );
 
-    event AgreementExecuted(
+    event AgreementInitialized(
         bytes32 agreementId,
         bytes32 templateId,
         bytes32 did,
@@ -301,7 +301,7 @@ contract ServiceExecutionAgreement {
             agreementId
         )
         returns (
-            bool agreementExecuted
+            bool agreementInitialized
         )
     {
         require(
@@ -350,7 +350,7 @@ contract ServiceExecutionAgreement {
 
         templateIdToAgreements[templateId].push(agreementId);
 
-        emit AgreementExecuted(
+        emit AgreementInitialized(
             agreementId,
             templateId,
             did,
@@ -471,7 +471,7 @@ contract ServiceExecutionAgreement {
             bytes32 conditionKey = hashCondition(templates[templateId].conditionKeys[i], valueHash[i]);
             agreement.conditionInstances.push(conditionKey);
 
-            emit ConditionExecuted(
+            emit ConditionInitialized(
                 agreementId,
                 conditionKey,
                 did,

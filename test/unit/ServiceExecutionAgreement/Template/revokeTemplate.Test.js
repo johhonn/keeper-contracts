@@ -52,7 +52,6 @@ contract('ServiceExecutionAgreement', (accounts) => {
         it('Should not revoke template when state of agreement is false', async () => {
             // arrange
 
-            console.log(initializeAgreement)
             await initializeAgreement(
                 contract,
                 accounts[0],
