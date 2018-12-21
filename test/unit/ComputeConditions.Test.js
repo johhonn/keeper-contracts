@@ -14,7 +14,7 @@ contract('ComputeConditions constructor', (accounts) => {
         try {
             await ComputeConditions.new(0x0, { from: accounts[0] })
         } catch (e) {
-            assert.strictEqual(e.reason, 'invalid address')
+            assert.strictEqual(e.reason, 'invalid contract address')
             return
         }
         assert.fail('Expected revert not received')
@@ -74,7 +74,7 @@ contract('ComputeConditions', (accounts) => {
             try {
                 await contract.submitHashSignature(agreementId, emptyBytes32, { from: accounts[0] })
             } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid data scientist address!')
+                assert.strictEqual(e.reason, 'Invalid consumer address!')
                 return
             }
             assert.fail('Expected revert not received')

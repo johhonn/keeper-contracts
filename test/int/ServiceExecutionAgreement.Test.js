@@ -230,8 +230,6 @@ contract('ServiceExecutionAgreement', (accounts) => {
         const fromProvider = { from: provider }
         const fromConsumer = { from: consumer }
         const resourcePrice = 3
-        const resourceName = 'self-driving ai data'
-        const serviceName = resourceName
         let timeouts = [0, 0, 0, 3]
         const fulfillmentIndices = [0] // Root Condition
         const fulfilmentOperator = 0 // AND
@@ -268,12 +266,16 @@ contract('ServiceExecutionAgreement', (accounts) => {
             console.log('conditions control contracts', contracts)
             console.log('functions: ', funcFingerPrints, valuesHashList)
             const setupTx = await sea.setupTemplate(
-                serviceTemplateId, contracts, funcFingerPrints, dependencies,
-                web3.utils.fromAscii(serviceName), fulfillmentIndices,
-                fulfilmentOperator, fromProvider
+                serviceTemplateId,
+                contracts,
+                funcFingerPrints,
+                dependencies,
+                fulfillmentIndices,
+                fulfilmentOperator,
+                fromProvider
             )
             // Grab `SetupAgreementTemplate` event to fetch the serviceTemplateId
-            templateId = utils.getEventArgsFromTx(setupTx, 'SetupAgreementTemplate').serviceTemplateId
+            templateId = utils.getEventArgsFromTx(setupTx, 'TemplateSetup').templateId
 
             // console.log('templateid: ', templateId)
             conditionKeys = utils.generateConditionsKeys(templateId, contracts, funcFingerPrints)
@@ -337,8 +339,11 @@ contract('ServiceExecutionAgreement', (accounts) => {
         it('Consume asset with Refund', async () => {
             const serviceAgreementId = utils.generateId(web3)
             const slaMsgHash = utils.createSLAHash(
-                web3, templateId, conditionKeys,
-                valuesHashList, timeouts,
+                web3,
+                templateId,
+                conditionKeys,
+                valuesHashList,
+                timeouts,
                 serviceAgreementId
             )
             const signature = await web3.eth.sign(slaMsgHash, consumer)
@@ -354,12 +359,12 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
             await token.approve(paymentConditions.address, 200, fromConsumer)
             const payTx = await paymentConditions.lockPayment(serviceId, resourceId, resourcePrice, fromConsumer)
-            console.log('lockpayment event: ', utils.getEventArgsFromTx(payTx, 'PaymentLocked').serviceId)
+            console.log('lockpayment event: ', utils.getEventArgsFromTx(payTx, 'PaymentLocked').agreementId)
             // Now refund should go through, after timeout
             await utils.sleep(4000)
             try {
                 const refundTx = await paymentConditions.refundPayment(serviceId, resourceId, resourcePrice, fromConsumer)
-                console.log('refundPayment event: ', utils.getEventArgsFromTx(refundTx, 'PaymentRefund').serviceId)
+                console.log('refundPayment event: ', utils.getEventArgsFromTx(refundTx, 'PaymentRefund').agreementId)
             } catch (err) {
                 console.log('\t >> Error: refund is denied, this should not occur.', err.message)
             }
