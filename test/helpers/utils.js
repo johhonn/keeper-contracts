@@ -90,7 +90,7 @@ const utils = {
         )
 
         return result.logs.filter((log) => {
-            return log.event === 'AgreementExecuted'
+            return log.event === 'AgreementInitialized'
         })[0].args.agreementId
     },
 
