@@ -9,7 +9,8 @@ const { initializeAgreement } = require('../../helpers/initializeAgreement.js')
 
 contract('ServiceExecutionAgreement', (accounts) => {
     let contract
-    let consumer
+    /* eslint-disable-next-line prefer-destructuring */
+    const consumer = accounts[1]
     let contracts
     let fingerprints
     let dependenciesBits
@@ -19,8 +20,6 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
     beforeEach(async () => {
         contract = await AgreementTest.new({ from: accounts[0] })
-        /* eslint-disable-next-line prefer-destructuring */
-        consumer = accounts[1]
         contracts = [accounts[2]]
         fingerprints = ['0x2e0a37a5']
         dependenciesBits = [0]

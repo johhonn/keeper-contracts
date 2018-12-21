@@ -22,8 +22,7 @@ contract('OceanAuth', (accounts) => {
     let market
     let auth
 
-    let publisher
-    let consumer
+    const [publisher, consumer] = accounts
 
     before(async () => {
         token = await OceanToken.deployed()
@@ -33,8 +32,6 @@ contract('OceanAuth', (accounts) => {
 
     describe('Test On-chain Authorization', () => {
         before(async () => {
-            [publisher, consumer] = accounts
-
             // consumer request initial funds to play
             await market.requestTokens('0x' + (1000 * scale).toString(16), { from: consumer })
         })
