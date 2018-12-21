@@ -140,7 +140,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
                 [1], [1], 1, { from: accounts[0] })
 
             // aassert
-            utils.assertEmitted(result, 1, 'SetupCondition')
+            utils.assertEmitted(result, 1, 'ConditionSetup')
             utils.assertEmitted(result, 1, 'TemplateSetup')
             const status = await contract.getTemplateStatus(utils.templateId)
             assert.strictEqual(status, true)
@@ -218,8 +218,8 @@ contract('ServiceExecutionAgreement', (accounts) => {
             const result = await contract.executeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, utils.templateId, { from: accounts[0] })
 
             // assert
-            utils.assertEmitted(result, 1, 'ExecuteCondition')
-            utils.assertEmitted(result, 1, 'ExecuteAgreement')
+            utils.assertEmitted(result, 1, 'ConditionExecuted')
+            utils.assertEmitted(result, 1, 'AgreementExecuted')
         })
 
         it('Should revert when timeout can lead to race condition', async () => {
@@ -252,8 +252,8 @@ contract('ServiceExecutionAgreement', (accounts) => {
             const result = await contract.executeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, utils.templateId, { from: accounts[0] })
 
             // assert
-            utils.assertEmitted(result, 1, 'ExecuteCondition')
-            utils.assertEmitted(result, 1, 'ExecuteAgreement')
+            utils.assertEmitted(result, 1, 'ConditionExecuted')
+            utils.assertEmitted(result, 1, 'AgreementExecuted')
         })
     })
 
@@ -421,7 +421,6 @@ contract('ServiceExecutionAgreement', (accounts) => {
         })
 
         it('Should revoke template', async () => {
-            const templateId = utils.generateId()
             // arrange
             await contract.setupTemplate(
                 utils.templateId,
@@ -433,7 +432,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             const result = await contract.revokeTemplate(utils.templateId, { from: accounts[0] })
 
             // assert
-            utils.assertEmitted(result, 1, 'SLATemplateRevoked')
+            utils.assertEmitted(result, 1, 'TemplateRevoked')
             const status = await contract.getTemplateStatus(utils.templateId)
             assert.strictEqual(status, false)
         })
