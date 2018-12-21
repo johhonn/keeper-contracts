@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity 0.4.25;
 
 import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
 import './ServiceExecutionAgreement.sol';
