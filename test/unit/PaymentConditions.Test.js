@@ -15,7 +15,7 @@ contract('PaymentConditions constructor', (accounts) => {
         try {
             await PaymentConditions.new(0x0, 0x0, { from: accounts[0] })
         } catch (e) {
-            assert.strictEqual(e.reason, 'invalid contract address')
+            assert.strictEqual(e.reason, 'invalid address')
             return
         }
         assert.fail('Expected revert not received')
@@ -29,7 +29,7 @@ contract('PaymentConditions constructor', (accounts) => {
         try {
             await PaymentConditions.new(dummyAddress, 0x0, { from: accounts[0] })
         } catch (e) {
-            assert.strictEqual(e.reason, 'invalid token address')
+            assert.strictEqual(e.reason, 'invalid address')
             return
         }
         assert.fail('Expected revert not received')
