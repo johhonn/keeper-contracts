@@ -47,7 +47,7 @@ contract('OceanToken', (accounts) => {
             try {
                 await contract.transfer(0x0, 100, { from: accounts[0] })
             } catch (e) {
-                assert.strictEqual(e.reason, 'To address is 0x0.')
+                assert.strictEqual(e.reason, 'invalid address')
                 return
             }
             assert.fail('Expected revert not received')
@@ -75,7 +75,7 @@ contract('OceanToken', (accounts) => {
             try {
                 await contract.transferFrom(accounts[0], 0x0, 100, { from: accounts[1] })
             } catch (e) {
-                assert.strictEqual(e.reason, 'To address is 0x0.')
+                assert.strictEqual(e.reason, 'invalid address')
                 return
             }
             assert.fail('Expected revert not received')
