@@ -11,7 +11,7 @@ const web3 = testUtils.getWeb3()
 
 contract('FitchainConditions', (accounts) => {
     describe('Test Fitchain Conditions', () => {
-        let token, market, agreement, paymentConditions, valuesHashList, serviceId, conditionKeys, templateId
+        let token, market, agreement, paymentConditions, valuesHashList, serviceId, conditionKeys
         let fingerPrints, contracts, agreementId, slaMsgHash, signature, fitchainConditions, GPCVerifiers, VPCVerifiers, i, myFreeSlots
 
         const publisher = accounts[0]
@@ -72,7 +72,7 @@ contract('FitchainConditions', (accounts) => {
                 fulfillmentIndices,
                 fulfilmentOperator, { from: publisher }
             )
-            templateId = testUtils.getEventArgsFromTx(createAgreementTemplate, 'TemplateSetup').templateId
+            let { templateId } = testUtils.getEventArgsFromTx(createAgreementTemplate, 'TemplateSetup')
             // create new agreement instance
             conditionKeys = testUtils.generateConditionsKeys(templateId, contracts, fingerPrints)
             slaMsgHash = testUtils.createSLAHash(web3, templateId, conditionKeys, valuesHashList, timeouts, agreementId)

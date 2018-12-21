@@ -20,7 +20,7 @@ contract('PaymentConditions', (accounts) => {
         let accessConditions
         let paymentConditions
 
-        let templateId
+        let testTemplateId
         let signature
         let contracts
         let fingerprints
@@ -73,7 +73,8 @@ contract('PaymentConditions', (accounts) => {
                 fulfillmentIndices,
                 fulfilmentOperator
             )
-            templateId = result.logs[3].args.templateId
+            const { templateId } = result.logs[3].args
+            testTemplateId = templateId
 
             const lockPaymentHash = utils.valueHash(['bytes32', 'uint256'], [asset, price])
             const releasePaymentHash = utils.valueHash(['bytes32', 'uint256'], [asset, price])
@@ -84,15 +85,15 @@ contract('PaymentConditions', (accounts) => {
 
         async function signAgreement(agreementId) {
             const hash = utils.createSLAHash(
-                web3, templateId,
-                utils.generateConditionsKeys(templateId, contracts, fingerprints),
+                web3, testTemplateId,
+                utils.generateConditionsKeys(testTemplateId, contracts, fingerprints),
                 hashes,
                 timeouts,
                 agreementId
             )
             signature = await web3.eth.sign(hash, consumer)
             const result = await agreement.executeAgreement(
-                templateId,
+                testTemplateId,
                 signature,
                 consumer,
                 hashes,

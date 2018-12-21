@@ -12,7 +12,7 @@ const web3 = testUtils.getWeb3()
 
 contract('ComputeConditions', (accounts) => {
     describe('Test On-Premise Compute Service Use Case', () => {
-        let token, market, agreement, paymentConditions, accessConditions, computeConditions, valuesHashList, serviceId, conditionKeys, templateId
+        let token, market, agreement, paymentConditions, accessConditions, computeConditions, valuesHashList, serviceId, conditionKeys
         let funcFingerPrints, contracts, agreementId, slaMsgHash, signature, algorithmHash
         const publisher = accounts[0]
         const datascientist = accounts[1]
@@ -60,7 +60,7 @@ contract('ComputeConditions', (accounts) => {
                 fulfillmentIndices,
                 fulfilmentOperator, { from: publisher }
             )
-            templateId = testUtils.getEventArgsFromTx(createAgreementTemplate, 'TemplateSetup').templateId
+            let { templateId } = testUtils.getEventArgsFromTx(createAgreementTemplate, 'TemplateSetup')
             // create new agreement instance
 
             conditionKeys = testUtils.generateConditionsKeys(templateId, contracts, funcFingerPrints)

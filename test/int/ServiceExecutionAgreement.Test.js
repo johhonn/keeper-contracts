@@ -222,7 +222,8 @@ contract('ServiceExecutionAgreement', (accounts) => {
     })
 
     describe('Test Access Service Agreement', () => {
-        let token, market, sea, paymentConditions, accessConditions, resourceId, valuesHashList, serviceId, conditionKeys, templateId
+        let token, market, sea, paymentConditions, accessConditions, resourceId,
+            valuesHashList, serviceId, conditionKeys, testTemplateId
 
         let funcFingerPrints, contracts
         const provider = accounts[0]
@@ -275,7 +276,8 @@ contract('ServiceExecutionAgreement', (accounts) => {
                 fromProvider
             )
             // Grab `SetupAgreementTemplate` event to fetch the serviceTemplateId
-            templateId = utils.getEventArgsFromTx(setupTx, 'TemplateSetup').templateId
+            const { templateId } = utils.getEventArgsFromTx(setupTx, 'TemplateSetup')
+            testTemplateId = templateId
 
             // console.log('templateid: ', templateId)
             conditionKeys = utils.generateConditionsKeys(templateId, contracts, funcFingerPrints)
@@ -285,19 +287,19 @@ contract('ServiceExecutionAgreement', (accounts) => {
         it('Consume asset happy path', async () => {
             const serviceAgreementId = utils.generateId(web3)
             const slaMsgHash = utils.createSLAHash(
-                web3, templateId, conditionKeys,
+                web3, testTemplateId, conditionKeys,
                 valuesHashList, timeouts,
                 serviceAgreementId
             )
             const signature = await web3.eth.sign(slaMsgHash, consumer)
 
             serviceId = await utils.signAgreement(
-                sea, templateId, signature, consumer, valuesHashList, timeouts, serviceAgreementId, did, fromProvider
+                sea, testTemplateId, signature, consumer, valuesHashList, timeouts, serviceAgreementId, did, fromProvider
             )
 
             try {
                 const fn = utils.getSelector(web3, accessConditions, 'checkPermissions')
-                const invalidKey = utils.generateConditionsKeys(templateId, [accessConditions.address], [fn])[0]
+                const invalidKey = utils.generateConditionsKeys(testTemplateId, [accessConditions.address], [fn])[0]
                 await sea.getConditionStatus(serviceId, invalidKey)
             } catch (error) {
                 console.log('invalid condition status: ', error)
@@ -340,7 +342,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             const serviceAgreementId = utils.generateId(web3)
             const slaMsgHash = utils.createSLAHash(
                 web3,
-                templateId,
+                testTemplateId,
                 conditionKeys,
                 valuesHashList,
                 timeouts,
@@ -349,7 +351,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             const signature = await web3.eth.sign(slaMsgHash, consumer)
 
             serviceId = await utils.signAgreement(
-                sea, templateId, signature, consumer, valuesHashList, timeouts, serviceAgreementId, did, fromProvider
+                sea, testTemplateId, signature, consumer, valuesHashList, timeouts, serviceAgreementId, did, fromProvider
             )
             try {
                 await paymentConditions.refundPayment(serviceId, resourceId, resourcePrice, fromConsumer)
