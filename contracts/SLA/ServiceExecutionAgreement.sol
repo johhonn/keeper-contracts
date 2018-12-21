@@ -60,7 +60,7 @@ contract ServiceExecutionAgreement {
         Agreement storage agreement = agreements[agreementId];
         Template storage template = templates[getTemplateId(agreementId)];
 
-        if(template.fulfillmentOperator == 0){
+        if (template.fulfillmentOperator == 0) {
             for (uint256 i = 0; i < template.fulfillmentIndices.length; i++) {
                 require(
                     agreement.conditionsState[template.fulfillmentIndices[i]] == 1,
@@ -69,10 +69,10 @@ contract ServiceExecutionAgreement {
         }
         else {
             uint8 N = 0;
-            for(uint256 j = 0; j < template.fulfillmentIndices.length; j++) {
-                if(agreement.conditionsState[template.fulfillmentIndices[j]] == 1) N += 1;
+            for (uint256 j = 0; j < template.fulfillmentIndices.length; j++) {
+                if (agreement.conditionsState[template.fulfillmentIndices[j]] == 1) N += 1;
             }
-            if(template.fulfillmentOperator == 1) {
+            if (template.fulfillmentOperator == 1) {
                 // OR operator (1 of M), N = 1
                 require(
                     N == 1,
@@ -124,8 +124,10 @@ contract ServiceExecutionAgreement {
     }
 
     // validate agreement execution request
-    modifier isValidExecuteRequest(bytes32 templateId,
-                                   bytes32 agreementId) {
+    modifier isValidExecuteRequest(
+        bytes32 templateId,
+        bytes32 agreementId
+    ) {
         require(
             templates[templateId].isAvailable == true,
             'Template is revoked');

@@ -2,87 +2,21 @@
 /* eslint-disable no-console */
 /* global assert */
 const Web3 = require('web3')
-
-const Eth = require('ethjs')
-const HttpProvider = require('ethjs-provider-http')
 const abi = require('ethereumjs-abi')
-
-const ethQuery = new Eth(new HttpProvider('http://localhost:7545'))
-
-const BN = small => new Eth.BN(small.toString(10), 10)
 
 const utils = {
 
     emptyBytes32: '0x0000000000000000000000000000000000000000000000000000000000000000',
     templateId: '0x0000000000000000000000000000000000000000000000000000000000000001',
-    dummyAddress: '0x1111aaaaeeeeffffcccc22223333444455556666',
-
-    getVoteSaltHash: (vote, salt) => (
-        `0x${abi.soliditySHA3(['uint', 'uint'], [vote, salt]).toString('hex')}`
-    ),
+    dummyAddress: '0xeE9300b7961e0a01d9f0adb863C7A227A07AaD75',
 
     getWeb3: () => {
-        const nodeUrl = 'http://localhost:8545'
+        const nodeUrl = `http://localhost:${process.env.ETHEREUM_RPC_PORT ? process.env.ETHEREUM_RPC_PORT : '8545'}`
         return new Web3(new Web3.providers.HttpProvider(nodeUrl))
     },
 
-    getListingHash: domain => (
-        `0x${abi.soliditySHA3(['string'], [domain]).toString('hex')}`
-    ),
-
     generateId: (web3) => {
         return web3.utils.sha3(Math.random().toString())
-    },
-
-    as: (actor, fn, ...args) => {
-        function detectSendObject(potentialSendObj) {
-            function hasOwnProperty(obj, prop) {
-                const proto = obj.constructor.prototype
-                return (prop in obj) &&
-                    (!(prop in proto) || proto[prop] !== obj[prop])
-            }
-            if (typeof potentialSendObj !== 'object') { return undefined }
-            if (
-                hasOwnProperty(potentialSendObj, 'from') ||
-                hasOwnProperty(potentialSendObj, 'to') ||
-                hasOwnProperty(potentialSendObj, 'gas') ||
-                hasOwnProperty(potentialSendObj, 'gasPrice') ||
-                hasOwnProperty(potentialSendObj, 'value')
-            ) {
-                throw new Error('It is unsafe to use "as" with custom send objects')
-            }
-            return undefined
-        }
-        detectSendObject(args[args.length - 1])
-        const sendObject = { from: actor }
-        return fn(...args, sendObject)
-    },
-
-    isEVMException: err => (
-        err.toString().includes('revert')
-    ),
-
-    // returns block timestamp
-    getBlockTimestamp: () => ethQuery.blockNumber()
-        .then(num => ethQuery.getBlockByNumber(num, true))
-        .then(block => block.timestamp.toString(10)),
-
-    divideAndGetWei: (numerator, denominator) => {
-        const weiNumerator = Eth.toWei(BN(numerator), 'gwei')
-        return weiNumerator.div(BN(denominator))
-    },
-
-    multiplyFromWei: (x, weiBN) => {
-        if (!Eth.BN.isBN(weiBN)) {
-            return false
-        }
-        const weiProduct = BN(x).mul(weiBN)
-        return BN(Eth.fromWei(weiProduct, 'gwei'))
-    },
-
-    multiplyByPercentage: (x, y, z = 100) => {
-        const weiQuotient = utils.divideAndGetWei(y, z)
-        return utils.multiplyFromWei(x, weiQuotient)
     },
 
     assertEmitted: (result, n, name, payload) => {
@@ -94,11 +28,6 @@ const utils = {
             }
         }
         assert.strictEqual(n, gotEvents)
-    },
-
-    toBigNumber: (num) => {
-        // return new BigNumber(num)
-        return num
     },
 
     generateConditionsKeys: (slaTemplateId, contracts, fingerprints) => {
@@ -164,6 +93,7 @@ const utils = {
             return log.event === 'AgreementExecuted'
         })[0].args.agreementId
     },
+
     sleep: (millis) => {
         return new Promise(resolve => setTimeout(resolve, millis))
     }

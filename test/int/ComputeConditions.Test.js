@@ -34,7 +34,7 @@ contract('ComputeConditions', (accounts) => {
             paymentConditions = await PaymentConditions.new(agreement.address, token.address, { from: accounts[0] })
             accessConditions = await AccessConditions.new(agreement.address, { from: accounts[0] })
             computeConditions = await ComputeConditions.new(agreement.address, { from: accounts[0] })
-            await market.requestTokens(testUtils.toBigNumber(1000), { from: datascientist })
+            await market.requestTokens(1000, { from: datascientist })
             // conditions
             contracts = [paymentConditions.address, computeConditions.address, accessConditions.address, paymentConditions.address, paymentConditions.address]
             funcFingerPrints = [
@@ -72,7 +72,7 @@ contract('ComputeConditions', (accounts) => {
                 agreementId, did, { from: publisher }
             )
             assert.strictEqual(serviceId, agreementId, 'Error: unable to retrieve service agreement Id')
-            await token.approve(paymentConditions.address, testUtils.toBigNumber(200), { from: datascientist })
+            await token.approve(paymentConditions.address, 200, { from: datascientist })
         })
 
         it('Data Scientist should be able to lock payment for on-premise compute', async () => {
