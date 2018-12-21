@@ -45,7 +45,7 @@ contract ServiceExecutionAgreement {
     mapping(bytes32 => uint256) private conditionKeyToIndex;
 
     // is able to revoke agreement template (template is no longer accessible)
-    modifier canRevokeTemplate(bytes32 templateId){
+    modifier canRevokeTemplate(bytes32 templateId) {
         bytes32[] storage agreementIds = templateIdToAgreements[templateId];
         for (uint256 i = 0; i < agreementIds.length; i++) {
             require(
@@ -56,7 +56,7 @@ contract ServiceExecutionAgreement {
     }
 
     // check if the no longer pending unfulfilled conditions in the SEA
-    modifier noPendingFulfillments(bytes32 agreementId){
+    modifier noPendingFulfillments(bytes32 agreementId) {
         Agreement storage agreement = agreements[agreementId];
         Template storage template = templates[getTemplateId(agreementId)];
 
@@ -116,7 +116,7 @@ contract ServiceExecutionAgreement {
     }
 
     // is the sender authorized to create instance of the SEA template
-    modifier isTemplateOwner(bytes32 templateId){
+    modifier isTemplateOwner(bytes32 templateId) {
         require(
             templates[templateId].owner == msg.sender,
             'Not a template owner');

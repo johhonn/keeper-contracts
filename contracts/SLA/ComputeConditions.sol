@@ -96,8 +96,8 @@ contract ComputeConditions {
         onlyDataConsumer(agreementId)
         returns(bool status)
         {
-        if(proofs[agreementId].exists){
-            if(proofs[agreementId].isLocked) { // avoid race conditions
+        if (proofs[agreementId].exists) {
+            if (proofs[agreementId].isLocked) { // avoid race conditions
                 emit HashSignatureSubmitted(
                     agreementId,
                     agreementStorage.getAgreementConsumer(agreementId),
@@ -144,8 +144,8 @@ contract ComputeConditions {
         onlyComputePublisher(agreementId)
         returns(bool status)
     {
-        if(proofs[agreementId].exists){
-            if(proofs[agreementId].isLocked) { // avoid race conditions
+        if (proofs[agreementId].exists) {
+            if (proofs[agreementId].isLocked) { // avoid race conditions
                 emit HashSubmitted(
                     agreementId,
                     agreementStorage.getAgreementConsumer(agreementId),
@@ -196,7 +196,7 @@ contract ComputeConditions {
             address(this),
             this.fulfillUpload.selector
         );
-        if (agreementStorage.hasUnfulfilledDependencies(agreementId, condition)){
+        if (agreementStorage.hasUnfulfilledDependencies(agreementId, condition)) {
             emit ProofOfUploadInvalid(
                 agreementId,
                 agreementStorage.getAgreementConsumer(agreementId),
