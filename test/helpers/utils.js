@@ -9,6 +9,8 @@ const utils = {
     emptyBytes32: '0x0000000000000000000000000000000000000000000000000000000000000000',
     templateId: '0x0000000000000000000000000000000000000000000000000000000000000001',
     dummyAddress: '0xeE9300b7961e0a01d9f0adb863C7A227A07AaD75',
+    did: '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae',
+    fingerprint: '0x2e0a37a5',
 
     getWeb3: () => {
         const nodeUrl = `http://localhost:${process.env.ETHEREUM_RPC_PORT ? process.env.ETHEREUM_RPC_PORT : '8545'}`
@@ -41,17 +43,6 @@ const utils = {
         return conditions
     },
 
-    createSLAHash: (web3, slaTemplateId, conditionsKeys, hashes, timeouts, agreementId) => {
-        // console.log(web3, slaTemplateId, conditionsKeys, hashes, timeouts, agreementId)
-        return web3.utils.soliditySha3(
-            { type: 'bytes32', value: slaTemplateId },
-            { type: 'bytes32[]', value: conditionsKeys },
-            { type: 'bytes32[]', value: hashes },
-            { type: 'uint256[]', value: timeouts },
-            { type: 'bytes32', value: agreementId }
-        ).toString('hex')
-    },
-
     getEventArgsFromTx: (txReceipt, eventName) => {
         return txReceipt.logs.filter((log) => {
             return log.event === eventName
@@ -77,7 +68,17 @@ const utils = {
         return '0x' + abi.soliditySHA3(types, values).toString('hex')
     },
 
-    signAgreement: async (agreement, templateId, signature, consumer, hashes, timeouts, agreementId, did, args = {}) => {
+    initializeAgreement: async (
+        agreement,
+        templateId,
+        signature,
+        consumer,
+        hashes,
+        timeouts,
+        agreementId,
+        did,
+        args = {}
+    ) => {
         const result = await agreement.initializeAgreement(
             templateId,
             signature,

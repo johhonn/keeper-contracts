@@ -7,6 +7,8 @@ const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.s
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const FitchainConditions = artifacts.require('FitchainConditions.sol')
 const testUtils = require('../helpers/utils')
+const { hashAgreement } = require('../helpers/hashAgreement.js')
+
 const web3 = testUtils.getWeb3()
 
 contract('FitchainConditions', (accounts) => {
@@ -75,9 +77,15 @@ contract('FitchainConditions', (accounts) => {
             let { templateId } = testUtils.getEventArgsFromTx(createAgreementTemplate, 'TemplateSetup')
             // create new agreement instance
             conditionKeys = testUtils.generateConditionsKeys(templateId, contracts, fingerPrints)
-            slaMsgHash = testUtils.createSLAHash(web3, templateId, conditionKeys, valuesHashList, timeouts, agreementId)
+            slaMsgHash = hashAgreement(
+                templateId,
+                conditionKeys,
+                valuesHashList,
+                timeouts,
+                agreementId
+            )
             signature = await web3.eth.sign(slaMsgHash, consumer)
-            serviceId = await testUtils.signAgreement(
+            serviceId = await testUtils.initializeAgreement(
                 agreement, templateId, signature,
                 consumer, valuesHashList, timeouts,
                 agreementId, did, { from: publisher }

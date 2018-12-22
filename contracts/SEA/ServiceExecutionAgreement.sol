@@ -10,7 +10,8 @@ import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
 contract ServiceExecutionAgreement {
 
     struct Template {
-        bool isAvailable; // 1 -> Available 0 -> revoked template
+        bool isExisting; // check if key in map actually contains a value
+        bool isRevoked; // is template revoked?
         address owner; // template owner
         bytes32[] conditionKeys; // preserving the order in the condition state
         uint256[] dependenciesBits; // 1st bit --> dependency, 2nd bit --> timeout flag (enabled/disabled)
@@ -22,9 +23,8 @@ contract ServiceExecutionAgreement {
     // instances of SEA Template
 
     struct Agreement {
-        bool isAvailable; // instance of SEA status
         bool isExisting; // avoid replay attack
-        bool isTerminated; // is this service agreement terminated or not
+        bool isFulfilled; // is this service agreement fulfilled or not
         uint8[] conditionsState; // maps the condition status in the template
         uint8[] conditionLockedState; // maps the condition status in the template
         bytes32 templateId; // refers to SEA template id
@@ -49,7 +49,7 @@ contract ServiceExecutionAgreement {
         bytes32[] storage agreementIds = templateIdToAgreements[templateId];
         for (uint256 i = 0; i < agreementIds.length; i++) {
             require(
-                agreements[agreementIds[i]].isAvailable == true,
+                agreements[agreementIds[i]].isFulfilled == true,
                 'Owner can not revoke template!');
         }
         _;
@@ -130,17 +130,20 @@ contract ServiceExecutionAgreement {
     )
     {
         require(
-            templates[templateId].isAvailable == true,
+            templates[templateId].isExisting == true,
+            'Template does not exist');
+        require(
+            templates[templateId].isRevoked == false,
             'Template is revoked');
         require(
             !agreements[agreementId].isExisting,
-            'Service Agreement ist already existing, Indicating Replay attack');
+            'Service Agreement is already existing, Indicating Replay attack');
         _;
     }
 
     modifier isValidTemplateId(bytes32 templateId) {
         require(
-            !templates[templateId].isAvailable,
+            !templates[templateId].isExisting,
             'Template ID already exists');
         _;
     }
@@ -166,12 +169,12 @@ contract ServiceExecutionAgreement {
 
     event TemplateRevoked(
         bytes32 templateId,
-        bool isAvailable
+        bool isRevoked
     );
 
     event ConditionSetup(
         bytes32 templateId,
-        bytes32 condition,
+        bytes32 conditionKey,
         address provider
     );
 
@@ -236,6 +239,7 @@ contract ServiceExecutionAgreement {
         // 2. generate conditions
         templates[templateId] = Template(
             true,
+            false,
             msg.sender,
             new bytes32[](0),
             dependenciesBits,
@@ -246,7 +250,11 @@ contract ServiceExecutionAgreement {
             bytes32 conditionKey = generateConditionKey(templateId, contracts[i], fingerprints[i]);
             templates[templateId].conditionKeys.push(conditionKey);
             conditionKeyToIndex[conditionKey] = i;
-            emit ConditionSetup(templateId, conditionKey, msg.sender);
+            emit ConditionSetup(
+                templateId,
+                conditionKey,
+                msg.sender
+            );
         }
         emit TemplateSetup(templateId, msg.sender);
         return true;
@@ -260,7 +268,7 @@ contract ServiceExecutionAgreement {
             bool templateRevoked
         )
     {
-        templates[templateId].isAvailable = false;
+        templates[templateId].isRevoked = true;
         emit TemplateRevoked(templateId, true);
         return true;
     }
@@ -275,15 +283,20 @@ contract ServiceExecutionAgreement {
         return agreements[agreementId].templateId;
     }
 
-    /// @notice deprecated use isTemplateAvailable instead
+    /// @notice deprecated use isTemplateRevoked instead (TODO)
     function getTemplateStatus(bytes32 templateId) public view returns (bool status)
     {
-        return isTemplateAvailable(templateId);
+        return !isTemplateRevoked(templateId);
     }
 
-    function isTemplateAvailable(bytes32 templateId) public view returns (bool status)
+    function isTemplateExisting(bytes32 templateId) public view returns (bool status)
     {
-        return templates[templateId].isAvailable;
+        return templates[templateId].isExisting;
+    }
+
+    function isTemplateRevoked(bytes32 templateId) public view returns (bool status)
+    {
+        return templates[templateId].isRevoked;
     }
 
     function initializeAgreement(
@@ -326,7 +339,6 @@ contract ServiceExecutionAgreement {
             'Invalid consumer signature of service agreement');
 
         agreements[agreementId] = Agreement(
-            false,
             true,
             false,
             new uint8[](0),
@@ -370,8 +382,8 @@ contract ServiceExecutionAgreement {
         )
     {
         Agreement storage agreement = agreements[agreementId];
-        agreement.isAvailable = true;
-        agreement.isTerminated = true;
+        agreement.isExisting = true;
+        agreement.isFulfilled = true;
         emit AgreementFulfilled(
             agreementId,
             agreement.templateId,
@@ -420,22 +432,22 @@ contract ServiceExecutionAgreement {
         return agreements[agreementId].consumer;
     }
 
-    function isAgreementTerminated(bytes32 agreementId)
+    function isAgreementFulfilled(bytes32 agreementId)
         public view
         returns(
-            bool isTerminated
+            bool isFulfilled
         )
     {
-        return agreements[agreementId].isTerminated;
+        return agreements[agreementId].isFulfilled;
     }
 
-    function isAgreementAvailable(bytes32 agreementId)
+    function isAgreementExisting(bytes32 agreementId)
         public view
         returns (
-            bool isAvailable
+            bool isExisting
         )
     {
-        return agreements[agreementId].isAvailable;
+        return agreements[agreementId].isExisting;
     }
 
     function initializeConditions(
@@ -501,7 +513,11 @@ contract ServiceExecutionAgreement {
     {
 
         Agreement storage agreement = agreements[agreementId];
-        bytes32 conditionKey = generateConditionKey(agreement.templateId, msg.sender, fingerprint);
+        bytes32 conditionKey = generateConditionKey(
+            agreement.templateId,
+            msg.sender,
+            fingerprint
+        );
         agreement.conditionsState[conditionKeyToIndex[conditionKey]] = 1;
         // Lock dependencies of this condition
         uint dependenciesValue = templates[agreement.templateId]

@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 /* global artifacts, assert, contract, describe, it */
 
-const AgreementTest = artifacts.require('ServiceExecutionAgreement.sol')
+const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const utils = require('../../../../helpers/utils.js')
 const { signAgreement } = require('../../../../helpers/signAgreement.js')
 
@@ -17,7 +17,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
     let agreementId
 
     beforeEach(async () => {
-        contract = await AgreementTest.new({ from: accounts[0] })
+        contract = await ServiceExecutionAgreement.new({ from: accounts[0] })
         contracts = [accounts[2]]
         fingerprints = ['0x2e0a37a5']
         valueHashes = [utils.valueHash(['bool'], [true])]
@@ -27,7 +27,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
     describe('initialize', () => {
         it('Should initialize existing template only', async () => {
-            // act-aassert
+            // act-assert
             try {
                 await contract.initializeAgreement(
                     utils.templateId,
@@ -38,7 +38,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
                     utils.emptyBytes32,
                     { from: accounts[0] })
             } catch (e) {
-                assert.strictEqual(e.reason, 'Template is revoked')
+                assert.strictEqual(e.reason, 'Template does not exist')
                 return
             }
             assert.fail('Expected revert not received')

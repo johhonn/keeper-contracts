@@ -6,6 +6,7 @@ const ComputeConditions = artifacts.require('ComputeConditions.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 
 const utils = require('../../../helpers/utils.js')
+const { hashAgreement } = require('../../../helpers/hashAgreement.js')
 const { signAgreement } = require('../../../helpers/signAgreement.js')
 const { initializeAgreement } = require('../../../helpers/initializeAgreement.js')
 
@@ -36,7 +37,13 @@ contract('ComputeConditions', (accounts) => {
 
     function getMessageHash(contracts, fingerprints, valueHashes, timeoutValues, agreementId) {
         const conditionKeys = utils.generateConditionsKeys(utils.templateId, contracts, fingerprints)
-        return utils.createSLAHash(web3, utils.templateId, conditionKeys, valueHashes, timeoutValues, agreementId)
+        return hashAgreement(
+            utils.templateId,
+            conditionKeys,
+            valueHashes,
+            timeoutValues,
+            agreementId
+        )
     }
 
     async function initializeAgreementWithValues() {

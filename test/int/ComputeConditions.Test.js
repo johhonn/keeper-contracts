@@ -8,6 +8,7 @@ const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const AccessConditions = artifacts.require('AccessConditions.sol')
 const ComputeConditions = artifacts.require('ComputeConditions.sol')
 const testUtils = require('../helpers/utils')
+const { hashAgreement } = require('../helpers/hashAgreement.js')
 const web3 = testUtils.getWeb3()
 
 contract('ComputeConditions', (accounts) => {
@@ -64,9 +65,15 @@ contract('ComputeConditions', (accounts) => {
             // create new agreement instance
 
             conditionKeys = testUtils.generateConditionsKeys(templateId, contracts, funcFingerPrints)
-            slaMsgHash = testUtils.createSLAHash(web3, templateId, conditionKeys, valuesHashList, timeouts, agreementId)
+            slaMsgHash = hashAgreement(
+                templateId,
+                conditionKeys,
+                valuesHashList,
+                timeouts,
+                agreementId
+            )
             signature = await web3.eth.sign(slaMsgHash, datascientist)
-            serviceId = await testUtils.signAgreement(
+            serviceId = await testUtils.initializeAgreement(
                 agreement, templateId, signature,
                 datascientist, valuesHashList, timeouts,
                 agreementId, did, { from: publisher }
@@ -117,8 +124,8 @@ contract('ComputeConditions', (accounts) => {
 
         it('Service agreement should be fulfilled', async () => {
             await agreement.fulfillAgreement(agreementId, { from: publisher })
-            const agreementTerminated = await agreement.isAgreementTerminated(agreementId, { from: publisher })
-            assert.strictEqual(agreementTerminated, true, 'Error: unable to fulfill or terminate the agreement')
+            const agreementFulfilled = await agreement.isAgreementFulfilled(agreementId, { from: publisher })
+            assert.strictEqual(agreementFulfilled, true, 'Error: unable to fulfill or terminate the agreement')
         })
     })
 })

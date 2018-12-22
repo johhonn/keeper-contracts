@@ -16,6 +16,19 @@ contract('ServiceExecutionAgreement', (accounts) => {
     })
 
     describe('setupTemplate', () => {
+        it('templateId should match template', async () => {
+            // TODO: why is the Id set and not generated?
+            // act
+            const result = await contract.setupTemplate(
+                utils.templateId,
+                [], [], [], [], 0, { from: accounts[0] }
+            )
+            // assert
+            const { templateId } = result.logs[0].args
+            assert.strictEqual(templateId, utils.templateId,
+                'Template Id should match indicating creating of agreement template')
+        })
+
         it('Should setup agreement without contracts', async () => {
             // act
             const result = await contract.setupTemplate(

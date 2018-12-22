@@ -1,5 +1,6 @@
 const utils = require('./utils.js')
 const web3 = utils.getWeb3()
+const { hashAgreement } = require('./hashAgreement.js')
 
 const signAgreement = function signAgreement(
     contracts,
@@ -13,8 +14,7 @@ const signAgreement = function signAgreement(
         utils.templateId,
         contracts,
         fingerprints)
-    const hash = utils.createSLAHash(
-        web3,
+    const hash = hashAgreement(
         utils.templateId,
         conditionKeys,
         valueHashes,
