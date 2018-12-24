@@ -205,8 +205,7 @@ contract FitchainConditions{
     }
 
     /// @notice registerVerifier called by any verifier in order to register
-    /// @dev any verifier is able to register with a certain number of slots,
-    /// staking will be implemented later
+    /// @dev any verifier is able to register with a certain number of slots, staking will be implemented later
     /// @param slots , number of pools that a verifier can offer to join multiple games at a time
     function registerVerifier(
         uint256 slots
@@ -422,6 +421,7 @@ contract FitchainConditions{
     /// and emit some events to notify the model provider/publisher that all votes have been submitted
     /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
     /// @param vote , the result of isVerified in Fitchain (T/F)
+    /// @return true if the caller (verifier) is able to commit his vote regarding the VPC proof
     function voteForVPC(
         bytes32 modelId,
         bool vote
@@ -459,6 +459,7 @@ contract FitchainConditions{
     /// reconstruct the right condition key based on the signed agreement
     /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
     /// @param count , represents the number of submitted votes by verifiers who testify that they check the existence of proof in Fitchain
+    /// @return true if the publisher is able to set the proof of training to true
     function setPoT(
         bytes32 modelId,
         uint256 count
@@ -495,6 +496,7 @@ contract FitchainConditions{
     /// reconstruct the right condition key based on the signed agreement
     /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
     /// @param count , represents the number of submitted votes by verifiers who testify that they check the existence of proof in Fitchain
+    /// @return true if the publisher is able to set the VPC proof to true
     function setVPC(
         bytes32 modelId,
         uint256 count
@@ -530,6 +532,7 @@ contract FitchainConditions{
     /// @dev it checks if the verifier is involved in a testifying game or not
     /// reconstruct the right condition key based on the signed agreement
     /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
+    /// @return true if a verifier is able to free its slots
     function freeMySlots(bytes32 modelId)
         public onlyVerifiers(modelId)
         returns(bool)
@@ -548,17 +551,20 @@ contract FitchainConditions{
 
     /// @notice getAvailableVerifiersCount , get the number of available verifiers
     /// @dev returns the number of available verifiers using registry length
+    /// @return number of available verifiers
     function getAvailableVerifiersCount() public view returns(uint256) {
         return registry.length;
     }
 
     /// @notice getMaximumNumberOfSlots, view function returns max number of slots
     /// @dev verifiers will not be able to register if they are supplying slots > maxSlots
+    /// @return number of maximum slots
     function getMaximumNumberOfSlots() public view returns(uint256) {
         return maxSlots;
     }
 
     /// @notice getMyFreeSlots returns the verifier free slots
+    /// @return number of free slots for a verifier
     function getMyFreeSlots() public view returns(uint256) {
         return verifiers[msg.sender].slots;
     }

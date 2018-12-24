@@ -82,6 +82,7 @@ contract('PaymentConditions', (accounts) => {
             const grantAccessHash = utils.valueHash(['bytes32', 'bytes32'], [asset, asset])
 
             hashes = [grantAccessHash, lockPaymentHash, releasePaymentHash]
+            await token.approve(paymentConditions.address, price, { from: consumer })
         })
 
         async function signAgreement(agreementId) {
@@ -141,8 +142,13 @@ contract('PaymentConditions', (accounts) => {
                 asset,
                 asset
             )
+<<<<<<< HEAD:test/int/PaymentConditions.Test.js
 
             await paymentConditions.lockPayment(agreementId, asset, price)
+=======
+            await token.approve(paymentConditions.address, price, { from: consumer })
+            await paymentConditions.lockPayment(serviceId, asset, price)
+>>>>>>> feature/contract_documentation:test/int/Test.PaymentConditions.js
             walletBalance += price
             assert.strictEqual(
                 walletBalance,
@@ -175,7 +181,13 @@ contract('PaymentConditions', (accounts) => {
                 asset,
                 asset
             )
+<<<<<<< HEAD:test/int/PaymentConditions.Test.js
             await paymentConditions.lockPayment(agreementId, asset, price)
+=======
+
+            await token.approve(paymentConditions.address, price, { from: consumer })
+            await paymentConditions.lockPayment(serviceId, asset, price)
+>>>>>>> feature/contract_documentation:test/int/Test.PaymentConditions.js
             walletBalance += price
 
             await paymentConditions.releasePayment(agreementId, asset, price)
@@ -194,7 +206,12 @@ contract('PaymentConditions', (accounts) => {
                 asset,
                 asset
             )
+<<<<<<< HEAD:test/int/PaymentConditions.Test.js
             await paymentConditions.lockPayment(agreementId, asset, price)
+=======
+            await token.approve(paymentConditions.address, price, { from: consumer })
+            await paymentConditions.lockPayment(serviceId, asset, price)
+>>>>>>> feature/contract_documentation:test/int/Test.PaymentConditions.js
             walletBalance += price
 
             await paymentConditions.releasePayment(agreementId, asset, price)

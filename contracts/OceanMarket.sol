@@ -5,10 +5,9 @@ import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
 import './OceanToken.sol';
 
-/**
-@title Ocean Protocol Marketplace Contract
-@author Team: Fang Gong, Samer Sallam, Ahmed Ali, Sebastian Gerske
-*/
+/// @title Ocean Protocol Marketplace Contract
+/// @author Ocean Protocol Team
+
 
 contract OceanMarket is Ownable {
 
