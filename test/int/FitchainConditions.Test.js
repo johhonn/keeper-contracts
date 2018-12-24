@@ -12,7 +12,7 @@ const { hashAgreement } = require('../helpers/hashAgreement.js')
 const web3 = testUtils.getWeb3()
 
 contract('FitchainConditions', (accounts) => {
-    describe('Test Fitchain Conditions', () => {
+    describe('Test integration of Fitchain conditions in SEA', () => {
         let token, market, agreement, paymentConditions, valuesHashList, serviceId, conditionKeys
         let fingerPrints, contracts, agreementId, slaMsgHash, signature, fitchainConditions, GPCVerifiers, VPCVerifiers, i, myFreeSlots
 

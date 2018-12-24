@@ -12,7 +12,7 @@ const { hashAgreement } = require('../helpers/hashAgreement.js')
 const web3 = testUtils.getWeb3()
 
 contract('ComputeConditions', (accounts) => {
-    describe('Test On-Premise Compute Service Use Case', () => {
+    describe('Test integration of On-Premise compute conditions in SEA', () => {
         let token, market, agreement, paymentConditions, accessConditions, computeConditions, valuesHashList, serviceId, conditionKeys
         let funcFingerPrints, contracts, agreementId, slaMsgHash, signature, algorithmHash
         const publisher = accounts[0]
