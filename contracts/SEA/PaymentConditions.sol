@@ -4,9 +4,12 @@ import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
 import '../OceanToken.sol';
 import './ServiceExecutionAgreement.sol';
 
-/// @title Payment Conditions Contract
-/// @author Ocean Protocol Team
-/// @dev All function calls are currently implement without side effects
+/**
+ * @title Payment Conditions
+ * @author Ocean Protocol Team
+ * @dev All function calls are currently implement without side effects
+ */
+
 
 contract PaymentConditions {
 

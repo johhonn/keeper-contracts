@@ -2,9 +2,11 @@ pragma solidity 0.4.25;
 
 import './ServiceExecutionAgreement.sol';
 
-/// @title Secret Store Access Control
-/// @author Ocean Protocol Team
-/// @dev All function calls are currently implement without side effects
+/**
+ * @title Secret Store Access Control
+ * @author Ocean Protocol Team
+ * @dev All function calls are currently implement without side effects
+ */
 
 contract AccessConditions{
 

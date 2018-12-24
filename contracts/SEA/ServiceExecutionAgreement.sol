@@ -3,9 +3,10 @@ pragma solidity 0.4.25;
 import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
 
 /**
-@title Ocean Protocol Service Execution Agreement
-@author Team: Ahmed Ali, Samer Sallam
-**/
+ * @title Service Execution Agreement
+ * @author Ocean Protocol Team
+ * @dev All function calls are currently implement without side effects
+ */
 
 contract ServiceExecutionAgreement {
 

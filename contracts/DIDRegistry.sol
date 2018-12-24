@@ -2,9 +2,11 @@ pragma solidity 0.4.25;
 
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
-/// @title Ocean DID Registry
-/// @author Ocean Protocol Team
-/// @dev All function calls are currently implement without side effects
+/**
+ * @title DID Registry
+ * @author Ocean Protocol Team
+ * @dev All function calls are currently implement without side effects
+ */
 
 contract DIDRegistry is Ownable {
     enum ValueType {

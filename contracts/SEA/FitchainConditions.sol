@@ -3,14 +3,18 @@ pragma solidity 0.4.25;
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 import './ServiceExecutionAgreement.sol';
 
-/// @title Fitchain conditions
-/// @author Ocean Protocol Team
-/// @notice This contract is WIP, don't use it for production
-/// @dev All function calls are currently implement with some side effects
+/**
+ * @title Fitchain conditions
+ * @author Ocean Protocol Team
+ * @notice This contract is WIP, don't use it for production
+ * @dev All function calls are currently implement without side effects
+ */
 
-/// TODO: Implementing commit-reveal approach to avoid the front-running
-/// TODO: Implement slashing conditions
-/// TODO: use enum VoteType rather than 1 and 2
+/**
+ * TODO: Implementing commit-reveal approach to avoid the front-running
+ * TODO: Implement slashing conditions
+ * TODO: use enum VoteType rather than 1 and 2
+ */
 
 contract FitchainConditions{
 
