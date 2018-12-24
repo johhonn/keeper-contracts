@@ -33,10 +33,10 @@ contract DIDRegistry is Ownable {
     /// @notice registerAttribute is called only by DID owner.
     /// @dev this function registers DID attributes by storing them in
     /// the system
-    /// @param _did , Dencentralized Identifier (a byte32 length ID)
-    /// @param _type , include DID, DID reference , URL, or DDO
-    /// @param _key , attribute key
-    /// @param _value , attribute value
+    /// @param did , Dencentralized Identifier (a byte32 length ID)
+    /// @param valueType , include DID, DID reference , URL, or DDO
+    /// @param key , attribute key
+    /// @param value , attribute value
     function registerAttribute(
         bytes32 did,
         ValueType valueType,
@@ -64,7 +64,7 @@ contract DIDRegistry is Ownable {
     }
 
     /// @notice getUpdateAt is called anyone.
-    /// @param _did , Dencentralized Identifier (a byte32 length ID)
+    /// @param did , Dencentralized Identifier (a byte32 length ID)
     /// @return last modified (update) time of a DID
     function getUpdateAt(bytes32 did)
         public view
@@ -74,7 +74,7 @@ contract DIDRegistry is Ownable {
     }
 
     /// @notice getOwner is called anyone.
-    /// @param _did , Dencentralized Identifier (a byte32 length ID)
+    /// @param did , Dencentralized Identifier (a byte32 length ID)
     /// @return the address of the owner
     function getOwner(bytes32 did)
         public view
