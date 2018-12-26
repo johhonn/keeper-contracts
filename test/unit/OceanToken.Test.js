@@ -1,15 +1,21 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
 /* global artifacts, assert, contract, describe, it */
-
+const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
 const OceanToken = artifacts.require('OceanToken.sol')
 
 contract('OceanToken', (accounts) => {
     let contract
 
+    before(async () => {
+        let zos = new ZeppelinHelper('OceanToken')
+        await zos.restoreState(accounts[9])
+    })
+
     beforeEach(async () => {
-        contract = await OceanToken.new({ from: accounts[0] })
-        await contract.initialize()
+        let zos = new ZeppelinHelper('OceanToken')
+        await zos.initialize(accounts[0], false)
+        contract = await OceanToken.at(zos.getProxyAddress('OceanToken'))
         await contract.setReceiver(accounts[0])
     })
 

@@ -106,8 +106,15 @@ To test the contract upgradability the following commands should be run
 
 ```console
 $npx truffle compile
-$./scripts/deployContractsForTest.sh
+$./scripts/setupWallet.sh
 $npx truffle test test/upgradability/DIDRegistry.Test.js
+```
+
+to run all test the simple run
+
+```console
+$npx truffle compile
+$npm run test
 ```
 
 The test script will setup a multisig wallet, run the deployment script after setting the testing parameters and change proxies admin. After each test the contract is downgraded to the initial version.

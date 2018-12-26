@@ -1,7 +1,7 @@
 pragma solidity 0.4.25;
 
 import './ServiceAgreement.sol';
-import "zos-lib/contracts/Initializable.sol";
+import 'zos-lib/contracts/Initializable.sol';
 
 /// @title Secret Store Access Control
 /// @author Ocean Protocol Team

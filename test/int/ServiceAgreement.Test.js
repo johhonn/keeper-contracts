@@ -4,7 +4,7 @@
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
 const abi = require('ethereumjs-abi')
 const utils = require('../utils')
-
+const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
 const web3 = utils.getWeb3()
 
 var colorSet = {
@@ -39,7 +39,10 @@ function sleep(millis) {
 contract('SLA', (accounts) => {
     describe('Test Service Level Agreement', () => {
         it('should be able to run through the full lifecycle of fulfilling SLA', async () => {
-            const sla = await ServiceAgreement.deployed()
+            let zos = new ZeppelinHelper('ServiceAgreement')
+            zos.restoreState(accounts[9])
+            await zos.initialize(accounts[0], false)
+            const sla = await ServiceAgreement.at(zos.getProxyAddress('ServiceAgreement'))
             const consumer = accounts[0]
             const SLATemplateOwner = accounts[1]
 
@@ -131,13 +134,13 @@ contract('SLA', (accounts) => {
             const serviceAgreementId = utils.generateId(web3)
             const hash = utils.createSLAHash(web3, templateId, condKeys, valHashList, timeoutValues, serviceAgreementId)
             const signature = await web3.eth.sign(hash, consumer)
-            const val = await sla.executeAgreement(templateId, signature, consumer, [ valHashList[0], valHashList[1], valHashList[2], valHashList[3] ], timeoutValues, serviceAgreementId, did, { from: SLATemplateOwner })
+            const val = await sla.executeAgreement(templateId, signature, consumer, [valHashList[0], valHashList[1], valHashList[2], valHashList[3]], timeoutValues, serviceAgreementId, did, { from: SLATemplateOwner })
             assert.strictEqual(val.logs[4].args.serviceAgreementId, serviceAgreementId, 'Execute Agreement event not emitted.')
             console.log('\x1b[36m%s\x1b[0m', '\t >> Service Agreement ID: ', val.logs[4].args.serviceAgreementId, ' ... Done!')
 
             console.log('\x1b[36m%s\x1b[0m', '\t >> Set 3rd condition status to 1 by contract address: ', contract3, ' Fingerprint: ', fingerprint3)
             console.log('\t >> Reconstruct condition-3 authorized hash')
-            const condition3 = '0x' + abi.soliditySHA3([ 'bytes32', 'bytes32' ], [ condKeys[2], valHashList[2] ]).toString('hex')
+            const condition3 = '0x' + abi.soliditySHA3(['bytes32', 'bytes32'], [condKeys[2], valHashList[2]]).toString('hex')
             console.log('\t >> Hash(ConditionKey, ValueHash): ', condition3)
             await sla.fulfillCondition(serviceAgreementId, fingerprint3, valHashList[2], { from: contract3 })
             const conditionIdStatus = await sla.getConditionStatus(serviceAgreementId, condKeys[2])
@@ -146,7 +149,7 @@ contract('SLA', (accounts) => {
 
             console.log('\x1b[36m%s\x1b[0m', '\t >> Set 2nd condition status to 1 by contract address: ', contract2, ' Fingerprint: ', fingerprint2)
             console.log('\t >> Reconstruct condition-2 authorized hash')
-            const condition2 = '0x' + abi.soliditySHA3([ 'bytes32', 'bytes32' ], [ condKeys[1], valHashList[1] ]).toString('hex')
+            const condition2 = '0x' + abi.soliditySHA3(['bytes32', 'bytes32'], [condKeys[1], valHashList[1]]).toString('hex')
             console.log('\t >> Hash(ConditionKey, ValueHash): ', condition2)
             await sla.fulfillCondition(serviceAgreementId, fingerprint2, valHashList[1], { from: contract2 })
             const conditionId2Status = await sla.getConditionStatus(serviceAgreementId, condKeys[1])
@@ -163,7 +166,7 @@ contract('SLA', (accounts) => {
                 try {
                     console.log('\x1b[36m%s\x1b[0m', '\t >> Set 4th condition status to 0 by contract address: ', contract4, ' Fingerprint: ', fingerprint4)
                     console.log('\t >> Reconstruct condition-4 authorized hash')
-                    const condition4 = '0x' + abi.soliditySHA3([ 'bytes32', 'bytes32' ], [ condKeys[3], valHashList[3] ]).toString('hex')
+                    const condition4 = '0x' + abi.soliditySHA3(['bytes32', 'bytes32'], [condKeys[3], valHashList[3]]).toString('hex')
                     console.log('\t >> Hash(ConditionKey, ValueHash): ', condition4)
                     await sla.fulfillCondition(serviceAgreementId, fingerprint4, valHashList[3], { from: contract4 })
                     const conditionId4Status = await sla.getConditionStatus(serviceAgreementId, condKeys[3])
@@ -184,7 +187,7 @@ contract('SLA', (accounts) => {
                 if ((conditionId4Status.toNumber() === -1 || conditionId4Status.toNumber() === 0) && conditionId2Status.toNumber() === 1) {
                     console.info('\t >> Set condition-1 to true if condition2=1 and condition4=0')
                     console.log('\t >> Reconstruct condition-1 authorized hash')
-                    const condition1 = '0x' + abi.soliditySHA3([ 'bytes32', 'bytes32' ], [ condKeys[0], valHashList[0] ]).toString('hex')
+                    const condition1 = '0x' + abi.soliditySHA3(['bytes32', 'bytes32'], [condKeys[0], valHashList[0]]).toString('hex')
                     console.log('\t >> Hash(ConditionKey, ValueHash): ', condition1)
                     await sla.fulfillCondition(serviceAgreementId, fingerprint1, valHashList[0], { from: contract1 })
                     const conditionId1Status = await sla.getConditionStatus(serviceAgreementId, condKeys[0])

@@ -9,8 +9,7 @@ const AccessConditions = artifacts.require('AccessConditions.sol')
 const ComputeConditions = artifacts.require('ComputeConditions.sol')
 const testUtils = require('../utils')
 const web3 = testUtils.getWeb3()
-/* eslint-disable-next-line security/detect-child-process */
-const { execSync } = require('child_process')
+const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
 
 contract('ComputeConditions', (accounts) => {
     describe('Test On-Premise Compute Service Use Case', () => {
@@ -28,22 +27,20 @@ contract('ComputeConditions', (accounts) => {
         const serviceTemplateId = testUtils.generateId(web3)
         serviceAgreementId = testUtils.generateId(web3)
         const algorithm = 'THIS IS FAKE CODE foo=Hello World!'
-        const debug = ' -s'
 
         before(async () => {
-            let tokenAddress = execSync('npx zos create OceanToken --init' + debug).toString().trim()
-            let marketAddress = execSync('npx zos create OceanMarket --init initialize --args ' + tokenAddress + debug).toString().trim()
-            let agreementAddress = execSync('npx zos create ServiceAgreement ' + debug).toString().trim()
-            let paymentAddress = execSync('npx zos create PaymentConditions --init initialize --args ' + agreementAddress + ',' + tokenAddress + ' + debug').toString().trim()
-            let accessAddress = execSync('npx zos create AccessConditions --init initialize --args ' + agreementAddress + debug).toString().trim()
-            let computeAddress = execSync('npx zos create ComputeConditions --init initialize --args ' + agreementAddress + ' + debug').toString().trim()
-
-            token = await OceanToken.at(tokenAddress)
-            market = await OceanMarket.at(marketAddress)
-            serviceAgreement = await ServiceAgreement.at(agreementAddress)
-            paymentConditions = await PaymentConditions.at(paymentAddress)
-            accessConditions = await AccessConditions.at(accessAddress)
-            computeConditions = await ComputeConditions.at(computeAddress)
+            let zos = new ZeppelinHelper('ComputeConditions')
+            await zos.restoreState(accounts[9])
+            zos.addDependency('OceanMarket')
+            zos.addDependency('PaymentConditions')
+            zos.addDependency('AccessConditions')
+            await zos.initialize(accounts[0], false)
+            token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
+            market = await OceanMarket.at(zos.getProxyAddress('OceanMarket'))
+            serviceAgreement = await ServiceAgreement.at(zos.getProxyAddress('ServiceAgreement'))
+            paymentConditions = await PaymentConditions.at(zos.getProxyAddress('PaymentConditions'))
+            accessConditions = await AccessConditions.at(zos.getProxyAddress('AccessConditions'))
+            computeConditions = await ComputeConditions.at(zos.getProxyAddress('ComputeConditions'))
 
             await market.requestTokens(testUtils.toBigNumber(1000), { from: datascientist })
             // conditions

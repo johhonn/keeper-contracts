@@ -6,8 +6,7 @@ const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 const utils = require('../utils.js')
-/* eslint-disable-next-line security/detect-child-process */
-const { execSync } = require('child_process')
+const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
 
 const web3 = utils.getWeb3()
 
@@ -26,7 +25,6 @@ contract('PaymentConditions', (accounts) => {
     let valueHashes
     let timeoutValues
     let serviceAgreementId
-    let debug = ' -s'
 
     function createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer) {
         const conditionKeys = utils.generateConditionsKeys(templateId, contracts, fingerprints)
@@ -40,14 +38,18 @@ contract('PaymentConditions', (accounts) => {
         await agreement.executeAgreement(templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
     }
 
-    beforeEach(async () => {
-        let tokenAddress = execSync('npx zos create OceanToken --init' + debug).toString().trim()
-        let agreementAddress = execSync('npx zos create ServiceAgreement ' + debug).toString().trim()
-        let paymentAddress = execSync('npx zos create PaymentConditions --init initialize --args ' + agreementAddress + ',' + tokenAddress + ' + debug').toString().trim()
+    before(async () => {
+        let zos = new ZeppelinHelper('PaymentConditions')
+        await zos.restoreState(accounts[9])
+    })
 
-        token = await OceanToken.at(tokenAddress)
-        agreement = await ServiceAgreement.at(agreementAddress)
-        contract = await PaymentConditions.at(paymentAddress)
+    beforeEach(async () => {
+        let zos = new ZeppelinHelper('PaymentConditions')
+        await zos.initialize(accounts[0], false)
+
+        token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
+        agreement = await ServiceAgreement.at(zos.getProxyAddress('ServiceAgreement'))
+        contract = await PaymentConditions.at(zos.getProxyAddress('PaymentConditions'))
 
         price = 1
         /* eslint-disable-next-line prefer-destructuring */

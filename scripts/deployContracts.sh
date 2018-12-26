@@ -30,7 +30,7 @@ npx zos push --skip-compile  -v
 # instance=MyContract.at(proxyAddress)
 npx zos create DIDRegistry --init initialize --args $OWNER -v
 token=$(npx zos create OceanToken --init -v)
-market=$(npx zos create OceanMarket --init initialize --args $token -v)
+market=$(npx zos create OceanMarket --init initialize --args $token,$OWNER -v)
 npx zos create OceanAuth --init initialize --args $market -v
 service=$(npx zos create ServiceAgreement -v)
 npx zos create AccessConditions --init initialize --args $service -v

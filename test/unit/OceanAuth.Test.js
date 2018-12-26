@@ -5,27 +5,13 @@
 const ethers = require('ethers')
 
 const OceanMarket = artifacts.require('OceanMarket.sol')
-const OceanToken = artifacts.require('OceanToken.sol')
 const OceanAuth = artifacts.require('OceanAuth.sol')
 const utils = require('../utils.js')
+const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
 
 const web3 = utils.getWeb3()
 
-contract('OceanAuth constructor', (accounts) => {
-    it('Should not deploy if market address is empty', async () => {
-        // act-assert
-        try {
-            await OceanAuth.new(0x0, { from: accounts[0] })
-        } catch (e) {
-            assert.strictEqual(e.reason, 'invalid address')
-            return
-        }
-        assert.fail('Expected revert not received')
-    })
-})
-
 contract('OceanAuth', (accounts) => {
-    let token
     let market
     let contract
     let assetId
@@ -43,10 +29,17 @@ contract('OceanAuth', (accounts) => {
         return requestId
     }
 
+    before(async () => {
+        let zos = new ZeppelinHelper('OceanAuth')
+        zos.restoreState(accounts[9])
+    })
+
     beforeEach(async () => {
-        token = await OceanToken.new({ from: accounts[0] })
-        market = await OceanMarket.new(token.address, { from: accounts[0] })
-        contract = await OceanAuth.new(market.address, { from: accounts[0] })
+        let zos = new ZeppelinHelper('OceanAuth')
+        await zos.initialize(accounts[0], false)
+        contract = await OceanAuth.at(zos.getProxyAddress('OceanAuth'))
+        market = await OceanMarket.at(zos.getProxyAddress('OceanMarket'))
+
         assetId = await market.methods['generateId(string)']('test asset')
     })
 

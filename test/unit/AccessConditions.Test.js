@@ -5,8 +5,7 @@
 const AccessConditions = artifacts.require('AccessConditions.sol')
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
 const utils = require('../utils.js')
-/* eslint-disable-next-line security/detect-child-process */
-const { execSync } = require('child_process')
+const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
 
 const web3 = utils.getWeb3()
 
@@ -23,7 +22,6 @@ contract('AccessConditions', (accounts) => {
     let valueHashes
     let timeoutValues
     let serviceAgreementId
-    let debug = ' -v'
 
     function createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer) {
         const conditionKeys = utils.generateConditionsKeys(templateId, contracts, fingerprints)
@@ -37,11 +35,16 @@ contract('AccessConditions', (accounts) => {
         await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
     }
 
+    before(async () => {
+        let zos = new ZeppelinHelper('PaymentConditions')
+        await zos.restoreState(accounts[9])
+    })
+
     beforeEach(async () => {
-        let serviceAddress = execSync('npx zos create ServiceAgreement' + debug).toString().trim()
-        let accessAddress = execSync('npx zos create AccessConditions --init initialize --args ' + serviceAddress + debug).toString().trim()
-        agreement = await ServiceAgreement.at(serviceAddress)
-        contract = await AccessConditions.at(accessAddress)
+        let zos = new ZeppelinHelper('AccessConditions')
+        await zos.initialize(accounts[0], false)
+        agreement = await ServiceAgreement.at(zos.getProxyAddress('ServiceAgreement'))
+        contract = await AccessConditions.at(zos.getProxyAddress('AccessConditions'))
 
         /* eslint-disable-next-line prefer-destructuring */
         consumer = accounts[1]

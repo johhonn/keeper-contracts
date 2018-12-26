@@ -1,6 +1,6 @@
 pragma solidity ^0.4.25;
 
-import "zos-lib/contracts/Initializable.sol";
+import 'zos-lib/contracts/Initializable.sol';
 import 'openzeppelin-eth/contracts/math/SafeMath.sol';
 import './ServiceAgreement.sol';
 

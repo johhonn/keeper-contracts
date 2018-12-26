@@ -83,12 +83,15 @@ contract OceanMarket is Ownable {
     * @param _tokenAddress The deployed contract address of OceanToken
     * Runs only on initial contract deployment.
     */
-    function initialize(address _tokenAddress) public initializer() {
+    function initialize(address _tokenAddress, address _owner) public initializer() {
         require(_tokenAddress != address(0x0), 'Token address is 0x0.');
+        require(_owner != address(0x0), 'Owner address is 0x0.');
         // instantiate Ocean token contract
         mToken = OceanToken(_tokenAddress);
         // set the token receiver to be marketplace
         mToken.setReceiver(address(this));
+        // Set owner
+        Ownable.initialize(_owner);
         // max amount of tokens user can get for each request
         maxAmount = 10000 * 10 ** 18;
         // min amount of time to wait before request token again

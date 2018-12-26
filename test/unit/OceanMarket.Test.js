@@ -5,22 +5,22 @@
 const OceanMarket = artifacts.require('OceanMarket.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 const utils = require('../utils.js')
-/* eslint-disable-next-line security/detect-child-process */
-const { execSync } = require('child_process')
+const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
 
 contract('OceanMarket', (accounts) => {
     let token
     let contract
     let id
-    let debug = ' -s'
+    beforeEach(async () => {
+        let zos = new ZeppelinHelper('OceanMarket')
+        await zos.restoreState(accounts[9])
+    })
 
     beforeEach(async () => {
-        // Create instances with zos
-        let tokenAddres = execSync('npx zos create OceanToken --init' + debug).toString().trim()
-        let marketAddres = execSync('npx zos create OceanMarket --init initialize --args ' + tokenAddres + debug).toString().trim()
-        contract = await OceanMarket.at(marketAddres)
-        token = await OceanToken.at(tokenAddres)
-
+        let zos = new ZeppelinHelper('OceanMarket')
+        await zos.initialize(accounts[0], false)
+        token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
+        contract = await OceanMarket.at(zos.getProxyAddress('OceanMarket'))
         id = await contract.methods['generateId(string)']('test')
     })
 
@@ -330,7 +330,7 @@ contract('OceanMarket', (accounts) => {
 
         it('Should not transfer frequently', async () => {
             // arrange
-            await contract.limitTokenRequest(10, 10)
+            await contract.limitTokenRequest(10, 10, { from: accounts[0] })
             await contract.requestTokens(10, { from: accounts[0] })
 
             // act

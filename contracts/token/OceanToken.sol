@@ -1,13 +1,15 @@
 pragma solidity 0.4.25;
 
 import 'openzeppelin-eth/contracts/token/ERC20/ERC20.sol';
+import 'zos-lib/contracts/Initializable.sol';
+
 
 /**
 @title Ocean Protocol ERC20 Token Contract
 @author Team: Fang Gong
 */
 
-contract OceanToken is ERC20 {
+contract OceanToken is Initializable, ERC20  {
 
     using SafeMath for uint256;
 

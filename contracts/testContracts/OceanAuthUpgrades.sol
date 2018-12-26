@@ -1,14 +1,25 @@
+/* solium-disable */
 pragma solidity 0.4.25;
 
 import '../OceanMarket.sol';
+import '../auth/OceanAuth.sol';
 import 'zos-lib/contracts/Initializable.sol';
 
 
-/**
-@title Ocean Protocol Authorization Contract
-@author Team: Fang Gong, Ahmed Ali, Sebastian Gerske, Samer Sallam
-*/
-contract OceanAuth is Initializable{
+
+contract OceanAuthExtraFunctionality is OceanAuth{
+    //returns a number
+    function getNumber() public view returns(uint) {
+        return 42;
+    }
+}
+
+contract OceanAuthChangeInStorage is OceanAuth{
+    // keep track of how many times a function was called.
+    mapping (address=>uint256) public called;
+}
+
+contract OceanAuthWithBug is Initializable{
 
     // ============
     // DATA STRUCTURES:
@@ -78,9 +89,9 @@ contract OceanAuth is Initializable{
     // ============
     // EVENTS:
     // ============
-    /* ethlint-next-line max-len */
+    /* solium-disable-next-line max-len */
     event AccessConsentRequested(bytes32 _id, address indexed _consumer, address indexed _provider, bytes32 indexed _resourceId, uint _timeout, string _pubKey);
-    /* ethlint-next-line max-len */
+    /* solium-disable-next-line max-len */
     event AccessRequestCommitted(bytes32 indexed _id, uint256 _expirationDate, string _discovery, string _permissions, string _accessAgreementRef);
     event AccessRequestRejected(address indexed _consumer, address indexed _provider, bytes32 indexed _id);
     event AccessRequestRevoked(address indexed _consumer, address indexed _provider, bytes32 indexed _id);
@@ -155,12 +166,12 @@ contract OceanAuth is Initializable{
         string permissions,
         string accessAgreementRef,
         string accessAgreementType)
-    public onlyProvider(id) isAccessRequested(id) returns (bool) {
-        /* ethlint-next-line security/no-block-members */
+    public returns (bool) {
+        /* solium-disable-next-line security/no-block-members */
         if (isAvailable && block.timestamp < expirationDate) {
             accessControlRequests[id].consent.isAvailable = isAvailable;
             accessControlRequests[id].consent.expirationDate = expirationDate;
-            /* ethlint-next-line security/no-block-members */
+            /* solium-disable-next-line security/no-block-members */
             accessControlRequests[id].consent.startDate = block.timestamp;
             accessControlRequests[id].consent.discovery = discovery;
             accessControlRequests[id].consent.permissions = permissions;
@@ -183,7 +194,7 @@ contract OceanAuth is Initializable{
     // you can cancel consent and do refund only after consumer makes the payment and timeout.
     function cancelAccessRequest(bytes32 id) public isAccessCommitted(id) onlyConsumer(id) {
         // timeout
-        /* ethlint-next-line security/no-block-members */
+        /* solium-disable-next-line security/no-block-members */
         require(block.timestamp > accessControlRequests[id].consent.timeout, 'Timeout not exceeded.');
 
         // refund only if consumer had made payment
@@ -277,4 +288,10 @@ contract OceanAuth is Initializable{
         return uint(accessControlRequests[id].status);
     }
 
+}
+
+contract OceanAuthChangeInStorageAndLogic is OceanAuth{
+}
+
+contract OceanAuthChangeFunctionSignature is OceanAuth{
 }

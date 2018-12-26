@@ -27,21 +27,17 @@ contract('OceanAuth', (accounts) => {
     let consumer
 
     before(async () => {
+        [publisher, consumer] = accounts
         let zos = new ZeppelinHelper('OceanAuth')
-        await zos.initialize(accounts)
-        auth = await OceanAuth.at(zos.proxyAddress)
-        token = await OceanToken.at(await zos.getInstance('OceanToken'))
-        market = await OceanMarket.at(await zos.getInstance('OceanMarket'))
+        await zos.restoreState(accounts[accounts.length - 1])
+        await zos.initialize(accounts[0], false)
+        auth = await OceanAuth.at(zos.getProxyAddress('OceanAuth'))
+        token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
+        market = await OceanMarket.at(zos.getProxyAddress('OceanMarket'))
+        await market.requestTokens('0x' + (1000 * scale).toString(16), { from: consumer })
     })
 
     describe('Test On-chain Authorization', () => {
-        before(async () => {
-            [publisher, consumer] = accounts
-
-            // consumer request initial funds to play
-            await market.requestTokens('0x' + (1000 * scale).toString(16), { from: consumer })
-        })
-
         // support upto 50 assets and providers; each asset has one single provider at this time
         it('Should walk through Authorization Process', async () => {
             const resourceName = 'resource'

@@ -9,7 +9,7 @@
   "main": "truffle.js",
   "scripts": {
     "compile": "truffle compile",
-    "migrate": "truffle migrate",
+    "migrate": "echo 'migrations are deprecated! use zos instead'",
     "migrate:spree": "npm run migrate -- --network spree",
     "migrate:nile": "npm run migrate -- --network nile",
     "migrate:kovan": "npm run migrate -- --network kovan",
@@ -53,11 +53,12 @@
     "ethjs": "^0.4.0",
     "ethjs-provider-http": "^0.1.6",
     "ethlint": "^1.2.1",
+    "glob": "^7.1.3",
+    "openzeppelin-eth": "^2.0.2",
     "solidity-coverage": "^0.5.11",
     "truffle": "^5.0.0",
     "truffle-hdwallet-provider": "^1.0.1",
     "web3": "1.0.0-beta.37",
-    "openzeppelin-eth": "^2.0.2",
     "zos": "^2.0.1",
     "zos-lib": "^2.0.1"
   }

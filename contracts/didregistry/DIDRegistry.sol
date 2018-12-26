@@ -1,7 +1,7 @@
 pragma solidity 0.4.25;
 
-import "zos-lib/contracts/Initializable.sol";
-import "openzeppelin-eth/contracts/ownership/Ownable.sol";
+import 'zos-lib/contracts/Initializable.sol';
+import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
 contract DIDRegistry is Initializable, Ownable {
     enum ValueType {

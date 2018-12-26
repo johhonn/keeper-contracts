@@ -1,8 +1,9 @@
+/* solium-disable */
 pragma solidity 0.4.25;
 
 // Contain upgraded version of the contracts for test
-import "zos-lib/contracts/Initializable.sol";
-import "openzeppelin-eth/contracts/ownership/Ownable.sol";
+import 'zos-lib/contracts/Initializable.sol';
+import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
 contract DIDRegistryExtraFunctionality is Initializable, Ownable {
     enum ValueType {

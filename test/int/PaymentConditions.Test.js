@@ -5,8 +5,7 @@ const OceanToken = artifacts.require('OceanToken.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
 const utils = require('../utils.js')
-/* eslint-disable-next-line security/detect-child-process */
-const { execSync } = require('child_process')
+const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
 
 const web3 = utils.getWeb3()
 const did = '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
@@ -28,7 +27,6 @@ contract('PaymentConditions', (accounts) => {
         let fingerprints
         let dependencies
         let hashes
-        let debug = ' -s'
         const timeouts = [0, 0, 0]
 
         const walletAllowance = 1000
@@ -39,15 +37,14 @@ contract('PaymentConditions', (accounts) => {
         var walletBalance = 0
 
         before(async () => {
-            let tokenAddress = execSync('npx zos create OceanToken --init' + debug).toString().trim()
-            let agreementAddress = execSync('npx zos create ServiceAgreement ' + debug).toString().trim()
-            let accessAddress = execSync('npx zos create AccessConditions --init initialize --args ' + agreementAddress + debug).toString().trim()
-            let paymentAddress = execSync('npx zos create PaymentConditions --init initialize --args ' + agreementAddress + ',' + tokenAddress + ' + debug').toString().trim()
-
-            token = await OceanToken.at(tokenAddress)
-            agreement = await ServiceAgreement.at(agreementAddress)
-            paymentConditions = await PaymentConditions.at(paymentAddress)
-            accessConditions = await AccessConditions.at(accessAddress)
+            let zos = new ZeppelinHelper('PaymentConditions')
+            await zos.restoreState(accounts[9])
+            zos.addDependency('AccessConditions')
+            await zos.initialize(accounts[0], false)
+            token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
+            agreement = await ServiceAgreement.at(zos.getProxyAddress('ServiceAgreement'))
+            paymentConditions = await PaymentConditions.at(zos.getProxyAddress('PaymentConditions'))
+            accessConditions = await AccessConditions.at(zos.getProxyAddress('AccessConditions'))
 
             await token.setReceiver(consumer)
             await token.approve(consumer, await token.totalSupply.call())

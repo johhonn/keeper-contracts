@@ -3,10 +3,11 @@
 
 const OceanToken = artifacts.require('OceanToken.sol')
 const OceanMarket = artifacts.require('OceanMarket.sol')
-const SLA = artifacts.require('ServiceAgreement.sol')
-const PaymentCtrl = artifacts.require('PaymentConditions.sol')
-const AccessCtrl = artifacts.require('AccessConditions.sol')
+const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
+const PaymentConditions = artifacts.require('PaymentConditions.sol')
+const AccessConditions = artifacts.require('AccessConditions.sol')
 const testUtils = require('../utils')
+const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
 
 const web3 = testUtils.getWeb3()
 
@@ -29,12 +30,17 @@ contract('ServiceAgreement', (accounts) => {
         const did = '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
         const serviceTemplateId = '0x419d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
         before(async () => {
-            token = await OceanToken.new()
-            // await token.setReceiver(consumer)
-            market = await OceanMarket.new(token.address)
-            sla = await SLA.new()
-            paymentConditions = await PaymentCtrl.new(sla.address, token.address)
-            accessConditions = await AccessCtrl.new(sla.address)
+            let zos = new ZeppelinHelper('PaymentConditions')
+            await zos.restoreState(accounts[9])
+            zos.addDependency('OceanMarket')
+            zos.addDependency('AccessConditions')
+            await zos.initialize(accounts[0], false)
+            token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
+            market = await OceanMarket.at(zos.getProxyAddress('OceanMarket'))
+            sla = await ServiceAgreement.at(zos.getProxyAddress('ServiceAgreement'))
+            paymentConditions = await PaymentConditions.at(zos.getProxyAddress('PaymentConditions'))
+            accessConditions = await AccessConditions.at(zos.getProxyAddress('AccessConditions'))
+
             // Do some preperations: give consumer funds, add an asset
             // consumer request initial funds to play
             console.log(consumer)

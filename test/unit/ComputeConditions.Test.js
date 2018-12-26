@@ -5,21 +5,9 @@
 const ComputeConditions = artifacts.require('ComputeConditions.sol')
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
 const utils = require('../utils.js')
+const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
 
 const web3 = utils.getWeb3()
-
-contract('ComputeConditions constructor', (accounts) => {
-    it('Should not deploy when agreement is empty', async () => {
-        // act-assert
-        try {
-            await ComputeConditions.new(0x0, { from: accounts[0] })
-        } catch (e) {
-            assert.strictEqual(e.reason, 'invalid address')
-            return
-        }
-        assert.fail('Expected revert not received')
-    })
-})
 
 contract('ComputeConditions', (accounts) => {
     const templateId = '0x0000000000000000000000000000000000000000000000000000000000000002'
@@ -49,10 +37,17 @@ contract('ComputeConditions', (accounts) => {
         await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, dependenciesBits, templateId, [0], 0, { from: accounts[0] })
         await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
     }
+    before(async () => {
+        let zos = new ZeppelinHelper('ComputeConditions')
+        zos.restoreState(accounts[9])
+    })
 
     beforeEach(async () => {
-        agreement = await ServiceAgreement.new({ from: accounts[0] })
-        contract = await ComputeConditions.new(agreement.address, { from: accounts[0] })
+        let zos = new ZeppelinHelper('ComputeConditions')
+        await zos.initialize(accounts[0], false)
+        agreement = await ServiceAgreement.at(zos.getProxyAddress('ServiceAgreement'))
+        contract = await ComputeConditions.at(zos.getProxyAddress('ComputeConditions'))
+
         /* eslint-disable-next-line prefer-destructuring */
         consumer = accounts[1]
         contracts = [contract.address]
