@@ -451,52 +451,6 @@ contract ServiceExecutionAgreement {
         return agreements[agreementId].isExisting;
     }
 
-    function initializeConditions(
-        bytes32 templateId,
-        bytes32 agreementId,
-        bytes32[] valueHash,
-        uint256[] timeoutValues,
-        bytes32 did
-    )
-        private
-        returns (
-            bool conditionInitiated
-        )
-    {
-        Agreement storage agreement = agreements[agreementId];
-
-        for (uint256 i = 0; i < templates[templateId].conditionKeys.length; i++) {
-            if (timeoutValues[i] != 0) {
-                // TODO: define dynamic margin
-                require(
-                    timeoutValues[i] > 2,
-                    'invalid timeout with a margin (~ 30 to 40 seconds = 2 blocks intervals) to avoid race conditions'
-                );
-                /* solium-disable-next-line security/no-block-members */
-                agreement.timeoutValues.push(block.timestamp + timeoutValues[i]);
-            } else {
-                agreement.timeoutValues.push(0);
-            }
-            agreement.conditionsState.push(0);
-            agreement.conditionLockedState.push(0);
-
-            // add condition instance
-            bytes32 conditionKey = hashCondition(templates[templateId].conditionKeys[i], valueHash[i]);
-            agreement.conditionInstances.push(conditionKey);
-
-            emit ConditionInitialized(
-                agreementId,
-                conditionKey,
-                did,
-                false,
-                templates[templateId].owner,
-                agreement.consumer
-            );
-        }
-
-        return true;
-    }
-
     function fulfillCondition(
         bytes32 agreementId,
         bytes4 fingerprint,
@@ -599,33 +553,6 @@ contract ServiceExecutionAgreement {
             fingerprint);
     }
 
-    function lockChildConditions(
-        bytes32 agreementId,
-        bytes32 condition,
-        uint256 dependenciesValue
-    )
-        private
-    {
-        // check the dependency conditions
-        Agreement storage agreement = agreements[agreementId];
-        for (uint16 i = 0; i < templates[agreement.templateId].conditionKeys.length; i++) {
-            if (getBitValue(dependenciesValue, i, 0, 2) != 0) {
-                // This is a dependency, lock it
-                // verify its state is either 1 or has timed out
-                uint8 timeoutFlag = getBitValue(dependenciesValue, i, 1, 2);
-                require(
-                    agreement.conditionsState[i] == 1 ||
-                    (
-                        timeoutFlag == 1 &&
-                        conditionTimedOut(agreementId, condition)
-                    ),
-                    'Invalid state, child dependency expected to be fulfilled or parent timeout occurred.'
-                );
-                agreement.conditionLockedState[i] = 1;
-            }
-        }
-    }
-
     function hasUnfulfilledDependencies(
         bytes32 agreementId,
         bytes32 condition
@@ -703,6 +630,80 @@ contract ServiceExecutionAgreement {
     {
         return ECDSA.recover(hash, signature);
     }
+
+    function initializeConditions(
+        bytes32 templateId,
+        bytes32 agreementId,
+        bytes32[] valueHash,
+        uint256[] timeoutValues,
+        bytes32 did
+    )
+        private
+        returns (
+            bool conditionInitiated
+        )
+    {
+        Agreement storage agreement = agreements[agreementId];
+
+        for (uint256 i = 0; i < templates[templateId].conditionKeys.length; i++) {
+            if (timeoutValues[i] != 0) {
+                // TODO: define dynamic margin
+                require(
+                    timeoutValues[i] > 2,
+                    'invalid timeout with a margin (~ 30 to 40 seconds = 2 blocks intervals) to avoid race conditions'
+                );
+                /* solium-disable-next-line security/no-block-members */
+                agreement.timeoutValues.push(block.timestamp + timeoutValues[i]);
+            } else {
+                agreement.timeoutValues.push(0);
+            }
+            agreement.conditionsState.push(0);
+            agreement.conditionLockedState.push(0);
+
+            // add condition instance
+            bytes32 conditionKey = hashCondition(templates[templateId].conditionKeys[i], valueHash[i]);
+            agreement.conditionInstances.push(conditionKey);
+
+            emit ConditionInitialized(
+                agreementId,
+                conditionKey,
+                did,
+                false,
+                templates[templateId].owner,
+                agreement.consumer
+            );
+        }
+
+        return true;
+    }
+
+    function lockChildConditions(
+        bytes32 agreementId,
+        bytes32 condition,
+        uint256 dependenciesValue
+    )
+        private
+    {
+        // check the dependency conditions
+        Agreement storage agreement = agreements[agreementId];
+        for (uint16 i = 0; i < templates[agreement.templateId].conditionKeys.length; i++) {
+            if (getBitValue(dependenciesValue, i, 0, 2) != 0) {
+                // This is a dependency, lock it
+                // verify its state is either 1 or has timed out
+                uint8 timeoutFlag = getBitValue(dependenciesValue, i, 1, 2);
+                require(
+                    agreement.conditionsState[i] == 1 ||
+                    (
+                        timeoutFlag == 1 &&
+                        conditionTimedOut(agreementId, condition)
+                    ),
+                    'Invalid state, child dependency expected to be fulfilled or parent timeout occurred.'
+                );
+                agreement.conditionLockedState[i] = 1;
+            }
+        }
+    }
+
 
     function getBitValue(
         uint256 value,
