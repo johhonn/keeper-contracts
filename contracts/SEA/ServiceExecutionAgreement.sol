@@ -568,7 +568,7 @@ contract ServiceExecutionAgreement {
     * @param conditionKey , condition key is located in DID which is a result of
     * hash(templateId || contractAddress || functionSelector (4bytes))
     * @return uint8 indicating the condition fulfilment status, the value holds all the information about
-    * the dependency conditions and timeouts
+    * the dependency conditions and timeouts fulfillment
     */
     function getConditionStatus(
         bytes32 agreementId,
@@ -580,9 +580,7 @@ contract ServiceExecutionAgreement {
             conditionKey
         )
         view
-        returns (
-            uint8 conditionStatus
-        )
+        returns (uint8)
     {
         return agreements[agreementId]
             .conditionsState[conditionKeyToIndex[conditionKey]];
@@ -651,9 +649,17 @@ contract ServiceExecutionAgreement {
             fingerprint);
     }
 
+   /**
+    * @notice hasUnfulfilledDependencies a utility function that is in charge to check if the condition has unfulfilled
+    * dependency (conditions)
+    * @dev gets the condition dependencies in terms of dependency bits, checks them and the timeouts they are associated with
+    * @param agreementId , SEA agreement ID
+    * @param conditionKey , condition key is hash (template ID, ContractAddress , functionSelector/Fingerprint)
+    * @return false if all the dependency conditions are fulfilled or there is no dependency conditions
+    */
     function hasUnfulfilledDependencies(
         bytes32 agreementId,
-        bytes32 condition
+        bytes32 conditionKey
     )
         public view
         returns (bool)
@@ -661,7 +667,7 @@ contract ServiceExecutionAgreement {
         Agreement storage agreement = agreements[agreementId];
         Template storage template = templates[agreement.templateId];
         uint dependenciesValue = template
-            .dependenciesBits[conditionKeyToIndex[condition]];
+            .dependenciesBits[conditionKeyToIndex[conditionKey]];
 
         // check the dependency conditions
         if (dependenciesValue == 0) {
@@ -673,7 +679,7 @@ contract ServiceExecutionAgreement {
                 uint8 timeoutFlag = getBitValue(dependenciesValue, i, 1, 2);
                 if (timeoutFlag == 1) {
                     if (agreement.conditionsState[i] == 1 ||
-                        !conditionTimedOut(agreementId, condition)) {
+                        !conditionTimedOut(agreementId, conditionKey)) {
                         return true;
                     }
                 } else if (agreement.conditionsState[i] == 0) {
@@ -684,17 +690,35 @@ contract ServiceExecutionAgreement {
         return false;
     }
 
-    function conditionTimedOut(bytes32 agreementId, bytes32 condition)
+    /**
+    * @notice conditionTimedOut is called by any actor in order to retrieve the status of the condition timeout
+    * @dev  check the current block.timestamp is greater than the condition timeout [block.timestamp could be manipulated by miners]
+    * @param agreementId , SEA agreement ID
+    * @param conditionKey , condition key = hash(templateId, contractAddress, functionSelector/Fingerprint)
+    * @return true if the condition is timed out
+    */
+    function conditionTimedOut(bytes32 agreementId, bytes32 conditionKey)
         public view
-        returns (bool timedOut)
+        returns (bool)
     {
         /* solium-disable-next-line security/no-block-members */
         if (block.timestamp > agreements[agreementId]
-            .timeoutValues[conditionKeyToIndex[condition]])
+            .timeoutValues[conditionKeyToIndex[conditionKey]])
             return true;
         return false;
     }
 
+    /**
+    * @notice initializeConditions is called during agreement initialization
+    * @dev condition is initialized by setting dependency conditions if exist, timeout values, and reconstructing the
+    * condition key and derive the condition instance from this key, finally emit event to notify the listeners
+    * @param templateId , SEA template Id
+    * @param agreementId , SEA agreement Id
+    * @param valueHash , array of the hashed input values that are associated with the conditions
+    * @param timeoutValues , array of timeout values that are associated with the conditions (zero value is default)
+    * @param did , decentralized identifier that it is in charge of resolving the service
+    * @return true if the condition is initialized without errors
+    */
     function initializeConditions(
         bytes32 templateId,
         bytes32 agreementId,
@@ -741,6 +765,12 @@ contract ServiceExecutionAgreement {
         return true;
     }
 
+    /**
+    * @notice lockChildConditions is used to avoid replay attack if the parent conditions are fulfilled
+    * @dev checks the dependency bits and timeouts of the child condition before setting the state of the condition to locked
+    * @param agreementId , SEA agreement ID
+    * @param condition , condition key
+    */
     function lockChildConditions(
         bytes32 agreementId,
         bytes32 condition,
@@ -768,6 +798,10 @@ contract ServiceExecutionAgreement {
         }
     }
 
+    /**
+    * @dev get the current blockchain number in ocean network
+    * @return block.number
+    */
     function getCurrentBlockNumber()
         public view
         returns (uint blockNumber)
@@ -775,45 +809,70 @@ contract ServiceExecutionAgreement {
         return block.number;
     }
 
+    /**
+    * @notice utility function which is used to add the Ethereum prefix to the hash(message)
+    * @param hash , hash(message)
+    * @return prefixed Hash
+    */
     function prefixHash(bytes32 hash)
         public pure
-        returns (bytes32 prefixedHash)
+        returns (bytes32)
     {
         return ECDSA.toEthSignedMessageHash(hash);
     }
 
+    /**
+    * @notice isValidSignature checks if the signature is valid
+    * @param hash , SHA3 based hash of the original message
+    * @param signature , ECDSA based signature
+    * @param consumer , signer address
+    * @return true if the recovered address equals the consumer's address
+    */
     function isValidSignature(
         bytes32 hash,
         bytes signature,
         address consumer
     )
         public pure
-        returns (bool isValid)
+        returns (bool)
     {
         return (consumer == recoverAddress(hash, signature));
     }
 
+    /**
+    * @notice recoverAddress retrieves the address of the signer using the original message and the signature
+    * @param hash , the hash of the original message
+    * @param signature , ECDSA based signature
+    * @return signer address
+    */
     function recoverAddress(bytes32 hash, bytes signature)
         public pure
-        returns (
-            address recoveredAddress
-        )
+        returns (address)
     {
         return ECDSA.recover(hash, signature);
     }
 
+    /**
+    * @notice this is utility function which performs bitwise operations over dependency bits for more info please
+    * check out this blog post: https://blog.oceanprotocol.com/ocean-integration-fitchain-secure-on-premises-compute-59f43a944266
+    * @dev using dependency bit value, bit position(0-> dependency flag, 1-> timeout flag), and the condition index, this function
+    * can check if this condition is a dependency condition or not by using bitwise operation (AND) between value and 2^(condIndex * 2) + bit position(0, 1))
+    * @param value , dependency bits value for a condition
+    * @param conditionIndex , the index of the condition in the conditions list
+    * @param bitPosition , first bit for dependency flag, second bit for timeout flag
+    * @param numBits , currently we have 2 bits but this to keep the function more generic for future updates
+    * @return dependency bit Value = 1 if the condition index is an index for a dependency condition, or there are timeout, otherwise return zero
+    */
     function getBitValue(
         uint256 value,
-        uint16 i,
+        uint16 conditionIndex,
         uint16 bitPosition,
         uint16 numBits
     )
         private pure
-        returns (
-            uint8 bitValue
-        )
+        returns (uint8)
     {
-        return uint8(value & (2 ** uint256((i * numBits) + bitPosition))) == 0 ? uint8(0) : uint8(1);
+        return uint8(value & (2 ** uint256((conditionIndex * numBits) + bitPosition))) == 0 ? uint8(0) : uint8(1);
     }
 
 }
