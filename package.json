@@ -20,12 +20,12 @@
     "report-coverage": "cat ./coverage/lcov.info | codacy-coverage --token b95545c0da4b45848cc5eef363c2711e",
     "release": "./bumpversion.sh patch",
     "clean": "rm -rf ./build/ && rm -rf ./artifacts/*.development.json",
-    "lint": "npm run lint:eslint && npm run lint:solium",
+    "lint": "npm run lint:eslint && npm run lint:ethlint",
     "lint:eslint": "eslint --ignore-pattern '/coverage/' .",
-    "lint:solium": "solium -d ./contracts/",
-    "lint:solium:watch": "npm run lint:solium -- --watch",
+    "lint:ethlint": "solium -d ./contracts/",
+    "lint:ethlint:watch": "npm run lint:ethlint -- --watch",
     "lint:mythril": "truffle compile && myth -x --truffle --max-depth 8 --outform markdown > mythril-report.md",
-    "lint:fix": "npm run lint:eslint -- --fix && npm run lint:solium -- --fix"
+    "lint:fix": "npm run lint:eslint -- --fix && npm run lint:ethlint -- --fix"
   },
   "directories": {
     "doc": "doc",
@@ -52,9 +52,9 @@
     "ethers": "^4.0.20",
     "ethjs": "^0.4.0",
     "ethjs-provider-http": "^0.1.6",
+    "ethlint": "^1.2.1",
     "openzeppelin-solidity": "^2.0.0",
     "solidity-coverage": "^0.5.11",
-    "solium": "^1.1.8",
     "truffle": "^5.0.0",
     "truffle-hdwallet-provider": "^1.0.1",
     "web3": "1.0.0-beta.37"
