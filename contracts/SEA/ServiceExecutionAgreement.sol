@@ -861,7 +861,7 @@ contract ServiceExecutionAgreement {
     * @param conditionIndex , the index of the condition in the conditions list
     * @param bitPosition , first bit for dependency flag, second bit for timeout flag
     * @param numBits , currently we have 2 bits but this to keep the function more generic for future updates
-    * @return dependency bit Value = 1 if the condition index is an index for a dependency condition, or there are timeout, otherwise return zero
+    * @return dependency bit Value = 1 if this index is an a dependency condition for the parent condition, or the timeout was set to 1, otherwise returns zero
     */
     function getBitValue(
         uint256 value,
