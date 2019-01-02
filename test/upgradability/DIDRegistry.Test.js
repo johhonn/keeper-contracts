@@ -28,12 +28,12 @@ async function assertRevert(promise) {
 contract('DIDRegistry', (accounts) => {
     let pAddress
 
-    before('Restore zos before all tests', async function() {
+    before('Restore zos before all tests', async function () {
         zos = new ZeppelinHelper('DIDRegistry')
         await zos.restoreState(accounts[9])
     })
 
-    beforeEach('Deploy with zos before each tests', async function() {
+    beforeEach('Deploy with zos before each tests', async function () {
         zos = new ZeppelinHelper('DIDRegistry')
         await zos.initialize(accounts[0], true)
         pAddress = zos.getProxyAddress('DIDRegistry')

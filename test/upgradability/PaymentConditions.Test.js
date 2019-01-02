@@ -1,7 +1,11 @@
 /* eslint-env mocha */
 /* global web3, artifacts, assert, contract, describe, it */
 const ZeppelinHelper = require('./ZeppelinHelper.js')
+const utils = require('../utils.js')
 
+const OceanToken = artifacts.require('OceanToken.sol')
+const ServiceAgreement = artifacts.require('ServiceAgreement')
+const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const PaymentConditionsWithBug = artifacts.require('PaymentConditionsWithBug')
 const PaymentConditionsChangeInStorage = artifacts.require('PaymentConditionsChangeInStorage')
 const PaymentConditionsExtraFunctionality = artifacts.require('PaymentConditionsExtraFunctionality')
@@ -23,14 +27,44 @@ async function assertRevert(promise) {
 }
 
 contract('PaymentConditions', (accounts) => {
+    let token
     let pAddress
+    let consumer = accounts[1]
+    const assetId = '0x0000000000000000000000000000000000000000000000000000000000000001'
+    const templateId = '0x0000000000000000000000000000000000000000000000000000000000000002'
+    let serviceAgreementId = utils.generateId(web3)
+    let price = 1
 
-    before('restore zos before all tests', async function() {
+    function createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer) {
+        const conditionKeys = utils.generateConditionsKeys(templateId, contracts, fingerprints)
+        const hash = utils.createSLAHash(web3, templateId, conditionKeys, valueHashes, timeoutValues, serviceAgreementId)
+        return web3.eth.sign(hash, consumer)
+    }
+
+    async function initAgreement() {
+        /* eslint-disable-next-line prefer-destructuring */
+        let contracts = [pAddress]
+        let fingerprints = [utils.getSelector(web3, PaymentConditions, 'lockPayment')]
+        let dependenciesBits = [0]
+        let valueHashes = [utils.valueHash(['bytes32', 'uint256'], [assetId, price])]
+        let timeoutValues = [0]
+
+        token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
+        let agreement = await ServiceAgreement.at(zos.getProxyAddress('ServiceAgreement'))
+
+        const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
+        await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, dependenciesBits, templateId, [0], 0, { from: accounts[0] })
+        await agreement.executeAgreement(templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+        await token.setReceiver(consumer, { from: accounts[0] })
+        await token.approve(pAddress, price, { from: consumer })
+    }
+
+    before('restore zos before all tests', async function () {
         zos = new ZeppelinHelper('PaymentConditions')
         await zos.restoreState(accounts[9])
     })
 
-    beforeEach('Deploy with zos before each tests', async function() {
+    beforeEach('Deploy with zos before each tests', async function () {
         zos = new ZeppelinHelper('PaymentConditions')
         await zos.initialize(accounts[0], true)
         pAddress = zos.getProxyAddress('PaymentConditions')
@@ -58,36 +92,46 @@ contract('PaymentConditions', (accounts) => {
 
             // Approve and call again
             await zos.approveLatestTransaction()
-            // await p.setReceiver(accounts[0])
             let n
             await p.called(zos.owner).then(i => { n = i })
             assert.equal(n.toNumber(), 0, 'Error calling added storage variable')
         })
-        it('Should be possible to append storage variables and change logic', async () => {
-            /* eslint-disable-next-line no-unused-vars */
-            let p = await PaymentConditionsChangeInStorageAndLogic.at(pAddress)
-            await zos.upgradeToNewContract('PaymentConditionsChangeInStorageAndLogic')
 
-            // Approve and test new logic
+        it('Should be possible to append storage variables and change logic', async () => {
+            await initAgreement()
             await zos.approveLatestTransaction()
-            // add test
+            const result = await p.lockPayment(serviceAgreementId, assetId, price, { from: consumer })
+            // assert
+            utils.assertEmitted(result, 1, 'PaymentLocked')
+
+            let n
+            await p.called(zos.owner).then(i => { n = i })
+            assert.equal(n.toNumber(), 0, 'Error calling added storage variable')
         })
 
         it('Should be possible to fix/add a bug', async () => {
-            /* eslint-disable-next-line no-unused-vars */
+            await initAgreement()
             let p = await PaymentConditionsWithBug.at(pAddress)
             await zos.upgradeToNewContract('PaymentConditionsWithBug')
             await zos.approveLatestTransaction()
-            // add test
+            const result = await p.lockPayment(serviceAgreementId, assetId, price, { from: consumer })
+            utils.assertEmitted(result, 0, 'PaymentLocked')
         })
 
         it('Should be possible to change function signature', async () => {
+            await initAgreement()
             await zos.upgradeToNewContract('PaymentConditionsChangeFunctionSignature')
-            // Approve and test new logic
-            await zos.approveLatestTransaction()
-            /* eslint-disable-next-line no-unused-vars */
             let p = await PaymentConditionsChangeFunctionSignature.at(pAddress)
-            // add test
+            await assertRevert(p.lockPayment(serviceAgreementId, assetId, { from: consumer }))
+            await zos.approveLatestTransaction()
+
+            // upgrade and test again
+            try {
+                await p.methods['lockPayment(bytes32,bytes32)'](serviceAgreementId, assetId, { from: consumer })
+                assert.fail('Expected revert not received')
+            } catch (error) {
+                assert.equal(error.reason, 'Invalid condition key', 'invalid revert reason')
+            }
         })
     })
 })

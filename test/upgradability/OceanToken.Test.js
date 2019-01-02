@@ -26,17 +26,17 @@ async function assertRevert(promise) {
 contract('OceanToken', (accounts) => {
     let pAddress
 
-    before('restore zos before all tests', async function() {
+    before('restore zos before all tests', async function () {
         zos = new ZeppelinHelper('OceanToken')
         await zos.restoreState(accounts[9])
     })
 
-    beforeEach('Deploy with zos before each tests', async function() {
+    beforeEach('Deploy with zos before each tests', async function () {
         zos = new ZeppelinHelper('OceanToken')
         await zos.initialize(accounts[0], true)
         pAddress = zos.getProxyAddress('OceanToken')
         let p = await OceanToken.at(pAddress)
-        p.setReceiver(accounts[0])
+        await p.setReceiver(accounts[0])
     })
 
     describe('Test upgradability for OceanToken', () => {
@@ -68,7 +68,6 @@ contract('OceanToken', (accounts) => {
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
-            // let p = await OceanTokenChangeInStorageAndLogic.at(zos.proxyAddress)
             let p = await OceanTokenChangeInStorageAndLogic.at(pAddress)
             await zos.upgradeToNewContract('OceanTokenChangeInStorageAndLogic')
 
@@ -78,7 +77,7 @@ contract('OceanToken', (accounts) => {
             await p.transfer(accounts[2], 100, { from: accounts[0] })
             let n
             await p.called(zos.owner).then(i => { n = i })
-            assert.equal(n.toNumber(), 2, 'Error calling added storage variable')
+            assert.equal(n.toNumber(), 2, 'Error on internal counter')
         })
 
         it('Should be possible to fix/add a bug', async () => {

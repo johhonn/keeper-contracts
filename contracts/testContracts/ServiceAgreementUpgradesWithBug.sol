@@ -3,21 +3,7 @@ pragma solidity 0.4.25;
 
 import '../SLA/ServiceAgreement.sol';
 
-
-
-contract ServiceAgreementExtraFunctionality is ServiceAgreement{
-    //returns a number
-    function getNumber() public view returns(uint) {
-        return 42;
-    }
-}
-
-contract ServiceAgreementChangeInStorage is ServiceAgreement{
-    // keep track of how many times a function was called.
-    mapping (address=>uint256) public called;
-}
-
-contract ServiceAgreementChangeInStorageAndLogic  {
+contract ServiceAgreementWithBug {
 
     struct ServiceAgreementTemplate {
         bool state; // 1 -> Available 0 -> revoked template
@@ -51,7 +37,6 @@ contract ServiceAgreementChangeInStorageAndLogic  {
 
     // map template Id to a list of agreement instances
     mapping(bytes32 => bytes32[]) templateId2Agreements;
-    mapping (address=>uint256) public called;
 
     // is able to revoke agreement template (template is no longer accessible)
     modifier canRevokeTemplate(bytes32 templateId){
@@ -133,19 +118,18 @@ contract ServiceAgreementChangeInStorageAndLogic  {
     // Setup service agreement template only once!
     function setupAgreementTemplate(bytes32 templateId, address[] contracts, bytes4[] fingerprints, uint256[] dependenciesBits, bytes32 service, uint8[] fulfillmentIndices, uint8 fulfillmentOperator)
     public isValidTemplateId(templateId) returns (bool){
-        called[msg.sender] += 1;
         // TODO: whitelisting the contracts/fingerprints
         require(contracts.length == fingerprints.length, 'fingerprints and contracts length do not match');
         require(contracts.length == dependenciesBits.length, 'contracts and dependencies do not match');
         require(fulfillmentIndices.length <= contracts.length, 'Invalid fulfillment indices');
         require(fulfillmentOperator <= fulfillmentIndices.length, 'Invalid fulfillment operator');
         // 2. generate conditions
-        templates[templateId] = ServiceAgreementTemplate(true, msg.sender, new bytes32[](0), dependenciesBits, fulfillmentIndices, fulfillmentOperator);
-        for (uint256 i = 0; i < contracts.length; i++) {
-            templates[templateId].conditionKeys.push(keccak256(abi.encodePacked(templateId, contracts[i], fingerprints[i])));
-            conditionKeyToIndex[keccak256(abi.encodePacked(templateId, contracts[i], fingerprints[i]))] = i;
-            emit SetupCondition(templateId, keccak256(abi.encodePacked(templateId, contracts[i], fingerprints[i])), msg.sender);
-        }
+        //templates[templateId] = ServiceAgreementTemplate(true, msg.sender, new bytes32[](0), dependenciesBits, fulfillmentIndices, fulfillmentOperator);
+        // for (uint256 i = 0; i < contracts.length; i++) {
+        //     templates[templateId].conditionKeys.push(keccak256(abi.encodePacked(templateId, contracts[i], fingerprints[i])));
+        //     conditionKeyToIndex[keccak256(abi.encodePacked(templateId, contracts[i], fingerprints[i]))] = i;
+        //     emit SetupCondition(templateId, keccak256(abi.encodePacked(templateId, contracts[i], fingerprints[i])), msg.sender);
+        // }
         emit SetupAgreementTemplate(templateId, msg.sender);
         return true;
     }

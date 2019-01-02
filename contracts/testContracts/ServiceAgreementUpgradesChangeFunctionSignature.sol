@@ -3,21 +3,7 @@ pragma solidity 0.4.25;
 
 import '../SLA/ServiceAgreement.sol';
 
-
-
-contract ServiceAgreementExtraFunctionality is ServiceAgreement{
-    //returns a number
-    function getNumber() public view returns(uint) {
-        return 42;
-    }
-}
-
-contract ServiceAgreementChangeInStorage is ServiceAgreement{
-    // keep track of how many times a function was called.
-    mapping (address=>uint256) public called;
-}
-
-contract ServiceAgreementChangeInStorageAndLogic  {
+contract ServiceAgreementChangeFunctionSignature {
 
     struct ServiceAgreementTemplate {
         bool state; // 1 -> Available 0 -> revoked template
@@ -51,7 +37,6 @@ contract ServiceAgreementChangeInStorageAndLogic  {
 
     // map template Id to a list of agreement instances
     mapping(bytes32 => bytes32[]) templateId2Agreements;
-    mapping (address=>uint256) public called;
 
     // is able to revoke agreement template (template is no longer accessible)
     modifier canRevokeTemplate(bytes32 templateId){
@@ -131,9 +116,9 @@ contract ServiceAgreementChangeInStorageAndLogic  {
 
 
     // Setup service agreement template only once!
-    function setupAgreementTemplate(bytes32 templateId, address[] contracts, bytes4[] fingerprints, uint256[] dependenciesBits, bytes32 service, uint8[] fulfillmentIndices, uint8 fulfillmentOperator)
+    function setupAgreementTemplate(bytes32 templateId, address[] contracts, bytes4[] fingerprints, uint256[] dependenciesBits, bytes32 service, uint8[] fulfillmentIndices)
     public isValidTemplateId(templateId) returns (bool){
-        called[msg.sender] += 1;
+        uint8 fulfillmentOperator = 0;
         // TODO: whitelisting the contracts/fingerprints
         require(contracts.length == fingerprints.length, 'fingerprints and contracts length do not match');
         require(contracts.length == dependenciesBits.length, 'contracts and dependencies do not match');

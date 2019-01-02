@@ -214,7 +214,6 @@ contract OceanTokenChangeInStorageAndLogic is ERC20 {
     * @param _value uint256 the amount of tokens to be transferred
     */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
-        called[msg.sender] += 1;
         require(_to != address(0), 'To address is 0x0.');
         return super.transferFrom(_from, _to, _value);
     }

@@ -58,20 +58,22 @@ contract('OceanMarket', (accounts) => {
 
             // Approve and call again
             await zos.approveLatestTransaction()
-            // await p.setReceiver(accounts[0])
             let n
             await p.called(zos.owner).then(i => { n = i })
             assert.equal(n.toNumber(), 0, 'Error calling added storage variable')
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
-            /* eslint-disable-next-line no-unused-vars */
             let p = await OceanMarketChangeInStorageAndLogic.at(pAddress)
             await zos.upgradeToNewContract('OceanMarketChangeInStorageAndLogic')
+            let id = await p.methods['generateId(string)']('test')
 
             // Approve and test new logic
             await zos.approveLatestTransaction()
-            // add test
+            await p.verifyPaymentReceived(id, { from: accounts[0] })
+            let n
+            await p.called(zos.owner).then(i => { n = i })
+            assert.equal(n.toNumber(), 0, 'Error calling added storage variable')
         })
 
         it('Should be possible to fix/add a bug', async () => {
@@ -79,16 +81,22 @@ contract('OceanMarket', (accounts) => {
             let p = await OceanMarketWithBug.at(pAddress)
             await zos.upgradeToNewContract('OceanMarketWithBug')
             await zos.approveLatestTransaction()
-            // add test
+            let id = await p.methods['generateId(string)']('test')
+
+            const result = await p.verifyPaymentReceived(id, { from: accounts[0] })
+            assert.strictEqual(result, false)
         })
 
         it('Should be possible to change function signature', async () => {
             await zos.upgradeToNewContract('OceanMarketChangeFunctionSignature')
+            let p = await OceanMarketChangeFunctionSignature.at(pAddress)
+            let id = await p.methods['generateId(string)']('test')
+            await assertRevert(p.verifyPaymentReceived(id, true))
+
             // Approve and test new logic
             await zos.approveLatestTransaction()
-            /* eslint-disable-next-line no-unused-vars */
-            let p = await OceanMarketChangeFunctionSignature.at(pAddress)
-            // add test
+            const result = await p.verifyPaymentReceived(id, true)
+            assert.strictEqual(result, true)
         })
     })
 })

@@ -8,7 +8,7 @@ const glob = require('glob')
 const fs = require('fs')
 
 const MultiSigWallet = artifacts.require('MultiSigWallet')
-const debug = ' -v'
+const debug = ' -s'
 const stdio = 'inherit'
 module.exports = class ZeppelinHelper {
     constructor(contractName) {
@@ -43,9 +43,13 @@ module.exports = class ZeppelinHelper {
 
     async createContract(contract) {
         if (this.addresses[contract] === undefined) {
-            console.log('Initializing: ', contract)
+            if (debug === ' -v') {
+                console.log('Initializing: ', contract)
+            }
             for (let dep of this.dependencies[contract]) {
-                console.log('Adding dependencies ' + dep)
+                if (debug === ' -v') {
+                    console.log('Adding dependencies ' + dep)
+                }
                 await this.createContract(dep)
             }
             let cmd
@@ -80,7 +84,9 @@ module.exports = class ZeppelinHelper {
                 default:
                     throw Error(contract + ' Not implemented in create')
             }
-            console.log('cmd:', cmd)
+            if (debug === ' -v') {
+                console.log('cmd:', cmd)
+            }
             let address = execSync('npx zos create ' + cmd + debug).toString().trim()
             // no need for wallet when upgrade is not to be tested
             if (this.upgrade) {
@@ -88,7 +94,9 @@ module.exports = class ZeppelinHelper {
             }
             this.addresses[contract] = address
         } else {
-            console.log('skipping: ' + contract + ' already initialized')
+            if (debug === ' -v') {
+                console.log('skipping: ' + contract + ' already initialized')
+            }
         }
     }
 
@@ -103,10 +111,12 @@ module.exports = class ZeppelinHelper {
         // set zos session parameters
         // we need to identify if the network is coverage or if its development
         let net = process.env.NETWORK
-        console.log('Creating session with network:' + net + ' and admin:', admin)
-        execSync('zos session --network ' + net + ' --from ' + admin)
+        if (debug === ' -v') {
+            console.log('Creating session with network:' + net + ' and admin:', admin)
+        }
+        execSync('npx zos session --network ' + net + ' --from ' + admin + debug)
 
-        execSync('npx zos init oceanprotocol 0.1.poc --force')
+        execSync('npx zos init oceanprotocol 0.1.poc --force' + debug)
         // add all contracts again
         for (let contract of ['DIDRegistry', 'OceanToken', 'OceanMarket',
             'OceanAuth', 'ServiceAgreement', 'AccessConditions', 'PaymentConditions',
@@ -124,7 +134,9 @@ module.exports = class ZeppelinHelper {
         const networkInfo = JSON.parse(fs.readFileSync(files[0]))
         let imp = networkInfo.contracts && networkInfo.contracts[this.contractName]
         this.implementationAddress = imp.address
-        console.log('implementation:', this.implementationAddress)
+        if (debug === ' -v') {
+            console.log('implementation:', this.implementationAddress)
+        }
     }
 
     async loadWallet() {
@@ -145,17 +157,11 @@ module.exports = class ZeppelinHelper {
     }
 
     async upgradeToNewContract(newContractName) {
-        console.log('adding')
-        execSync('npx zos add ' + newContractName + ':' + this.contractName + ' --skip-compile -v', { stdio: stdio })
-        console.log('pushing')
-        execSync('npx zos push --skip-compile --force -v', { stdio: stdio })
-        console.log('reading json')
+        execSync('npx zos add ' + newContractName + ':' + this.contractName + ' --skip-compile ' + debug, { stdio: stdio })
+        execSync('npx zos push --skip-compile --force -v' + debug, { stdio: stdio })
         await this.readImplementationFromJson()
-        console.log('Implementation', this.implementationAddress)
         const upgradeCallData = encodeCall('upgradeTo', ['address'], [this.implementationAddress])
-        console.log('submit upgrade')
         let tx = await this.wallet.submitTransaction(this.addresses[this.contractName], 0, upgradeCallData, { from: this.walletOwners[0] })
-        console.log('Storing tx')
         this.latestTransaction = tx.logs[0].args.transactionId.toNumber()
     }
 

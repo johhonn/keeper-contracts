@@ -2,6 +2,7 @@ pragma solidity 0.4.25;
 
 import 'openzeppelin-eth/contracts/math/SafeMath.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
+import 'zos-lib/contracts/Initializable.sol';
 
 import './token/OceanToken.sol';
 
@@ -10,7 +11,7 @@ import './token/OceanToken.sol';
 @author Team: Fang Gong, Samer Sallam, Ahmed Ali, Sebastian Gerske
 */
 
-contract OceanMarket is Ownable {
+contract OceanMarket is Initializable, Ownable {
 
     using SafeMath for uint256;
     using SafeMath for uint;

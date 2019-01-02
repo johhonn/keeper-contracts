@@ -1,5 +1,5 @@
 /* eslint-env mocha */
-/* global web3, artifacts, assert, contract, describe, it */
+/* global artifacts, assert, contract, describe, it */
 const ZeppelinHelper = require('./ZeppelinHelper.js')
 
 const FitchainConditionsWithBug = artifacts.require('FitchainConditionsWithBug')
@@ -9,7 +9,6 @@ const FitchainConditionsChangeInStorageAndLogic = artifacts.require('FitchainCon
 const FitchainConditionsChangeFunctionSignature = artifacts.require('FitchainConditionsChangeFunctionSignature')
 
 global.artifacts = artifacts
-global.web3 = web3
 let zos
 
 async function assertRevert(promise) {
@@ -24,13 +23,14 @@ async function assertRevert(promise) {
 
 contract('FitchainConditions', (accounts) => {
     let pAddress
+    const verifier1 = accounts[2]
 
-    before('restore zos before all tests', async function() {
+    before('restore zos before all tests', async function () {
         zos = new ZeppelinHelper('FitchainConditions')
         await zos.restoreState(accounts[9])
     })
 
-    beforeEach('Deploy with zos before each tests', async function() {
+    beforeEach('Deploy with zos before each tests', async function () {
         zos = new ZeppelinHelper('FitchainConditions')
         await zos.initialize(accounts[0], true)
         pAddress = zos.getProxyAddress('FitchainConditions')
@@ -58,37 +58,44 @@ contract('FitchainConditions', (accounts) => {
 
             // Approve and call again
             await zos.approveLatestTransaction()
-            // await p.setReceiver(accounts[0])
             let n
             await p.called(zos.owner).then(i => { n = i })
             assert.equal(n.toNumber(), 0, 'Error calling added storage variable')
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
-            /* eslint-disable-next-line no-unused-vars */
             let p = await FitchainConditionsChangeInStorageAndLogic.at(pAddress)
             await zos.upgradeToNewContract('FitchainConditionsChangeInStorageAndLogic')
-
             // Approve and test new logic
             await zos.approveLatestTransaction()
-            // add test
+            const registerVerifier1 = await p.registerVerifier(1, { from: verifier1 })
+            assert.strictEqual(verifier1, registerVerifier1.logs[0].args.verifier, 'invalid verifier address 1')
+            let n
+            await p.called(verifier1).then(i => { n = i })
+            assert.equal(n.toNumber() > 0, true, 'Error calling added storage variable')
         })
 
         it('Should be possible to fix/add a bug', async () => {
-            /* eslint-disable-next-line no-unused-vars */
             let p = await FitchainConditionsWithBug.at(pAddress)
             await zos.upgradeToNewContract('FitchainConditionsWithBug')
             await zos.approveLatestTransaction()
-            // add test
+            const registerVerifier1 = await p.registerVerifier(1, { from: verifier1 })
+            assert.strictEqual(5, registerVerifier1.logs[0].args.slots.toNumber(), 'invalid verifier slots')
         })
 
         it('Should be possible to change function signature', async () => {
             await zos.upgradeToNewContract('FitchainConditionsChangeFunctionSignature')
+            let p = await FitchainConditionsChangeFunctionSignature.at(pAddress)
+            try {
+                await p.registerVerifier({ from: verifier1 })
+                assert.fail('Expected revert not received')
+            } catch (e) {
+                /* eslint-disable-next-line no-empty */
+            }
             // Approve and test new logic
             await zos.approveLatestTransaction()
-            /* eslint-disable-next-line no-unused-vars */
-            let p = await FitchainConditionsChangeFunctionSignature.at(pAddress)
-            // add test
+            const registerVerifier1 = await p.registerVerifier({ from: verifier1 })
+            assert.strictEqual(verifier1, registerVerifier1.logs[0].args.verifier, 'invalid verifier address 1')
         })
     })
 })

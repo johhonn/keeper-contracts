@@ -47,12 +47,12 @@ contract('ComputeConditions', (accounts) => {
     serviceAgreementId = testUtils.generateId(web3)
     const algorithm = 'THIS IS FAKE CODE foo=Hello World!'
 
-    before('restore zos before all tests', async function() {
+    before('restore zos before all tests', async function () {
         zos = new ZeppelinHelper('ComputeConditions')
         await zos.restoreState(accounts[9])
     })
 
-    beforeEach('Deploy with zos before each tests', async function() {
+    beforeEach('Deploy with zos before each tests', async function () {
         zos = new ZeppelinHelper('ComputeConditions')
         zos.addDependency('OceanMarket')
         zos.addDependency('PaymentConditions')
@@ -159,7 +159,7 @@ contract('ComputeConditions', (accounts) => {
             await zos.upgradeToNewContract('ComputeConditionsWithBug')
             algorithmHash = web3.utils.soliditySha3({ type: 'string', value: algorithm }).toString('hex')
             const signature = await web3.eth.sign(algorithmHash, accounts[2])
-            assertRevert(p.submitHashSignature(serviceAgreementId, signature))
+            await assertRevert(p.submitHashSignature(serviceAgreementId, signature))
             await zos.approveLatestTransaction()
             await p.submitHashSignature(serviceAgreementId, signature)
         })
@@ -171,7 +171,7 @@ contract('ComputeConditions', (accounts) => {
             algorithmHash = web3.utils.soliditySha3({ type: 'string', value: algorithm }).toString('hex')
             const signature = await web3.eth.sign(algorithmHash, datascientist)
 
-            assertRevert(p.submitHashSignature(true, signature, serviceAgreementId, { from: datascientist }))
+            await assertRevert(p.submitHashSignature(true, signature, serviceAgreementId, { from: datascientist }))
 
             // should work after approval
             await zos.approveLatestTransaction()

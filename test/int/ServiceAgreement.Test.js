@@ -23,7 +23,7 @@ for (var i = 0; i < funcNames.length; i++) {
     let funcName = funcNames[i]
     let color = colors[i]
     let oldFunc = console[funcName]
-    console[funcName] = function() {
+    console[funcName] = function () {
         var args = Array.prototype.slice.call(arguments)
         if (args.length) args = [color + args[0]].concat(args.slice(1), colorSet.Reset)
         oldFunc.apply(null, args)
