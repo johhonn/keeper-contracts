@@ -277,6 +277,13 @@ contract ServiceAgreement {
         return agreements[serviceId].consumer;
     }
 
+    /**
+    * @notice Deprecated use getAgreementConsumer instead
+    */
+    function getServiceAgreementConsumer(bytes32 serviceId) public view returns (address consumer){
+        return getAgreementConsumer(serviceId);
+    }
+
     function getConditionByFingerprint(bytes32 serviceId, address _contract, bytes4 fingerprint) public view returns (bytes32) {
         return keccak256(abi.encodePacked(getTemplateId(serviceId), _contract, fingerprint));
     }
