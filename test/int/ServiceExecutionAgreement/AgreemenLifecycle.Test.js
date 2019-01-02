@@ -10,32 +10,31 @@ const web3 = utils.getWeb3()
 
 /*
 
-                                    condition-1            Index: 0
+                                    condition-0
                                        / \
                                       /   \
                                      /     \
                                     /       \
                                    /         \
-                              F=0 /           \ F=1
-                    Index: 3 condition-4    condition-2     Index: 1
+                              F=0 v           v F=1
+                            condition-3    condition-1
                                   \            /
                                    \          /
                                Timeout=1     /
                                      \      /
                                       \    /
-                                   F=0 \  / F=1
-                                    condition3              Index: 2
+                                   F=0 v  v F=1
+                                    condition-2
 
     1st bit --> dependency index
     2nd bit --> Flag (indicating the expected value of the dependency condition)
     3rd bit --> exit strategy (i.e timeout)
 
-           condition 1               condition 2      condition 3,      condition 4
-     [ [  [1,1, 0 ], [3, 0, 0]],      [[2, 1 , 0]],  [[0,0,0]],          [2, 0, 1] ]
+           condition 0               condition 1       condition 2,      condition 3
+     [[[1, 1, 0 ], [3, 0, 0]],       [[2, 1, 0]]    ,  [[0, 0, 0]]    ,  [2, 0, 1]      ]
      Generating compressed version of nested arrays (one array)
-       condition 1                  condition 2             condition 3             condition 4
-     [ 001 000 011 000,             000 011 000 000,        000 000 000 000,        000 101 000 000]
-     [ 536           ,             192            ,        0              ,        320            ]
+     [ 001 000 011 000       ,       000 011 000 000,  000 000 000 000,  000 101 000 000]
+     [ 536                   ,       192            ,  0              ,  320            ]
 */
 
 contract('ServiceExecutionAgreement', (accounts) => {
@@ -98,7 +97,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
     }
 
     describe('Test Service Level Agreement', () => {
-        it('should be able to run through the full lifecycle of fulfilling SLA', async () => {
+        it('should be able to run through the full lifecycle of fulfilling a SEA', async () => {
             await sea.setupTemplate(
                 templateId,
                 contracts,
@@ -131,23 +130,42 @@ contract('ServiceExecutionAgreement', (accounts) => {
             assert.strictEqual(conditionStatus.toNumber(), 0,
                 'Invalid condition state')
 
+            let fulfillResult,
+                activeCondition
+            // fulfill condition 1
+            activeCondition = 1
+            fulfillResult = await fulfillCondition(activeCondition)
+            assert.strictEqual(fulfillResult.conditionStatus.toNumber(), activeCondition,
+                'Invalid condition state')
+            assert.strictEqual(fulfillResult.isAgreementFulfilled, false,
+                'Agreement should not be fulfilled')
+            console.log(await sea.hasUnfulfilledDependencies(agreementId, conditionKeys[activeCondition]))
+
             // fulfill condition 2
-            let fulfillResult = await fulfillCondition(2)
+            fulfillResult = await fulfillCondition(2)
             assert.strictEqual(fulfillResult.conditionStatus.toNumber(), 1,
                 'Invalid condition state')
             assert.strictEqual(fulfillResult.isAgreementFulfilled, false,
                 'Agreement should not be fulfilled')
 
-            // fulfill condition 1
-            fulfillResult = await fulfillCondition(1)
+            // fulfill condition 0
+            fulfillResult = await fulfillCondition(0)
             assert.strictEqual(fulfillResult.conditionStatus.toNumber(), 1,
                 'Invalid condition state')
+            await sea.fulfillAgreement(agreementId, { from: accounts[0] })
             assert.strictEqual(fulfillResult.isAgreementFulfilled, false,
-                'Agreement should not be fulfilled')
+                'Agreement should be fulfilled')
 
             // await utils.sleep(2000)
             //
             // await sea.conditionTimedOut(agreementId, conditionKeys[3])
+            //
+            // // fulfill condition 3
+            // fulfillResult = await fulfillCondition(3)
+            // assert.strictEqual(fulfillResult.conditionStatus.toNumber(), 1,
+            //     'Invalid condition state')
+            // assert.strictEqual(fulfillResult.isAgreementFulfilled, false,
+            //     'Agreement should be fulfilled')
             //
             // await sea.fulfillCondition(
             //     agreementId,

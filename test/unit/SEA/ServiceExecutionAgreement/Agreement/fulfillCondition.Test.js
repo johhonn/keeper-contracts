@@ -47,9 +47,15 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
             // act-assert
             try {
-                await contract.fulfillCondition(agreementId, fingerprints[0], valueHashes[0], { from: accounts[1] })
+                await contract.fulfillCondition(
+                    agreementId,
+                    fingerprints[0],
+                    valueHashes[0],
+                    { from: accounts[1] })
             } catch (e) {
-                assert.strictEqual(e.reason, 'unable to reconstruct the right condition hash')
+                assert.strictEqual(
+                    e.reason,
+                    'unable to reconstruct the right condition hash')
                 return
             }
             assert.fail('Expected revert not received')
@@ -60,7 +66,11 @@ contract('ServiceExecutionAgreement', (accounts) => {
             await initializeAgreementWithValues()
 
             // act
-            const result = await contract.fulfillCondition(agreementId, fingerprints[0], valueHashes[0], { from: accounts[2] })
+            const result = await contract.fulfillCondition(
+                agreementId,
+                fingerprints[0],
+                valueHashes[0],
+                { from: accounts[2] })
 
             // assert
             utils.assertEmitted(result, 1, 'ConditionFulfilled')
@@ -73,9 +83,15 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
             // act-assert
             try {
-                await contract.fulfillCondition(agreementId, fingerprints[0], valueHashes[0], { from: accounts[2] })
+                await contract.fulfillCondition(
+                    agreementId,
+                    fingerprints[0],
+                    valueHashes[0],
+                    { from: accounts[2] })
             } catch (e) {
-                assert.strictEqual(e.reason, 'This condition has unfulfilled dependency')
+                assert.strictEqual(
+                    e.reason,
+                    'This condition has unfulfilled dependency')
                 return
             }
             assert.fail('Expected revert not received')
@@ -87,7 +103,11 @@ contract('ServiceExecutionAgreement', (accounts) => {
             await initializeAgreementWithValues()
 
             // act
-            const result = await contract.fulfillCondition(agreementId, fingerprints[0], valueHashes[0], { from: accounts[2] })
+            const result = await contract.fulfillCondition(
+                agreementId,
+                fingerprints[0],
+                valueHashes[0],
+                { from: accounts[2] })
 
             // assert
             utils.assertEmitted(result, 1, 'ConditionFulfilled')

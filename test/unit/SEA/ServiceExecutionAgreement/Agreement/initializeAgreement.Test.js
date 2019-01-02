@@ -71,7 +71,10 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
         it('Should not initialize agreement (revert) when signature is not valid', async () => {
             // arrange
-            await contract.setupTemplate(utils.templateId, [], [], [], [], 0, { from: accounts[0] })
+            await contract.setupTemplate(
+                utils.templateId,
+                [], [], [], [], 0,
+                { from: accounts[0] })
 
             // act-assert
             try {
@@ -142,16 +145,64 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
         it('Should initialize condition when signature is valid', async () => {
             // arrange
-            const signature = await signAgreement(contracts, fingerprints, valueHashes, timeoutValues, agreementId, consumer)
+            const signature = await signAgreement(
+                contracts,
+                fingerprints,
+                valueHashes,
+                timeoutValues,
+                agreementId,
+                consumer)
             await contract.setupTemplate(
-                utils.templateId, contracts, fingerprints, [0], [0], 0, { from: accounts[0] })
+                utils.templateId,
+                contracts,
+                fingerprints,
+                [0], [0], 0,
+                { from: accounts[0] })
 
             // act
-            const result = await contract.initializeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
+            const result = await contract.initializeAgreement(
+                utils.templateId,
+                signature,
+                consumer,
+                valueHashes,
+                timeoutValues,
+                agreementId,
+                utils.templateId,
+                { from: accounts[0] })
 
             // assert
             utils.assertEmitted(result, 1, 'ConditionInitialized')
             utils.assertEmitted(result, 1, 'AgreementInitialized')
+        })
+
+        it('Should throw when signature is invalid', async () => {
+            // arrange
+            const signature = '0x000000'
+            await contract.setupTemplate(
+                utils.templateId,
+                contracts,
+                fingerprints,
+                [0], [0], 0,
+                { from: accounts[0] })
+
+            // act
+            try {
+                await contract.initializeAgreement(
+                    utils.templateId,
+                    signature,
+                    consumer,
+                    valueHashes,
+                    timeoutValues,
+                    agreementId,
+                    utils.templateId,
+                    { from: accounts[0] })
+            } catch (e) {
+                assert.strictEqual(
+                    e.reason,
+                    'Invalid consumer signature of service agreement')
+                return
+            }
+            assert.fail('Expected revert not received')
         })
 
         it('Should revert when timeout can lead to race condition', async () => {

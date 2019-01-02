@@ -463,8 +463,9 @@ contract ServiceExecutionAgreement {
         )
     {
         Agreement storage agreement = agreements[agreementId];
+        Template storage template = templates[templateId];
 
-        for (uint256 i = 0; i < templates[templateId].conditionKeys.length; i++) {
+        for (uint256 i = 0; i < template.conditionKeys.length; i++) {
             if (timeoutValues[i] != 0) {
                 // TODO: define dynamic margin
                 require(
@@ -480,7 +481,7 @@ contract ServiceExecutionAgreement {
             agreement.conditionLockedState.push(0);
 
             // add condition instance
-            bytes32 conditionKey = hashCondition(templates[templateId].conditionKeys[i], valueHash[i]);
+            bytes32 conditionKey = hashCondition(template.conditionKeys[i], valueHash[i]);
             agreement.conditionInstances.push(conditionKey);
 
             emit ConditionInitialized(
@@ -488,7 +489,7 @@ contract ServiceExecutionAgreement {
                 conditionKey,
                 did,
                 false,
-                templates[templateId].owner,
+                template.owner,
                 agreement.consumer
             );
         }
