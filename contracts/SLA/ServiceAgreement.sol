@@ -52,17 +52,17 @@ contract ServiceAgreement {
 
     // check if the no longer pending unfulfilled conditions in the SLA
     modifier noPendingFulfillments(bytes32 serviceId){
-        if(templates[getTemplateId(serviceId)].fulfillmentOperator == 0){
-            for (uint256 i=0; i < templates[getTemplateId(serviceId)].fulfillmentIndices.length; i++) {
+        if (templates[getTemplateId(serviceId)].fulfillmentOperator == 0) {
+            for (uint256 i = 0; i < templates[getTemplateId(serviceId)].fulfillmentIndices.length; i++) {
                 require(agreements[serviceId].conditionsState[templates[getTemplateId(serviceId)].fulfillmentIndices[i]] == 1, 'Indicating one of the fulfillment conditions is false');
             }
         }
         else {
             uint8 N = 0;
-            for(uint256 j=0; j < templates[getTemplateId(serviceId)].fulfillmentIndices.length; j++) {
-                if(agreements[serviceId].conditionsState[templates[getTemplateId(serviceId)].fulfillmentIndices[j]] == 1) N += 1;
+            for (uint256 j = 0; j < templates[getTemplateId(serviceId)].fulfillmentIndices.length; j++) {
+                if (agreements[serviceId].conditionsState[templates[getTemplateId(serviceId)].fulfillmentIndices[j]] == 1) N += 1;
             }
-            if(templates[getTemplateId(serviceId)].fulfillmentOperator == 1) {
+            if (templates[getTemplateId(serviceId)].fulfillmentOperator == 1) {
                 // OR operator (1 of M), N =1
                 require(N == 1, 'Indicating all fulfillment conditions are false');
             }
@@ -281,11 +281,18 @@ contract ServiceAgreement {
         return agreements[serviceId].consumer;
     }
 
+    /**
+    * @notice Deprecated use getAgreementConsumer instead
+    */
+    function getServiceAgreementConsumer(bytes32 serviceId) public view returns (address consumer){
+        return getAgreementConsumer(serviceId);
+    }
+
     function getConditionByFingerprint(bytes32 serviceId, address _contract, bytes4 fingerprint) public view returns (bytes32) {
         return keccak256(abi.encodePacked(getTemplateId(serviceId), _contract, fingerprint));
     }
 
-    function isAgreementTerminated(bytes32 serviceAgreementId) public view returns(bool) {
+    function isAgreementTerminated(bytes32 serviceAgreementId) public view returns (bool) {
         return agreements[serviceAgreementId].terminated;
     }
 
