@@ -96,7 +96,7 @@ contract ComputeConditions {
         bytes32 agreementId,
         bytes signature
     )
-        public
+        external
         onlyDataConsumer(agreementId)
         returns(bool status)
         {
@@ -146,7 +146,7 @@ contract ComputeConditions {
         bytes32 agreementId,
         bytes32 hash
     )
-        public
+        external
         onlyComputePublisher(agreementId)
         returns(bool status)
     {
