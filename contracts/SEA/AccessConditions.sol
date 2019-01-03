@@ -8,7 +8,7 @@ import './ServiceExecutionAgreement.sol';
  * @dev All function calls are currently implement without side effects
  */
 
-contract AccessConditions is Common {
+contract AccessConditions {
 
     mapping(bytes32 => mapping(address => bool)) private assetPermissions;
 
