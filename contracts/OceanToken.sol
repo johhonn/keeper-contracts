@@ -1,7 +1,6 @@
 pragma solidity 0.4.25;
 
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
-import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
 /**
  * @title Ocean ERC20 Token
