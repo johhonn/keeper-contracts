@@ -121,7 +121,7 @@ contract OceanMarket is Ownable {
         uint256 _expire) public validAddress(msg.sender) returns (bool) {
         // consumer make payment to Market contract
         require(mToken.transferFrom(msg.sender, address(this), _amount), 'Token transferFrom failed.');
-        /* solium-disable-next-line security/no-block-members */
+        /* ethlint-next-line security/no-block-members */
         mPayments[_paymentId] = Payment(msg.sender, _receiver, PaymentState.Locked, _amount, block.timestamp, _expire);
         emit PaymentReceived(_paymentId, _receiver, _amount, _expire);
         return true;
@@ -171,7 +171,7 @@ contract OceanMarket is Ownable {
     * @return valid Boolean indication of tokens are requested
     */
     function requestTokens(uint256 amount) public validAddress(msg.sender) returns (bool) {
-        /* solium-disable-next-line security/no-block-members */
+        /* ethlint-next-line security/no-block-members */
         if (block.timestamp < tokenRequest[msg.sender] + minPeriod) {
             emit FrequentTokenRequest(msg.sender, minPeriod);
             return false;
@@ -183,7 +183,7 @@ contract OceanMarket is Ownable {
         } else {
             require(mToken.transfer(msg.sender, amount), 'Token transfer failed.');
         }
-        /* solium-disable-next-line security/no-block-members */
+        /* ethlint-next-line security/no-block-members */
         tokenRequest[msg.sender] = block.timestamp;
         return true;
     }
