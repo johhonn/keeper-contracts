@@ -61,12 +61,20 @@ contract PaymentConditions {
         uint256 amount
     );
 
+    /**
+    * @notice lockPayment is called by asset consumer
+    * @dev checks if this condition has unfulfilled dependencies otherwise it will fulfil the condition and lock the payment
+    * @param agreementId , SEA agreement ID
+    * @param assetId , refers to DID
+    * @param price , asset or service price in OCN tokens
+    * @return true if asset consumer is able to lock payment into paymentCondition.sol contract
+    */
     function lockPayment(
         bytes32 agreementId,
         bytes32 assetId,
         uint256 price
     )
-        public
+        external
         returns (bool)
     {
         require(
@@ -108,12 +116,20 @@ contract PaymentConditions {
         );
     }
 
+    /**
+    * @notice releasePayment is called only by asset publisher
+    * @dev it checks if this condition has unfulfilled dependencies otherwise it will fulfil the condition and release the payment
+    * @param agreementId , SEA agreement ID
+    * @param assetId , refers to DID
+    * @param price , asset or service price in OCN tokens
+    * @return true if the publisher is able to release the payment
+    */
     function releasePayment(
         bytes32 agreementId,
         bytes32 assetId,
         uint256 price
     )
-        public
+        external
         returns (bool)
     {
         require(
@@ -151,12 +167,20 @@ contract PaymentConditions {
         );
     }
 
+    /**
+    * @notice refundPayment is called by asset consumer
+    * @dev it checks if this condition has unfulfilled dependencies otherwise it will fulfil the condition and make refund
+    * @param agreementId , SEA agreement ID
+    * @param assetId , refers to DID
+    * @param price , asset or service price in OCN tokens
+    * @return true if the consumer is able to make refund
+    */
     function refundPayment(
         bytes32 agreementId,
         bytes32 assetId,
         uint256 price
     )
-        public
+        external
         returns (bool)
     {
         require(
@@ -192,8 +216,16 @@ contract PaymentConditions {
             payments[agreementId].sender,
             payments[agreementId].amount
         );
+        return true;
     }
 
+   /**
+    * @notice hashValues called by anyone
+    * @dev it hashes the price and assetID (DID) in order to generate unique hash that it is used for condition authorization
+    * @param assetId , refers to DID
+    * @param price , asset or service price in OCN tokens
+    * @return hash of input values
+    */
     function hashValues(
         bytes32 assetId,
         uint256 price
