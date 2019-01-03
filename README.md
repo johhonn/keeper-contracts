@@ -44,7 +44,7 @@ Ocean Keeper implementation where we put the following modules together:
 
 ## Get Started
 
-For local developmenty you can either use Docker, or setup the development environment on your machine.
+For local development you can either use Docker, or setup the development environment on your machine.
 
 ### Docker
 
@@ -315,3 +315,4 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
+
