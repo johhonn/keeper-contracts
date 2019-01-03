@@ -1,4 +1,4 @@
-pragma solidity 0.4.25;
+pragma solidity ^0.4.25;
 
 import './ServiceExecutionAgreement.sol';
 
@@ -8,7 +8,7 @@ import './ServiceExecutionAgreement.sol';
  * @dev All function calls are currently implement without side effects
  */
 
-contract AccessConditions{
+contract AccessConditions is Common {
 
     mapping(bytes32 => mapping(address => bool)) private assetPermissions;
 

@@ -1,6 +1,6 @@
 pragma solidity 0.4.25;
 
-import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
+import './Common.sol';
 
 /**
  * @title Service Execution Agreement
@@ -8,7 +8,7 @@ import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
  * @dev All function calls are currently implement without side effects
  */
 
-contract ServiceExecutionAgreement {
+contract ServiceExecutionAgreement is Common {
 
     struct Template {
         bool isExisting;
@@ -810,18 +810,6 @@ contract ServiceExecutionAgreement {
     }
 
     /**
-    * @notice utility function which is used to add the Ethereum prefix to the hash(message)
-    * @param hash , hash(message)
-    * @return prefixed Hash
-    */
-    function prefixHash(bytes32 hash)
-        public pure
-        returns (bytes32)
-    {
-        return ECDSA.toEthSignedMessageHash(hash);
-    }
-
-    /**
     * @notice isValidSignature checks if the signature is valid
     * @param hash , SHA3 based hash of the original message
     * @param signature , ECDSA based signature
@@ -837,19 +825,6 @@ contract ServiceExecutionAgreement {
         returns (bool)
     {
         return (consumer == recoverAddress(hash, signature));
-    }
-
-    /**
-    * @notice recoverAddress retrieves the address of the signer using the original message and the signature
-    * @param hash , the hash of the original message
-    * @param signature , ECDSA based signature
-    * @return signer address
-    */
-    function recoverAddress(bytes32 hash, bytes signature)
-        public pure
-        returns (address)
-    {
-        return ECDSA.recover(hash, signature);
     }
 
     /**
