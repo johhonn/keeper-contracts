@@ -208,9 +208,11 @@ contract FitchainConditions{
         maxSlots = _maxSlots;
     }
 
-    /// @notice registerVerifier called by any verifier in order to register
-    /// @dev any verifier is able to register with a certain number of slots, staking will be implemented later
-    /// @param slots , number of pools that a verifier can offer to join multiple games at a time
+   /**
+    * @notice registerVerifier called by any verifier in order to register
+    * @dev any verifier is able to register with a certain number of slots, staking will be implemented later
+    * @param slots , number of pools that a verifier can offer to join multiple games at a time
+    */
     function registerVerifier(
         uint256 slots
     )
@@ -227,9 +229,11 @@ contract FitchainConditions{
         return true;
     }
 
-    /// @notice deregisterVerifier called by any verifier in order to deregister
-    /// @dev checks that verifier has no longer part of any verification games, then free slot
-    /// returns the stake to the verifier account and release them from the registry
+   /**
+    * @notice deregisterVerifier called by any verifier in order to deregister
+    * @dev checks that verifier has no longer part of any verification games, then free slot
+    * returns the stake to the verifier account and release them from the registry
+    */
     function deregisterVerifier()
         public onlyFreeSlots()
         returns(bool)
@@ -243,12 +247,14 @@ contract FitchainConditions{
         return true;
     }
 
-    /// @notice electRRKVerifiers private function, elects K verifiers using round-robin
-    /// @dev remove verifiers from registry if there is no available slots to serve more verification games
-    /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
-    /// @param k , number of required verifiers
-    /// @param vType , represent the type of the verifier (1 -> GPC, 2 -> VPC)
-    /// @param timeout , optional but required to set the voting timeout
+   /**
+    * @notice electRRKVerifiers private function, elects K verifiers using round-robin
+    * @dev remove verifiers from registry if there is no available slots to serve more verification games
+    * @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
+    * @param k , number of required verifiers
+    * @param vType , represent the type of the verifier (1 -> GPC, 2 -> VPC)
+    * @param timeout , optional but required to set the voting timeout
+    */
     function electRRKVerifiers(
         bytes32 modelId,
         uint256 k,
@@ -276,9 +282,11 @@ contract FitchainConditions{
         return true;
     }
 
-    /// @notice addVerifierToRegistry private function maintains the verifiers registry
-    /// @dev add verifiers to the registry, and updates the slots number
-    /// @param verifier , verifier address
+   /**
+    * @notice addVerifierToRegistry private function maintains the verifiers registry
+    * @dev add verifiers to the registry, and updates the slots number
+    * @param verifier , verifier address
+    */
     function addVerifierToRegistry(
         address verifier
     )
@@ -290,9 +298,11 @@ contract FitchainConditions{
         return true;
     }
 
-    /// @notice removeVerifierFromRegistry private function maintains the verifiers registry
-    /// @dev remove verifiers from registry if there is no available slots to serve more verification games
-    /// @param verifier , verifier address
+   /**
+    * @notice removeVerifierFromRegistry private function maintains the verifiers registry
+    * @dev remove verifiers from registry if there is no available slots to serve more verification games
+    * @param verifier , verifier address
+    */
     function removeVerifierFromRegistry(
         address verifier
     )
@@ -312,11 +322,13 @@ contract FitchainConditions{
         return false;
     }
 
-    /// @notice initPoT called by publisher or model provider electing verifiers to check the PoT proof in Fitchain
-    /// @dev performs some security checks, elect verifiers and notify them to start the game
-    /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
-    /// @param k , the number of voters that are required to testify
-    /// @param timeout , timeout to set the vote (This will be changed for more advanced options)
+   /**
+    * @notice initPoT called by publisher or model provider electing verifiers to check the PoT proof in Fitchain
+    * @dev performs some security checks, elect verifiers and notify them to start the game
+    * @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
+    * @param k , the number of voters that are required to testify
+    * @param timeout , timeout to set the vote (This will be changed for more advanced options)
+    */
     function initPoT(
         bytes32 modelId,
         uint256 k,
@@ -351,11 +363,13 @@ contract FitchainConditions{
         return true;
     }
 
-    /// @notice initVPCProof called by publisher or model provider electing verifiers to check the verification proof in Fitchain
-    /// @dev performs some security checks, elect verifiers and notify them to start the game
-    /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
-    /// @param k , the number of voters that are required to testify
-    /// @param timeout , timeout to set the vote (This will be changed for more advanced options)
+   /**
+    * @notice initVPCProof called by publisher or model provider electing verifiers to check the verification proof in Fitchain
+    * @dev performs some security checks, elect verifiers and notify them to start the game
+    * @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
+    * @param k , the number of voters that are required to testify
+    * @param timeout , timeout to set the vote (This will be changed for more advanced options)
+    */
     function initVPCProof(
         bytes32 modelId,
         uint256 k,
@@ -382,11 +396,13 @@ contract FitchainConditions{
         return true;
     }
 
-    /// @notice voteForPoT called by verifiers where they vote for the existence of verification proof
-    /// @dev performs some security checks, set the vote and update the state of voteCount
-    /// and emit some events to notify the model provider/publisher that all votes have been submitted
-    /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
-    /// @param vote , the result of isTrained in Fitchain (T/F)
+   /**
+    * @notice voteForPoT called by verifiers where they vote for the existence of verification proof
+    * @dev performs some security checks, set the vote and update the state of voteCount
+    * and emit some events to notify the model provider/publisher that all votes have been submitted
+    * @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
+    * @param vote , the result of isTrained in Fitchain (T/F)
+    */
     function voteForPoT(
         bytes32 modelId,
         bool vote
@@ -420,12 +436,14 @@ contract FitchainConditions{
         return true;
     }
 
-    /// @notice voteForVPC called by verifiers where they vote for the existence of verification proof
-    /// @dev performs some security checks, set the vote and update the state of voteCount
-    /// and emit some events to notify the model provider/publisher that all votes have been submitted
-    /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
-    /// @param vote , the result of isVerified in Fitchain (T/F)
-    /// @return true if the caller (verifier) is able to commit his vote regarding the VPC proof
+   /**
+    * @notice voteForVPC called by verifiers where they vote for the existence of verification proof
+    * @dev performs some security checks, set the vote and update the state of voteCount
+    * and emit some events to notify the model provider/publisher that all votes have been submitted
+    * @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
+    * @param vote , the result of isVerified in Fitchain (T/F)
+    * @return true if the caller (verifier) is able to commit his vote regarding the VPC proof
+    */
     function voteForVPC(
         bytes32 modelId,
         bool vote
@@ -458,12 +476,14 @@ contract FitchainConditions{
         return true;
     }
 
-    /// @notice setPoT (Gossiper pool contract in Fitchain) is called only by the model provider.
-    /// @dev At first It checks if the proof state is created or not, then uses the count to
-    /// reconstruct the right condition key based on the signed agreement
-    /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
-    /// @param count , represents the number of submitted votes by verifiers who testify that they check the existence of proof in Fitchain
-    /// @return true if the publisher is able to set the proof of training to true
+   /**
+    * @notice setPoT (Gossiper pool contract in Fitchain) is called only by the model provider.
+    * @dev At first It checks if the proof state is created or not, then uses the count to
+    * reconstruct the right condition key based on the signed agreement
+    * @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
+    * @param count , represents the number of submitted votes by verifiers who testify that they check the existence of proof in Fitchain
+    * @return true if the publisher is able to set the proof of training to true
+    */
     function setPoT(
         bytes32 modelId,
         uint256 count
@@ -495,12 +515,14 @@ contract FitchainConditions{
         return true;
     }
 
-    /// @notice setVPC (verification pool contract in Fitchain) is called only by the model provider.
-    /// @dev At first It checks if the proof state is created or not, then uses the count to
-    /// reconstruct the right condition key based on the signed agreement
-    /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
-    /// @param count , represents the number of submitted votes by verifiers who testify that they check the existence of proof in Fitchain
-    /// @return true if the publisher is able to set the VPC proof to true
+   /**
+    * @notice setVPC (verification pool contract in Fitchain) is called only by the model provider.
+    * @dev At first It checks if the proof state is created or not, then uses the count to
+    * reconstruct the right condition key based on the signed agreement
+    * @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
+    * @param count , represents the number of submitted votes by verifiers who testify that they check the existence of proof in Fitchain
+    * @return true if the publisher is able to set the VPC proof to true
+    */
     function setVPC(
         bytes32 modelId,
         uint256 count
@@ -532,11 +554,13 @@ contract FitchainConditions{
         return true;
     }
 
-    /// @notice freeMySlots called by verifier in order to be able to deregister
-    /// @dev it checks if the verifier is involved in a testifying game or not
-    /// reconstruct the right condition key based on the signed agreement
-    /// @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
-    /// @return true if a verifier is able to free its slots
+   /**
+    * @notice freeMySlots called by verifier in order to be able to deregister
+    * @dev it checks if the verifier is involved in a testifying game or not
+    * reconstruct the right condition key based on the signed agreement
+    * @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
+    * @return true if a verifier is able to free its slots
+    */
     function freeMySlots(bytes32 modelId)
         public onlyVerifiers(modelId)
         returns(bool)
@@ -553,22 +577,28 @@ contract FitchainConditions{
         return true;
     }
 
-    /// @notice getAvailableVerifiersCount , get the number of available verifiers
-    /// @dev returns the number of available verifiers using registry length
-    /// @return number of available verifiers
+   /**
+    * @notice getAvailableVerifiersCount , get the number of available verifiers
+    * @dev returns the number of available verifiers using registry length
+    * @return number of available verifiers
+    */
     function getAvailableVerifiersCount() public view returns(uint256) {
         return registry.length;
     }
 
-    /// @notice getMaximumNumberOfSlots, view function returns max number of slots
-    /// @dev verifiers will not be able to register if they are supplying slots > maxSlots
-    /// @return number of maximum slots
+   /**
+    * @notice getMaximumNumberOfSlots, view function returns max number of slots
+    * @dev verifiers will not be able to register if they are supplying slots > maxSlots
+    * @return number of maximum slots
+    */
     function getMaximumNumberOfSlots() public view returns(uint256) {
         return maxSlots;
     }
 
-    /// @notice getMyFreeSlots returns the verifier free slots
-    /// @return number of free slots for a verifier
+   /**
+    * @notice getMyFreeSlots returns the verifier free slots
+    * @return number of free slots for a verifier
+    */
     function getMyFreeSlots() public view returns(uint256) {
         return verifiers[msg.sender].slots;
     }
