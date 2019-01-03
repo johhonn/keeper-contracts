@@ -76,9 +76,9 @@ contract OceanAuth {
     // ============
     // EVENTS:
     // ============
-    /* solium-disable-next-line max-len */
+    /* ethlint-next-line max-len */
     event AccessConsentRequested(bytes32 _id, address indexed _consumer, address indexed _provider, bytes32 indexed _resourceId, uint _timeout, string _pubKey);
-    /* solium-disable-next-line max-len */
+    /* ethlint-next-line max-len */
     event AccessRequestCommitted(bytes32 indexed _id, uint256 _expirationDate, string _discovery, string _permissions, string _accessAgreementRef);
     event AccessRequestRejected(address indexed _consumer, address indexed _provider, bytes32 indexed _id);
     event AccessRequestRevoked(address indexed _consumer, address indexed _provider, bytes32 indexed _id);
@@ -154,11 +154,11 @@ contract OceanAuth {
         string accessAgreementRef,
         string accessAgreementType)
     public onlyProvider(id) isAccessRequested(id) returns (bool) {
-        /* solium-disable-next-line security/no-block-members */
+        /* ethlint-next-line security/no-block-members */
         if (isAvailable && block.timestamp < expirationDate) {
             accessControlRequests[id].consent.isAvailable = isAvailable;
             accessControlRequests[id].consent.expirationDate = expirationDate;
-            /* solium-disable-next-line security/no-block-members */
+            /* ethlint-next-line security/no-block-members */
             accessControlRequests[id].consent.startDate = block.timestamp;
             accessControlRequests[id].consent.discovery = discovery;
             accessControlRequests[id].consent.permissions = permissions;
@@ -181,7 +181,7 @@ contract OceanAuth {
     // you can cancel consent and do refund only after consumer makes the payment and timeout.
     function cancelAccessRequest(bytes32 id) public isAccessCommitted(id) onlyConsumer(id) {
         // timeout
-        /* solium-disable-next-line security/no-block-members */
+        /* ethlint-next-line security/no-block-members */
         require(block.timestamp > accessControlRequests[id].consent.timeout, 'Timeout not exceeded.');
 
         // refund only if consumer had made payment
