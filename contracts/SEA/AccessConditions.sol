@@ -41,6 +41,12 @@ contract AccessConditions{
         agreementStorage = ServiceExecutionAgreement(_agreementAddress);
     }
 
+    /**
+    * @notice checkPermissions is called by Parity secret store
+    * @param consumer , asset consumer address
+    * @param documentKeyId , refers to DID document (TODO remove the duplicate and use only one variable documentKeyId)
+    * @return true if the access was granted
+    */
     function checkPermissions(
         address consumer,
         bytes32 documentKeyId
@@ -51,6 +57,13 @@ contract AccessConditions{
         return assetPermissions[documentKeyId][consumer];
     }
 
+    /**
+    * @notice grantAccess is called by asset owner or SLA Publisher
+    * @param agreementId , SEA agreement ID
+    * @param assetId , the DID that refers to information about the service/asset or resource
+    * @param documentKeyId , refers to DID document (TODO remove the duplicate and use only one variable documentKeyId)
+    * @return true if the SLA publisher is able to grand access
+    */
     function grantAccess(
         bytes32 agreementId,
         bytes32 assetId,
@@ -83,6 +96,12 @@ contract AccessConditions{
         emit AccessGranted(agreementId, assetId);
     }
 
+    /**
+    * @notice hashValues a utility function which in charge of calculating the hash of input values in payment conditions
+    * @param assetId , refers to DID document that hold information about the service
+    * @param documentKeyId , refers to DID document (TODO remove the duplicate and use only one variable documentKeyId)
+    * @return hash of asset ID and document key ID
+    */
     function hashValues(
         bytes32 assetId,
         bytes32 documentKeyId
