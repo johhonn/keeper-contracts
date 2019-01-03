@@ -84,12 +84,14 @@ contract ComputeConditions {
         agreementStorage = ServiceExecutionAgreement(agreementAddress);
     }
 
-    /// @notice submitHashSignature is called only by the data-consumer address.
-    /// @dev At first It checks if the proof state is created or not then checks that the hash
-    /// has been submitted by the publisher in order to call fulfillUpload. This preserves
-    /// the message integrity and proof that both parties agree on the same algorithm file/s
-    /// @param agreementId , the service level agreement Id
-    /// @param signature data scientist signature = signed_hash(uploaded_algorithm_file/s)
+   /**
+    * @notice submitHashSignature is called only by the data-consumer address.
+    * @dev At first It checks if the proof state is created or not then checks that the hash
+    * has been submitted by the publisher in order to call fulfillUpload. This preserves
+    * the message integrity and proof that both parties agree on the same algorithm file/s
+    * @param agreementId , the service level agreement Id
+    * @param signature data scientist signature = signed_hash(uploaded_algorithm_file/s)
+    */
     function submitHashSignature(
         bytes32 agreementId,
         bytes signature
@@ -132,12 +134,14 @@ contract ComputeConditions {
 
     }
 
-    /// @notice submitAlgorithmHash is called only by the on-premise address.
-    /// @dev At first It checks if the proof state is created or not then checks if the signature
-    /// has been submitted by the data scientist in order to call fulfillUpload. This preserves
-    /// the message integrity and proof that both parties agree on the same algorithm file/s
-    /// @param agreementId the service level agreement Id
-    /// @param hash = kekccak(uploaded_algorithm_file/s)
+   /**
+    * @notice submitAlgorithmHash is called only by the on-premise address.
+    * @dev At first It checks if the proof state is created or not then checks if the signature
+    * has been submitted by the data scientist in order to call fulfillUpload. This preserves
+    * the message integrity and proof that both parties agree on the same algorithm file/s
+    * @param agreementId the service level agreement Id
+    * @param hash = kekccak(uploaded_algorithm_file/s)
+    */
     function submitAlgorithmHash(
         bytes32 agreementId,
         bytes32 hash
@@ -179,12 +183,14 @@ contract ComputeConditions {
         return true;
     }
 
-    /// @notice fulfillUpload is called by anyone of the stakeholders [publisher or data scientist]
-    /// @dev check if there are unfulfilled dependency condition, if false, it verifies the signature
-    /// using the submitted hash (by publisher), the signature (by data scientist) then call
-    /// fulfillCondition in service level agreement storage contract
-    /// @param agreementId the service level agreement Id
-    /// @param state get be used fo input value hash for this condition indicating the state of verification
+   /**
+    * @notice fulfillUpload is called by anyone of the stakeholders [publisher or data scientist]
+    * @dev check if there are unfulfilled dependency condition, if false, it verifies the signature
+    * using the submitted hash (by publisher), the signature (by data scientist) then call
+    * fulfillCondition in service level agreement storage contract
+    * @param agreementId the service level agreement Id
+    * @param state get be used fo input value hash for this condition indicating the state of verification
+    */
     function fulfillUpload(
         bytes32 agreementId,
         bool state
@@ -243,6 +249,11 @@ contract ComputeConditions {
         return false;
     }
 
+   /**
+    * @notice utility function which is used to add the Ethereum prefix to the hash(message)
+    * @param hash , hash(message)
+    * @return prefixed Hash
+    */
     function prefixHash(bytes32 hash)
         public pure
         returns (bytes32 prefixedHash)
@@ -250,6 +261,12 @@ contract ComputeConditions {
         return ECDSA.toEthSignedMessageHash(hash);
     }
 
+    /**
+    * @notice recoverAddress retrieves the address of the signer using the original message and the signature
+    * @param hash , the hash of the original message
+    * @param signature , ECDSA based signature
+    * @return signer address
+    */
     function recoverAddress(bytes32 hash, bytes signature)
         public pure
         returns (
