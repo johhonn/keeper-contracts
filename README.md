@@ -196,7 +196,7 @@ npm test -- test/Auth.Test.js
 
 ### Code Linting
 
-Linting is setup for JavaScript with [ESLint](https://eslint.org) & Solidity with [Solium](https://github.com/duaraghav8/Solium).
+Linting is setup for JavaScript with [ESLint](https://eslint.org) & Solidity with [Ethlint](https://github.com/duaraghav8/Ethlint).
 
 Code style is enforced through the CI test process, builds will fail if there're any linting errors.
 

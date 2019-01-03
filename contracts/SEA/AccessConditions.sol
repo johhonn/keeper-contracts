@@ -1,6 +1,7 @@
 pragma solidity ^0.4.25;
 
 import './ServiceExecutionAgreement.sol';
+import './ISecretStore.sol';
 
 /**
  * @title Secret Store Access Control
@@ -8,7 +9,7 @@ import './ServiceExecutionAgreement.sol';
  * @dev All function calls are currently implement without side effects
  */
 
-contract AccessConditions {
+contract AccessConditions is ISecretStore {
 
     mapping(bytes32 => mapping(address => bool)) private assetPermissions;
 
@@ -52,7 +53,7 @@ contract AccessConditions {
         bytes32 documentKeyId
     )
         public view
-        returns(bool)
+        returns(bool permissionGranted)
     {
         return assetPermissions[documentKeyId][consumer];
     }
