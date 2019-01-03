@@ -243,10 +243,9 @@ contract FitchainConditions{
             verifiers[msg.sender].isStaking = false;
             //TODO: send back stake to verifier
             verifiers[msg.sender].amount = 0;
-            emit VerifierDeregistered(msg.sender);
-            return true;
         }
-        return false
+        emit VerifierDeregistered(msg.sender);
+        return true;
     }
 
    /**
