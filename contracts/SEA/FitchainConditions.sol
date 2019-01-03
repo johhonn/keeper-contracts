@@ -209,9 +209,10 @@ contract FitchainConditions{
     }
 
    /**
-    * @notice registerVerifier called by any verifier in order to register
+    * @notice registerVerifier called by any verifier in order to be registered as a verifier
     * @dev any verifier is able to register with a certain number of slots, staking will be implemented later
     * @param slots , number of pools that a verifier can offer to join multiple games at a time
+    * @return true if an actor is able to register as a verifier
     */
     function registerVerifier(
         uint256 slots
@@ -232,7 +233,7 @@ contract FitchainConditions{
    /**
     * @notice deregisterVerifier called by any verifier in order to deregister
     * @dev checks that verifier has no longer part of any verification games, then free slot
-    * returns the stake to the verifier account and release them from the registry
+    * @return true if there all the verifier's slots are free
     */
     function deregisterVerifier()
         public onlyFreeSlots()
@@ -242,9 +243,10 @@ contract FitchainConditions{
             verifiers[msg.sender].isStaking = false;
             //TODO: send back stake to verifier
             verifiers[msg.sender].amount = 0;
+            emit VerifierDeregistered(msg.sender);
+            return true;
         }
-        emit VerifierDeregistered(msg.sender);
-        return true;
+        return false
     }
 
    /**

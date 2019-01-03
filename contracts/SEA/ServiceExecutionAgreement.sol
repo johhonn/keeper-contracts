@@ -273,7 +273,7 @@ contract ServiceExecutionAgreement is Common {
     }
 
    /**
-    * @notice revokeTemplate revokes the template agreement, so it will not be used in the future
+    * @notice revokeTemplate revokes the template agreement, so the template will not be used in the future
     * @param templateId , service execution agreement template ID
     * @return true if the service execution agreement template was revoked
     */
@@ -472,7 +472,7 @@ contract ServiceExecutionAgreement is Common {
     }
 
     /**
-    * @dev retrieve the service execution agreement publisher address
+    * @dev getAgreementPublisher retrieves the service execution agreement publisher address
     * @param agreementId , SEA agreement ID
     * @return publisher address
     */
@@ -484,7 +484,7 @@ contract ServiceExecutionAgreement is Common {
     }
 
     /**
-    * @dev retrieve the service execution agreement consumer address
+    * @dev getAgreementConsumer retrieves the service execution agreement consumer address
     * @param agreementId , SEA agreement ID
     * @return consumer address
     */

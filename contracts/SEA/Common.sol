@@ -23,7 +23,7 @@ contract Common {
     }
 
     /**
-    * @notice recoverAddress retrieves the address of the signer using the original message and the signature
+    * @notice recoverAddress retrieves the address of the signer using the original message hash and the signature
     * @param hash , the hash of the original message
     * @param signature , ECDSA based signature
     * @return signer address
