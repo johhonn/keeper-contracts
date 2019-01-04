@@ -151,18 +151,16 @@ contract('ServiceAgreement', (accounts) => {
             assert.fail('Expected revert not received')
         })
 
-        it('Should not execute agreement (revert) when signature is not valid', async () => {
+        it('Should emit event ExecuteAgreement with false state when signature is not valid', async () => {
             // arrange
             await contract.setupAgreementTemplate(templateId, [], [], [], emptyBytes32, [], 0, { from: accounts[0] })
 
-            // act-assert
-            try {
-                await contract.executeAgreement(templateId, '0x10', dummyAddress, [], [], emptyBytes32, emptyBytes32, { from: accounts[0] })
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid consumer signature of service agreement')
-                return
-            }
-            assert.fail('Expected revert not received on invalid signature')
+            // act
+            const result = await contract.executeAgreement(templateId, '0x10', dummyAddress, [], [], emptyBytes32, emptyBytes32, { from: accounts[0] })
+
+            // assert
+            utils.assertEmitted(result, 1, 'ExecuteAgreement')
+            assert.strictEqual(!!(result.logs.find(i => i.event === 'ExecuteAgreement').args.state), false)
         })
 
         it('Should execute condition when signature is valid', async () => {
