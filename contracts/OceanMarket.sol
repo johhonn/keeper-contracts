@@ -58,8 +58,8 @@ contract OceanMarket is Ownable {
     */
     constructor(
         address tokenAddress
-    ) 
-        public 
+    )
+        public
     {
         require(
             tokenAddress != address(0x0),
@@ -107,7 +107,7 @@ contract OceanMarket is Ownable {
                 'Token transfer failed.'
             );
         }
-        /* solium-disable-next-line security/no-block-members */
+        /* ethlint-next-line security/no-block-members */
         tokenRequest[msg.sender] = block.timestamp;
         return true;
     }
