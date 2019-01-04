@@ -694,7 +694,7 @@ contract ServiceExecutionAgreement is Common {
 
     /**
     * @notice conditionTimedOut is called by any actor in order to retrieve the status of the condition timeout
-    * @dev  check the current block.timestamp is greater than the condition timeout [block.timestamp could be manipulated by miners]
+    * @dev check the current block.timestamp is greater than the condition timeout (TODO:block.timestamp could be manipulated by miners)
     * @param agreementId , SEA agreement ID
     * @param conditionKey , condition key = hash(templateId, contractAddress, functionSelector/Fingerprint)
     * @return true if the condition is timed out
@@ -713,10 +713,10 @@ contract ServiceExecutionAgreement is Common {
     /**
     * @notice initializeConditions is called during agreement initialization
     * @dev condition is initialized by setting dependency conditions if exist, timeout values, and reconstructing the
-    * condition key and derive the condition instance from this key, finally emit event to notify the listeners
+    * condition key then derive the condition instance from this key, finally it emits event to notify the listeners
     * @param templateId , SEA template Id
     * @param agreementId , SEA agreement Id
-    * @param valueHash , array of the hashed input values that are associated with the conditions
+    * @param valueHash , array of the hashed input values that are associated with every condition
     * @param timeoutValues , array of timeout values that are associated with the conditions (zero value is default)
     * @param did , decentralized identifier that it is in charge of resolving the service
     * @return true if the condition is initialized without errors
@@ -833,8 +833,8 @@ contract ServiceExecutionAgreement is Common {
     * @notice this is utility function which performs bitwise operations over dependency bits for more info please
     * check out this blog post: https://blog.oceanprotocol.com/ocean-integration-fitchain-secure-on-premises-compute-59f43a944266
     * @dev using dependency bit value, bit position(0-> dependency flag, 1-> timeout flag), and the condition index, this function
-    * can check if this condition is a dependency condition or not by using bitwise operation (AND) between value and 2^(condIndex * 2) + bit position(0, 1))
-    * @param value , dependency bits value for a condition
+    * can check if this condition has a dependency condition/s or not by using bitwise operation (AND) between value and 2^(condIndex * 2) + bit position(0, 1))
+    * @param value , dependency bits value for a condition (compressed version of flags)
     * @param conditionIndex , the index of the condition in the conditions list
     * @param bitPosition , first bit for dependency flag, second bit for timeout flag
     * @param numBits , currently we have 2 bits but this to keep the function more generic for future updates

@@ -34,8 +34,7 @@ contract DIDRegistry is Ownable {
 
    /**
     * @notice registerAttribute is called only by DID owner.
-    * @dev this function registers DID attributes by storing them in
-    * the system
+    * @dev this function registers DID attributes
     * @param did , Dencentralized Identifier (a byte32 length ID)
     * @param valueType , include DID, DID reference , URL, or DDO
     * @param key , attribute key
