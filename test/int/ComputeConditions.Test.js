@@ -2,7 +2,6 @@
 /* eslint-disable no-console, max-len */
 
 const OceanToken = artifacts.require('OceanToken.sol')
-const OceanMarket = artifacts.require('OceanMarket.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const AccessConditions = artifacts.require('AccessConditions.sol')
@@ -13,7 +12,7 @@ const web3 = testUtils.getWeb3()
 
 contract('ComputeConditions', (accounts) => {
     describe('Test On-Premise Compute Service Use Case', () => {
-        let token, market, agreement, paymentConditions, accessConditions, computeConditions, valuesHashList, serviceId, conditionKeys
+        let token, agreement, paymentConditions, accessConditions, computeConditions, valuesHashList, serviceId, conditionKeys
         let funcFingerPrints, contracts, agreementId, slaMsgHash, signature, algorithmHash
         const publisher = accounts[0]
         const datascientist = accounts[1]
@@ -31,11 +30,10 @@ contract('ComputeConditions', (accounts) => {
         before(async () => {
             agreement = await ServiceExecutionAgreement.new({ from: accounts[0] })
             token = await OceanToken.new({ from: accounts[0] })
-            market = await OceanMarket.new(token.address, { from: accounts[0] })
+            await token.mint(datascientist, 1000)
             paymentConditions = await PaymentConditions.new(agreement.address, token.address, { from: accounts[0] })
             accessConditions = await AccessConditions.new(agreement.address, { from: accounts[0] })
             computeConditions = await ComputeConditions.new(agreement.address, { from: accounts[0] })
-            await market.requestTokens(1000, { from: datascientist })
             // conditions
             contracts = [paymentConditions.address, computeConditions.address, accessConditions.address, paymentConditions.address, paymentConditions.address]
             funcFingerPrints = [

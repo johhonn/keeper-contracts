@@ -6,11 +6,11 @@ import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 import './OceanToken.sol';
 
 /**
-@title Ocean Protocol Marketplace Contract
+@title Ocean Protocol Dispenser Contract
 @author Team: Fang Gong, Samer Sallam, Ahmed Ali, Sebastian Gerske
 */
 
-contract OceanMarket is Ownable {
+contract Dispenser is Ownable {
 
     using SafeMath for uint256;
     using SafeMath for uint;
@@ -20,21 +20,24 @@ contract OceanMarket is Ownable {
     // ============
 
     // limit period for request of tokens
-    mapping(address => uint256) private tokenRequest; // mapping from address to last time of request
-    uint256 maxAmount = 10000 * 10 ** 18;             // max amount of tokens user can get for each request
-    uint256 minPeriod = 0;                            // min amount of time to wait before request token again
+    mapping(address => uint256) private tokenRequests; // mapping from address to last time of request
+    uint256 private maxAmount;                         // max amount of tokens user can get for each request
+    uint256 private minPeriod;                         // min amount of time to wait before request token again
+    uint256 private scale;
 
-    // marketplace global variables
     OceanToken public oceanToken;
 
     // ============
     // EVENTS:
     // ============
-    event FrequentTokenRequest(
+    // Request failed, to frequently
+    event RequestFrequencyExceeded(
         address indexed requester,
         uint256 minPeriod
     );
-    event LimitTokenRequest(
+
+    // Request amount limit exceeded
+    event RequestLimitExceeded(
         address indexed requester,
         uint256 amount,
         uint256 maxAmount
@@ -52,23 +55,25 @@ contract OceanMarket is Ownable {
     }
 
     /**
-    * @dev OceanMarket Constructor
-    * @param tokenAddress The deployed contract address of OceanToken
+    * @dev Dispenser Constructor
+    * @param oceanTokenAddress The deployed contract address of an ERC20Detailed token
     * Runs only on initial contract creation.
     */
     constructor(
-        address tokenAddress
+        address oceanTokenAddress
     ) 
         public 
     {
         require(
-            tokenAddress != address(0x0),
+            oceanTokenAddress != address(0x0),
             'Token address is 0x0.'
         );
-        // instantiate Ocean token contract
-        oceanToken = OceanToken(tokenAddress);
-        // set the token receiver to be marketplace
-        oceanToken.setReceiver(address(this));
+        // instantiate OceanToken contract
+        oceanToken = OceanToken(oceanTokenAddress);
+
+        scale = 10 ** uint256(oceanToken.decimals());
+        maxAmount = uint256(1000).mul(scale);
+        minPeriod = 0;
     }
 
     /**
@@ -80,45 +85,45 @@ contract OceanMarket is Ownable {
         uint256 amount
     )
         public validAddress(msg.sender)
-        returns (bool)
+        returns (bool tokensTransferred)
     {
         /* solium-disable-next-line security/no-block-members */
-        if (block.timestamp < tokenRequest[msg.sender] + minPeriod) {
-            emit FrequentTokenRequest(
+        if (block.timestamp < tokenRequests[msg.sender] + minPeriod) {
+            // Failed, requested to frequently
+            emit RequestFrequencyExceeded(
                 msg.sender,
                 minPeriod
             );
             return false;
         }
+
         // amount should not exceed maxAmount
-        if (amount > maxAmount) {
-            require(
-                oceanToken.transfer(msg.sender, maxAmount),
-                'Token transfer failed.'
-            );
-            emit LimitTokenRequest(
+        if (amount.mul(scale) > maxAmount) {
+            // Failed, requested to much tokens
+            emit RequestLimitExceeded(
                 msg.sender,
                 amount,
                 maxAmount
             );
+            return false;
         } else {
             require(
-                oceanToken.transfer(msg.sender, amount),
-                'Token transfer failed.'
+                oceanToken.mint(msg.sender, amount),
+                'Token minting failed.'
             );
+
+            /* solium-disable-next-line security/no-block-members */
+            tokenRequests[msg.sender] = block.timestamp;
+
+            return true;
         }
-        /* solium-disable-next-line security/no-block-members */
-        tokenRequest[msg.sender] = block.timestamp;
-        return true;
     }
 
     /**
-    * @dev Owner can limit the amount and time for token request in Testing
-    * @param amount the max amount of tokens that can be requested
+    * @dev the Owner can set the min period for token requests
     * @param period the min amount of time before next request
     */
-    function limitTokenRequest(
-        uint amount,
+    function setMinPeriod(
         uint period
     )
         public
@@ -126,7 +131,19 @@ contract OceanMarket is Ownable {
     {
         // set min period of time before next request (in seconds)
         minPeriod = period;
+    }
+
+    /**
+    * @dev the Owner can set the max amount for token requests
+    * @param amount the max amount of tokens that can be requested
+    */
+    function setMaxAmount(
+        uint amount
+    )
+        public
+        onlyOwner()
+    {
         // set max amount for each request
-        maxAmount = amount;
+        maxAmount = amount.mul(scale);
     }
 }

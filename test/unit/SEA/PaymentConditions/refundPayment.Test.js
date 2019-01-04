@@ -75,7 +75,7 @@ contract('PaymentConditions', (accounts) => {
             valueHashes.push(utils.valueHash(['bytes32', 'uint256'], [assetId, price]))
             timeoutValues.push(0)
             await initializeAgreementWithValues()
-            await token.setReceiver(consumer, { from: accounts[0] })
+            await token.mint(consumer, price)
             await token.approve(paymentConditions.address, price, { from: consumer })
             await paymentConditions.lockPayment(agreementId, assetId, price, { from: consumer })
 
@@ -94,7 +94,7 @@ contract('PaymentConditions', (accounts) => {
             valueHashes.push(utils.valueHash(['bytes32', 'uint256'], [assetId, price]))
             timeoutValues.push(0)
             await initializeAgreementWithValues()
-            await token.setReceiver(consumer, { from: accounts[0] })
+            await token.mint(consumer, price)
             await token.approve(paymentConditions.address, price, { from: consumer })
             await paymentConditions.lockPayment(agreementId, assetId, price, { from: consumer })
             await paymentConditions.refundPayment(agreementId, assetId, price, { from: consumer })

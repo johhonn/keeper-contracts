@@ -38,11 +38,9 @@ contract('PaymentConditions', (accounts) => {
 
         before(async () => {
             token = await OceanToken.new()
-
-            await token.setReceiver(consumer)
-            await token.approve(consumer, await token.totalSupply.call())
-
             agreement = await Agreement.new()
+
+            token.mint(consumer, walletAllowance)
 
             paymentConditions = await PaymentConditions.new(
                 agreement.address, token.address

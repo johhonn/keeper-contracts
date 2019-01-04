@@ -3,7 +3,6 @@
 
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
-const OceanMarket = artifacts.require('OceanMarket.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const AccessConditions = artifacts.require('AccessConditions.sol')
 
@@ -16,7 +15,7 @@ const web3 = utils.getWeb3()
 
 contract('ServiceExecutionAgreement', (accounts) => {
     describe('Test Access Service Agreement', () => {
-        let token, market, sea, paymentConditions, accessConditions, resourceId,
+        let token, sea, paymentConditions, accessConditions, resourceId,
             valuesHashList, serviceId, conditionKeys, testTemplateId
 
         let funcFingerPrints, contracts
@@ -33,15 +32,13 @@ contract('ServiceExecutionAgreement', (accounts) => {
         const serviceTemplateId = '0x419d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
         before(async () => {
             token = await OceanToken.new()
-            // await token.setReceiver(consumer)
-            market = await OceanMarket.new(token.address)
             sea = await ServiceExecutionAgreement.new()
             paymentConditions = await PaymentConditions.new(sea.address, token.address)
             accessConditions = await AccessConditions.new(sea.address)
             // Do some preperations: give consumer funds, add an asset
             // consumer request initial funds to play
             console.log(consumer)
-            await market.requestTokens(1000, fromConsumer)
+            await token.mint(consumer, 1000)
             const bal = await token.balanceOf.call(consumer)
             console.log(`consumer has balance := ${bal.valueOf()} now`)
             resourceId = did

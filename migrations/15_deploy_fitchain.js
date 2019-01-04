@@ -7,7 +7,12 @@ const stake = 10
 const maxSlots = 1
 
 const fitchainConditions = async (deployer, network) => {
-    await deployer.deploy(FitchainConditions, ServiceExecutionAgreement.address, stake, maxSlots)
+    await deployer.deploy(
+        FitchainConditions,
+        ServiceExecutionAgreement.address,
+        stake,
+        maxSlots
+    )
 
     saveDefinition(network, FitchainConditions)
 }

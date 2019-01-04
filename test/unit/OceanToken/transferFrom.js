@@ -9,7 +9,7 @@ contract('OceanToken', (accounts) => {
 
     beforeEach(async () => {
         token = await OceanToken.new({ from: accounts[0] })
-        await token.setReceiver(accounts[0])
+        await token.mint(accounts[0], 1000)
     })
 
     describe('transferFrom', () => {
