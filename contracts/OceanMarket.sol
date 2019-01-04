@@ -107,7 +107,7 @@ contract OceanMarket is Ownable {
                 'Token transfer failed.'
             );
         }
-        /* ethlint-next-line security/no-block-members */
+        /* solium-disable-next-line security/no-block-members */
         tokenRequest[msg.sender] = block.timestamp;
         return true;
     }
