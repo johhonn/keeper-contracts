@@ -62,7 +62,7 @@ or simply pull it from docker hub:
 
 ```bash
 docker pull oceanprotocol/keeper-contracts
-docker run -d -p 8545:8545 oceanprotocol/keeper-contracts 
+docker run -d -p 8545:8545 oceanprotocol/keeper-contracts
 ```
 
 Which will expose the Ethereum RPC client with all contracts loaded under localhost:8545, which you can add to your `truffle.js`:
@@ -138,15 +138,15 @@ The contract addresses deployed on Ocean Nile testnet:
 
 | Contract           | Version | Address                                      |
 |--------------------|---------|----------------------------------------------|
-| AccessConditions   | v0.5.1  | `0x4dd7644b0AA5CE5A2Cf7586b2973FA51a81B15d1` |
-| ComputeConditions  | v0.5.1  | `0xbA9AD7EF9863dA33E0Ce0FC5E5FeBA8F84288Bb0` |
-| DIDRegistry        | v0.5.1  | `0xB6B04b74E110CED8F3a3a3DB043d3b9eA95A1174` |
-| FitchainConditions | v0.5.1  | `0x03e04F5B150bE7c2e358eD339f37D245A76067ad` |
-| OceanAuth          | v0.5.1  | `0x8243c5Aa94f1cEA09Fe82086aa32c753cc4fC898` |
-| OceanMarket        | v0.5.1  | `0x2b463c95d05CB01DE459e81Faa386d5bE9A72AAE` |
-| OceanToken         | v0.5.1  | `0xE035deFF16160d6Aa362914DbCD401B4820CFbc2` |
-| PaymentConditions  | v0.5.1  | `0x3F7B787EC90CcF5eFB63282A7AAD16871460Fd6a` |
-| ServiceAgreement   | v0.5.1  | `0x9cBcc80a98f0B0b6473032a3477BAFa338D89E37` |
+| AccessConditions   | v0.5.2  | `0x4dd7644b0AA5CE5A2Cf7586b2973FA51a81B15d1` |
+| ComputeConditions  | v0.5.2  | `0xbA9AD7EF9863dA33E0Ce0FC5E5FeBA8F84288Bb0` |
+| DIDRegistry        | v0.5.2  | `0xB6B04b74E110CED8F3a3a3DB043d3b9eA95A1174` |
+| FitchainConditions | v0.5.2  | `0x03e04F5B150bE7c2e358eD339f37D245A76067ad` |
+| OceanAuth          | v0.5.2  | `0x8243c5Aa94f1cEA09Fe82086aa32c753cc4fC898` |
+| OceanMarket        | v0.5.2  | `0x2b463c95d05CB01DE459e81Faa386d5bE9A72AAE` |
+| OceanToken         | v0.5.2  | `0xE035deFF16160d6Aa362914DbCD401B4820CFbc2` |
+| PaymentConditions  | v0.5.2  | `0x3F7B787EC90CcF5eFB63282A7AAD16871460Fd6a` |
+| ServiceAgreement   | v0.5.2  | `0x9cBcc80a98f0B0b6473032a3477BAFa338D89E37` |
 
 #### Kovan Testnet
 
