@@ -48,7 +48,7 @@ contract('ComputeConditions', (accounts) => {
             valuesHashList = [
                 testUtils.valueHash(['bytes32', 'uint256'], [did, price]),
                 testUtils.valueHash(['bool'], [true]),
-                testUtils.valueHash(['bytes32', 'bytes32'], [did, did]),
+                testUtils.valueHash(['bytes32'], [did]),
                 testUtils.valueHash(['bytes32', 'uint256'], [did, price]),
                 testUtils.valueHash(['bytes32', 'uint256'], [did, price])
             ]
@@ -105,7 +105,7 @@ contract('ComputeConditions', (accounts) => {
         })
 
         it('Service publisher should be able to grant access for derived asset to the data scientist', async () => {
-            await accessConditions.grantAccess(agreementId, did, did, { from: publisher })
+            await accessConditions.grantAccess(agreementId, did, { from: publisher })
             const fulfillAccessConditionState = await agreement.getConditionStatus(agreementId, conditionKeys[2])
             assert.strictEqual(fulfillAccessConditionState.toNumber(), 1, 'Error: unable to fulfill granted access to derived asset condition')
         })

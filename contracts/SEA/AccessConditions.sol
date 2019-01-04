@@ -45,7 +45,7 @@ contract AccessConditions is ISecretStore {
     /**
     * @notice checkPermissions is called by Parity secret store
     * @param consumer , asset consumer address
-    * @param documentKeyId , refers to DID document (TODO remove the duplicate and use only one variable documentKeyId)
+    * @param documentKeyId , refers to the DID in which secret store will issue the decryption keys
     * @return true if the access was granted
     */
     function checkPermissions(
@@ -59,15 +59,13 @@ contract AccessConditions is ISecretStore {
     }
 
     /**
-    * @notice grantAccess is called by asset owner or SLA Publisher
+    * @notice grantAccess is called by asset/resource/DID owner/SLA Publisher
     * @param agreementId , SEA agreement ID
-    * @param assetId , the DID that refers to information about the service/asset or resource
-    * @param documentKeyId , refers to DID document (TODO remove the duplicate and use only one variable documentKeyId)
-    * @return true if the SLA publisher is able to grand access
+    * @param documentKeyId , refers to the DID in which secret store will issue the decryption keys
+    * @return true if the SLA publisher is able to grant access
     */
     function grantAccess(
         bytes32 agreementId,
-        bytes32 assetId,
         bytes32 documentKeyId
     )
         public
@@ -83,7 +81,7 @@ contract AccessConditions is ISecretStore {
         if (agreementStorage.hasUnfulfilledDependencies(agreementId, condition))
             return;
 
-        bytes32 valueHash = hashValues(assetId, documentKeyId);
+        bytes32 valueHash = keccak256(abi.encodePacked(documentKeyId));
         require(
             agreementStorage.fulfillCondition(
                 agreementId,
@@ -94,29 +92,6 @@ contract AccessConditions is ISecretStore {
         );
         address consumer = agreementStorage.getAgreementConsumer(agreementId);
         assetPermissions[documentKeyId][consumer] = true;
-        emit AccessGranted(agreementId, assetId);
-    }
-
-    /**
-    * @notice hashValues a utility function which in charge of calculating the hash of input values in payment conditions
-    * @param assetId , refers to DID document that hold information about the service
-    * @param documentKeyId , refers to DID document (TODO remove the duplicate and use only one variable documentKeyId)
-    * @return hash of asset ID and document key ID
-    */
-    function hashValues(
-        bytes32 assetId,
-        bytes32 documentKeyId
-    )
-        public pure
-        returns (
-            bytes32 valueHash
-        )
-    {
-        return keccak256(
-            abi.encodePacked(
-                assetId,
-                documentKeyId
-            )
-        );
+        emit AccessGranted(agreementId, documentKeyId);
     }
 }
