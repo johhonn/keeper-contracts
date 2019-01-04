@@ -1,7 +1,7 @@
 pragma solidity 0.4.25;
 
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol';
-import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol';
+import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Capped.sol';
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 
 /**
@@ -9,7 +9,7 @@ import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 @author Team: Fang Gong, Sebastian Gerske
 */
 
-contract OceanToken is ERC20, ERC20Mintable, ERC20Detailed {
+contract OceanToken is ERC20Capped, ERC20Detailed {
 
     using SafeMath for uint256;
 
@@ -18,7 +18,9 @@ contract OceanToken is ERC20, ERC20Mintable, ERC20Detailed {
     * Runs only on initial contract creation.
     */
     constructor ()
-        public ERC20Detailed('OceanToken', 'OCN', 18)
+        public
+        ERC20Detailed('OceanToken', 'OCN', 18)
+        ERC20Capped(1400000000 * 10 ** 18)
     {
     }
 
@@ -32,7 +34,7 @@ contract OceanToken is ERC20, ERC20Mintable, ERC20Detailed {
         uint256 value
     )
         public
-        returns (bool)
+        returns (bool tokenTransferred)
     {
         require(
             to != address(0),
@@ -43,23 +45,23 @@ contract OceanToken is ERC20, ERC20Mintable, ERC20Detailed {
 
     /**
     * @dev Transfer tokens from one address to another when not paused
-    * @param _from address The address which you want to send tokens from
+    * @param from address The address which you want to send tokens from
     * @param to address The address which you want to transfer to
     * @param value uint256 the amount of tokens to be transferred
     */
     function transferFrom(
-        address _from,
+        address from,
         address to,
         uint256 value
     )
         public
-        returns (bool)
+        returns (bool tokenTransferred)
     {
         require(
             to != address(0),
             'To address is 0x0.'
         );
-        return super.transferFrom(_from, to, value);
+        return super.transferFrom(from, to, value);
     }
 
 }

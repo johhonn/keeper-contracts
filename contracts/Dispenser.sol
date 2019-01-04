@@ -56,7 +56,7 @@ contract Dispenser is Ownable {
 
     /**
     * @dev Dispenser Constructor
-    * @param oceanTokenAddress The deployed contract address of an ERC20Detailed token
+    * @param oceanTokenAddress The deployed contract address of an OceanToken
     * Runs only on initial contract creation.
     */
     constructor(
