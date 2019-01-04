@@ -62,7 +62,7 @@ contract Dispenser is Ownable {
     constructor(
         address oceanTokenAddress
     ) 
-        public 
+        public
     {
         require(
             oceanTokenAddress != address(0x0),
