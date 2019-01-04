@@ -68,7 +68,7 @@ contract AccessConditions is ISecretStore {
         bytes32 agreementId,
         bytes32 documentKeyId
     )
-        public
+        external
         onlySLAPublisher(agreementId, msg.sender)
         returns (bool)
     {

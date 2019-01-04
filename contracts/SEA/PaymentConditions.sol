@@ -220,11 +220,11 @@ contract PaymentConditions {
     }
 
    /**
-    * @notice hashValues called by anyone
+    * @notice hashValues called by anyone and it produces hash of input values
     * @dev it hashes the price and assetID (DID) in order to generate unique hash that it is used for condition authorization
     * @param assetId , refers to DID
     * @param price , asset or service price in OCN tokens
-    * @return hash of input values
+    * @return hash of the input values
     */
     function hashValues(
         bytes32 assetId,

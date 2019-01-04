@@ -12,9 +12,6 @@ contract OceanToken is ERC20 {
 
     using SafeMath for uint256;
 
-    // ============
-    // DATA STRUCTURES:
-    // ============
     string public constant name = 'OceanToken';                      // Set the token name for display
     string public constant symbol = 'OCN';                           // Set the token symbol for display
 

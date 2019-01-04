@@ -87,8 +87,8 @@ contract ComputeConditions is Common {
    /**
     * @notice submitHashSignature is called only by the data-consumer address.
     * @dev At first It checks if the proof state is created or not then checks that the hash
-    * has been submitted by the publisher in order to call fulfillUpload. This preserves
-    * the message integrity and proof that both parties agree on the same algorithm file/s
+    * has been submitted by the publisher. This preserves the message integrity
+    * it also proof that both parties agree on the same algorithm file/s
     * @param agreementId , the service level agreement Id
     * @param signature data scientist signature = signed_hash(uploaded_algorithm_file/s)
     */
@@ -135,12 +135,13 @@ contract ComputeConditions is Common {
     }
 
    /**
-    * @notice submitAlgorithmHash is called only by the on-premise address.
+    * @notice submitAlgorithmHash is called only by the compute publisher.
     * @dev At first It checks if the proof state is created or not then checks if the signature
     * has been submitted by the data scientist in order to call fulfillUpload. This preserves
     * the message integrity and proof that both parties agree on the same algorithm file/s
     * @param agreementId the service level agreement Id
     * @param hash = kekccak(uploaded_algorithm_file/s)
+    * @return true if the compute publisher is able to send the right algorithm hash
     */
     function submitAlgorithmHash(
         bytes32 agreementId,
@@ -148,7 +149,7 @@ contract ComputeConditions is Common {
     )
         external
         onlyComputePublisher(agreementId)
-        returns(bool status)
+        returns(bool)
     {
         if (proofs[agreementId].exists) {
             if (proofs[agreementId].isLocked) { // avoid race conditions
@@ -184,9 +185,9 @@ contract ComputeConditions is Common {
     }
 
    /**
-    * @notice fulfillUpload is called by anyone of the stakeholders [publisher or data scientist]
+    * @notice fulfillUpload is called by anyone of the stakeholders [compute publisher or compute consumer]
     * @dev check if there are unfulfilled dependency condition, if false, it verifies the signature
-    * using the submitted hash (by publisher), the signature (by data scientist) then call
+    * using the submitted hash (by publisher), the signature (by data scientist/consumer) then call
     * fulfillCondition in service level agreement storage contract
     * @param agreementId the service level agreement Id
     * @param state get be used fo input value hash for this condition indicating the state of verification
