@@ -12,7 +12,7 @@ const did = '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
 const serviceTemplateId = '0x419d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
 
 contract('PaymentConditions', (accounts) => {
-    describe('Tests payment conditions used in SLAs', () => {
+    describe('Tests integration of payment conditions in SEA', () => {
         const consumer = accounts[0]
 
         let token
@@ -79,7 +79,7 @@ contract('PaymentConditions', (accounts) => {
 
             const lockPaymentHash = utils.valueHash(['bytes32', 'uint256'], [asset, price])
             const releasePaymentHash = utils.valueHash(['bytes32', 'uint256'], [asset, price])
-            const grantAccessHash = utils.valueHash(['bytes32', 'bytes32'], [asset, asset])
+            const grantAccessHash = utils.valueHash(['bytes32'], [asset])
 
             hashes = [grantAccessHash, lockPaymentHash, releasePaymentHash]
         })
@@ -121,7 +121,6 @@ contract('PaymentConditions', (accounts) => {
 
             await accessConditions.grantAccess(
                 agreementId,
-                asset,
                 asset
             )
 
@@ -138,7 +137,6 @@ contract('PaymentConditions', (accounts) => {
 
             await accessConditions.grantAccess(
                 agreementId,
-                asset,
                 asset
             )
 
@@ -172,7 +170,6 @@ contract('PaymentConditions', (accounts) => {
 
             await accessConditions.grantAccess(
                 agreementId,
-                asset,
                 asset
             )
             await paymentConditions.lockPayment(agreementId, asset, price)
@@ -191,7 +188,6 @@ contract('PaymentConditions', (accounts) => {
 
             await accessConditions.grantAccess(
                 agreementId,
-                asset,
                 asset
             )
             await paymentConditions.lockPayment(agreementId, asset, price)

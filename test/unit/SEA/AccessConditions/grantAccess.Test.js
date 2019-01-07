@@ -29,7 +29,7 @@ contract('AccessConditions', (accounts) => {
         contracts = [accessConditions.address]
         fingerprints = [utils.getSelector(web3, AccessConditions, 'grantAccess')]
         dependenciesBits = [0]
-        valueHashes = [utils.valueHash(['bytes32', 'bytes32'], [assetId, assetId])]
+        valueHashes = [utils.valueHash(['bytes32'], [assetId])]
         timeoutValues = [0]
         agreementId = utils.generateId()
     })
@@ -54,7 +54,7 @@ contract('AccessConditions', (accounts) => {
 
             // act-assert
             try {
-                await accessConditions.grantAccess(agreementId, utils.emptyBytes32, utils.emptyBytes32, { from: consumer })
+                await accessConditions.grantAccess(agreementId, utils.emptyBytes32, { from: consumer })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Restricted access - only SLA publisher')
                 return
@@ -67,7 +67,7 @@ contract('AccessConditions', (accounts) => {
             await initializeAgreementWithValues()
 
             // act
-            const result = await accessConditions.grantAccess(agreementId, assetId, assetId, { from: accounts[0] })
+            const result = await accessConditions.grantAccess(agreementId, assetId, { from: accounts[0] })
 
             // assert
             utils.assertEmitted(result, 1, 'AccessGranted')
@@ -81,7 +81,7 @@ contract('AccessConditions', (accounts) => {
             await initializeAgreementWithValues()
 
             // act
-            const result = await accessConditions.grantAccess(agreementId, assetId, assetId, { from: accounts[0] })
+            const result = await accessConditions.grantAccess(agreementId, assetId, { from: accounts[0] })
 
             // assert
             utils.assertEmitted(result, 0, 'AccessGranted')

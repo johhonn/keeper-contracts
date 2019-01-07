@@ -2,22 +2,18 @@ pragma solidity 0.4.25;
 
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
-
 import './OceanToken.sol';
 
 /**
-@title Ocean Protocol Marketplace Contract
-@author Team: Fang Gong, Samer Sallam, Ahmed Ali, Sebastian Gerske
-*/
+ * @title Ocean Marketplace
+ * @author Ocean Protocol Team
+ * @dev All function calls are currently implemented without side effects
+ */
 
 contract OceanMarket is Ownable {
 
     using SafeMath for uint256;
     using SafeMath for uint;
-
-    // ============
-    // DATA STRUCTURES:
-    // ============
 
     // limit period for request of tokens
     mapping(address => uint256) private tokenRequest; // mapping from address to last time of request
@@ -27,9 +23,6 @@ contract OceanMarket is Ownable {
     // marketplace global variables
     OceanToken public oceanToken;
 
-    // ============
-    // EVENTS:
-    // ============
     event FrequentTokenRequest(
         address indexed requester,
         uint256 minPeriod
@@ -40,9 +33,6 @@ contract OceanMarket is Ownable {
         uint256 maxAmount
     );
 
-    // ============
-    // modifier:
-    // ============
     modifier validAddress(address sender) {
         require(
             sender != address(0x0),

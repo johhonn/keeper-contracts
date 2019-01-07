@@ -1,14 +1,15 @@
 pragma solidity 0.4.25;
 
-import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
+import './Common.sol';
 import './ServiceExecutionAgreement.sol';
 
-/// @title On-premise compute conditions
-/// @author Ocean Protocol Team
-/// @notice This contract is WIP, don't use it for production
-/// @dev All function calls are currently implement without side effects
+/**
+ * @title On-premise compute conditions
+ * @author Ocean Protocol Team
+ * @notice This contract is WIP, don't use it for production
+ */
 
-contract ComputeConditions {
+contract ComputeConditions is Common {
 
     struct ProofOfUpload {
         bool exists;
@@ -82,17 +83,19 @@ contract ComputeConditions {
         agreementStorage = ServiceExecutionAgreement(agreementAddress);
     }
 
-    /// @notice submitHashSignature is called only by the data-consumer address.
-    /// @dev At first It checks if the proof state is created or not then checks that the hash
-    /// has been submitted by the publisher in order to call fulfillUpload. This preserves
-    /// the message integrity and proof that both parties agree on the same algorithm file/s
-    /// @param agreementId , the service level agreement Id
-    /// @param signature data scientist signature = signed_hash(uploaded_algorithm_file/s)
+   /**
+    * @notice submitHashSignature is called only by the data-consumer address.
+    * @dev At first It checks if the proof state is created or not then checks that the hash
+    * has been submitted by the publisher. This preserves the message integrity
+    * it also proof that both parties agree on the same algorithm file(s)
+    * @param agreementId is the service level agreement Id
+    * @param signature data scientist signature = signed_hash(uploaded_algorithm_file/s)
+    */
     function submitHashSignature(
         bytes32 agreementId,
         bytes signature
     )
-        public
+        external
         onlyDataConsumer(agreementId)
         returns(bool status)
         {
@@ -130,19 +133,22 @@ contract ComputeConditions {
 
     }
 
-    /// @notice submitAlgorithmHash is called only by the on-premise address.
-    /// @dev At first It checks if the proof state is created or not then checks if the signature
-    /// has been submitted by the data scientist in order to call fulfillUpload. This preserves
-    /// the message integrity and proof that both parties agree on the same algorithm file/s
-    /// @param agreementId the service level agreement Id
-    /// @param hash = kekccak(uploaded_algorithm_file/s)
+   /**
+    * @notice submitAlgorithmHash is called only by the compute publisher.
+    * @dev At first It checks if the proof state is created or not then checks if the signature
+    * has been submitted by the data scientist in order to call fulfillUpload. This preserves
+    * the message integrity and proof that both parties agree on the same algorithm file/s
+    * @param agreementId the service level agreement Id
+    * @param hash = kekccak(uploaded_algorithm_file/s)
+    * @return true if the compute publisher is able to send the right algorithm hash
+    */
     function submitAlgorithmHash(
         bytes32 agreementId,
         bytes32 hash
     )
-        public
+        external
         onlyComputePublisher(agreementId)
-        returns(bool status)
+        returns(bool)
     {
         if (proofs[agreementId].exists) {
             if (proofs[agreementId].isLocked) { // avoid race conditions
@@ -177,12 +183,14 @@ contract ComputeConditions {
         return true;
     }
 
-    /// @notice fulfillUpload is called by anyone of the stakeholders [publisher or data scientist]
-    /// @dev check if there are unfulfilled dependency condition, if false, it verifies the signature
-    /// using the submitted hash (by publisher), the signature (by data scientist) then call
-    /// fulfillCondition in service level agreement storage contract
-    /// @param agreementId the service level agreement Id
-    /// @param state get be used fo input value hash for this condition indicating the state of verification
+   /**
+    * @notice fulfillUpload is called by anyone of the stakeholders [compute publisher or compute consumer]
+    * @dev check if there are unfulfilled dependency condition, if false, it verifies the signature
+    * using the submitted hash (by publisher), the signature (by data scientist/consumer) then call
+    * fulfillCondition in service level agreement storage contract
+    * @param agreementId the service level agreement Id
+    * @param state get be used fo input value hash for this condition indicating the state of verification
+    */
     function fulfillUpload(
         bytes32 agreementId,
         bool state
@@ -240,21 +248,4 @@ contract ComputeConditions {
         );
         return false;
     }
-
-    function prefixHash(bytes32 hash)
-        public pure
-        returns (bytes32 prefixedHash)
-    {
-        return ECDSA.toEthSignedMessageHash(hash);
-    }
-
-    function recoverAddress(bytes32 hash, bytes signature)
-        public pure
-        returns (
-            address recoveredAddress
-        )
-    {
-        return ECDSA.recover(hash, signature);
-    }
-
 }
