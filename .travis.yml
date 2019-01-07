@@ -67,6 +67,7 @@ script:
     - git status
     - git add package-lock.json
     - git diff-index --quiet HEAD || git commit -m "Travis update"
+    - python2 -c 'import os,sys,fcntl; flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL); fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags&~os.O_NONBLOCK);'
     - docker run -v $(pwd):/project chainsecurity/securify 2>&1 | tee securifyReport.txt || true
     #-|
     #    if [ "${TRAVIS_BRANCH}" = "develop" ]; then
@@ -76,6 +77,24 @@ script:
 
 after_script:
     - greenkeeper-lockfile-upload
+
+after_success:
+  - |
+        declare -r SSH_FILE="$(mktemp -u $HOME/.ssh/XXXXX)"
+        openssl aes-256-cbc -K  -iv  -in .travis/travis_keeper-contracts-security-reports.enc -out $SSH_FILE -d
+
+        chmod 600 "$SSH_FILE" \
+        && printf "%s\n" \
+              "Host github.com" \
+              "  IdentityFile $SSH_FILE" \
+              "  LogLevel ERROR" >> ~/.ssh/config
+
+        git clone git@github.com:oceanprotocol/keeper-contracts-security-reports.git
+        cp -rp securifyReport.txt keeper-contracts-security-reports/${TRAVIS_BRANCH}_securifyReport.txt
+        cd keeper-contracts-security-reports
+        git add ${TRAVIS_BRANCH}_securifyReport.txt
+        git commit ${TRAVIS_BRANCH}_securifyReport.txt -m "UPSERT ${TRAVIS_BRANCH}_securifyReport.txt"
+        git push
 
 notifications:
     email: false
