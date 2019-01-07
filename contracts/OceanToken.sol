@@ -5,7 +5,7 @@ import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
 /**
  * @title Ocean ERC20 Token
  * @author Ocean Protocol Team
- * @dev All function calls are currently implement without side effects
+ * @dev All function calls are currently implemented without side effects
  */
 
 contract OceanToken is ERC20 {

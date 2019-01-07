@@ -7,7 +7,7 @@ import './OceanToken.sol';
 /**
  * @title Ocean Marketplace
  * @author Ocean Protocol Team
- * @dev All function calls are currently implement without side effects
+ * @dev All function calls are currently implemented without side effects
  */
 
 contract OceanMarket is Ownable {

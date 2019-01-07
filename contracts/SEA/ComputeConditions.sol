@@ -7,7 +7,6 @@ import './ServiceExecutionAgreement.sol';
  * @title On-premise compute conditions
  * @author Ocean Protocol Team
  * @notice This contract is WIP, don't use it for production
- * @dev All function calls are currently implement without side effects
  */
 
 contract ComputeConditions is Common {
@@ -88,8 +87,8 @@ contract ComputeConditions is Common {
     * @notice submitHashSignature is called only by the data-consumer address.
     * @dev At first It checks if the proof state is created or not then checks that the hash
     * has been submitted by the publisher. This preserves the message integrity
-    * it also proof that both parties agree on the same algorithm file/s
-    * @param agreementId , the service level agreement Id
+    * it also proof that both parties agree on the same algorithm file(s)
+    * @param agreementId is the service level agreement Id
     * @param signature data scientist signature = signed_hash(uploaded_algorithm_file/s)
     */
     function submitHashSignature(

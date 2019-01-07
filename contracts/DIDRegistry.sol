@@ -5,7 +5,7 @@ import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 /**
  * @title DID Registry
  * @author Ocean Protocol Team
- * @dev All function calls are currently implement without side effects
+ * @dev All function calls are currently implemented without side effects
  */
 
 contract DIDRegistry is Ownable {
@@ -35,10 +35,10 @@ contract DIDRegistry is Ownable {
    /**
     * @notice registerAttribute is called only by DID owner.
     * @dev this function registers DID attributes
-    * @param did , Dencentralized Identifier (a byte32 length ID)
-    * @param valueType , include DID, DID reference , URL, or DDO
-    * @param key , attribute key
-    * @param value , attribute value
+    * @param did refers to decentralized identifier (a byte32 length ID)
+    * @param valueType includes DID, DID reference , URL, or DDO
+    * @param key represents the attribute key
+    * @param value refers to the attribute value
     */
     function registerAttribute(
         bytes32 did,
@@ -67,8 +67,8 @@ contract DIDRegistry is Ownable {
     }
 
    /**
-    * @notice getUpdateAt is called anyone.
-    * @param did , Dencentralized Identifier (a byte32 length ID)
+    * @notice getUpdateAt is called by anyone.
+    * @param did refers to decentralized identifier (a byte32 length ID)
     * @return last modified (update) time of a DID
     */
     function getUpdateAt(bytes32 did)
@@ -79,8 +79,8 @@ contract DIDRegistry is Ownable {
     }
 
    /**
-    * @notice getOwner is called anyone.
-    * @param did , Dencentralized Identifier (a byte32 length ID)
+    * @notice getOwner is called by anyone.
+    * @param did refers to decentralized identifier (a byte32 length ID)
     * @return the address of the owner
     */
     function getOwner(bytes32 did)

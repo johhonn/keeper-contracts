@@ -5,7 +5,7 @@ import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
 /**
  * @title Common (Abstract Contract)
  * @author Ocean Protocol Team
- * @dev All function calls are currently implement without side effects
+ * @dev All function calls are currently implemented without side effects
  */
 
 contract Common {
@@ -24,8 +24,8 @@ contract Common {
 
     /**
     * @notice recoverAddress retrieves the address of the signer using the original message hash and the signature
-    * @param hash , the hash of the original message
-    * @param signature , ECDSA based signature
+    * @param hash is the hash of the original message
+    * @param signature is an ECDSA based signature
     * @return signer address
     */
     function recoverAddress(bytes32 hash, bytes signature)

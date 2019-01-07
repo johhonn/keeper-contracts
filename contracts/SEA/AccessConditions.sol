@@ -6,7 +6,7 @@ import './ISecretStore.sol';
 /**
  * @title Secret Store Access Control
  * @author Ocean Protocol Team
- * @dev All function calls are currently implement without side effects
+ * @dev All function calls are currently implemented without side effects
  */
 
 contract AccessConditions is ISecretStore {
@@ -44,8 +44,8 @@ contract AccessConditions is ISecretStore {
 
     /**
     * @notice checkPermissions is called by Parity secret store
-    * @param consumer , asset consumer address
-    * @param documentKeyId , refers to the DID in which secret store will issue the decryption keys
+    * @param consumer is the asset consumer address
+    * @param documentKeyId refers to the DID in which secret store will issue the decryption keys
     * @return true if the access was granted
     */
     function checkPermissions(
@@ -60,8 +60,8 @@ contract AccessConditions is ISecretStore {
 
     /**
     * @notice grantAccess is called by asset/resource/DID owner/SLA Publisher
-    * @param agreementId , SEA agreement ID
-    * @param documentKeyId , refers to the DID in which secret store will issue the decryption keys
+    * @param agreementId is the SEA agreement ID
+    * @param documentKeyId refers to the DID in which secret store will issue the decryption keys
     * @return true if the SLA publisher is able to grant access
     */
     function grantAccess(

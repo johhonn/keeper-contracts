@@ -7,7 +7,7 @@ import './ServiceExecutionAgreement.sol';
 /**
  * @title Payment Conditions
  * @author Ocean Protocol Team
- * @dev All function calls are currently implement without side effects
+ * @dev All function calls are currently implemented without side effects
  */
 
 
@@ -64,9 +64,9 @@ contract PaymentConditions {
     /**
     * @notice lockPayment is called by asset consumer
     * @dev checks if this condition has unfulfilled dependencies otherwise it will fulfil the condition and lock the payment
-    * @param agreementId , SEA agreement ID
-    * @param assetId , refers to DID
-    * @param price , asset or service price in OCN tokens
+    * @param agreementId is the SEA agreement ID
+    * @param assetId refers to DID
+    * @param price is the asset or service price in OCN tokens
     * @return true if asset consumer is able to lock payment into paymentCondition.sol contract
     */
     function lockPayment(
@@ -119,9 +119,9 @@ contract PaymentConditions {
     /**
     * @notice releasePayment is called only by asset publisher
     * @dev it checks if this condition has unfulfilled dependencies otherwise it will fulfil the condition and release the payment
-    * @param agreementId , SEA agreement ID
-    * @param assetId , refers to DID
-    * @param price , asset or service price in OCN tokens
+    * @param agreementId is the SEA agreement ID
+    * @param assetId refers to DID
+    * @param price is the asset or service price in OCN tokens
     * @return true if the publisher is able to release the payment
     */
     function releasePayment(
@@ -170,9 +170,9 @@ contract PaymentConditions {
     /**
     * @notice refundPayment is called by asset consumer
     * @dev it checks if this condition has unfulfilled dependencies otherwise it will fulfil the condition and make refund
-    * @param agreementId , SEA agreement ID
-    * @param assetId , refers to DID
-    * @param price , asset or service price in OCN tokens
+    * @param agreementId is the SEA agreement ID
+    * @param assetId refers to DID
+    * @param price is the asset or service price in OCN tokens
     * @return true if the consumer is able to make refund
     */
     function refundPayment(
@@ -222,8 +222,8 @@ contract PaymentConditions {
    /**
     * @notice hashValues called by anyone and it produces hash of input values
     * @dev it hashes the price and assetID (DID) in order to generate unique hash that it is used for condition authorization
-    * @param assetId , refers to DID
-    * @param price , asset or service price in OCN tokens
+    * @param assetId refers to DID
+    * @param price is the asset or service price in OCN tokens
     * @return hash of the input values
     */
     function hashValues(

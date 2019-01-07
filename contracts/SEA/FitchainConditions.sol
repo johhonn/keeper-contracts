@@ -7,7 +7,7 @@ import './ServiceExecutionAgreement.sol';
  * @title Fitchain conditions
  * @author Ocean Protocol Team
  * @notice This contract is WIP, don't use it for production
- * @dev All function calls are currently implement without side effects
+ * @dev All function calls are currently implemented without side effects
  */
 
 /**
@@ -211,7 +211,7 @@ contract FitchainConditions{
    /**
     * @notice registerVerifier called by any verifier in order to be registered as a verifier
     * @dev any verifier is able to register with a certain number of slots, (TODO:implementing staking)
-    * @param slots , number of pools that a verifier can offer to join multiple verification games at a time
+    * @param slots refers to the number of pools that a verifier can offer to join multiple verification games at a time
     * @return true if an actor is able to register himself/herself as a verifier
     */
     function registerVerifier(
@@ -251,9 +251,9 @@ contract FitchainConditions{
    /**
     * @notice initPoT called by publisher or model provider which elects verifiers
     * @dev performs some input checks, elect verifiers and notify them to start the verification game
-    * @param modelId , represents the SEA agreement Id in Ocean and Model Id in Fitchain
-    * @param k , the number of voters that are required to witness the proof of training (PoT) in Fitchain network
-    * @param timeout , timeout to set the vote (This will be changed for more advanced options)
+    * @param modelId represents the SEA agreement Id in Ocean and Model Id in Fitchain
+    * @param k is the number of voters that are required to witness the proof of training (PoT) in Fitchain network
+    * @param timeout is the timeout period to set the vote (This will be changed for more advanced options)
     * @return true if all the challenge initiated successfully
     */
     function initPoT(
@@ -293,9 +293,9 @@ contract FitchainConditions{
    /**
     * @notice initVPCProof called by publisher or model provider electing verifiers to check the verification proof in Fitchain
     * @dev performs some security checks, elect verifiers and notify them to start the game
-    * @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
-    * @param k , the number of voters that are required to witness the proof of verification in Fitchain network
-    * @param timeout , timeout to set the vote
+    * @param modelId represents the service level agreement Id in Ocean and Model Id in Fitchain
+    * @param k is the number of voters that are required to witness the proof of verification in Fitchain network
+    * @param timeout is the timeout period to set the vote
     * @return true if all the challenge initiated successfully
     */
     function initVPCProof(
@@ -328,8 +328,8 @@ contract FitchainConditions{
     * @notice voteForPoT called by verifiers where they vote for the existence of verification proof
     * @dev performs some security checks, set the vote and update the state of voteCount
     * and emit some events to notify the model provider/publisher that all votes have been submitted
-    * @param modelId , represents the SEA agreement Id in Ocean and Model Id in Fitchain
-    * @param vote , the result of isTrained in Fitchain (T/F)
+    * @param modelId represents the SEA agreement Id in Ocean and Model Id in Fitchain
+    * @param vote is the result of isTrained in Fitchain (T/F)
     */
     function voteForPoT(
         bytes32 modelId,
@@ -368,8 +368,8 @@ contract FitchainConditions{
     * @notice voteForVPC called by verifiers where they vote for the existence of verification proof
     * @dev performs some security checks, set the vote and update the state of voteCount
     * and emit some events to notify the model provider/publisher that all votes have been submitted
-    * @param modelId , refers to the SEA agreement Id in Ocean and Model Id in Fitchain
-    * @param vote , the result of isVerified in Fitchain (T/F)
+    * @param modelId refers to the SEA agreement Id in Ocean and Model Id in Fitchain
+    * @param vote is the result of isVerified in Fitchain (T/F)
     * @return true if the caller (verifier) is able to commit his vote regarding the VPC proof
     */
     function voteForVPC(
@@ -408,8 +408,8 @@ contract FitchainConditions{
     * @notice setPoT (Gossiper pool contract in Fitchain) is called only by the service provider.
     * @dev At first It checks if the proof state is created or not, then uses the count to
     * reconstruct the right condition key based on the signed agreement
-    * @param modelId , refers the SEA agreement Id in Ocean and Model Id in Fitchain
-    * @param count , represents the number of submitted votes by verifiers who are illegible to check the PoT in Fitchain
+    * @param modelId refers the SEA agreement Id in Ocean and Model Id in Fitchain
+    * @param count represents the number of submitted votes by verifiers who are illegible to check the PoT in Fitchain
     * @return true if the publisher is able to set the proof of training to true
     */
     function setPoT(
@@ -447,8 +447,8 @@ contract FitchainConditions{
     * @notice setVPC (verification pool contract in Fitchain) is called only by the model provider.
     * @dev At first It checks if the proof state is created or not, then uses the count to
     * reconstruct the right condition key based on the signed agreement
-    * @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
-    * @param count , represents the number of submitted votes by verifiers who who are illegible to check the verification proof in Fitchain
+    * @param modelId represents the service level agreement Id in Ocean and Model Id in Fitchain
+    * @param count represents the number of submitted votes by verifiers who who are illegible to check the verification proof in Fitchain
     * @return true if the publisher is able to set the VPC proof to true
     */
     function setVPC(
@@ -486,7 +486,7 @@ contract FitchainConditions{
     * @notice freeMySlots is called by verifier in order to be able to deregister
     * @dev it checks if the verifier is involved in a witnessing game or not
     * reconstruct the right condition key based on the signed agreement
-    * @param modelId , represents the SEA Id in Ocean and Model Id in Fitchain
+    * @param modelId represents the SEA Id in Ocean and Model Id in Fitchain
     * @return true if a verifier is able to free its slots
     */
     function freeMySlots(bytes32 modelId)
@@ -534,10 +534,10 @@ contract FitchainConditions{
     /**
     * @notice electRRKVerifiers private function, elects K verifiers using round-robin
     * @dev remove verifiers from registry if there is no available slots to serve more verification games
-    * @param modelId , represents the service level agreement Id in Ocean and Model Id in Fitchain
-    * @param k , number of required verifiers
-    * @param vType , represents the type of the verifier (1 -> GPC, 2 -> VPC)
-    * @param timeout , optional but required to set the voting timeout
+    * @param modelId represents the service level agreement Id in Ocean and Model Id in Fitchain
+    * @param k is the number of required verifiers
+    * @param vType represents the type of the verifier (1 -> GPC, 2 -> VPC)
+    * @param timeout optional but is required to set the voting timeout
     */
     function electRRKVerifiers(
         bytes32 modelId,
@@ -569,7 +569,7 @@ contract FitchainConditions{
    /**
     * @notice addVerifierToRegistry private function maintains the verifiers registry
     * @dev add verifiers to the registry, and updates the slots number
-    * @param verifier , verifier address
+    * @param verifier is the verifier address
     */
     function addVerifierToRegistry(
         address verifier
@@ -585,7 +585,7 @@ contract FitchainConditions{
    /**
     * @notice removeVerifierFromRegistry private function maintains the verifiers registry
     * @dev removes a verifier from registry
-    * @param verifier , verifier address
+    * @param verifier is the verifier address
     * @return true if verifier is removed from the registry
     */
     function removeVerifierFromRegistry(
