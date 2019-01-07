@@ -4,7 +4,10 @@ const AccessConditions = artifacts.require('AccessConditions.sol')
 const { saveDefinition } = require('./helper')
 
 const serviceAgreement = async (deployer, network) => {
-    await deployer.deploy(AccessConditions, ServiceExecutionAgreement.address)
+    await deployer.deploy(
+        AccessConditions,
+        ServiceExecutionAgreement.address
+    )
 
     saveDefinition(network, AccessConditions)
 }

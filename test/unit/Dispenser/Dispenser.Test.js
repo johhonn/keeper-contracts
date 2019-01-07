@@ -2,13 +2,13 @@
 /* eslint-disable no-console */
 /* global artifacts, assert, contract, describe, it */
 
-const OceanMarket = artifacts.require('OceanMarket.sol')
+const Dispenser = artifacts.require('Dispenser.sol')
 
-contract('OceanMarket constructor', (accounts) => {
+contract('Dispenser constructor', (accounts) => {
     it('Should not deploy if token is empty', async () => {
         // act-assert
         try {
-            await OceanMarket.new(0x0, { from: accounts[0] })
+            await Dispenser.new(0x0, { from: accounts[0] })
         } catch (e) {
             assert.strictEqual(e.reason, 'invalid address')
             return

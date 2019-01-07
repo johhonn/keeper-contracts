@@ -2,7 +2,6 @@
 /* eslint-disable no-console, max-len */
 
 const OceanToken = artifacts.require('OceanToken.sol')
-const OceanMarket = artifacts.require('OceanMarket.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const FitchainConditions = artifacts.require('FitchainConditions.sol')
@@ -13,7 +12,7 @@ const web3 = testUtils.getWeb3()
 
 contract('FitchainConditions', (accounts) => {
     describe('Test integration of Fitchain conditions in SEA', () => {
-        let token, market, agreement, paymentConditions, valuesHashList, serviceId, conditionKeys
+        let token, agreement, paymentConditions, valuesHashList, serviceId, conditionKeys
         let fingerPrints, contracts, agreementId, slaMsgHash, signature, fitchainConditions, GPCVerifiers, VPCVerifiers, i, myFreeSlots
 
         const publisher = accounts[0]
@@ -37,16 +36,15 @@ contract('FitchainConditions', (accounts) => {
         before(async () => {
             agreement = await ServiceExecutionAgreement.new({ from: accounts[0] })
             token = await OceanToken.new({ from: accounts[0] })
-            market = await OceanMarket.new(token.address, { from: accounts[0] })
             paymentConditions = await PaymentConditions.new(agreement.address, token.address, { from: accounts[0] })
             fitchainConditions = await FitchainConditions.new(agreement.address, price, slots)
 
-            await market.requestTokens(1000, { from: consumer })
-            await market.requestTokens(1000, { from: publisher })
-            await market.requestTokens(1000, { from: verifier1 })
-            await market.requestTokens(1000, { from: verifier2 })
-            await market.requestTokens(1000, { from: verifier3 })
-            await market.requestTokens(1000, { from: verifier4 })
+            await token.mint(consumer, 1000)
+            await token.mint(publisher, 1000)
+            await token.mint(verifier1, 1000)
+            await token.mint(verifier2, 1000)
+            await token.mint(verifier3, 1000)
+            await token.mint(verifier4, 1000)
 
             // conditions
             contracts = [paymentConditions.address, fitchainConditions.address, fitchainConditions.address, paymentConditions.address, paymentConditions.address]

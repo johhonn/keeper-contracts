@@ -70,7 +70,7 @@ contract('PaymentConditions', (accounts) => {
         it('Should lock payment', async () => {
             // arrange
             await initializeAgreementWithValues()
-            await token.setReceiver(consumer, { from: accounts[0] })
+            await token.mint(consumer, price)
             await token.approve(paymentConditions.address, price, { from: consumer })
 
             // act
@@ -95,7 +95,7 @@ contract('PaymentConditions', (accounts) => {
         it('Should not lock payment twice', async () => {
             // arrange
             await initializeAgreementWithValues()
-            await token.setReceiver(consumer, { from: accounts[0] })
+            await token.mint(consumer, price)
             await token.approve(paymentConditions.address, price, { from: consumer })
             await paymentConditions.lockPayment(agreementId, assetId, price, { from: consumer })
 
