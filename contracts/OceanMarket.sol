@@ -20,9 +20,14 @@ contract OceanMarket is Ownable {
     // ============
 
     // limit period for request of tokens
-    mapping(address => uint256) private tokenRequest; // mapping from address to last time of request
-    uint256 maxAmount = 10000 * 10 ** 18;             // max amount of tokens user can get for each request
-    uint256 minPeriod = 0;                            // min amount of time to wait before request token again
+    // mapping from address to last time of request
+    mapping(address => uint256) private tokenRequest;
+
+    // max amount of tokens user can get for each request
+    uint256 maxAmount = 10000 * 10 ** 18;
+
+    // min amount of time to wait before request token again
+    uint256 minPeriod = 0;
 
     // marketplace global variables
     OceanToken public oceanToken;

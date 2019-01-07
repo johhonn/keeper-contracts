@@ -14,8 +14,12 @@ contract ServiceExecutionAgreement {
         bool isRevoked; // is template revoked?
         address owner; // template owner
         bytes32[] conditionKeys; // preserving the order in the condition state
-        uint256[] dependenciesBits; // 1st bit --> dependency, 2nd bit --> timeout flag (enabled/disabled)
-        uint8[] fulfillmentIndices; // if conditions true accept as this agreement as fulfilled agreement
+
+        // 1st bit --> dependency, 2nd bit --> timeout flag (enabled/disabled)
+        uint256[] dependenciesBits;
+
+        // if conditions true accept as this agreement as fulfilled agreement
+        uint8[] fulfillmentIndices;
         uint8 fulfillmentOperator; // 0 --> AND, 1--> OR, N--> M-of-N
     }
 
@@ -26,11 +30,15 @@ contract ServiceExecutionAgreement {
         bool isExisting; // avoid replay attack
         bool isFulfilled; // is this service agreement fulfilled or not
         uint8[] conditionsState; // maps the condition status in the template
-        uint8[] conditionLockedState; // maps the condition status in the template
+
+        // maps the condition status in the template
+        uint8[] conditionLockedState;
         bytes32 templateId; // refers to SEA template id
         address consumer;
         address publisher;
-        bytes32[] conditionInstances; // condition Instance = [handler + value hash]
+
+        // condition Instance = [handler + value hash]
+        bytes32[] conditionInstances;
         uint256[] timeoutValues; // in terms of block number not sec!
         bytes32 did; // Decentralized Identifier
     }
@@ -153,7 +161,9 @@ contract ServiceExecutionAgreement {
         bytes32 condition
     )
     {
-        Template storage template = templates[agreements[agreementId].templateId];
+        Template storage template = templates
+            [agreements[agreementId].templateId];
+
         uint256 conditionIndex = conditionKeyToIndex[condition];
         require(
             template.conditionKeys[conditionIndex] == condition,
@@ -247,7 +257,7 @@ contract ServiceExecutionAgreement {
             fulfillmentOperator);
 
         for (uint256 i = 0; i < contracts.length; i++) {
-            bytes32 conditionKey = generateConditionKey(templateId, contracts[i], fingerprints[i]);
+          bytes32 conditionKey = generateConditionKey(templateId, contracts[i], fingerprints[i]);
             templates[templateId].conditionKeys.push(conditionKey);
             conditionKeyToIndex[conditionKey] = i;
             emit ConditionSetup(
@@ -273,28 +283,33 @@ contract ServiceExecutionAgreement {
         return true;
     }
 
-    function getTemplateOwner(bytes32 templateId) public view returns (address owner)
+    function getTemplateOwner(bytes32 templateId) public
+     view returns (address owner)
     {
         return templates[templateId].owner;
     }
 
-    function getTemplateId(bytes32 agreementId) public view returns (bytes32 templateId)
+    function getTemplateId(bytes32 agreementId) public
+     view returns (bytes32 templateId)
     {
         return agreements[agreementId].templateId;
     }
 
     /// @notice deprecated use isTemplateRevoked instead (TODO)
-    function getTemplateStatus(bytes32 templateId) public view returns (bool status)
+    function getTemplateStatus(bytes32 templateId) public
+     view returns (bool status)
     {
         return !isTemplateRevoked(templateId);
     }
 
-    function isTemplateExisting(bytes32 templateId) public view returns (bool status)
+    function isTemplateExisting(bytes32 templateId) public
+     view returns (bool status)
     {
         return templates[templateId].isExisting;
     }
 
-    function isTemplateRevoked(bytes32 templateId) public view returns (bool status)
+    function isTemplateRevoked(bytes32 templateId) public
+     view returns (bool status)
     {
         return templates[templateId].isRevoked;
     }
@@ -610,7 +625,8 @@ contract ServiceExecutionAgreement {
     {
         // check the dependency conditions
         Agreement storage agreement = agreements[agreementId];
-        for (uint16 i = 0; i < templates[agreement.templateId].conditionKeys.length; i++) {
+        for (uint16 i = 0;
+           i < templates[agreement.templateId].conditionKeys.length; i++) {
             if (getBitValue(dependenciesValue, i, 0, 2) != 0) {
                 // This is a dependency, lock it
                 // verify its state is either 1 or has timed out
