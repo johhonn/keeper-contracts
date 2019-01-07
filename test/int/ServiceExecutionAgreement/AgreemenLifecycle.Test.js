@@ -8,35 +8,6 @@ const utils = require('../../helpers/utils')
 
 const web3 = utils.getWeb3()
 
-/*
-
-                                    condition-0
-                                       / \
-                                      /   \
-                                     /     \
-                                    /       \
-                                   /         \
-                              F=0 v           v F=1
-                            condition-3    condition-1
-                                  \            /
-                                   \          /
-                               Timeout=1     /
-                                     \      /
-                                      \    /
-                                   F=0 v  v F=1
-                                    condition-2
-
-    1st bit --> dependency index
-    2nd bit --> Flag (indicating the expected value of the dependency condition)
-    3rd bit --> exit strategy (i.e timeout)
-
-           condition 0               condition 1       condition 2,      condition 3
-     [[[1, 1, 0 ], [3, 0, 0]],       [[2, 1, 0]]    ,  [[0, 0, 0]]    ,  [2, 0, 1]      ]
-     Generating compressed version of nested arrays (one array)
-     [ 001 000 011 000       ,       000 011 000 000,  000 000 000 000,  000 101 000 000]
-     [ 536                   ,       192            ,  0              ,  320            ]
-*/
-
 contract('ServiceExecutionAgreement', (accounts) => {
     let sea
     /* eslint-disable-next-line prefer-destructuring */

@@ -3,9 +3,11 @@ pragma solidity 0.4.25;
 import './ServiceExecutionAgreement.sol';
 import './ISecretStore.sol';
 
-/// @title Secret Store Access Control
-/// @author Ocean Protocol Team
-/// @dev All function calls are currently implement without side effects
+/**
+ * @title Secret Store Access Control
+ * @author Ocean Protocol Team
+ * @dev All function calls are currently implemented without side effects
+ */
 
 contract AccessConditions is ISecretStore {
 
@@ -40,6 +42,12 @@ contract AccessConditions is ISecretStore {
         agreementStorage = ServiceExecutionAgreement(_agreementAddress);
     }
 
+    /**
+    * @notice checkPermissions is called by Parity secret store
+    * @param consumer is the asset consumer address
+    * @param documentKeyId refers to the DID in which secret store will issue the decryption keys
+    * @return true if the access was granted
+    */
     function checkPermissions(
         address consumer,
         bytes32 documentKeyId
@@ -50,12 +58,17 @@ contract AccessConditions is ISecretStore {
         return assetPermissions[documentKeyId][consumer];
     }
 
+    /**
+    * @notice grantAccess is called by asset/resource/DID owner/SLA Publisher
+    * @param agreementId is the SEA agreement ID
+    * @param documentKeyId refers to the DID in which secret store will issue the decryption keys
+    * @return true if the SLA publisher is able to grant access
+    */
     function grantAccess(
         bytes32 agreementId,
-        bytes32 assetId,
         bytes32 documentKeyId
     )
-        public
+        external
         onlySLAPublisher(agreementId, msg.sender)
         returns (bool)
     {
@@ -68,7 +81,7 @@ contract AccessConditions is ISecretStore {
         if (agreementStorage.hasUnfulfilledDependencies(agreementId, condition))
             return;
 
-        bytes32 valueHash = hashValues(assetId, documentKeyId);
+        bytes32 valueHash = keccak256(abi.encodePacked(documentKeyId));
         require(
             agreementStorage.fulfillCondition(
                 agreementId,
@@ -79,23 +92,6 @@ contract AccessConditions is ISecretStore {
         );
         address consumer = agreementStorage.getAgreementConsumer(agreementId);
         assetPermissions[documentKeyId][consumer] = true;
-        emit AccessGranted(agreementId, assetId);
-    }
-
-    function hashValues(
-        bytes32 assetId,
-        bytes32 documentKeyId
-    )
-        public pure
-        returns (
-            bytes32 valueHash
-        )
-    {
-        return keccak256(
-            abi.encodePacked(
-                assetId,
-                documentKeyId
-            )
-        );
+        emit AccessGranted(agreementId, documentKeyId);
     }
 }

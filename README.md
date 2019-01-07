@@ -62,7 +62,7 @@ or simply pull it from docker hub:
 
 ```bash
 docker pull oceanprotocol/keeper-contracts
-docker run -d -p 8545:8545 oceanprotocol/keeper-contracts 
+docker run -d -p 8545:8545 oceanprotocol/keeper-contracts
 ```
 
 Which will expose the Ethereum RPC client with all contracts loaded under localhost:8545, which you can add to your `truffle.js`:
@@ -84,7 +84,7 @@ module.exports = {
 
 As a pre-requisite, you need:
 
-- Node.js >=6, <=v9 (because of ursa, see https://github.com/JoshKaufman/ursa/issues/175)
+- Node.js >=6, <=v10.13.0
 - npm
 
 Clone the project and install all dependencies:
@@ -138,15 +138,15 @@ The contract addresses deployed on Ocean Nile testnet:
 
 | Contract           | Version | Address                                      |
 |--------------------|---------|----------------------------------------------|
-| AccessConditions   | v0.5.0  | `0x38ba43fFa8C7715F0f2A5d52E78a392d2bD71176` |
-| ComputeConditions  | v0.5.0  | `0x771136ebC55A1747B52722D1bb95323D98550293` |
-| DIDRegistry        | v0.5.0  | `0xe6CeA58707df303b6d9D1DF5BA8Bf88fF4A5920D` |
-| FitchainConditions | v0.5.0  | `0x4563092EE6736a5D920882D2c39c91EAf7956f07` |
-| OceanAuth          | v0.5.0  | `0xfC6DB8141144831a8B7d858f356D0d1148d8F11d` |
-| OceanMarket        | v0.5.0  | `0x8c4a2cC4572B6CD68c58BFc220f04CD1143230a0` |
-| OceanToken         | v0.5.0  | `0x5e29AcdE5285E24eb7A211d9F4313E5a9Ed07F36` |
-| PaymentConditions  | v0.5.0  | `0xdAAb92eABB4F2D7fC51948E44A88aa4fd986EDa9` |
-| ServiceAgreement   | v0.5.0  | `0xb8D436b29CBF1ef690DD3b0972Cce2090ECb09bc` |
+| AccessConditions   | v0.5.2  | `0x31a64a1DCdD9e1b8db84ef94431a61C6B462Ad0c` |
+| ComputeConditions  | v0.5.2  | `0xb28BC9489c55be810858F206602cf91c83DF816f` |
+| DIDRegistry        | v0.5.2  | `0xBDFeAc66c022165Bdb320264398977bf8A54e3C0` |
+| FitchainConditions | v0.5.2  | `0x549A383bE23615B61d0E40cf90cD558D889b5632` |
+| OceanAuth          | v0.5.2  | `0x0C84ECe5A68059220ff114de2b11457Fa7d7Fc45` |
+| OceanMarket        | v0.5.2  | `0x0959092E0D313F0BD3a6441151B2E2685d7350b5` |
+| OceanToken         | v0.5.2  | `0x8cCD9073B23689ca2BB76a049Eb33dfF5e16228D` |
+| PaymentConditions  | v0.5.2  | `0x78D2CA96F19e0e5b97Ca19Da179CEBF0fC5101BC` |
+| ServiceAgreement   | v0.5.2  | `0xCa925335D4EC611f35388eEeA9b9F7B0a6947d32` |
 
 #### Kovan Testnet
 
@@ -166,15 +166,15 @@ The contract addresses deployed on Kovan testnet:
 
 | Contract           | Version | Address                                      |
 |--------------------|---------|----------------------------------------------|
-| AccessConditions   | v0.5.0  | `0x0aF8734b1DB51464a01F83FE4167054a2f7F6794` |
-| ComputeConditions  | v0.5.0  | `0x138F020dDdd65cA6Ce4E799adFD32cbfEbE384f6` |
-| DIDRegistry        | v0.5.0  | `0x6DCbE42F6bF7c350F5A8a86FC5fCfea0b3EDe9f6` |
-| FitchainConditions | v0.5.0  | `0xE4498F5B1a9E890F3A0A4Bbd6aF4fCC8b54D96ff` |
-| OceanAuth          | v0.5.0  | `0x094E34848e884411684BDC5422BAcF251d046D8B` |
-| OceanMarket        | v0.5.0  | `0xb5bEfAB48835547Ac3A22608c74CFe2ce973d110` |
-| OceanToken         | v0.5.0  | `0x63A94230DA3aa27E5f68F22F8854CE3FcA702695` |
-| PaymentConditions  | v0.5.0  | `0x34D6dFB10fb29441Ee6B053f86AE58D3A8a7D869` |
-| ServiceAgreement   | v0.5.0  | `0xd13998e9c0B40c0028412b59e36213f5cAaA9C6E` |
+| AccessConditions   | v0.5.2  | `0x53CF7c49188C3d5c6e22d2d25619bA5e51367344` |
+| ComputeConditions  | v0.5.2  | `0x7DAa90122f4d6Fe4A30B1Be6759Aec6982202102` |
+| DIDRegistry        | v0.5.2  | `0x1Acbe77Ef52bfE4952D2bB31a2BB008FD8b44AE9` |
+| FitchainConditions | v0.5.2  | `0xc8c2B83986157754D37e9DB4eeDfb0E80b9c4644` |
+| OceanAuth          | v0.5.2  | `0x3Cfb6C5812A31F741Ecb535A25DB949F0Eb614fa` |
+| OceanMarket        | v0.5.2  | `0x5C710A2AAd4f7Bd21b997F1BC2cC47b4AFb21242` |
+| OceanToken         | v0.5.2  | `0x9aF3CBE3e26878836D6a5f7923870e7ed48a5347` |
+| PaymentConditions  | v0.5.2  | `0x7e299E4c4ae90775363dAb771Ba93a736A7cD01D` |
+| ServiceAgreement   | v0.5.2  | `0x5ec66884C7419fd227F642209590A604244596Aa` |
 
 ## Libraries
 
@@ -204,7 +204,7 @@ Code style is enforced through the CI test process, builds will fail if there're
 
 * [**Main Documentation: TCR, Market and Ocean Tokens**](doc/)
 * [Architecture (pdf)](doc/files/Smart-Contract-UML-class-diagram.pdf)
-* [Packaging of libraries](docs/packaging.md)
+* [Packaging of libraries](doc/packaging.md)
 
 ### Use Case 1: Register data asset
 

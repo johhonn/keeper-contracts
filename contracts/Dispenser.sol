@@ -2,22 +2,18 @@ pragma solidity 0.4.25;
 
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
-
 import './OceanToken.sol';
 
 /**
-@title Ocean Protocol Dispenser Contract
-@author Team: Fang Gong, Samer Sallam, Ahmed Ali, Sebastian Gerske
-*/
+ * @title Ocean Protocol Dispenser Contract
+ * @author Ocean Protocol Team
+ * @dev All function calls are currently implemented without side effects
+ */
 
 contract Dispenser is Ownable {
 
     using SafeMath for uint256;
     using SafeMath for uint;
-
-    // ============
-    // DATA STRUCTURES:
-    // ============
 
     // limit period for request of tokens
     mapping(address => uint256) private tokenRequests; // mapping from address to last time of request
@@ -27,10 +23,6 @@ contract Dispenser is Ownable {
 
     OceanToken public oceanToken;
 
-    // ============
-    // EVENTS:
-    // ============
-    // Request failed, to frequently
     event RequestFrequencyExceeded(
         address indexed requester,
         uint256 minPeriod
@@ -43,9 +35,6 @@ contract Dispenser is Ownable {
         uint256 maxAmount
     );
 
-    // ============
-    // modifier:
-    // ============
     modifier validAddress(address sender) {
         require(
             sender != address(0x0),
@@ -61,7 +50,7 @@ contract Dispenser is Ownable {
     */
     constructor(
         address oceanTokenAddress
-    ) 
+    )
         public
     {
         require(

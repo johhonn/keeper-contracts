@@ -52,7 +52,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             ]
             valuesHashList = [
                 utils.valueHash(['bytes32', 'uint256'], [resourceId, resourcePrice]),
-                utils.valueHash(['bytes32', 'bytes32'], [resourceId, resourceId]),
+                utils.valueHash(['bytes32'], [resourceId]),
                 utils.valueHash(['bytes32', 'uint256'], [resourceId, resourcePrice]),
                 utils.valueHash(['bytes32', 'uint256'], [resourceId, resourcePrice])]
             console.log('conditions control contracts', contracts)
@@ -112,7 +112,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             console.log('has dependencies: ', dep)
 
             await sea.getConditionStatus(serviceId, conditionKeys[1])
-            const gaccTx = await accessConditions.grantAccess(serviceId, resourceId, resourceId, fromProvider)
+            const gaccTx = await accessConditions.grantAccess(serviceId, resourceId, fromProvider)
             console.log('accessgranted event: ', utils.getEventArgsFromTx(gaccTx, 'AccessGranted').serviceId)
             const hasPermission1 = await accessConditions.checkPermissions(consumer, resourceId)
             console.log('consumer permission: ', hasPermission1)

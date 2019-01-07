@@ -1,13 +1,13 @@
 pragma solidity 0.4.25;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol';
-import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Capped.sol';
-import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
+import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
+import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
 /**
-@title Ocean Protocol ERC20 Token Contract
-@author Team: Fang Gong, Sebastian Gerske
-*/
+ * @title Ocean Protocol ERC20 Token Contract
+ * @author Ocean Protocol Team
+ * @dev All function calls are currently implemented without side effects
+ */
 
 contract OceanToken is ERC20Capped, ERC20Detailed {
 
