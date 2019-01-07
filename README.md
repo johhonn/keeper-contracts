@@ -166,15 +166,15 @@ The contract addresses deployed on Kovan testnet:
 
 | Contract           | Version | Address                                      |
 |--------------------|---------|----------------------------------------------|
-| AccessConditions   | v0.5.0  | `0x0aF8734b1DB51464a01F83FE4167054a2f7F6794` |
-| ComputeConditions  | v0.5.0  | `0x138F020dDdd65cA6Ce4E799adFD32cbfEbE384f6` |
-| DIDRegistry        | v0.5.0  | `0x6DCbE42F6bF7c350F5A8a86FC5fCfea0b3EDe9f6` |
-| FitchainConditions | v0.5.0  | `0xE4498F5B1a9E890F3A0A4Bbd6aF4fCC8b54D96ff` |
-| OceanAuth          | v0.5.0  | `0x094E34848e884411684BDC5422BAcF251d046D8B` |
-| OceanMarket        | v0.5.0  | `0xb5bEfAB48835547Ac3A22608c74CFe2ce973d110` |
-| OceanToken         | v0.5.0  | `0x63A94230DA3aa27E5f68F22F8854CE3FcA702695` |
-| PaymentConditions  | v0.5.0  | `0x34D6dFB10fb29441Ee6B053f86AE58D3A8a7D869` |
-| ServiceAgreement   | v0.5.0  | `0xd13998e9c0B40c0028412b59e36213f5cAaA9C6E` |
+| AccessConditions   | v0.5.2  | `0x53CF7c49188C3d5c6e22d2d25619bA5e51367344` |
+| ComputeConditions  | v0.5.2  | `0x7DAa90122f4d6Fe4A30B1Be6759Aec6982202102` |
+| DIDRegistry        | v0.5.2  | `0x1Acbe77Ef52bfE4952D2bB31a2BB008FD8b44AE9` |
+| FitchainConditions | v0.5.2  | `0xc8c2B83986157754D37e9DB4eeDfb0E80b9c4644` |
+| OceanAuth          | v0.5.2  | `0x3Cfb6C5812A31F741Ecb535A25DB949F0Eb614fa` |
+| OceanMarket        | v0.5.2  | `0x5C710A2AAd4f7Bd21b997F1BC2cC47b4AFb21242` |
+| OceanToken         | v0.5.2  | `0x9aF3CBE3e26878836D6a5f7923870e7ed48a5347` |
+| PaymentConditions  | v0.5.2  | `0x7e299E4c4ae90775363dAb771Ba93a736A7cD01D` |
+| ServiceAgreement   | v0.5.2  | `0x5ec66884C7419fd227F642209590A604244596Aa` |
 
 ## Libraries
 
