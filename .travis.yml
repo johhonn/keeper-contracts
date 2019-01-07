@@ -67,10 +67,12 @@ script:
     - git status
     - git add package-lock.json
     - git diff-index --quiet HEAD || git commit -m "Travis update"
-    -|
-        if [ "${TRAVIS_BRANCH}" = "develop" ]; then
-          docker run -v $(pwd):/project chainsecurity/securify 2>&1 | tee securifyReport.txt || true
-        fi
+    - docker run -v $(pwd):/project chainsecurity/securify 2>&1 | tee securifyReport.txt || true
+    #-|
+    #    if [ "${TRAVIS_BRANCH}" = "develop" ]; then
+    #      docker run -v $(pwd):/project chainsecurity/securify 2>&1 | tee securifyReport.txt || true
+    #   fi
+
 
 after_script:
     - greenkeeper-lockfile-upload
