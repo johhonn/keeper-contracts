@@ -11,7 +11,7 @@ const testUtils = require('../utils')
 const web3 = testUtils.getWeb3()
 
 contract('ServiceAgreement', (accounts) => {
-    describe('Test On-chain Authorization', () => {
+    describe('Test Access Service Agreement', () => {
         let token, market, sla, paymentConditions, accessConditions, resourceId, valuesHashList, serviceId, conditionKeys, templateId
 
         let funcFingerPrints, contracts

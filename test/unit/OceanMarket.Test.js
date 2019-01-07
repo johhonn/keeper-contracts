@@ -12,7 +12,7 @@ contract('OceanMarket constructor', (accounts) => {
         try {
             await OceanMarket.new(0x0, { from: accounts[0] })
         } catch (e) {
-            assert.strictEqual(e.reason, 'Token address is 0x0.')
+            assert.strictEqual(e.reason, 'invalid address')
             return
         }
         assert.fail('Expected revert not received')

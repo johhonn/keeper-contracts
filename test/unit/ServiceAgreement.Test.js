@@ -141,7 +141,7 @@ contract('ServiceAgreement', (accounts) => {
             // arrange
             await contract.setupAgreementTemplate(templateId, [dummyAddress], ['0x1234'], [1], emptyBytes32, [1], 1, { from: accounts[0] })
 
-            // act-aassert
+            // act-assert
             try {
                 await contract.executeAgreement(templateId, '0x10', dummyAddress, [], [], emptyBytes32, emptyBytes32, { from: accounts[0] })
             } catch (e) {
