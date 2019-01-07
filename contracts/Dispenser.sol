@@ -35,7 +35,7 @@ contract Dispenser is Ownable {
         uint256 maxAmount
     );
 
-    modifier validAddress(address sender) {
+    modifier isValidAddress(address sender) {
         require(
             sender != address(0x0),
             'Sender address is 0x0.'
@@ -73,7 +73,7 @@ contract Dispenser is Ownable {
     function requestTokens(
         uint256 amount
     )
-        public validAddress(msg.sender)
+        public isValidAddress(msg.sender)
         returns (bool tokensTransferred)
     {
         /* solium-disable-next-line security/no-block-members */
