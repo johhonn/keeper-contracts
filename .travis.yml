@@ -67,7 +67,7 @@ script:
     - git status
     - git add package-lock.json
     - git diff-index --quiet HEAD || git commit -m "Travis update"
-    - docker run -v $(pwd):/project chainsecurity/securify
+    - docker run -v $(pwd):/project chainsecurity/securify > securifyReport.txt
 
 after_script:
     - greenkeeper-lockfile-upload
