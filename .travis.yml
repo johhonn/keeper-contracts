@@ -95,6 +95,7 @@ after_success:
         git add ${FILENAME}_securifyReport.txt
         git commit ${FILENAME}_securifyReport.txt -m "UPSERT ${FILENAME}_securifyReport.txt"
         git push
+        cd ..
 
 notifications:
     email: false
