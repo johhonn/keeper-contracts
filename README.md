@@ -84,7 +84,7 @@ module.exports = {
 
 As a pre-requisite, you need:
 
-- Node.js >=6, <=v9 (because of ursa, see https://github.com/JoshKaufman/ursa/issues/175)
+- Node.js >=6, <=v10.13.0
 - npm
 
 Clone the project and install all dependencies:
