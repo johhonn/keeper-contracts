@@ -11,7 +11,7 @@ contract AccessConditions{
     mapping(bytes32 => mapping(address => bool)) private assetPermissions;
 
     ServiceAgreement private serviceAgreementStorage;
-    event AccessGranted(bytes32 serviceId, bytes32 asset);
+    event AccessGranted(bytes32 indexed serviceId, bytes32 indexed asset);
 
     modifier onlySLAPublisher(bytes32 serviceId, address publisher) {
         require(serviceAgreementStorage.getAgreementPublisher(serviceId) == publisher, 'Restricted access - only SLA publisher');

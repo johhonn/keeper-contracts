@@ -110,13 +110,13 @@ contract ServiceAgreement {
     }
 
     // events
-    event SetupCondition(bytes32 serviceTemplate, bytes32 condition, address provider);
-    event SetupAgreementTemplate(bytes32 serviceTemplateId, address provider);
-    event ExecuteCondition(bytes32 serviceAgreementId, bytes32 condition, bytes32 did, bool status, address templateOwner, address consumer);
-    event ExecuteAgreement(bytes32 serviceAgreementId, bytes32 templateId, bytes32 did, bool status, address templateOwner, address consumer, bool state);
-    event ConditionFulfilled(bytes32 serviceAgreementId, bytes32 templateId, bytes32 condition);
-    event AgreementFulfilled(bytes32 serviceAgreementId, bytes32 templateId, address owner);
-    event SLATemplateRevoked(bytes32 templateId, bool state);
+    event SetupCondition(bytes32 indexed serviceTemplate, bytes32 indexed condition, address indexed provider);
+    event SetupAgreementTemplate(bytes32 indexed serviceTemplateId, address indexed provider);
+    event ExecuteCondition(bytes32 indexed serviceAgreementId, bytes32 indexed condition, bytes32 indexed did, bool status, address templateOwner, address consumer);
+    event ExecuteAgreement(bytes32 indexed serviceAgreementId, bytes32 indexed templateId, bytes32 indexed did, bool status, address templateOwner, address consumer, bool state);
+    event ConditionFulfilled(bytes32 indexed serviceAgreementId, bytes32 indexed templateId, bytes32 indexed condition);
+    event AgreementFulfilled(bytes32 indexed serviceAgreementId, bytes32 indexed templateId, address indexed owner);
+    event SLATemplateRevoked(bytes32 indexed templateId, bool state);
 
 
     // Setup service agreement template only once!

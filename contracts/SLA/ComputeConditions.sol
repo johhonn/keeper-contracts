@@ -23,9 +23,9 @@ contract ComputeConditions {
     mapping (bytes32 => ProofOfUpload) proofs;
 
     //events
-    event HashSignatureSubmitted(bytes32 serviceAgreementId, address dataScientist, address publisher, bool state);
-    event HashSubmitted(bytes32 serviceAgreementId, address dataScientist, address publisher, bool state);
-    event ProofOfUploadValid(bytes32 serviceAgreementId, address dataScientist, address publisher);
+    event HashSignatureSubmitted(bytes32 indexed serviceAgreementId, address indexed dataScientist, address indexed publisher, bool state);
+    event HashSubmitted(bytes32 indexed serviceAgreementId, address indexed dataScientist, address indexed publisher, bool state);
+    event ProofOfUploadValid(bytes32 indexed serviceAgreementId, address indexed dataScientist, address indexed publisher);
     event ProofOfUploadInvalid(bytes32 serviceAgreementId, address dataScientist, address publisher);
 
     modifier onlyDataConsumer(bytes32 serviceAgreementId) {
