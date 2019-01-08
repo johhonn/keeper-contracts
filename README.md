@@ -138,15 +138,15 @@ The contract addresses deployed on Ocean Nile testnet:
 
 | Contract           | Version | Address                                      |
 |--------------------|---------|----------------------------------------------|
-| AccessConditions   | v0.5.2  | `0x31a64a1DCdD9e1b8db84ef94431a61C6B462Ad0c` |
-| ComputeConditions  | v0.5.2  | `0xb28BC9489c55be810858F206602cf91c83DF816f` |
-| DIDRegistry        | v0.5.2  | `0xBDFeAc66c022165Bdb320264398977bf8A54e3C0` |
-| FitchainConditions | v0.5.2  | `0x549A383bE23615B61d0E40cf90cD558D889b5632` |
-| OceanAuth          | v0.5.2  | `0x0C84ECe5A68059220ff114de2b11457Fa7d7Fc45` |
-| OceanMarket        | v0.5.2  | `0x0959092E0D313F0BD3a6441151B2E2685d7350b5` |
-| OceanToken         | v0.5.2  | `0x8cCD9073B23689ca2BB76a049Eb33dfF5e16228D` |
-| PaymentConditions  | v0.5.2  | `0x78D2CA96F19e0e5b97Ca19Da179CEBF0fC5101BC` |
-| ServiceAgreement   | v0.5.2  | `0xCa925335D4EC611f35388eEeA9b9F7B0a6947d32` |
+| AccessConditions   | v0.5.3  | `0x771136ebC55A1747B52722D1bb95323D98550293` |
+| ComputeConditions  | v0.5.3  | `0xc1E945362f7fE01Acc9ACA60A417138f80DaF627` |
+| DIDRegistry        | v0.5.3  | `0x8c4a2cC4572B6CD68c58BFc220f04CD1143230a0` |
+| FitchainConditions | v0.5.3  | `0x5396Bf17658321B5d9Fc449470f9441F5D935914` |
+| OceanAuth          | v0.5.3  | `0xb8D436b29CBF1ef690DD3b0972Cce2090ECb09bc` |
+| OceanMarket        | v0.5.3  | `0xfC6DB8141144831a8B7d858f356D0d1148d8F11d` |
+| OceanToken         | v0.5.3  | `0xe6CeA58707df303b6d9D1DF5BA8Bf88fF4A5920D` |
+| PaymentConditions  | v0.5.3  | `0x38ba43fFa8C7715F0f2A5d52E78a392d2bD71176` |
+| ServiceAgreement   | v0.5.3  | `0xdAAb92eABB4F2D7fC51948E44A88aa4fd986EDa9` |
 
 #### Kovan Testnet
 
@@ -166,15 +166,15 @@ The contract addresses deployed on Kovan testnet:
 
 | Contract           | Version | Address                                      |
 |--------------------|---------|----------------------------------------------|
-| AccessConditions   | v0.5.2  | `0x53CF7c49188C3d5c6e22d2d25619bA5e51367344` |
-| ComputeConditions  | v0.5.2  | `0x7DAa90122f4d6Fe4A30B1Be6759Aec6982202102` |
-| DIDRegistry        | v0.5.2  | `0x1Acbe77Ef52bfE4952D2bB31a2BB008FD8b44AE9` |
-| FitchainConditions | v0.5.2  | `0xc8c2B83986157754D37e9DB4eeDfb0E80b9c4644` |
-| OceanAuth          | v0.5.2  | `0x3Cfb6C5812A31F741Ecb535A25DB949F0Eb614fa` |
-| OceanMarket        | v0.5.2  | `0x5C710A2AAd4f7Bd21b997F1BC2cC47b4AFb21242` |
-| OceanToken         | v0.5.2  | `0x9aF3CBE3e26878836D6a5f7923870e7ed48a5347` |
-| PaymentConditions  | v0.5.2  | `0x7e299E4c4ae90775363dAb771Ba93a736A7cD01D` |
-| ServiceAgreement   | v0.5.2  | `0x5ec66884C7419fd227F642209590A604244596Aa` |
+| AccessConditions   | v0.5.3  | `0xD82184412E6bbe2F737A35867ec6242A477ca440` |
+| ComputeConditions  | v0.5.3  | `0xFC11E68470bd76cBA31A63861ac6c615B0A04e0F` |
+| DIDRegistry        | v0.5.3  | `0x3cBCAaB6b5223136d21E1Aad37Db25bB01D1A603` |
+| FitchainConditions | v0.5.3  | `0xC840aEf9090018F804C6e598610accD786E5EfCB` |
+| OceanAuth          | v0.5.3  | `0x2a7008cEb2527042162C96F491110154C231af6A` |
+| OceanMarket        | v0.5.3  | `0x551f2854E4C7cBD954B5DBdddE902F8A04A16435` |
+| OceanToken         | v0.5.3  | `0x798D0F9104C1C758b721b447F58927ca4FcFE666` |
+| PaymentConditions  | v0.5.3  | `0x8fE425e8EAe09aA65511186eab2F6a4D07f123A1` |
+| ServiceAgreement   | v0.5.3  | `0x2243B639CBD840c88600506f257f56429235c8D8` |
 
 ## Libraries
 
