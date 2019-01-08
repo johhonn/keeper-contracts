@@ -22,7 +22,7 @@
     "clean": "rm -rf ./build/ && rm -rf ./artifacts/*.development.json",
     "lint": "npm run lint:eslint && npm run lint:ethlint",
     "lint:eslint": "eslint --ignore-pattern '/coverage/' .",
-    "lint:solium": "solium -d ./contracts/",
+    "lint:ethlint": "solium -d ./contracts/",
     "lint:solium:watch": "npm run lint:solium -- --watch",
     "lint:fix": "npm run lint:eslint -- --fix && npm run lint:solium -- --fix",
     "security:mythril": "truffle compile && myth -x --truffle --max-depth 8 --outform markdown > mythril-report.md",
