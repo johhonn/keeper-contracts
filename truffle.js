@@ -39,7 +39,7 @@ module.exports = {
         },
         // nile the ocean testnet
         nile: {
-            provider: () => new HDWalletProvider(process.env.NMEMORIC, url || `http://52.1.94.55:8545`),
+            provider: () => new HDWalletProvider(process.env.NMEMORIC, url || `https://nile.dev-ocean.com`),
             network_id: 0x2323,
             gas: 6000000,
             gasPrice: 10000,
@@ -61,6 +61,13 @@ module.exports = {
         optimizer: {
             enabled: true,
             runs: 200
+        }
+    },
+    mocha: {
+        reporter: 'eth-gas-reporter',
+        reporterOptions: {
+            currency: 'EUR',
+            gasPrice: 21
         }
     }
 }

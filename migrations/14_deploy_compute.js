@@ -1,10 +1,13 @@
 /* global artifacts */
-const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
+const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const ComputeConditions = artifacts.require('ComputeConditions.sol')
 const { saveDefinition } = require('./helper')
 
 const computeConditions = async (deployer, network) => {
-    await deployer.deploy(ComputeConditions, ServiceAgreement.address)
+    await deployer.deploy(
+        ComputeConditions,
+        ServiceExecutionAgreement.address
+    )
 
     saveDefinition(network, ComputeConditions)
 }

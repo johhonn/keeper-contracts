@@ -3,7 +3,7 @@
 /* global artifacts, assert, contract, describe, it */
 
 const DIDRegistry = artifacts.require('DIDRegistry.sol')
-const utils = require('../utils.js')
+const utils = require('../helpers/utils.js')
 
 const web3 = utils.getWeb3()
 
@@ -138,7 +138,7 @@ contract('DIDRegistry', (accounts) => {
             // a different owner can register his own DID
             await registry.registerAttribute(anotherDID, valueType, provider, providerDID, anotherPerson)
 
-            var failed = false
+            let failed = false
             try {
                 // must not be able to add attributes to someone else's DID
                 await registry.registerAttribute(did, valueType, provider, providerDID, anotherPerson)

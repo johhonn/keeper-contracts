@@ -48,7 +48,6 @@ before_install:
           export release_version
           echo "Release version: $release_version"
         fi
-
 before_script:
     - greenkeeper-lockfile-update
     - ganache-cli > ganache-cli.log &
