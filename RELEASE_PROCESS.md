@@ -43,4 +43,4 @@
   ```
 
 - Go to Travis and check the Travis job. It should deploy a new release to PyPI.
-- Check PyPI for the new release at [https://pypi.org/project/keeper-contracts/](https://pypi.org/project/keeper-contracts/)
+- Check PyPI for the new release at [Relase page](https://pypi.org/project/keeper-contracts/)
