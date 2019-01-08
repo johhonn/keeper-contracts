@@ -14,8 +14,6 @@ contract OceanToken is ERC20Capped, ERC20Detailed {
 
     using SafeMath for uint256;
 
-<<<<<<< HEAD
-=======
     // ============
     // DATA STRUCTURES:
     // ============
@@ -39,7 +37,6 @@ contract OceanToken is ERC20Capped, ERC20Detailed {
     uint256 public totalSupply;       // total supply of Ocean tokens including 
                                      // initial tokens plus block rewards
 
->>>>>>> ethlint_max-char_fix
     /**
     * @dev OceanToken Constructor
     * Runs only on initial contract creation.
