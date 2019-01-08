@@ -24,7 +24,7 @@ matrix:
 before_install:
     - npm install -g npm
     - npm install -g ganache-cli@~6.1.8 release-it greenkeeper-lockfile codacy-coverage
-    - pip3 install mythril
+    - pip install mythril
     - docker pull chainsecurity/securify
     - |
         if [ "${DEPLOY_PACKAGE}" = "true" ] && [ ! -z "${TRAVIS_TAG}" ]; then
@@ -62,6 +62,7 @@ script:
     - git diff-index --quiet HEAD || git commit -m "Travis update"
     - python2 -c 'import os,sys,fcntl; flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL); fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags&~os.O_NONBLOCK);'
     - travis_wait 25 docker run -v $(pwd):/project chainsecurity/securify 2>&1 | tee securifyReport.txt || true
+    - npm run lint:mythril
     #-|
     #    if [ "${TRAVIS_BRANCH}" = "develop" ]; then
     #      docker run -v $(pwd):/project chainsecurity/securify 2>&1 | tee securifyReport.txt || true
