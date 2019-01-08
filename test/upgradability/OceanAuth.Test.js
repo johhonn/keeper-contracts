@@ -31,12 +31,12 @@ contract('OceanAuth', (accounts) => {
         return result.logs.find(i => i.event === 'AccessConsentRequested').args._id
     }
 
-    before('restore zos before all tests', async function () {
+    before('restore zos before all tests', async function() {
         zos = new ZeppelinHelper('OceanAuth')
         await zos.restoreState(accounts[9])
     })
 
-    beforeEach('Deploy with zos before each tests', async function () {
+    beforeEach('Deploy with zos before each tests', async function() {
         zos = new ZeppelinHelper('OceanAuth')
         await zos.initialize(accounts[0], true)
         pAddress = zos.getProxyAddress('OceanAuth')

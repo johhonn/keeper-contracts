@@ -9,6 +9,7 @@ const FitchainConditionsChangeInStorageAndLogic = artifacts.require('FitchainCon
 const FitchainConditionsChangeFunctionSignature = artifacts.require('FitchainConditionsChangeFunctionSignature')
 
 global.artifacts = artifacts
+
 let zos
 
 async function assertRevert(promise) {
@@ -25,12 +26,12 @@ contract('FitchainConditions', (accounts) => {
     let pAddress
     const verifier1 = accounts[2]
 
-    before('restore zos before all tests', async function () {
+    before('restore zos before all tests', async function() {
         zos = new ZeppelinHelper('FitchainConditions')
         await zos.restoreState(accounts[9])
     })
 
-    beforeEach('Deploy with zos before each tests', async function () {
+    beforeEach('Deploy with zos before each tests', async function() {
         zos = new ZeppelinHelper('FitchainConditions')
         await zos.initialize(accounts[0], true)
         pAddress = zos.getProxyAddress('FitchainConditions')

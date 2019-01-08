@@ -59,12 +59,12 @@ contract('PaymentConditions', (accounts) => {
         await token.approve(pAddress, price, { from: consumer })
     }
 
-    before('restore zos before all tests', async function () {
+    before('restore zos before all tests', async function() {
         zos = new ZeppelinHelper('PaymentConditions')
         await zos.restoreState(accounts[9])
     })
 
-    beforeEach('Deploy with zos before each tests', async function () {
+    beforeEach('Deploy with zos before each tests', async function() {
         zos = new ZeppelinHelper('PaymentConditions')
         await zos.initialize(accounts[0], true)
         pAddress = zos.getProxyAddress('PaymentConditions')
@@ -99,6 +99,10 @@ contract('PaymentConditions', (accounts) => {
 
         it('Should be possible to append storage variables and change logic', async () => {
             await initAgreement()
+            let p = await PaymentConditionsChangeInStorageAndLogic.at(pAddress)
+            await zos.upgradeToNewContract('PaymentConditionsChangeInStorageAndLogic')
+
+            // Approve and test new logic
             await zos.approveLatestTransaction()
             const result = await p.lockPayment(serviceAgreementId, assetId, price, { from: consumer })
             // assert

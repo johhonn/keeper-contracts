@@ -47,12 +47,12 @@ contract('ComputeConditions', (accounts) => {
     serviceAgreementId = testUtils.generateId(web3)
     const algorithm = 'THIS IS FAKE CODE foo=Hello World!'
 
-    before('restore zos before all tests', async function () {
+    before('restore zos before all tests', async function() {
         zos = new ZeppelinHelper('ComputeConditions')
         await zos.restoreState(accounts[9])
     })
 
-    beforeEach('Deploy with zos before each tests', async function () {
+    beforeEach('Deploy with zos before each tests', async function() {
         zos = new ZeppelinHelper('ComputeConditions')
         zos.addDependency('OceanMarket')
         zos.addDependency('PaymentConditions')

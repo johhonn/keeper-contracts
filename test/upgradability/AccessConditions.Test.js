@@ -63,77 +63,77 @@ contract('AccessConditions', (accounts) => {
         await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
     }
 
-    before('restore zos before all tests', async function () {
+    before('restore zos before all tests', async function() {
         zos = new ZeppelinHelper('AccessConditions')
         await zos.restoreState(accounts[9])
     })
 
-    beforeEach('Deploy with zos before each tests', async function () {
+    beforeEach('Deploy with zos before each tests', async function() {
         zos = new ZeppelinHelper('AccessConditions')
         await zos.initialize(accounts[0], true)
         pAddress = zos.getProxyAddress('AccessConditions')
     })
 
     describe('Test upgradability for AccessConditions', () => {
-        // it('Should be able to call new method added after upgrade is approved', async () => {
-        //     await zos.upgradeToNewContract('AccessConditionsExtraFunctionality')
-        //     let p = await AccessConditionsExtraFunctionality.at(pAddress)
-        //     // should not be able to be called before upgrade is approved
-        //     await assertRevert(p.getNumber())
+        it('Should be able to call new method added after upgrade is approved', async () => {
+            await zos.upgradeToNewContract('AccessConditionsExtraFunctionality')
+            let p = await AccessConditionsExtraFunctionality.at(pAddress)
+            // should not be able to be called before upgrade is approved
+            await assertRevert(p.getNumber())
 
-        //     // Approve and call again
-        //     await zos.approveLatestTransaction()
-        //     let n
-        //     await p.getNumber().then(i => { n = i })
-        //     assert.equal(n.toString(), '42', 'Error calling getNumber')
-        // })
+            // Approve and call again
+            await zos.approveLatestTransaction()
+            let n
+            await p.getNumber().then(i => { n = i })
+            assert.equal(n.toString(), '42', 'Error calling getNumber')
+        })
 
-        // it('Should be possible to append storage variables ', async () => {
-        //     await zos.upgradeToNewContract('AccessConditionsChangeInStorage')
-        //     let p = await AccessConditionsChangeInStorage.at(pAddress)
-        //     // should not be able to be called before upgrade is approved
-        //     await assertRevert(p.called(zos.owner))
+        it('Should be possible to append storage variables ', async () => {
+            await zos.upgradeToNewContract('AccessConditionsChangeInStorage')
+            let p = await AccessConditionsChangeInStorage.at(pAddress)
+            // should not be able to be called before upgrade is approved
+            await assertRevert(p.called(zos.owner))
 
-        // Approve and call again
-        await zos.approveLatestTransaction()
-        let n
-        await p.called(zos.owner).then(i => { n = i })
-        assert.equal(n.toNumber(), 0, 'Error calling added storage variable')
+            // Approve and call again
+            await zos.approveLatestTransaction()
+            let n
+            await p.called(zos.owner).then(i => { n = i })
+            assert.equal(n.toNumber(), 0, 'Error calling added storage variable')
+        })
+
+        it('Should be possible to append storage variables and change logic', async () => {
+            await initAgreement()
+            let p = await AccessConditionsChangeInStorageAndLogic.at(pAddress)
+            await zos.upgradeToNewContract('AccessConditionsChangeInStorageAndLogic')
+
+            // Approve and test new logic
+            await zos.approveLatestTransaction()
+
+            // act
+            await p.grantAccess(serviceAgreementId, assetId, assetId, { from: accounts[0] })
+            let n
+            await p.called(zos.owner).then(i => { n = i })
+            assert.equal(n.toNumber(), 1, 'Error calling added storage variable')
+        })
+
+        it('Should be possible to fix/add a bug', async () => {
+            await initAgreement()
+            let p = await AccessConditionsWithBug.at(pAddress)
+            await zos.upgradeToNewContract('AccessConditionsWithBug')
+            await assertRevert(p.grantAccess(serviceAgreementId, emptyBytes32, emptyBytes32, { from: consumer })
+            )
+            await zos.approveLatestTransaction()
+            await p.grantAccess(serviceAgreementId, emptyBytes32, emptyBytes32, { from: consumer })
+        })
+
+        it('Should be possible to change function signature', async () => {
+            await initAgreement()
+            let p = await AccessConditionsChangeFunctionSignature.at(pAddress)
+            await zos.upgradeToNewContract('AccessConditionsChangeFunctionSignature')
+            await assertRevert(p.grantAccess(serviceAgreementId, assetId, assetId, accounts[0]))
+
+            await zos.approveLatestTransaction()
+            await p.grantAccess(serviceAgreementId, assetId, assetId, accounts[0], { from: accounts[0] })
+        })
     })
-
-    it('Should be possible to append storage variables and change logic', async () => {
-        await initAgreement()
-        let p = await AccessConditionsChangeInStorageAndLogic.at(pAddress)
-        await zos.upgradeToNewContract('AccessConditionsChangeInStorageAndLogic')
-
-        // Approve and test new logic
-        await zos.approveLatestTransaction()
-
-        // act
-        await p.grantAccess(serviceAgreementId, assetId, assetId, { from: accounts[0] })
-        let n
-        await p.called(zos.owner).then(i => { n = i })
-        assert.equal(n.toNumber(), 1, 'Error calling added storage variable')
-    })
-
-    it('Should be possible to fix/add a bug', async () => {
-        initAgreement()
-        let p = await AccessConditionsWithBug.at(pAddress)
-        await zos.upgradeToNewContract('AccessConditionsWithBug')
-        assertRevert(p.grantAccess(serviceAgreementId, emptyBytes32, emptyBytes32, { from: consumer })
-        )
-        await zos.approveLatestTransaction()
-        await p.grantAccess(serviceAgreementId, emptyBytes32, emptyBytes32, { from: consumer })
-    })
-
-    it('Should be possible to change function signature', async () => {
-        await initAgreement()
-        let p = await AccessConditionsChangeFunctionSignature.at(pAddress)
-        await zos.upgradeToNewContract('AccessConditionsChangeFunctionSignature')
-        await assertRevert(p.grantAccess(serviceAgreementId, assetId, assetId, accounts[0]))
-
-        await zos.approveLatestTransaction()
-        await p.grantAccess(serviceAgreementId, assetId, assetId, accounts[0], { from: accounts[0] })
-    })
-})
 })
