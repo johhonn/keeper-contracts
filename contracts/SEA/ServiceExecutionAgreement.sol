@@ -11,7 +11,6 @@ import './Common.sol';
 contract ServiceExecutionAgreement is Common {
 
     struct Template {
-<<<<<<< HEAD
         bool isExisting;
         bool isRevoked;
         address owner;
@@ -19,19 +18,6 @@ contract ServiceExecutionAgreement is Common {
         uint256[] dependenciesBits; // 1st bit --> dependency, 2nd bit --> timeout flag (enabled/disabled)
         uint8[] fulfillmentIndices;
         uint8 fulfillmentOperator;
-=======
-        bool isExisting; // check if key in map actually contains a value
-        bool isRevoked; // is template revoked?
-        address owner; // template owner
-        bytes32[] conditionKeys; // preserving the order in the condition state
-
-        // 1st bit --> dependency, 2nd bit --> timeout flag (enabled/disabled)
-        uint256[] dependenciesBits;
-
-        // if conditions true accept as this agreement as fulfilled agreement
-        uint8[] fulfillmentIndices;
-        uint8 fulfillmentOperator; // 0 --> AND, 1--> OR, N--> M-of-N
->>>>>>> ethlint_max-char_fix
     }
 
     mapping(bytes32 => Template) private templates;
@@ -41,19 +27,11 @@ contract ServiceExecutionAgreement is Common {
         bool isExisting;
         bool isFulfilled;
         uint8[] conditionsState; // maps the condition status in the template
-
-        // maps the condition status in the template
-        uint8[] conditionLockedState;
+        uint8[] conditionLockedState; // maps the condition status in the template
         bytes32 templateId; // refers to SEA template id
         address consumer;
         address publisher;
-<<<<<<< HEAD
         bytes32[] conditionInstances; // condition Instance = hash(handler || value hash)
-=======
-
-        // condition Instance = [handler + value hash]
-        bytes32[] conditionInstances;
->>>>>>> ethlint_max-char_fix
         uint256[] timeoutValues; // in terms of block number not sec!
         bytes32 did; // Decentralized Identifier
     }
@@ -176,9 +154,7 @@ contract ServiceExecutionAgreement is Common {
         bytes32 condition
     )
     {
-        Template storage template = templates
-            [agreements[agreementId].templateId];
-
+        Template storage template = templates[agreements[agreementId].templateId];
         uint256 conditionIndex = conditionKeyToIndex[condition];
         require(
             template.conditionKeys[conditionIndex] == condition,
@@ -283,11 +259,7 @@ contract ServiceExecutionAgreement is Common {
             fulfillmentOperator);
 
         for (uint256 i = 0; i < contracts.length; i++) {
-            bytes32 conditionKey = generateConditionKey(
-                templateId,
-                contracts[i],
-                fingerprints[i]
-            );
+            bytes32 conditionKey = generateConditionKey(templateId, contracts[i], fingerprints[i]);
             templates[templateId].conditionKeys.push(conditionKey);
             conditionKeyToIndex[conditionKey] = i;
             emit ConditionSetup(
@@ -316,37 +288,26 @@ contract ServiceExecutionAgreement is Common {
         return true;
     }
 
-<<<<<<< HEAD
    /**
     * @notice getTemplateOwner returns service execution agreement template owner
     * @param templateId is the service execution agreement template ID
     * @return template owner address
     */
     function getTemplateOwner(bytes32 templateId) public view returns (address)
-=======
-    function getTemplateOwner(bytes32 templateId) public
-     view returns (address owner)
->>>>>>> ethlint_max-char_fix
     {
         return templates[templateId].owner;
     }
 
-<<<<<<< HEAD
    /**
     * @notice getTemplateId returns template Id using agreement ID
     * @param agreementId is the service execution agreement ID
     * @return service execution template ID
     */
     function getTemplateId(bytes32 agreementId) public view returns (bytes32)
-=======
-    function getTemplateId(bytes32 agreementId) public
-     view returns (bytes32 templateId)
->>>>>>> ethlint_max-char_fix
     {
         return agreements[agreementId].templateId;
     }
 
-<<<<<<< HEAD
     /// @notice getTemplateStatus is deprecated, use isTemplateRevoked instead (TODO)
     function getTemplateStatus(bytes32 templateId) public view returns (bool status){
         return !templates[templateId].isRevoked && templates[templateId].isExisting;
@@ -358,32 +319,16 @@ contract ServiceExecutionAgreement is Common {
     * @return true if the template exists
     */
     function isTemplateExisting(bytes32 templateId) public view returns (bool)
-=======
-    /// @notice deprecated use isTemplateRevoked instead (TODO)
-    function getTemplateStatus(bytes32 templateId) public
-     view returns (bool status)
-    {
-        return !isTemplateRevoked(templateId);
-    }
-
-    function isTemplateExisting(bytes32 templateId) public
-     view returns (bool status)
->>>>>>> ethlint_max-char_fix
     {
         return templates[templateId].isExisting;
     }
 
-<<<<<<< HEAD
    /**
     * @notice isTemplateExisting checks revocation status of the template
     * @param templateId is the service execution agreement template ID
     * @return true if the template is revoked
     */
     function isTemplateRevoked(bytes32 templateId) public view returns (bool)
-=======
-    function isTemplateRevoked(bytes32 templateId) public
-     view returns (bool status)
->>>>>>> ethlint_max-char_fix
     {
         return templates[templateId].isRevoked;
     }
@@ -574,7 +519,6 @@ contract ServiceExecutionAgreement is Common {
         return agreements[agreementId].isExisting;
     }
 
-<<<<<<< HEAD
     /**
     * @notice fulfillCondition called by condition fulfillment handler - authorized contract and function
     * (conditionContract.functionSlector)
@@ -586,58 +530,6 @@ contract ServiceExecutionAgreement is Common {
     * @param valueHash is hash of input values for the condition which is part of the fulfilment
     * @return true if all the children conditions are fulfilled and the caller is authorized to access this function
     */
-=======
-    function initializeConditions(
-        bytes32 templateId,
-        bytes32 agreementId,
-        bytes32[] valueHash,
-        uint256[] timeoutValues,
-        bytes32 did
-    )
-        private
-        returns (
-            bool conditionInitiated
-        )
-    {
-        Agreement storage agreement = agreements[agreementId];
-        Template storage template = templates[templateId];
-
-        for (uint256 i = 0; i < template.conditionKeys.length; i++) {
-            if (timeoutValues[i] != 0) {
-                // TODO: define dynamic margin
-                require(
-                    timeoutValues[i] > 2,
-                    'invalid timeout with a margin (~ 30 to 40 seconds = 2 blocks intervals) to avoid race conditions'
-                );
-                /* solium-disable-next-line security/no-block-members */
-                agreement.timeoutValues.push(block.timestamp + timeoutValues[i]);
-            } else {
-                agreement.timeoutValues.push(0);
-            }
-            agreement.conditionsState.push(0);
-            agreement.conditionLockedState.push(0);
-
-            // add condition instance
-            bytes32 conditionKey = hashCondition(
-                template.conditionKeys[i],
-                valueHash[i]
-            );
-            agreement.conditionInstances.push(conditionKey);
-
-            emit ConditionInitialized(
-                agreementId,
-                conditionKey,
-                did,
-                false,
-                template.owner,
-                agreement.consumer
-            );
-        }
-
-        return true;
-    }
-
->>>>>>> ethlint_max-char_fix
     function fulfillCondition(
         bytes32 agreementId,
         bytes4 fingerprint,
@@ -761,7 +653,6 @@ contract ServiceExecutionAgreement is Common {
             fingerprint);
     }
 
-<<<<<<< HEAD
    /**
     * @notice hasUnfulfilledDependencies a utility function that is in charge to check if the condition has unfulfilled
     * dependency (conditions)
@@ -770,36 +661,6 @@ contract ServiceExecutionAgreement is Common {
     * @param conditionKey is hash (template ID, ContractAddress , functionSelector/Fingerprint)
     * @return false if all the dependency conditions are fulfilled or there is no dependency conditions
     */
-=======
-    function lockChildConditions(
-        bytes32 agreementId,
-        bytes32 condition,
-        uint256 dependenciesValue
-    )
-        private
-    {
-        // check the dependency conditions
-        Agreement storage agreement = agreements[agreementId];
-        for (uint16 i = 0;
-           i < templates[agreement.templateId].conditionKeys.length; i++) {
-            if (getBitValue(dependenciesValue, i, 0, 2) != 0) {
-                // This is a dependency, lock it
-                // verify its state is either 1 or has timed out
-                uint8 timeoutFlag = getBitValue(dependenciesValue, i, 1, 2);
-                require(
-                    agreement.conditionsState[i] == 1 ||
-                    (
-                        timeoutFlag == 1 &&
-                        conditionTimedOut(agreementId, condition)
-                    ),
-                    'Invalid state, child dependency expected to be fulfilled or parent timeout occurred.'
-                );
-                agreement.conditionLockedState[i] = 1;
-            }
-        }
-    }
-
->>>>>>> ethlint_max-char_fix
     function hasUnfulfilledDependencies(
         bytes32 agreementId,
         bytes32 conditionKey
@@ -990,12 +851,7 @@ contract ServiceExecutionAgreement is Common {
         private pure
         returns (uint8)
     {
-<<<<<<< HEAD
         return uint8(value & (2 ** uint256((conditionIndex * numBits) + bitPosition))) == 0 ? uint8(0) : uint8(1);
-=======
-        uint8 tmp = uint8(value & (2 ** uint256((i * numBits) + bitPosition)));
-        return tmp == 0 ? uint8(0) : uint8(1);
->>>>>>> ethlint_max-char_fix
     }
 
 }

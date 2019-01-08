@@ -14,29 +14,6 @@ contract OceanToken is ERC20Capped, ERC20Detailed {
 
     using SafeMath for uint256;
 
-    // ============
-    // DATA STRUCTURES:
-    // ============
-
-    // Set the token name for display
-    string public constant name = 'OceanToken';
-
-    // Set the token symbol for display
-    string public constant symbol = 'OCN';
-
-    // SUPPLY
-
-    // Set the number of decimals for display
-    uint8 public constant decimals = 18;
-
-     // OceanToken total supply
-    uint256 public constant TOTAL_SUPPLY = 1400000000 * 10 ** 18;
-
-    // EMIT TOKENS
-    address public receiver = address(0); // address to receive TOKENS
-    uint256 public totalSupply;       // total supply of Ocean tokens including 
-                                     // initial tokens plus block rewards
-
     /**
     * @dev OceanToken Constructor
     * Runs only on initial contract creation.
