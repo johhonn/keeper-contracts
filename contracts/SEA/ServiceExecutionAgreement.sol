@@ -257,7 +257,11 @@ contract ServiceExecutionAgreement {
             fulfillmentOperator);
 
         for (uint256 i = 0; i < contracts.length; i++) {
-          bytes32 conditionKey = generateConditionKey(templateId, contracts[i], fingerprints[i]);
+            bytes32 conditionKey = generateConditionKey(
+                templateId,
+                contracts[i],
+                fingerprints[i]
+            );
             templates[templateId].conditionKeys.push(conditionKey);
             conditionKeyToIndex[conditionKey] = i;
             emit ConditionSetup(
@@ -498,7 +502,10 @@ contract ServiceExecutionAgreement {
             agreement.conditionLockedState.push(0);
 
             // add condition instance
-            bytes32 conditionKey = hashCondition(template.conditionKeys[i], valueHash[i]);
+            bytes32 conditionKey = hashCondition(
+                template.conditionKeys[i],
+                valueHash[i]
+            );
             agreement.conditionInstances.push(conditionKey);
 
             emit ConditionInitialized(
@@ -733,7 +740,8 @@ contract ServiceExecutionAgreement {
             uint8 bitValue
         )
     {
-        return uint8(value & (2 ** uint256((i * numBits) + bitPosition))) == 0 ? uint8(0) : uint8(1);
+        uint8 tmp = uint8(value & (2 ** uint256((i * numBits) + bitPosition)));
+        return tmp == 0 ? uint8(0) : uint8(1);
     }
 
 }
