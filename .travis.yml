@@ -17,20 +17,15 @@ cache:
 
 env:
     - DEPLOY_PACKAGE=true
-    - SOLIDITY_COVERAGE=true
-    - SOLC_NIGHTLY=true
 
 matrix:
     fast_finish: true
-    allow_failures:
-        - env: SOLIDITY_COVERAGE=true
-        - env: SOLC_NIGHTLY=true
 
 before_install:
     - npm install -g npm
     - npm install -g ganache-cli@~6.1.8 release-it greenkeeper-lockfile codacy-coverage
     - |
-        if [ "${DEPLOY_PACKAGE}" = "true" ]; then
+        if [ "${DEPLOY_PACKAGE}" = "true" ] && [ ! -z "${TRAVIS_TAG}" ]; then
           sudo apt-get -y install python3-pip gnupg-agent
           gpg-agent --daemon --no-grab --write-env-file $HOME/.gpg-agent-info
           pip3 install --user twine six==1.10.0 wheel==0.31.0
@@ -40,10 +35,7 @@ before_install:
           export WEB3J_VERSION=4.0.1
           curl -L -o web3j-${WEB3J_VERSION}.tar https://github.com/web3j/web3j/releases/download/v${WEB3J_VERSION}/web3j-${WEB3J_VERSION}.tar
           tar xf web3j-${WEB3J_VERSION}.tar
-          ls -la
-          echo "$PATH"
           export PATH="${PWD}/web3j-${WEB3J_VERSION}/bin:${PATH}"
-          echo "$PATH"
           web3j version
           bash -x scripts/maven.sh
           echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
@@ -51,7 +43,7 @@ before_install:
           version_line=$(cat .bumpversion.cfg | grep current_version)
           release_version=${version_line##* }
           export release_version
-          echo $release_version
+          echo "Release version: $release_version"
         fi
 before_script:
     - greenkeeper-lockfile-update
@@ -102,10 +94,6 @@ deploy:
     - provider: releases
       skip_cleanup: true
       api_key: $GITHUB_TOKEN
-      # file:
-      # - oceanprotocol-keeper-contracts-$release_version.tgz.jar
-      # - dist/keeper_contracts-$release_version-py2.py3-none-any.jar
-      # - target/keeper-contracts-$release_version.jar
       name: "$release_version"
       on:
           tags: true
