@@ -25,25 +25,25 @@ contract ComputeConditions is Common {
 
     //events
     event HashSignatureSubmitted(
-        bytes32 agreementId,
-        address consumer,
-        address publisher,
+        bytes32 agreementId, 
+        address consumer, 
+        address publisher, 
         bool state
     );
     event HashSubmitted(
-        bytes32 agreementId,
-        address consumer,
-        address publisher,
+        bytes32 agreementId, 
+        address consumer, 
+        address publisher, 
         bool state
     );
     event ProofOfUploadValid(
-        bytes32 agreementId,
-        address consumer,
+        bytes32 agreementId, 
+        address consumer, 
         address publisher
     );
     event ProofOfUploadInvalid(
-        bytes32 agreementId,
-        address consumer,
+        bytes32 agreementId, 
+        address consumer, 
         address publisher
     );
 
@@ -204,8 +204,7 @@ contract ComputeConditions is Common {
             address(this),
             this.fulfillUpload.selector
         );
-        if (agreementStorage.hasUnfulfilledDependencies(agreementId,
-            condition)) {
+        if (agreementStorage.hasUnfulfilledDependencies(agreementId, condition)) {
             emit ProofOfUploadInvalid(
                 agreementId,
                 agreementStorage.getAgreementConsumer(agreementId),
