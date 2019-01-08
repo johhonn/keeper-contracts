@@ -44,20 +44,20 @@ contract PaymentConditions {
 
     event PaymentLocked(
         bytes32 indexed agreementId,
-        address sender,
-        address receiver,
+        address indexed sender,
+        address indexed receiver,
         uint256 amount
     );
     event PaymentReleased(
         bytes32 indexed agreementId,
-        address sender,
-        address receiver,
+        address indexed sender,
+        address indexed receiver,
         uint256 amount
     );
     event PaymentRefund(
         bytes32 indexed agreementId,
-        address sender,
-        address receiver,
+        address indexed sender,
+        address indexed receiver,
         uint256 amount
     );
 

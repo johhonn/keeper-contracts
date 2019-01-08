@@ -164,49 +164,49 @@ contract ServiceExecutionAgreement is Common {
 
     // events
     event TemplateSetup(
-        bytes32 templateId,
-        address provider
+        bytes32 indexed templateId,
+        address indexed provider
     );
 
     event TemplateRevoked(
-        bytes32 templateId,
+        bytes32 indexed templateId,
         bool isRevoked
     );
 
     event ConditionSetup(
-        bytes32 templateId,
-        bytes32 conditionKey,
-        address provider
+        bytes32 indexed templateId,
+        bytes32 indexed conditionKey,
+        address indexed provider
     );
 
     event ConditionInitialized(
-        bytes32 agreementId,
-        bytes32 condition,
-        bytes32 did,
+        bytes32 indexed agreementId,
+        bytes32 indexed condition,
+        bytes32 indexed did,
         bool status,
         address templateOwner,
         address consumer
     );
 
     event ConditionFulfilled(
-        bytes32 agreementId,
-        bytes32 templateId,
-        bytes32 condition
+        bytes32 indexed agreementId,
+        bytes32 indexed templateId,
+        bytes32 indexed condition
     );
 
     event AgreementInitialized(
-        bytes32 agreementId,
-        bytes32 templateId,
-        bytes32 did,
+        bytes32 indexed agreementId,
+        bytes32 indexed templateId,
+        bytes32 indexed did,
         bool status,
         address templateOwner,
         address consumer
     );
 
     event AgreementFulfilled(
-        bytes32 agreementId,
-        bytes32 templateId,
-        address owner
+        bytes32 indexed agreementId,
+        bytes32 indexed templateId,
+        address indexed owner
     );
 
    /**
