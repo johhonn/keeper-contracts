@@ -24,7 +24,7 @@ matrix:
 before_install:
     - npm install -g npm
     - npm install -g ganache-cli@~6.1.8 release-it greenkeeper-lockfile codacy-coverage surya@0.2.7
-    - pip install graphviz
+    - pip3 install --user graphviz mythril
     #- pip install --upgrade pip
     #- pip install mythril
     - docker pull chainsecurity/securify
