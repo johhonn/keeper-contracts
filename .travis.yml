@@ -60,7 +60,7 @@ script:
     - git add package-lock.json
     - git diff-index --quiet HEAD || git commit -m "Travis update"
     - python2 -c 'import os,sys,fcntl; flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL); fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags&~os.O_NONBLOCK);'
-    - travis_wait 20 docker run -v $(pwd):/project chainsecurity/securify 2>&1 | tee securifyReport.txt || true
+    - travis_wait 25 docker run -v $(pwd):/project chainsecurity/securify 2>&1 | tee securifyReport.txt || true
     #-|
     #    if [ "${TRAVIS_BRANCH}" = "develop" ]; then
     #      docker run -v $(pwd):/project chainsecurity/securify 2>&1 | tee securifyReport.txt || true
