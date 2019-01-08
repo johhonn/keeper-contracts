@@ -1,0 +1,46 @@
+# The keeper-contracts Release Process (Python)
+
+- Create a new local feature branch, e.g. `git checkout -b feature/bumpversion-to-v0.2.5`
+- Use the `bumpversion.sh` script to bump the project version. You can execute the script using {major|minor|patch} as first argument to bump the version accordingly:
+  - To bump the patch version: `./bumpversion.sh patch`
+  - To bump the minor version: `./bumpversion.sh minor`
+  - To bump the major version: `./bumpversion.sh major`
+- Commit the changes to the feature branch.
+- Push the feature branch to GitHub.
+- Make a pull request from the just-pushed branch.
+- Wait for all the tests to pass!
+- Merge the pull request into the `develop` branch.
+- To make a GitHub release (which creates a Git tag):
+  - Go to the keeper-contracts repo's Releases page [https://github.com/oceanprotocol/keeper-contracts/releases](https://github.com/oceanprotocol/keeper-contracts/releases)
+  - Click "Draft a new release".
+  - For tag version, put something like `v0.2.5`
+  - For release title, put the same value (like `v0.2.5`).
+  - For the target, select the `develop` branch, or the just-merged commit.
+  - Describe the main changes. (In the future, these will come from the changelog.)
+  - Click "Publish release".
+- Travis will detect the release (a new tag) and run the deployment section of [.travis.yml](.travis.yml), i.e.
+
+  ```yaml
+    - provider: script
+      script: bash -x ./scripts/deploy_pypi.sh
+      skip_cleanup: true
+      on:
+          tags: true
+          all_branches: true
+          condition: $DEPLOY_PACKAGE = true
+  ```
+  
+  - Travis call the following script that is responsible of package the artifacts and create a new release in PyPI.
+  
+  ```bash
+    #!/bin/bash
+    
+    shopt -s nullglob
+    abifiles=( ./artifacts/*.development.json )
+    [ "${#abifiles[@]}" -lt "1" ] && echo "ABI Files for development environment not found" && exit 1
+    python3 setup.py sdist bdist_wheel
+    twine upload dist/*
+  ```
+
+- Go to Travis and check the Travis job. It should deploy a new release to PyPI.
+- Check PyPI for the new release at [https://pypi.org/project/keeper-contracts/](https://pypi.org/project/keeper-contracts/)
