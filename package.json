@@ -23,7 +23,7 @@
     "lint": "npm run lint:eslint && npm run lint:ethlint",
     "lint:eslint": "eslint --ignore-pattern '/coverage/' .",
     "lint:ethlint": "solium -d ./contracts/",
-    "lint:solium:watch": "npm run lint:solium -- --watch",
+    "lint:ethlint:watch": "npm run lint:solium -- --watch",
     "lint:fix": "npm run lint:eslint -- --fix && npm run lint:solium -- --fix",
     "security:mythril": "truffle compile && myth -x --truffle --max-depth 8 --outform markdown > mythril-report.md",
     "security:securify": "docker run -v $(pwd):/project chainsecurity/securify 2>&1 | tee securifyReport.txt || true",
