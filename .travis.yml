@@ -24,8 +24,8 @@ matrix:
 before_install:
     - npm install -g npm
     - npm install -g ganache-cli@~6.1.8 release-it greenkeeper-lockfile codacy-coverage
-    - pip install --upgrade pip
-    - pip install mythril
+    #- pip install --upgrade pip
+    #- pip install mythril
     - docker pull chainsecurity/securify
     - |
         if [ "${DEPLOY_PACKAGE}" = "true" ] && [ ! -z "${TRAVIS_TAG}" ]; then
@@ -62,8 +62,10 @@ script:
     - git add package-lock.json
     - git diff-index --quiet HEAD || git commit -m "Travis update"
     - python2 -c 'import os,sys,fcntl; flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL); fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags&~os.O_NONBLOCK);'
-    - travis_wait 25 docker run -v $(pwd):/project chainsecurity/securify 2>&1 | tee securifyReport.txt || true
-    - npm run lint:mythril
+    - npm run security:surya
+    # The lines below should run only in case of merge to develop branch
+    - travis_wait 30 npm run security:securify
+    #- travis_wait 30 npm run security:mythril
     #-|
     #    if [ "${TRAVIS_BRANCH}" = "develop" ]; then
     #      docker run -v $(pwd):/project chainsecurity/securify 2>&1 | tee securifyReport.txt || true
@@ -86,8 +88,10 @@ after_success:
 
         git clone git@github.com:oceanprotocol/keeper-contracts-security-reports.git
         cp -rp securifyReport.txt keeper-contracts-security-reports/${FILENAME}_securifyReport.txt
+        cp -rp KeeperContracts.png keeper-contracts-security-reports/${FILENAME}_KeeperContracts.png
         cd keeper-contracts-security-reports
         git add ${FILENAME}_securifyReport.txt
+        git add ${FILENAME}_KeeperContracts.png
         git commit ${FILENAME}_securifyReport.txt -m "UPSERT ${FILENAME}_securifyReport.txt"
         git push
         cd ..
