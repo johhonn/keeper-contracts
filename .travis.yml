@@ -29,7 +29,8 @@ before_install:
     # - sudo apt-get -y install python3.6 python3.6-dev gnupg-agent python3-apt
     - sudo apt-get -y install gnupg-agent python3-apt
     - pyenv global system 3.6.7
-    - pip3 install --user graphviz mythril==0.19.10
+    # - pip3 install --user graphviz mythril==0.19.10
+    - pip3 install -r requirements_dev.txt
     - docker pull chainsecurity/securify
     - |
         if [ "${DEPLOY_PACKAGE}" = "true" ] && [ ! -z "${TRAVIS_TAG}" ]; then
@@ -67,8 +68,8 @@ script:
     - sudo apt-get install -y dot2tex
     - npm run security:surya
     # The lines below should run only in case of merge to develop branch
-    - travis_wait 40 npm run security:securify
     - travis_wait 30 npm run security:mythril
+    - travis_wait 30 npm run security:securify
     #-|
     #    if [ "${TRAVIS_BRANCH}" = "develop" ]; then
     #      docker run -v $(pwd):/project chainsecurity/securify 2>&1 | tee securifyReport.txt || true
