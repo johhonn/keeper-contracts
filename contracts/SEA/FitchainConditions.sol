@@ -190,7 +190,9 @@ contract FitchainConditions{
         _;
     }
 
-    constructor(address agreementAddress, uint256 _stake, uint256 _maxSlots) public {
+    constructor(address agreementAddress,
+      uint256 _stake,
+      uint256 _maxSlots) public {
         require(
             agreementAddress != address(0),
             'invalid service agreement contract address'
@@ -495,8 +497,8 @@ contract FitchainConditions{
     {
         uint256 slots = verifiers[msg.sender].slots;
         if (models[modelId].GPCVerifiers[msg.sender].exists &&
-            models[modelId].isTrained || 
-            models[modelId].VPCVerifiers[msg.sender].exists && 
+            models[modelId].isTrained ||
+            models[modelId].VPCVerifiers[msg.sender].exists &&
             models[modelId].isVerified) {
             addVerifierToRegistry(msg.sender);
             slots.add(1);
