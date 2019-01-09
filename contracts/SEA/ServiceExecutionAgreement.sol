@@ -849,6 +849,7 @@ contract ServiceExecutionAgreement is Common {
         return (consumer == recoverAddress(hash, signature));
     }
 
+    // todo: this (getBitValue) needs refactoring, i am unable to understand that
     /**
     * @notice this is utility function which performs bitwise operations over dependency bits for more info please
     * check out this blog post: https://blog.oceanprotocol.com/ocean-integration-fitchain-secure-on-premises-compute-59f43a944266
