@@ -51,15 +51,15 @@ contract FitchainConditions{
     ServiceAgreement private serviceAgreementStorage;
 
     // events
-    event VerifierRegistered(address verifier, uint256 slots);
-    event VerifierDeregistered(address verifier);
-    event VerifierElected(address verifier, bytes32 serviceAgreementId);
+    event VerifierRegistered(address indexed verifier, uint256 slots);
+    event VerifierDeregistered(address indexed verifier);
+    event VerifierElected(address indexed verifier, bytes32 indexed serviceAgreementId);
     event PoTInitialized(bool state);
     event VPCInitialized(bool state);
-    event VerificationConditionState(bytes32 serviceAgreementId, bool state);
-    event TrainingConditionState(bytes32 serviceAgreementId, bool state);
-    event FreedSlots(address verifier, uint256 slots);
-    event VotesSubmitted(bytes32 serviceAgreementId, address Publisher, uint256 voteType);
+    event VerificationConditionState(bytes32 indexed serviceAgreementId, bool state);
+    event TrainingConditionState(bytes32 indexed serviceAgreementId, bool state);
+    event FreedSlots(address indexed verifier, uint256 slots);
+    event VotesSubmitted(bytes32 indexed serviceAgreementId, address indexed Publisher, uint256 indexed voteType);
 
     modifier onlyProvider(bytes32 modelId){
         require(models[modelId].exists, 'model does not exist!');
