@@ -28,7 +28,7 @@ before_install:
     - npm install -g ganache-cli@~6.1.8 release-it greenkeeper-lockfile codacy-coverage surya@0.2.7
     # - sudo apt-get -y install python3.6 python3.6-dev gnupg-agent python3-apt
     - sudo apt-get -y install gnupg-agent python3-apt
-    - curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+    - pyenv global system 3.6.7
     - pip3 install --user graphviz mythril==0.19.10
     - docker pull chainsecurity/securify
     - |
