@@ -869,8 +869,9 @@ contract ServiceExecutionAgreement is Common {
         private pure
         returns (uint8)
     {
-          return uint8(value & (2 ** uint256((conditionIndex * numBits) +
-              bitPosition))) == 0 ? uint8(0) : uint8(1);
+        uint256 index = conditionIndex * numBits;
+        uint8 tmp = uint8(value & (2 ** uint256((index) + bitPosition)));
+        return tmp == 0 ? uint8(0) : uint8(1);
     }
 
 }
