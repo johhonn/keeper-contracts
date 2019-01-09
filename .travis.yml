@@ -24,7 +24,7 @@ matrix:
 before_install:
     - npm install -g npm
     - npm install -g ganache-cli@~6.1.8 release-it greenkeeper-lockfile codacy-coverage surya@0.2.7
-    - sudo apt-get -y install python3.5 python3.5-dev gnupg-agent
+    - sudo apt-get -y install python3.5 python3.5-dev gnupg-agent python3-apt
     - curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
     - sudo python3.5 get-pip.py
     - pip3.5 install --user graphviz mythril==0.19.10
