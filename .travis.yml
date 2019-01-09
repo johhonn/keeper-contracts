@@ -68,6 +68,8 @@ script:
     - sudo apt-get install -y dot2tex
     - npm run security:surya
     # The lines below should run only in case of merge to develop branch
+    # Workaroun missing mythril signatures.db (https://github.com/ConsenSys/mythril-classic/pull/826)
+    - mkdir $HOME/.mythril && curl -L -o $HOME/.mythril/signatures.db https://github.com/ConsenSys/mythril-classic/raw/develop/signatures.db
     - travis_wait 30 npm run security:mythril
     - travis_wait 30 npm run security:securify
     #-|
