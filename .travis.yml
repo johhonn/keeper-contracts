@@ -17,14 +17,9 @@ cache:
 
 env:
 - DEPLOY_PACKAGE=true
-- SOLIDITY_COVERAGE=true
-- SOLC_NIGHTLY=true
 
 matrix:
     fast_finish: true
-    allow_failures:
-    - env: SOLIDITY_COVERAGE=true
-    - env: SOLC_NIGHTLY=true
 
 before_install:
 - npm install -g npm
@@ -70,23 +65,23 @@ notifications:
     email: false
 
 deploy:
-- provider: npm
-  email: "devops@oceanprotocol.com"
-  api_key: ${NPM_TOKEN}
-  skip_cleanup: true
-  on:
-      tags: true
-      all_branches: true
-      condition: $DEPLOY_PACKAGE = true
-
-- provider: script
-  script: bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
-  skip_cleanup: true
-  on:
-      tags: true
-      all_branches: true
-      condition: $DEPLOY_PACKAGE = true
-
+#- provider: npm
+#  email: "devops@oceanprotocol.com"
+#  api_key: ${NPM_TOKEN}
+#  skip_cleanup: true
+#  on:
+#      tags: true
+#      all_branches: true
+#      condition: $DEPLOY_PACKAGE = true
+#
+#- provider: script
+#  script: bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
+#  skip_cleanup: true
+#  on:
+#      tags: true
+#      all_branches: true
+#      condition: $DEPLOY_PACKAGE = true
+#
 - provider: script
   script: bash -x ./scripts/deploy_pypi.sh
   skip_cleanup: true
