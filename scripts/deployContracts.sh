@@ -1,16 +1,34 @@
 #! /usr/bin/env bash
+
 # -----------------------------------------------------------------------
-# Project setup and first implementation of an upgradeable DIDRegistry
+# Script configuration
 # -----------------------------------------------------------------------
+# Owner is the owner passed to ownables contracts
+OWNER='0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1'
+# Admin is the account used to deploy and manage upgrades.
+# After deployment the multisig wallet is set to Admin
+ADMIN='0x1df62f291b2e969fb0849d99d9ce41e2f137006e'
 # Config variables for initializers
 stake='10'
 maxSlots='1'
+
+# -----------------------------------------------------------------------
+# Script setup
+# -----------------------------------------------------------------------
+# Set zos session (network, admin, timeout)
+npx zos session --network development --from $ADMIN --expires 36000
+# Setup multisig wallet
+npx truffle exec scripts/setupWallet.js
+# Get wallet address
+MULTISIG=$(jq -r '.wallet' wallet.json)
 # Clean up
 rm -f zos.*
 
+# -----------------------------------------------------------------------
+# Project setup using zOS
+# -----------------------------------------------------------------------
 # List of contracts
 declare -a contracts=("DIDRegistry" "OceanToken" "OceanMarket" "OceanAuth" "ServiceAgreement" "AccessConditions" "PaymentConditions" "FitchainConditions" "ComputeConditions")
-
 # Initialize project zOS project
 # NOTE: Creates a zos.json file that keeps track of the project's details
 npx zos init oceanprotocol 0.1.poc -v

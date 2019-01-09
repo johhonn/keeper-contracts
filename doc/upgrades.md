@@ -106,7 +106,7 @@ To test the contract upgradability the following commands should be run
 
 ```console
 $npx truffle compile
-$./scripts/setupWallet.sh
+$npx truffle exec scripts/setupWallet.js
 $npx truffle test test/upgradability/DIDRegistry.Test.js
 ```
 
