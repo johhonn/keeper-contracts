@@ -27,9 +27,7 @@ before_install:
     - sudo apt-get -y install python3.5 python3.5-dev gnupg-agent
     - curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
     - sudo python3.5 get-pip.py
-    - pip3.5 install --user graphviz mythril
-    #- pip install --upgrade pip
-    #- pip install mythril
+    - pip3.5 install --user graphviz mythril==0.19.10
     - docker pull chainsecurity/securify
     - |
         if [ "${DEPLOY_PACKAGE}" = "true" ] && [ ! -z "${TRAVIS_TAG}" ]; then
@@ -68,7 +66,7 @@ script:
     - npm run security:surya
     # The lines below should run only in case of merge to develop branch
     - travis_wait 40 npm run security:securify
-    #- travis_wait 30 npm run security:mythril
+    - travis_wait 30 npm run security:mythril
     #-|
     #    if [ "${TRAVIS_BRANCH}" = "develop" ]; then
     #      docker run -v $(pwd):/project chainsecurity/securify 2>&1 | tee securifyReport.txt || true
@@ -80,7 +78,7 @@ after_script:
 
 after_success:
   - |
-        FILENAME=${TRAVIS_BRANCH//\//_}
+        BRANCHNAME=${TRAVIS_BRANCH//\//_}
         declare -r SSH_FILE="$(mktemp -u $HOME/.ssh/XXXXX)"
         openssl aes-256-cbc -K $encrypted_387ed244ad7b_key -iv $encrypted_387ed244ad7b_iv -in .travis/travis_keeper-contracts-security-reports.enc -out $SSH_FILE -d
         chmod 600 "$SSH_FILE" \
@@ -90,12 +88,11 @@ after_success:
               "  LogLevel ERROR" >> ~/.ssh/config
 
         git clone git@github.com:oceanprotocol/keeper-contracts-security-reports.git
-        cp -rp securifyReport.txt keeper-contracts-security-reports/${FILENAME}_securifyReport.txt
-        cp -rp KeeperContracts.png keeper-contracts-security-reports/${FILENAME}_KeeperContracts.png
+        cp -rp securifyReport.txt keeper-contracts-security-reports/${BRANCHNAME}_securifyReport.txt
+        cp -rp KeeperContracts.png keeper-contracts-security-reports/${BRANCHNAME}_KeeperContracts.png
         cd keeper-contracts-security-reports
-        git add ${FILENAME}_securifyReport.txt
-        git add ${FILENAME}_KeeperContracts.png
-        git commit ${FILENAME}_securifyReport.txt -m "UPSERT ${FILENAME}_securifyReport.txt"
+        git add .
+        git commit -m "UPSERT ${BRANCHNAME}"
         git push
         cd ..
 
