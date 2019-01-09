@@ -64,6 +64,7 @@ script:
     - git add package-lock.json
     - git diff-index --quiet HEAD || git commit -m "Travis update"
     - python2 -c 'import os,sys,fcntl; flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL); fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags&~os.O_NONBLOCK);'
+    - sudo apt-get install -y dot2tex
     - npm run security:surya
     # The lines below should run only in case of merge to develop branch
     - travis_wait 40 npm run security:securify
