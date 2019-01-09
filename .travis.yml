@@ -24,17 +24,17 @@ matrix:
 before_install:
     - npm install -g npm
     - npm install -g ganache-cli@~6.1.8 release-it greenkeeper-lockfile codacy-coverage surya@0.2.7
-    - sudo apt-get -y install python3 gnupg-agent
+    - sudo apt-get -y install python3.5 gnupg-agent
     - curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-    - sudo python3 get-pip.py
-    - pip3 install --user graphviz mythril
+    - sudo python3.5 get-pip.py
+    - pip3.5 install --user graphviz mythril
     #- pip install --upgrade pip
     #- pip install mythril
     - docker pull chainsecurity/securify
     - |
         if [ "${DEPLOY_PACKAGE}" = "true" ] && [ ! -z "${TRAVIS_TAG}" ]; then
           gpg-agent --daemon --no-grab --write-env-file $HOME/.gpg-agent-info
-          pip3 install --user twine six==1.10.0 wheel==0.31.0
+          pip3.5 install --user twine six==1.10.0 wheel==0.31.0
           sudo apt-get install oracle-java8-set-default maven
           java -version
           mvn -version
@@ -66,7 +66,7 @@ script:
     - python2 -c 'import os,sys,fcntl; flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL); fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags&~os.O_NONBLOCK);'
     - npm run security:surya
     # The lines below should run only in case of merge to develop branch
-    - travis_wait 30 npm run security:securify
+    - travis_wait 40 npm run security:securify
     #- travis_wait 30 npm run security:mythril
     #-|
     #    if [ "${TRAVIS_BRANCH}" = "develop" ]; then
