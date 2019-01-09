@@ -15,7 +15,7 @@ contract AccessConditions is ISecretStore {
 
     ServiceExecutionAgreement private agreementStorage;
     event AccessGranted(
-        bytes32 agreementId, 
+        bytes32 indexed agreementId,
         bytes32 asset
     );
 

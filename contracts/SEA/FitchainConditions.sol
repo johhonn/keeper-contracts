@@ -56,15 +56,15 @@ contract FitchainConditions{
 
     // events
     event VerifierRegistered(
-        address verifier,
+        address indexed verifier,
         uint256 slots
     );
     event VerifierDeregistered(
-        address verifier
+        address indexed verifier
     );
     event VerifierElected(
-        address verifier,
-        bytes32 agreementId
+        address indexed verifier,
+        bytes32 indexed agreementId
     );
     event PoTInitialized(
         bool state
@@ -73,21 +73,21 @@ contract FitchainConditions{
         bool state
     );
     event VerificationConditionState(
-        bytes32 agreementId,
+        bytes32 indexed agreementId,
         bool state
     );
     event TrainingConditionState(
-        bytes32 agreementId,
+        bytes32 indexed agreementId,
         bool state
     );
     event SlotsFreed(
-        address verifier,
+        address indexed verifier,
         uint256 slots
     );
     event VotesSubmitted(
-        bytes32 agreementId,
-        address Publisher,
-        uint256 voteType
+        bytes32 indexed agreementId,
+        address indexed Publisher,
+        uint256 indexed voteType
     );
 
     modifier onlyProvider(bytes32 modelId) {
@@ -501,8 +501,8 @@ contract FitchainConditions{
     {
         uint256 slots = verifiers[msg.sender].slots;
         if (models[modelId].GPCVerifiers[msg.sender].exists &&
-            models[modelId].isTrained || 
-            models[modelId].VPCVerifiers[msg.sender].exists && 
+            models[modelId].isTrained ||
+            models[modelId].VPCVerifiers[msg.sender].exists &&
             models[modelId].isVerified) {
             addVerifierToRegistry(msg.sender);
             slots.add(1);

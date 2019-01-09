@@ -15,7 +15,9 @@ contract ServiceExecutionAgreement is Common {
         bool isRevoked;
         address owner;
         bytes32[] conditionKeys;
-        uint256[] dependenciesBits; // 1st bit --> dependency, 2nd bit --> timeout flag (enabled/disabled)
+
+        // 1st bit --> dependency, 2nd bit --> timeout flag (enabled/disabled)
+        uint256[] dependenciesBits;
         uint8[] fulfillmentIndices;
         uint8 fulfillmentOperator;
     }
@@ -26,12 +28,17 @@ contract ServiceExecutionAgreement is Common {
     struct Agreement {
         bool isExisting;
         bool isFulfilled;
-        uint8[] conditionsState; // maps the condition status in the template
-        uint8[] conditionLockedState; // maps the condition status in the template
+
+        // maps the condition status in the template
+        uint8[] conditionsState;
+        // maps the condition status in the template
+        uint8[] conditionLockedState;
         bytes32 templateId; // refers to SEA template id
         address consumer;
         address publisher;
-        bytes32[] conditionInstances; // condition Instance = hash(handler || value hash)
+
+        // condition Instance = hash(handler || value hash)
+        bytes32[] conditionInstances;
         uint256[] timeoutValues; // in terms of block number not sec!
         bytes32 did; // Decentralized Identifier
     }
@@ -154,7 +161,8 @@ contract ServiceExecutionAgreement is Common {
         bytes32 condition
     )
     {
-        Template storage template = templates[agreements[agreementId].templateId];
+        Template storage template = templates
+        [agreements[agreementId].templateId];
         uint256 conditionIndex = conditionKeyToIndex[condition];
         require(
             template.conditionKeys[conditionIndex] == condition,
@@ -164,49 +172,49 @@ contract ServiceExecutionAgreement is Common {
 
     // events
     event TemplateSetup(
-        bytes32 templateId,
-        address provider
+        bytes32 indexed templateId,
+        address indexed provider
     );
 
     event TemplateRevoked(
-        bytes32 templateId,
+        bytes32 indexed templateId,
         bool isRevoked
     );
 
     event ConditionSetup(
-        bytes32 templateId,
-        bytes32 conditionKey,
-        address provider
+        bytes32 indexed templateId,
+        bytes32 indexed conditionKey,
+        address indexed provider
     );
 
     event ConditionInitialized(
-        bytes32 agreementId,
-        bytes32 condition,
-        bytes32 did,
+        bytes32 indexed agreementId,
+        bytes32 indexed condition,
+        bytes32 indexed did,
         bool status,
         address templateOwner,
         address consumer
     );
 
     event ConditionFulfilled(
-        bytes32 agreementId,
-        bytes32 templateId,
-        bytes32 condition
+        bytes32 indexed agreementId,
+        bytes32 indexed templateId,
+        bytes32 indexed condition
     );
 
     event AgreementInitialized(
-        bytes32 agreementId,
-        bytes32 templateId,
-        bytes32 did,
+        bytes32 indexed agreementId,
+        bytes32 indexed templateId,
+        bytes32 indexed did,
         bool status,
         address templateOwner,
         address consumer
     );
 
     event AgreementFulfilled(
-        bytes32 agreementId,
-        bytes32 templateId,
-        address owner
+        bytes32 indexed agreementId,
+        bytes32 indexed templateId,
+        address indexed owner
     );
 
    /**
@@ -259,7 +267,10 @@ contract ServiceExecutionAgreement is Common {
             fulfillmentOperator);
 
         for (uint256 i = 0; i < contracts.length; i++) {
-            bytes32 conditionKey = generateConditionKey(templateId, contracts[i], fingerprints[i]);
+            bytes32 conditionKey = generateConditionKey(
+                templateId,
+                contracts[i],
+                fingerprints[i]);
             templates[templateId].conditionKeys.push(conditionKey);
             conditionKeyToIndex[conditionKey] = i;
             emit ConditionSetup(
@@ -309,8 +320,10 @@ contract ServiceExecutionAgreement is Common {
     }
 
     /// @notice getTemplateStatus is deprecated, use isTemplateRevoked instead (TODO)
-    function getTemplateStatus(bytes32 templateId) public view returns (bool status){
-        return !templates[templateId].isRevoked && templates[templateId].isExisting;
+    function getTemplateStatus(bytes32 templateId) public
+      view returns (bool status){
+        return !templates[templateId].isRevoked &&
+        templates[templateId].isExisting;
     }
 
    /**
@@ -737,7 +750,9 @@ contract ServiceExecutionAgreement is Common {
     {
         Agreement storage agreement = agreements[agreementId];
 
-        for (uint256 i = 0; i < templates[templateId].conditionKeys.length; i++) {
+        for (uint256 i = 0;
+          i < templates[templateId].conditionKeys.length;
+          i++) {
             if (timeoutValues[i] != 0) {
                 // TODO: define dynamic margin
                 require(
@@ -753,7 +768,9 @@ contract ServiceExecutionAgreement is Common {
             agreement.conditionLockedState.push(0);
 
             // add condition instance
-            bytes32 conditionKey = hashCondition(templates[templateId].conditionKeys[i], valueHash[i]);
+            bytes32 conditionKey = hashCondition(
+                templates[templateId].conditionKeys[i],
+                valueHash[i]);
             agreement.conditionInstances.push(conditionKey);
 
             emit ConditionInitialized(
@@ -784,7 +801,8 @@ contract ServiceExecutionAgreement is Common {
     {
         // check the dependency conditions
         Agreement storage agreement = agreements[agreementId];
-        for (uint16 i = 0; i < templates[agreement.templateId].conditionKeys.length; i++) {
+        for (uint16 i = 0;
+            i < templates[agreement.templateId].conditionKeys.length; i++) {
             if (getBitValue(dependenciesValue, i, 0, 2) != 0) {
                 // This is a dependency, lock it
                 // verify its state is either 1 or has timed out
@@ -831,6 +849,7 @@ contract ServiceExecutionAgreement is Common {
         return (consumer == recoverAddress(hash, signature));
     }
 
+    // todo: this (getBitValue) needs refactoring, i am unable to understand that
     /**
     * @notice this is utility function which performs bitwise operations over dependency bits for more info please
     * check out this blog post: https://blog.oceanprotocol.com/ocean-integration-fitchain-secure-on-premises-compute-59f43a944266
@@ -851,7 +870,9 @@ contract ServiceExecutionAgreement is Common {
         private pure
         returns (uint8)
     {
-        return uint8(value & (2 ** uint256((conditionIndex * numBits) + bitPosition))) == 0 ? uint8(0) : uint8(1);
+        uint256 index = conditionIndex * numBits;
+        uint8 tmp = uint8(value & (2 ** uint256((index) + bitPosition)));
+        return tmp == 0 ? uint8(0) : uint8(1);
     }
 
 }
