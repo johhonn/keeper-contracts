@@ -204,7 +204,8 @@ contract ComputeConditions is Common {
             address(this),
             this.fulfillUpload.selector
         );
-        if (agreementStorage.hasUnfulfilledDependencies(agreementId, condition)) {
+        if (agreementStorage.hasUnfulfilledDependencies(
+          agreementId, condition)) {
             emit ProofOfUploadInvalid(
                 agreementId,
                 agreementStorage.getAgreementConsumer(agreementId),

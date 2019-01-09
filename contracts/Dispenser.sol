@@ -16,9 +16,14 @@ contract Dispenser is Ownable {
     using SafeMath for uint;
 
     // limit period for request of tokens
-    mapping(address => uint256) private tokenRequests; // mapping from address to last time of request
-    uint256 private maxAmount;                         // max amount of tokens user can get for each request
-    uint256 private minPeriod;                         // min amount of time to wait before request token again
+    // mapping from address to last time of request
+    mapping(address => uint256) private tokenRequests;
+
+    // max amount of tokens user can get for each request
+    uint256 private maxAmount;
+    
+     // min amount of time to wait before request token again
+    uint256 private minPeriod;
     uint256 private scale;
 
     OceanToken public oceanToken;
