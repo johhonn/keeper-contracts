@@ -102,7 +102,7 @@ contract ComputeConditions is Common {
         if (proofs[agreementId].exists) {
             require(
                 !proofs[agreementId].isLocked,
-                "avoid race conditions"
+                'avoid race conditions'
             );
             proofs[agreementId].isLocked = true;
             proofs[agreementId].algorithmHashSignature = signature;
@@ -148,7 +148,7 @@ contract ComputeConditions is Common {
         if (proofs[agreementId].exists) {
             require(
                 !proofs[agreementId].isLocked,
-                "avoid race conditions"
+                'avoid race conditions'
             );
             proofs[agreementId].isLocked = true;
             proofs[agreementId].algorithmHash = hash;
@@ -199,7 +199,7 @@ contract ComputeConditions is Common {
                 agreementId,
                 condition
             ),
-            "condition has unfulfilled dependencies"
+            'condition has unfulfilled dependencies'
         );
 
         if (

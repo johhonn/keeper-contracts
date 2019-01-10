@@ -225,7 +225,10 @@ contract FitchainConditions{
         external onlyFreeSlots()
         returns(bool)
     {
-        require(removeVerifierFromRegistry(msg.sender), "invalid deregister request");
+        require(
+            removeVerifierFromRegistry(msg.sender),
+            'invalid deregister request'
+        );
         verifiers[msg.sender].isStaking = false;
         //TODO: send back stake to verifier
         verifiers[msg.sender].amount = 0;
@@ -418,7 +421,7 @@ contract FitchainConditions{
                 modelId,
                 condition
             ),
-            "condition has unfulfilled dependencies"
+            'condition has unfulfilled dependencies'
         );
         if (agreementStorage.getConditionStatus(modelId, condition) == 1)
             return true;
@@ -458,7 +461,7 @@ contract FitchainConditions{
                 modelId,
                 condition
             ),
-            "condition has unfulfilled dependencies"
+            'condition has unfulfilled dependencies'
         );
         if (agreementStorage.getConditionStatus(modelId, condition) == 1)
             return true;
@@ -550,7 +553,9 @@ contract FitchainConditions{
         }
         for(uint256 j = 0; j < registry.length; j++) {
             if (verifiers[registry[i]].slots == 0) {
-                assert(removeVerifierFromRegistry(registry[i]));
+                if (!removeVerifierFromRegistry(registry[i])){
+                    return false;
+                }
             }
         }
         return true;

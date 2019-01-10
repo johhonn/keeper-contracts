@@ -101,10 +101,9 @@ contract('ComputeConditions', (accounts) => {
             await computeConditions.submitHashSignature(agreementId, utils.emptyBytes32, { from: consumer })
 
             // act
-            try{
+            try {
                 await computeConditions.fulfillUpload(agreementId, utils.emptyBytes32, { from: accounts[0] })
-            }
-            catch (e) {
+            } catch (e) {
                 assert.strictEqual(e.reason, 'condition has unfulfilled dependencies')
                 return
             }

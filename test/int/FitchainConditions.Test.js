@@ -129,11 +129,10 @@ contract('FitchainConditions', (accounts) => {
             assert.strictEqual(true, PoTstate.logs[0].args.state, 'unable to fulfill the proof of training condition')
         })
         it('should not fulfill verification proof of PoT condition twice', async () => {
-            try{
+            try {
                 await fitchainConditions.setPoT(agreementId, kVerifiers, { from: publisher })
-            }catch (e) {
+            } catch (e) {
                 assert.strictEqual(e.reason, 'avoid replay attack')
-                return
             }
         })
         it('should a byzantine GPC verifier fails to submit vote twice', async () => {
@@ -168,11 +167,10 @@ contract('FitchainConditions', (accounts) => {
             }
         })
         it('should not fulfill verification proof of VPC condition twice', async () => {
-            try{
+            try {
                 await fitchainConditions.setVPC(agreementId, kVerifiers, { from: publisher })
-            }catch (e) {
+            } catch (e) {
                 assert.strictEqual(e.reason, 'avoid replay attack')
-                return
             }
         })
         it('should verifiers should able to deregister if their slots are free', async () => {
@@ -184,11 +182,10 @@ contract('FitchainConditions', (accounts) => {
             assert.strictEqual(verifier3, deregisterVerifier3.logs[0].args.verifier, 'unable to deregister')
         })
         it('should verifiers not able to deregister multiple times', async () => {
-            try{
+            try {
                 await fitchainConditions.deregisterVerifier({ from: verifier1 })
             } catch (e) {
                 assert.strictEqual(e.reason, 'access denied, please free some slots')
-                return
             }
         })
         it('should verifier able to get his free slots count', async () => {
@@ -201,11 +198,10 @@ contract('FitchainConditions', (accounts) => {
             const slot = 1
             await fitchainConditions.registerVerifier(slot, { from: accounts[8] })
             await fitchainConditions.deregisterVerifier({ from: accounts[8] })
-            try{
+            try {
                 await fitchainConditions.deregisterVerifier({ from: accounts[8] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'invalid deregister request')
-                return
             }
         })
     })
