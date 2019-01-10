@@ -26,15 +26,16 @@ matrix:
 before_install:
     - npm install -g npm
     - npm install -g ganache-cli@~6.1.8 release-it greenkeeper-lockfile codacy-coverage surya@0.2.7
+    - pyenv global system 3.6.7
     - |
         if [ "${TRAVIS_BRANCH}" = "develop" ]; then
-            sudo apt-get -y install gnupg-agent python3-apt
-            pyenv global system 3.6.7
+            sudo apt-get -y install python3-apt dot2tex
             pip3 install -r requirements_dev.txt
             docker pull chainsecurity/securify
         fi
     - |
         if [ "${DEPLOY_PACKAGE}" = "true" ] && [ ! -z "${TRAVIS_TAG}" ]; then
+          sudo apt-get -y install gnupg-agent
           gpg-agent --daemon --no-grab --write-env-file $HOME/.gpg-agent-info
           pip3 install --user twine six==1.10.0 wheel==0.31.0
           sudo apt-get install oracle-java8-set-default maven
@@ -68,7 +69,6 @@ script:
     - |
         if [ "${TRAVIS_BRANCH}" = "develop" ]; then
             python2 -c 'import os,sys,fcntl; flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL); fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags&~os.O_NONBLOCK);'
-            sudo apt-get install -y dot2tex
             npm run security:surya
             mkdir -p $HOME/.mythril && curl -L -o $HOME/.mythril/signatures.db https://github.com/ConsenSys/mythril-classic/raw/develop/signatures.db
             npm run security:mythril
