@@ -67,6 +67,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
                 await contract.revokeTemplate(utils.templateId, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Owner can not revoke template!')
+                assert.strictEqual(await contract.isTemplateRevoked(utils.templateId), false, 'Template did not revoked')
                 return
             }
             assert.fail('Expected revert not received')
@@ -87,6 +88,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             utils.assertEmitted(result, 1, 'TemplateRevoked')
             const status = await contract.getTemplateStatus(utils.templateId)
             assert.strictEqual(status, false)
+            assert.strictEqual(await contract.isTemplateRevoked(utils.templateId), true, 'Template did not revoked')
         })
     })
 })
