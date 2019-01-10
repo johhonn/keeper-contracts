@@ -23,9 +23,11 @@
     "lint": "npm run lint:eslint && npm run lint:ethlint",
     "lint:eslint": "eslint --ignore-pattern '/coverage/' .",
     "lint:ethlint": "solium -d ./contracts/",
-    "lint:ethlint:watch": "npm run lint:ethlint -- --watch",
-    "lint:mythril": "truffle compile && myth -x --truffle --max-depth 8 --outform markdown > mythril-report.md",
-    "lint:fix": "npm run lint:eslint -- --fix && npm run lint:ethlint -- --fix"
+    "lint:ethlint:watch": "npm run lint:solium -- --watch",
+    "lint:fix": "npm run lint:eslint -- --fix && npm run lint:solium -- --fix",
+    "security:mythril": "truffle compile && myth -x --truffle --max-depth 8 --outform markdown 2>&1 | tee mythrilReport.md || true",
+    "security:securify": "docker run -v $(pwd):/project chainsecurity/securify 2>&1 | tee securifyReport.txt || true",
+    "security:surya": "surya graph contracts/**/*.sol | dot -Tpng > KeeperContracts.png"
   },
   "directories": {
     "doc": "doc",
@@ -43,6 +45,7 @@
   "author": "Ocean Protocol",
   "license": "Apache-2.0",
   "devDependencies": {
+    "dot": "^1.1.2",
     "eslint": "^5.12.0",
     "eslint-config-oceanprotocol": "^1.3.0",
     "eth-crypto": "^1.3.2",
@@ -52,6 +55,8 @@
     "ethlint": "^1.2.1",
     "openzeppelin-solidity": "^2.0.0",
     "solidity-coverage": "^0.5.11",
+    "solium": "^1.2.1",
+    "solium-plugin-security": "^0.1.1",
     "truffle": "^5.0.0",
     "truffle-hdwallet-provider": "^1.0.1",
     "web3": "1.0.0-beta.37"

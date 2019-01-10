@@ -190,9 +190,13 @@ contract FitchainConditions{
         _;
     }
 
-    constructor(address agreementAddress,
-      uint256 _stake,
-      uint256 _maxSlots) public {
+    constructor(
+        address agreementAddress, 
+        uint256 _stake,
+        uint256 _maxSlots
+    ) 
+    public 
+    {
         require(
             agreementAddress != address(0),
             'invalid service agreement contract address'

@@ -12,3 +12,6 @@ target/
 .python-version
 artifacts/*.development.json
 .eggs/
+mythrilReport.md
+securifyReport.txt
+KeeperContracts.png
