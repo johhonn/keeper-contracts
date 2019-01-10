@@ -170,7 +170,6 @@ contract('ServiceExecutionAgreement', (accounts) => {
                 utils.templateId,
                 { from: accounts[0] })
 
-
             // assert
             assert.strictEqual(await contract.isAgreementExisting(agreementId), true, 'Agreement does not exist')
             utils.assertEmitted(result, 1, 'ConditionInitialized')
