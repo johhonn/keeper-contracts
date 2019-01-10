@@ -90,22 +90,6 @@ contract FitchainConditions{
         uint256 indexed voteType
     );
 
-    modifier onlyProvider(bytes32 modelId) {
-        require(
-            models[modelId].exists,
-            'model does not exist!'
-        );
-        require(
-            msg.sender == models[modelId].provider,
-            'invalid data-compute provider'
-        );
-        require(
-            agreementStorage.getAgreementPublisher(modelId) == msg.sender,
-            'service provider has to be provider'
-        );
-        _;
-    }
-
     modifier onlyPublisher(bytes32 modelId) {
         require(
             agreementStorage.getAgreementPublisher(modelId) == msg.sender,
