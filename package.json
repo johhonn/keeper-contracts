@@ -17,7 +17,7 @@
     "migrate:mainnet": "npm run migrate ----network mainnet",
     "test": "if [ -z ${NETWORK} ]; then export NETWORK='development'; fi && if [ ! -f wallet.json ]; then truffle exec scripts/setupWallet.js --network $NETWORK; fi && truffle test",
     "test:cover": "export NETWORK='coverage' && solidity-coverage",
-    "report-coverage": "cat ./coverage/lcov.info | codacy-coverage --token b95545c0da4b45848cc5eef363c2711e",
+    "report-coverage": "cat ./coverage/lcov.info | codacy-coverage --token b95545c0da4b45848cc5eef363c2711e  --prefix ./",
     "release": "./bumpversion.sh patch",
     "clean": "rm -rf ./build/ ./artifacts/*.development.json ./coverage/ ./coverageEnv/ ./coverage.json",
     "lint": "npm run lint:eslint && npm run lint:ethlint",
