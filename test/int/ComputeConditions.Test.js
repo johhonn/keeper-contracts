@@ -9,6 +9,7 @@ const AccessConditions = artifacts.require('AccessConditions.sol')
 const ComputeConditions = artifacts.require('ComputeConditions.sol')
 const testUtils = require('../utils')
 const web3 = testUtils.getWeb3()
+const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
 
 contract('ComputeConditions', (accounts) => {
     describe('Test On-Premise Compute Service Use Case', () => {
@@ -28,12 +29,19 @@ contract('ComputeConditions', (accounts) => {
         const algorithm = 'THIS IS FAKE CODE foo=Hello World!'
 
         before(async () => {
-            token = await OceanToken.deployed()
-            market = await OceanMarket.deployed(token.address)
-            serviceAgreement = await ServiceAgreement.deployed()
-            paymentConditions = await PaymentConditions.deployed(serviceAgreement.address, token.address)
-            accessConditions = await AccessConditions.deployed(serviceAgreement.address)
-            computeConditions = await ComputeConditions.deployed(serviceAgreement.address)
+            let zos = new ZeppelinHelper('ComputeConditions')
+            await zos.restoreState(accounts[9])
+            zos.addDependency('OceanMarket')
+            zos.addDependency('PaymentConditions')
+            zos.addDependency('AccessConditions')
+            await zos.initialize(accounts[0], false)
+            token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
+            market = await OceanMarket.at(zos.getProxyAddress('OceanMarket'))
+            serviceAgreement = await ServiceAgreement.at(zos.getProxyAddress('ServiceAgreement'))
+            paymentConditions = await PaymentConditions.at(zos.getProxyAddress('PaymentConditions'))
+            accessConditions = await AccessConditions.at(zos.getProxyAddress('AccessConditions'))
+            computeConditions = await ComputeConditions.at(zos.getProxyAddress('ComputeConditions'))
+
             await market.requestTokens(testUtils.toBigNumber(1000), { from: datascientist })
             // conditions
             contracts = [paymentConditions.address, computeConditions.address, accessConditions.address, paymentConditions.address, paymentConditions.address]

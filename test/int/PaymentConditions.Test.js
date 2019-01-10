@@ -1,10 +1,11 @@
-/* global assert, artifacts, contract, before, describe, it */
+/* global contract, assert, artifacts, before, describe, it */
 
 const AccessConditions = artifacts.require('AccessConditions.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
 const utils = require('../utils.js')
+const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
 
 const web3 = utils.getWeb3()
 const did = '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
@@ -36,21 +37,21 @@ contract('PaymentConditions', (accounts) => {
         var walletBalance = 0
 
         before(async () => {
-            token = await OceanToken.new()
+            let zos = new ZeppelinHelper('PaymentConditions')
+            await zos.restoreState(accounts[9])
+            zos.addDependency('AccessConditions')
+            await zos.initialize(accounts[0], false)
+            token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
+            agreement = await ServiceAgreement.at(zos.getProxyAddress('ServiceAgreement'))
+            paymentConditions = await PaymentConditions.at(zos.getProxyAddress('PaymentConditions'))
+            accessConditions = await AccessConditions.at(zos.getProxyAddress('AccessConditions'))
 
             await token.setReceiver(consumer)
             await token.approve(consumer, await token.totalSupply.call())
-
-            agreement = await ServiceAgreement.new()
-
-            paymentConditions = await PaymentConditions.new(
-                agreement.address, token.address
-            )
             await token.approve(paymentConditions.address, walletAllowance)
 
             // Setup an agreement template where lockPayment depends on grantAccess,
             // releasePayment depends on lockPayment.
-            accessConditions = await AccessConditions.new(agreement.address)
             contracts = [
                 accessConditions.address,
                 paymentConditions.address,

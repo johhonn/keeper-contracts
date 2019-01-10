@@ -1,8 +1,9 @@
 pragma solidity 0.4.25;
 
-import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
+import 'zos-lib/contracts/Initializable.sol';
+import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
-contract DIDRegistry is Ownable {
+contract DIDRegistry is Initializable, Ownable {
     enum ValueType {
         DID,                // DID string e.g. 'did:op:xxx'
         DIDRef,             // hash of DID same as in parameter (bytes32 _did) in text 0x0123abc.. or 0123abc..
@@ -26,7 +27,8 @@ contract DIDRegistry is Ownable {
 
     mapping(bytes32 => DIDRegister) private didRegister;
 
-    constructor() Ownable() public {
+    function initialize(address _owner) public initializer() {
+        Ownable.initialize(_owner);
     }
 
     function registerAttribute(bytes32 _did, ValueType _type, bytes32 _key, string _value) public {

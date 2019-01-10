@@ -1,37 +1,43 @@
 pragma solidity 0.4.25;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
-import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
+import 'openzeppelin-eth/contracts/token/ERC20/ERC20.sol';
+import 'zos-lib/contracts/Initializable.sol';
+
 
 /**
 @title Ocean Protocol ERC20 Token Contract
 @author Team: Fang Gong
 */
 
-contract OceanToken is ERC20 {
+contract OceanToken is Initializable, ERC20  {
 
     using SafeMath for uint256;
 
     // ============
     // DATA STRUCTURES:
     // ============
-    string public constant name = 'OceanToken';                      // Set the token name for display
-    string public constant symbol = 'OCN';                           // Set the token symbol for display
+    string public name;             // Set the token name for display
+    string public symbol;           // Set the token symbol for display
 
     // SUPPLY
-    uint8 public constant decimals = 18;                             // Set the number of decimals for display
-    uint256 public constant TOTAL_SUPPLY = 1400000000 * 10 ** 18;    // OceanToken total supply
+    uint8 public decimals;          // Set the number of decimals for display
+    uint256 public TOTAL_SUPPLY;    // OceanToken total supply
 
     // EMIT TOKENS
-    address public _receiver = address(0);                           // address to receive TOKENS
-    uint256 public totalSupply;                                      // total supply of Ocean tokens including initial tokens plus block rewards
+    address public _receiver;       // address to receive TOKENS
+    uint256 public totalSupply;     // total supply of Ocean tokens including initial tokens plus block rewards
 
     /**
-    * @dev OceanToken Constructor
-    * Runs only on initial contract creation.
+    * @dev OceanToken initializer
+    * Runs only once after initial deploy.
     */
-    constructor() public {
+    function initialize() public initializer() {
         totalSupply = TOTAL_SUPPLY;
+        name = 'OceanToken';                     // Set the token name for display
+        symbol = 'OCN';                          // Set the token symbol for display
+        decimals = 18;                           // Set the number of decimals for display
+        TOTAL_SUPPLY = 1400000000 * 10 ** 18;    // OceanToken total supply
+        _receiver = address(0);                  // address to receive TOKENS
     }
 
     /**
@@ -69,5 +75,4 @@ contract OceanToken is ERC20 {
         require(_to != address(0), 'To address is 0x0.');
         return super.transferFrom(_from, _to, _value);
     }
-
 }

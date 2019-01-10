@@ -9,15 +9,15 @@
   "main": "truffle.js",
   "scripts": {
     "compile": "truffle compile",
-    "migrate": "truffle migrate",
+    "migrate": "echo 'migrations are deprecated! use zos instead'",
     "migrate:spree": "npm run migrate -- --network spree",
     "migrate:nile": "npm run migrate -- --network nile",
     "migrate:kovan": "npm run migrate -- --network kovan",
     "migrate:rinkeby": "npm run migrate -- --network rinkeby",
     "migrate:mainnet": "npm run migrate ----network mainnet",
-    "test": "truffle test",
-    "test:cover": "solidity-coverage",
-    "report-coverage": "cat ./coverage/lcov.info | codacy-coverage --token b95545c0da4b45848cc5eef363c2711e --prefix ./",
+    "test": "if [ -z ${NETWORK} ]; then export NETWORK='development'; fi && if [ ! -f wallet.json ]; then truffle exec scripts/setupWallet.js --network $NETWORK; fi && truffle test",
+    "test:cover": "export NETWORK='coverage' && solidity-coverage",
+    "report-coverage": "cat ./coverage/lcov.info | codacy-coverage --token b95545c0da4b45848cc5eef363c2711e  --prefix ./",
     "release": "./bumpversion.sh patch",
     "clean": "rm -rf ./build/ ./artifacts/*.development.json ./coverage/ ./coverageEnv/ ./coverage.json",
     "lint": "npm run lint:eslint && npm run lint:ethlint",
@@ -53,10 +53,13 @@
     "ethjs": "^0.4.0",
     "ethjs-provider-http": "^0.1.6",
     "ethlint": "^1.2.1",
-    "openzeppelin-solidity": "^2.0.0",
+    "glob": "^7.1.3",
+    "openzeppelin-eth": "^2.0.2",
     "solidity-coverage": "^0.5.11",
     "truffle": "^5.0.0",
     "truffle-hdwallet-provider": "^1.0.1",
-    "web3": "1.0.0-beta.37"
+    "web3": "1.0.0-beta.37",
+    "zos": "^2.0.2",
+    "zos-lib": "^2.0.1"
   }
 }

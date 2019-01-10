@@ -4,6 +4,7 @@
 
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
 const utils = require('../utils.js')
+const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
 
 const web3 = utils.getWeb3()
 
@@ -32,8 +33,15 @@ contract('ServiceAgreement', (accounts) => {
         await contract.executeAgreement(templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
     }
 
+    before(async () => {
+        let zos = new ZeppelinHelper('ServiceAgreement')
+        await zos.restoreState(accounts[9])
+    })
+
     beforeEach(async () => {
-        contract = await ServiceAgreement.new({ from: accounts[0] })
+        let zos = new ZeppelinHelper('ServiceAgreement')
+        await zos.initialize(accounts[0], false)
+        contract = await ServiceAgreement.at(zos.getProxyAddress('ServiceAgreement'))
         /* eslint-disable-next-line prefer-destructuring */
         consumer = accounts[1]
         contracts = [accounts[2]]

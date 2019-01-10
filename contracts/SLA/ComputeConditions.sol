@@ -1,6 +1,7 @@
 pragma solidity ^0.4.25;
 
-import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
+import 'zos-lib/contracts/Initializable.sol';
+import 'openzeppelin-eth/contracts/cryptography/ECDSA.sol';
 import './ServiceAgreement.sol';
 
 /// @title On-premise compute conditions
@@ -8,7 +9,7 @@ import './ServiceAgreement.sol';
 /// @notice This contract is WIP, don't use it for production
 /// @dev All function calls are currently implement without side effects
 
-contract ComputeConditions {
+contract ComputeConditions is Initializable{
 
     struct ProofOfUpload {
         bool exists;
@@ -45,7 +46,7 @@ contract ComputeConditions {
         _;
     }
 
-    constructor(address serviceAgreementAddress) public {
+    function initialize(address serviceAgreementAddress) public initializer(){
         require(serviceAgreementAddress != address(0), 'invalid service agreement contract address');
         serviceAgreementStorage = ServiceAgreement(serviceAgreementAddress);
     }

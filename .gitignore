@@ -12,3 +12,7 @@ target/
 .python-version
 artifacts/*.development.json
 .eggs/
+zos.dev-*
+.zos.session
+zos.json
+wallet.json

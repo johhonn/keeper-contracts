@@ -1,6 +1,7 @@
 pragma solidity ^0.4.25;
 
-import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
+import 'zos-lib/contracts/Initializable.sol';
+import 'openzeppelin-eth/contracts/math/SafeMath.sol';
 import './ServiceAgreement.sol';
 
 /// @title Fitchain conditions
@@ -12,7 +13,7 @@ import './ServiceAgreement.sol';
 /// TODO: Implement slashing conditions
 /// TODO: use enum VoteType rather than 1 and 2
 
-contract FitchainConditions{
+contract FitchainConditions is Initializable{
 
     using SafeMath for uint256;
 
@@ -110,7 +111,7 @@ contract FitchainConditions{
         _;
     }
 
-    constructor(address serviceAgreementAddress, uint256 _stake, uint256 _maxSlots) public {
+    function initialize(address serviceAgreementAddress, uint256 _stake, uint256 _maxSlots) public initializer(){
         require(serviceAgreementAddress != address(0), 'invalid service agreement contract address');
         require(_stake > 0, 'invalid staking amount');
         require(_maxSlots > 0, 'invalid slots number');

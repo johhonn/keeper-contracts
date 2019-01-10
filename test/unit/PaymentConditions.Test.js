@@ -6,35 +6,9 @@ const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 const utils = require('../utils.js')
+const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
 
 const web3 = utils.getWeb3()
-
-contract('PaymentConditions constructor', (accounts) => {
-    it('Should not deploy when agreement is empty', async () => {
-        // act-assert
-        try {
-            await PaymentConditions.new(0x0, 0x0, { from: accounts[0] })
-        } catch (e) {
-            assert.strictEqual(e.reason, 'invalid address')
-            return
-        }
-        assert.fail('Expected revert not received')
-    })
-
-    it('Should not deploy when token is empty', async () => {
-        // arrange
-        const dummyAddress = '0x1111aaaaeeeeffffcccc22223333444455556666'
-
-        // act-assert
-        try {
-            await PaymentConditions.new(dummyAddress, 0x0, { from: accounts[0] })
-        } catch (e) {
-            assert.strictEqual(e.reason, 'invalid address')
-            return
-        }
-        assert.fail('Expected revert not received')
-    })
-})
 
 contract('PaymentConditions', (accounts) => {
     const assetId = '0x0000000000000000000000000000000000000000000000000000000000000001'
@@ -64,10 +38,19 @@ contract('PaymentConditions', (accounts) => {
         await agreement.executeAgreement(templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
     }
 
+    before(async () => {
+        let zos = new ZeppelinHelper('PaymentConditions')
+        await zos.restoreState(accounts[9])
+    })
+
     beforeEach(async () => {
-        agreement = await ServiceAgreement.new({ from: accounts[0] })
-        token = await OceanToken.new({ from: accounts[0] })
-        contract = await PaymentConditions.new(agreement.address, token.address, { from: accounts[0] })
+        let zos = new ZeppelinHelper('PaymentConditions')
+        await zos.initialize(accounts[0], false)
+
+        token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
+        agreement = await ServiceAgreement.at(zos.getProxyAddress('ServiceAgreement'))
+        contract = await PaymentConditions.at(zos.getProxyAddress('PaymentConditions'))
+
         price = 1
         /* eslint-disable-next-line prefer-destructuring */
         consumer = accounts[1]

@@ -1,6 +1,7 @@
 pragma solidity 0.4.25;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
+import 'openzeppelin-eth/contracts/token/ERC20/ERC20.sol';
+import 'zos-lib/contracts/Initializable.sol';
 import '../token/OceanToken.sol';
 import './ServiceAgreement.sol';
 
@@ -8,7 +9,7 @@ import './ServiceAgreement.sol';
 /// @author Ocean Protocol Team
 /// @dev All function calls are currently implement without side effects
 
-contract PaymentConditions {
+contract PaymentConditions is Initializable{
 
     struct Payment {
         address sender;
@@ -19,7 +20,7 @@ contract PaymentConditions {
     ServiceAgreement private serviceAgreementStorage;
     ERC20 private token;
 
-    constructor(address _serviceAgreementAddress, address _tokenAddress) public {
+    function initialize(address _serviceAgreementAddress, address _tokenAddress) public initializer(){
         require(_serviceAgreementAddress != address(0), 'invalid contract address');
         require(_tokenAddress != address(0), 'invalid token address');
         serviceAgreementStorage = ServiceAgreement(_serviceAgreementAddress);

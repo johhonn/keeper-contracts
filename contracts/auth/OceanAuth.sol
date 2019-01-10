@@ -1,12 +1,14 @@
 pragma solidity 0.4.25;
 
 import '../OceanMarket.sol';
+import 'zos-lib/contracts/Initializable.sol';
+
 
 /**
 @title Ocean Protocol Authorization Contract
 @author Team: Fang Gong, Ahmed Ali, Sebastian Gerske, Samer Sallam
 */
-contract OceanAuth {
+contract OceanAuth is Initializable{
 
     // ============
     // DATA STRUCTURES:
@@ -86,11 +88,11 @@ contract OceanAuth {
     event AccessRequestDelivered(address indexed _consumer, address indexed _provider, bytes32 indexed _id);
 
     /**
-    * @dev OceanAuth Constructor
+    * @dev OceanAuth initializer
     * @param _marketAddress The deployed contract address of Ocean marketplace
-    * Runs only on initial contract creation.
+    * Runs only on initial contract deployment.
     */
-    constructor(address _marketAddress) public {
+    function initialize(address _marketAddress) public initializer(){
         require(_marketAddress != address(0), 'Market address cannot be 0x0');
         // instance of Market
         market = OceanMarket(_marketAddress);
