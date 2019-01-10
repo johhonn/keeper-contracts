@@ -225,11 +225,10 @@ contract FitchainConditions{
         external onlyFreeSlots()
         returns(bool)
     {
-        if (removeVerifierFromRegistry(msg.sender)) {
-            verifiers[msg.sender].isStaking = false;
-            //TODO: send back stake to verifier
-            verifiers[msg.sender].amount = 0;
-        }
+        require(removeVerifierFromRegistry(msg.sender), "invalid deregister request");
+        verifiers[msg.sender].isStaking = false;
+        //TODO: send back stake to verifier
+        verifiers[msg.sender].amount = 0;
         emit VerifierDeregistered(msg.sender);
         return true;
     }
@@ -551,7 +550,7 @@ contract FitchainConditions{
         }
         for(uint256 j = 0; j < registry.length; j++) {
             if (verifiers[registry[i]].slots == 0) {
-                removeVerifierFromRegistry(registry[i]);
+                assert(removeVerifierFromRegistry(registry[i]));
             }
         }
         return true;
