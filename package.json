@@ -25,7 +25,7 @@
     "lint:ethlint": "solium -d ./contracts/",
     "lint:ethlint:watch": "npm run lint:solium -- --watch",
     "lint:fix": "npm run lint:eslint -- --fix && npm run lint:solium -- --fix",
-    "security:mythril": "truffle compile && myth -x --truffle --max-depth 8 --outform markdown",
+    "security:mythril": "truffle compile && myth -x --truffle --max-depth 8 --outform markdown 2>&1 | tee mythrilReport.md || true",
     "security:securify": "docker run -v $(pwd):/project chainsecurity/securify 2>&1 | tee securifyReport.txt || true",
     "security:surya": "surya graph contracts/**/*.sol | dot -Tpng > KeeperContracts.png"
   },
