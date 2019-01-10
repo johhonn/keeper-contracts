@@ -70,7 +70,7 @@ script:
     # The lines below should run only in case of merge to develop branch
     # Workaroun missing mythril signatures.db (https://github.com/ConsenSys/mythril-classic/pull/826)
     - mkdir $HOME/.mythril && curl -L -o $HOME/.mythril/signatures.db https://github.com/ConsenSys/mythril-classic/raw/develop/signatures.db
-    - travis_wait 60 npm run security:mythril
+    - npm run security:mythril
     - travis_wait 30 npm run security:securify
     #-|
     #    if [ "${TRAVIS_BRANCH}" = "develop" ]; then
@@ -93,6 +93,7 @@ after_success:
               "  LogLevel ERROR" >> ~/.ssh/config
 
         git clone git@github.com:oceanprotocol/keeper-contracts-security-reports.git
+        cp -rp mythrilReport.md keeper-contracts-security-reports/${BRANCHNAME}_mythrilReport.md
         cp -rp securifyReport.txt keeper-contracts-security-reports/${BRANCHNAME}_securifyReport.txt
         cp -rp KeeperContracts.png keeper-contracts-security-reports/${BRANCHNAME}_KeeperContracts.png
         cd keeper-contracts-security-reports
