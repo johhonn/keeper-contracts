@@ -105,15 +105,10 @@ contract ComputeConditions is Common, Initializable {
         returns(bool status)
         {
         if (proofs[agreementId].exists) {
-            if (proofs[agreementId].isLocked) { // avoid race conditions
-                emit HashSignatureSubmitted(
-                    agreementId,
-                    agreementStorage.getAgreementConsumer(agreementId),
-                    agreementStorage.getAgreementPublisher(agreementId),
-                    false
-                );
-                return false;
-            }
+            require(
+                !proofs[agreementId].isLocked,
+                'avoid race conditions'
+            );
             proofs[agreementId].isLocked = true;
             proofs[agreementId].algorithmHashSignature = signature;
             fulfillUpload(agreementId, true);
@@ -156,15 +151,10 @@ contract ComputeConditions is Common, Initializable {
         returns(bool)
     {
         if (proofs[agreementId].exists) {
-            if (proofs[agreementId].isLocked) { // avoid race conditions
-                emit HashSubmitted(
-                    agreementId,
-                    agreementStorage.getAgreementConsumer(agreementId),
-                    agreementStorage.getAgreementPublisher(agreementId),
-                    false
-                );
-                return false;
-            }
+            require(
+                !proofs[agreementId].isLocked,
+                'avoid race conditions'
+            );
             proofs[agreementId].isLocked = true;
             proofs[agreementId].algorithmHash = hash;
             fulfillUpload(agreementId, true);
@@ -209,24 +199,13 @@ contract ComputeConditions is Common, Initializable {
             address(this),
             this.fulfillUpload.selector
         );
-        if (agreementStorage.hasUnfulfilledDependencies(
-          agreementId, condition)) {
-            emit ProofOfUploadInvalid(
+        require(
+            !agreementStorage.hasUnfulfilledDependencies(
                 agreementId,
-                agreementStorage.getAgreementConsumer(agreementId),
-                agreementStorage.getAgreementPublisher(agreementId)
-            );
-            return false;
-        }
-
-        if (agreementStorage.getConditionStatus(agreementId, condition) == 1) {
-            emit ProofOfUploadValid(
-                agreementId,
-                agreementStorage.getAgreementConsumer(agreementId),
-                agreementStorage.getAgreementPublisher(agreementId)
-            );
-            return true;
-        }
+                condition
+            ),
+            'condition has unfulfilled dependencies'
+        );
 
         if (
             proofs[agreementId].dataConsumer == recoverAddress(

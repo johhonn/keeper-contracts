@@ -101,10 +101,13 @@ contract('ComputeConditions', (accounts) => {
             await computeConditions.submitHashSignature(agreementId, utils.emptyBytes32, { from: consumer })
 
             // act
-            const result = await computeConditions.fulfillUpload(agreementId, utils.emptyBytes32, { from: accounts[0] })
-
-            // assert
-            utils.assertEmitted(result, 1, 'ProofOfUploadInvalid')
+            try {
+                await computeConditions.fulfillUpload(agreementId, utils.emptyBytes32, { from: accounts[0] })
+            } catch (e) {
+                assert.strictEqual(e.reason, 'condition has unfulfilled dependencies')
+                return
+            }
+            assert.fail('Expected revert not received')
         })
 
         it('Should fulfill upload when hash is valid', async () => {
