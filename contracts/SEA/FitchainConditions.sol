@@ -90,22 +90,6 @@ contract FitchainConditions{
         uint256 indexed voteType
     );
 
-    modifier onlyProvider(bytes32 modelId) {
-        require(
-            models[modelId].exists,
-            'model does not exist!'
-        );
-        require(
-            msg.sender == models[modelId].provider,
-            'invalid data-compute provider'
-        );
-        require(
-            agreementStorage.getAgreementPublisher(modelId) == msg.sender,
-            'service provider has to be provider'
-        );
-        _;
-    }
-
     modifier onlyPublisher(bytes32 modelId) {
         require(
             agreementStorage.getAgreementPublisher(modelId) == msg.sender,
@@ -245,11 +229,13 @@ contract FitchainConditions{
         external onlyFreeSlots()
         returns(bool)
     {
-        if (removeVerifierFromRegistry(msg.sender)) {
-            verifiers[msg.sender].isStaking = false;
-            //TODO: send back stake to verifier
-            verifiers[msg.sender].amount = 0;
-        }
+        require(
+            removeVerifierFromRegistry(msg.sender),
+            'invalid deregister request'
+        );
+        verifiers[msg.sender].isStaking = false;
+        //TODO: send back stake to verifier
+        verifiers[msg.sender].amount = 0;
         emit VerifierDeregistered(msg.sender);
         return true;
     }
@@ -271,11 +257,14 @@ contract FitchainConditions{
         onlyPublisher(modelId)
         returns(bool)
     {
-        require(k > 0, 'number of verifiers cannot smaller than 1');
-        if (registry.length < k) {
-            emit PoTInitialized(false);
-            return false;
-        }
+        require(
+            k > 0,
+            'number of verifiers cannot smaller than 1'
+        );
+        require(
+            registry.length >= k,
+            'verifiers are not available'
+        );
         // init model
         models[modelId] = Model(
             true,
@@ -318,10 +307,10 @@ contract FitchainConditions{
             k > 0,
             'number of verifiers cannot smaller than 1'
         );
-        if (registry.length < k) {
-            emit VPCInitialized(false);
-            return false;
-        }
+        require(
+            registry.length >= k,
+            'verifiers are not available'
+        );
         require(
             electRRKVerifiers(modelId, k, 2, timeout),
             'unable to allocate resources'
@@ -431,14 +420,15 @@ contract FitchainConditions{
             address(this),
             this.setPoT.selector
         );
-        if (agreementStorage.hasUnfulfilledDependencies(modelId, condition)) {
-            emit TrainingConditionState(modelId, false);
-            return false;
-        }
-        if (agreementStorage.getConditionStatus(modelId, condition) == 1) {
-            emit TrainingConditionState(modelId, true);
+        require(
+            !agreementStorage.hasUnfulfilledDependencies(
+                modelId,
+                condition
+            ),
+            'condition has unfulfilled dependencies'
+        );
+        if (agreementStorage.getConditionStatus(modelId, condition) == 1)
             return true;
-        }
         agreementStorage.fulfillCondition(
             modelId,
             this.setPoT.selector,
@@ -470,14 +460,15 @@ contract FitchainConditions{
             address(this),
             this.setVPC.selector
         );
-        if (agreementStorage.hasUnfulfilledDependencies(modelId, condition)) {
-            emit VerificationConditionState(modelId, false);
-            return false;
-        }
-        if (agreementStorage.getConditionStatus(modelId, condition) == 1) {
-            emit VerificationConditionState(modelId, true);
+        require(
+            !agreementStorage.hasUnfulfilledDependencies(
+                modelId,
+                condition
+            ),
+            'condition has unfulfilled dependencies'
+        );
+        if (agreementStorage.getConditionStatus(modelId, condition) == 1)
             return true;
-        }
         agreementStorage.fulfillCondition(
             modelId,
             this.setVPC.selector,
@@ -566,7 +557,9 @@ contract FitchainConditions{
         }
         for(uint256 j = 0; j < registry.length; j++) {
             if (verifiers[registry[i]].slots == 0) {
-                removeVerifierFromRegistry(registry[i]);
+                if (!removeVerifierFromRegistry(registry[i])){
+                    return false;
+                }
             }
         }
         return true;

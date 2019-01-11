@@ -128,6 +128,13 @@ contract('FitchainConditions', (accounts) => {
             const PoTstate = await fitchainConditions.setPoT(agreementId, kVerifiers, { from: publisher })
             assert.strictEqual(true, PoTstate.logs[0].args.state, 'unable to fulfill the proof of training condition')
         })
+        it('should not fulfill verification proof of PoT condition twice', async () => {
+            try {
+                await fitchainConditions.setPoT(agreementId, kVerifiers, { from: publisher })
+            } catch (e) {
+                assert.strictEqual(e.reason, 'avoid replay attack')
+            }
+        })
         it('should a byzantine GPC verifier fails to submit vote twice', async () => {
             try {
                 await fitchainConditions.voteForPoT(agreementId, true, { from: GPCVerifiers[0] })
@@ -159,6 +166,13 @@ contract('FitchainConditions', (accounts) => {
                 await fitchainConditions.freeMySlots(agreementId, { from: VPCVerifiers[i] })
             }
         })
+        it('should not fulfill verification proof of VPC condition twice', async () => {
+            try {
+                await fitchainConditions.setVPC(agreementId, kVerifiers, { from: publisher })
+            } catch (e) {
+                assert.strictEqual(e.reason, 'avoid replay attack')
+            }
+        })
         it('should verifiers should able to deregister if their slots are free', async () => {
             const deregisterVerifier1 = await fitchainConditions.deregisterVerifier({ from: verifier1 })
             const deregisterVerifier2 = await fitchainConditions.deregisterVerifier({ from: verifier2 })
@@ -167,10 +181,27 @@ contract('FitchainConditions', (accounts) => {
             assert.strictEqual(verifier2, deregisterVerifier2.logs[0].args.verifier, 'unable to deregister')
             assert.strictEqual(verifier3, deregisterVerifier3.logs[0].args.verifier, 'unable to deregister')
         })
+        it('should verifiers not able to deregister multiple times', async () => {
+            try {
+                await fitchainConditions.deregisterVerifier({ from: verifier1 })
+            } catch (e) {
+                assert.strictEqual(e.reason, 'access denied, please free some slots')
+            }
+        })
         it('should verifier able to get his free slots count', async () => {
             for (i = 0; i < VPCVerifiers.length; i++) {
                 myFreeSlots = await fitchainConditions.getMyFreeSlots({ from: VPCVerifiers[i] })
                 assert.strictEqual(slots, myFreeSlots.toNumber(), 'invalid free slots')
+            }
+        })
+        it('should actor deregister twice', async () => {
+            const slot = 1
+            await fitchainConditions.registerVerifier(slot, { from: accounts[8] })
+            await fitchainConditions.deregisterVerifier({ from: accounts[8] })
+            try {
+                await fitchainConditions.deregisterVerifier({ from: accounts[8] })
+            } catch (e) {
+                assert.strictEqual(e.reason, 'invalid deregister request')
             }
         })
     })
