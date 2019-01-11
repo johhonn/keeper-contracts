@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 /* global web3, artifacts, assert, contract, describe, it */
-const ZeppelinHelper = require('./ZeppelinHelper.js')
+const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
 const utils = require('../helpers/utils.js')
 
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement')

@@ -4,7 +4,7 @@
 
 const DIDRegistry = artifacts.require('DIDRegistry.sol')
 const utils = require('../helpers/utils.js')
-const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
+const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
 
 const web3 = utils.getWeb3()
 

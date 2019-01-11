@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 /* global artifacts, assert, contract, describe, it */
-const ZeppelinHelper = require('./ZeppelinHelper.js')
+const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
 
 const FitchainConditionsWithBug = artifacts.require('FitchainConditionsWithBug')
 const FitchainConditionsChangeInStorage = artifacts.require('FitchainConditionsChangeInStorage')

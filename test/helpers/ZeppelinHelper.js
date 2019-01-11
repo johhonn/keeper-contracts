@@ -60,7 +60,7 @@ module.exports = class ZeppelinHelper {
                     cmd = 'OceanToken --init '
                     break
                 case 'Dispenser':
-                    cmd = 'Dispenser --init initialize --args ' + this.addresses['OceanToken']
+                    cmd = 'Dispenser --init initialize --args ' + this.addresses['OceanToken'] + ',' + this.owner
                     break
                 case 'ServiceExecutionAgreement':
                     cmd = 'ServiceExecutionAgreement'

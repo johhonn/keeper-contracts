@@ -3,7 +3,7 @@
 const AccessConditions = artifacts.require('AccessConditions.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
-const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
+const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const utils = require('../helpers/utils.js')
 const { hashAgreement } = require('../helpers/hashAgreement.js')

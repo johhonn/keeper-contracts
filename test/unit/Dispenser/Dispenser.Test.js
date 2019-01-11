@@ -1,15 +1,19 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, assert, contract, describe, it */
+/* global assert, contract, describe, it, before */
+const ZeppelinHelper = require('../../helpers/ZeppelinHelper.js')
 
-const Dispenser = artifacts.require('Dispenser.sol')
-
-contract('Dispenser constructor', (accounts) => {
+contract('Dispenser initializer', (accounts) => {
+    let zos
+    before(() => {
+        zos = new ZeppelinHelper('Dispenser')
+    })
     it('Should not deploy if token is empty', async () => {
         // act-assert
         try {
-            await Dispenser.new(0x0, { from: accounts[0] })
+            await zos.initialize(0x0, false)
         } catch (e) {
+            console.log(e.message)
             assert.strictEqual(e.reason, 'invalid address')
             return
         }

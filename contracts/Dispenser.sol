@@ -51,20 +51,24 @@ contract Dispenser is Initializable, Ownable {
 
     /**
     * @dev Dispenser Initializer
-    * @param oceanTokenAddress The deployed contract address of an OceanToken
+    * @param _oceanTokenAddress The deployed contract address of an OceanToken
+    * @param _owner The owner of the Dispenser
     * Runs only on initial contract creation.
     */
     function initialize(
-        address oceanTokenAddress
+        address _oceanTokenAddress,
+        address _owner
     )
         public initializer()
     {
         require(
-            oceanTokenAddress != address(0x0),
+            _oceanTokenAddress != address(0x0),
             'Token address is 0x0.'
         );
+
         // instantiate OceanToken contract
-        oceanToken = OceanToken(oceanTokenAddress);
+        oceanToken = OceanToken(_oceanTokenAddress);
+        Ownable.initialize(_owner);
 
         scale = 10 ** uint256(oceanToken.decimals());
         maxAmount = uint256(1000).mul(scale);

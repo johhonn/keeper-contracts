@@ -2,7 +2,7 @@
 /* global web3, artifacts, assert, contract, describe, it */
 
 const utils = require('../helpers/utils.js')
-const ZeppelinHelper = require('./ZeppelinHelper.js')
+const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
 
 const DIDRegistry = artifacts.require('DIDRegistry')
 const DIDRegistryWithBug = artifacts.require('DIDRegistryWithBug')
