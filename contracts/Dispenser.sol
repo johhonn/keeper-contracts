@@ -1,16 +1,17 @@
 pragma solidity 0.4.25;
 
-import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
-import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
+import 'openzeppelin-eth/contracts/math/SafeMath.sol';
+import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
+import 'zos-lib/contracts/Initializable.sol';
 import './OceanToken.sol';
+
 
 /**
  * @title Ocean Protocol Dispenser Contract
  * @author Ocean Protocol Team
  * @dev All function calls are currently implemented without side effects
  */
-
-contract Dispenser is Ownable {
+contract Dispenser is Initializable, Ownable {
 
     using SafeMath for uint256;
     using SafeMath for uint;
@@ -53,10 +54,10 @@ contract Dispenser is Ownable {
     * @param oceanTokenAddress The deployed contract address of an OceanToken
     * Runs only on initial contract creation.
     */
-    constructor(
+    function initialize(
         address oceanTokenAddress
     )
-        public
+        public initializer()
     {
         require(
             oceanTokenAddress != address(0x0),

@@ -1,14 +1,15 @@
 pragma solidity 0.4.25;
 
+import 'zos-lib/contracts/Initializable.sol';
 import './Common.sol';
+
 
 /**
  * @title Service Execution Agreement
  * @author Ocean Protocol Team
  * @dev All function calls are currently implemented without side effects
  */
-
-contract ServiceExecutionAgreement is Common {
+contract ServiceExecutionAgreement is Common, Initializable {
 
     struct Template {
         bool isExisting;

@@ -1,6 +1,6 @@
 pragma solidity 0.4.25;
 
-import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
+import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
 /**
  * @title DID Registry

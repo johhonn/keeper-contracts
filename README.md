@@ -205,6 +205,7 @@ Code style is enforced through the CI test process, builds will fail if there're
 * [**Main Documentation: TCR, Market and Ocean Tokens**](doc/)
 * [Architecture (pdf)](doc/files/Smart-Contract-UML-class-diagram.pdf)
 * [Packaging of libraries](doc/packaging.md)
+* [Upgrading contracts](doc/upgrades.md)
 
 ### Use Case 1: Register data asset
 

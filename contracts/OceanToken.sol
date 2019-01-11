@@ -1,8 +1,9 @@
 pragma solidity 0.4.25;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Capped.sol';
-import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol';
-import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
+import 'openzeppelin-eth/contracts/token/ERC20/ERC20Capped.sol';
+import 'openzeppelin-eth/contracts/token/ERC20/ERC20Detailed.sol';
+import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
+import 'zos-lib/contracts/Initializable.sol';
 
 /**
  * @title Ocean Protocol ERC20 Token Contract
@@ -10,19 +11,20 @@ import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
  * @dev All function calls are currently implemented without side effects
  */
 
-contract OceanToken is ERC20Capped, ERC20Detailed {
+contract OceanToken is Initializable, ERC20Capped, ERC20Detailed {
 
     using SafeMath for uint256;
 
     /**
-    * @dev OceanToken Constructor
+    * @dev OceanToken Initializer
     * Runs only on initial contract creation.
     */
-    constructor ()
-        public
-        ERC20Detailed('OceanToken', 'OCN', 18)
-        ERC20Capped(1400000000 * 10 ** 18)
+    function initialize()
+        public initializer()
     {
+        ERC20Detailed.initialize('OceanToken', 'OCN', 18);
+        ERC20Capped.initialize(1400000000 * 10 ** 18, address(this));
+        renounceMinter();
     }
 
     /**

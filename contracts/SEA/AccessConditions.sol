@@ -1,6 +1,7 @@
 pragma solidity 0.4.25;
 
 import './ServiceExecutionAgreement.sol';
+import 'zos-lib/contracts/Initializable.sol';
 import './ISecretStore.sol';
 
 /**
@@ -9,7 +10,7 @@ import './ISecretStore.sol';
  * @dev All function calls are currently implemented without side effects
  */
 
-contract AccessConditions is ISecretStore {
+contract AccessConditions is ISecretStore, Initializable {
 
     mapping(bytes32 => mapping(address => bool)) private assetPermissions;
 
@@ -30,10 +31,10 @@ contract AccessConditions is ISecretStore {
         _;
     }
 
-    constructor(
+    function initialize(
         address _agreementAddress
     )
-        public
+        public initializer()
     {
         require(
             _agreementAddress != address(0),

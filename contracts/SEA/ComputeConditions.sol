@@ -1,6 +1,7 @@
 pragma solidity 0.4.25;
 
 import './Common.sol';
+import 'zos-lib/contracts/Initializable.sol';
 import './ServiceExecutionAgreement.sol';
 
 /**
@@ -9,7 +10,7 @@ import './ServiceExecutionAgreement.sol';
  * @notice This contract is WIP, don't use it for production
  */
 
-contract ComputeConditions is Common {
+contract ComputeConditions is Common, Initializable {
 
     struct ProofOfUpload {
         bool exists;
@@ -75,7 +76,11 @@ contract ComputeConditions is Common {
         _;
     }
 
-    constructor(address agreementAddress) public {
+    function initialize(
+        address agreementAddress
+    )
+        public initializer()
+    {
         require(
             agreementAddress != address(0),
             'invalid service agreement contract address'

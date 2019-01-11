@@ -5,6 +5,7 @@ const OceanToken = artifacts.require('OceanToken.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const FitchainConditions = artifacts.require('FitchainConditions.sol')
+const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
 const testUtils = require('../helpers/utils')
 const { hashAgreement } = require('../helpers/hashAgreement.js')
 
@@ -34,10 +35,14 @@ contract('FitchainConditions', (accounts) => {
         GPCVerifiers = []
         VPCVerifiers = []
         before(async () => {
-            agreement = await ServiceExecutionAgreement.new({ from: accounts[0] })
-            token = await OceanToken.new({ from: accounts[0] })
-            paymentConditions = await PaymentConditions.new(agreement.address, token.address, { from: accounts[0] })
-            fitchainConditions = await FitchainConditions.new(agreement.address, price, slots)
+            let zos = new ZeppelinHelper('FitchainConditions')
+            await zos.restoreState(accounts[9])
+            zos.addDependency('PaymentConditions')
+            await zos.initialize(accounts[0], false)
+            token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
+            agreement = await ServiceExecutionAgreement.at(zos.getProxyAddress('ServiceExecutionAgreement'))
+            paymentConditions = await PaymentConditions.at(zos.getProxyAddress('PaymentConditions'))
+            fitchainConditions = await FitchainConditions.at(zos.getProxyAddress('FitchainConditions'))
 
             await token.mint(consumer, 1000)
             await token.mint(publisher, 1000)

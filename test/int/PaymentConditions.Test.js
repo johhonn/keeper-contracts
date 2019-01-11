@@ -1,9 +1,10 @@
-/* global assert, artifacts, contract, before, describe, it */
+/* global contract, assert, artifacts, before, describe, it */
 
 const AccessConditions = artifacts.require('AccessConditions.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
-const Agreement = artifacts.require('ServiceExecutionAgreement.sol')
+const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
+const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const utils = require('../helpers/utils.js')
 const { hashAgreement } = require('../helpers/hashAgreement.js')
 
@@ -37,19 +38,22 @@ contract('PaymentConditions', (accounts) => {
         let walletBalance = 0
 
         before(async () => {
-            token = await OceanToken.new()
-            agreement = await Agreement.new()
+            let zos = new ZeppelinHelper('PaymentConditions')
+            await zos.restoreState(accounts[9])
+            zos.addDependency('AccessConditions')
+            await zos.initialize(accounts[0], false)
+            token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
+            agreement = await ServiceExecutionAgreement.at(zos.getProxyAddress('ServiceExecutionAgreement'))
+            paymentConditions = await PaymentConditions.at(zos.getProxyAddress('PaymentConditions'))
+            accessConditions = await AccessConditions.at(zos.getProxyAddress('AccessConditions'))
 
-            token.mint(consumer, walletAllowance)
+            await token.mint(consumer, walletAllowance)
 
-            paymentConditions = await PaymentConditions.new(
-                agreement.address, token.address
-            )
+            await token.approve(consumer, await token.totalSupply.call())
             await token.approve(paymentConditions.address, walletAllowance)
 
             // Setup an agreement template where lockPayment depends on grantAccess,
             // releasePayment depends on lockPayment.
-            accessConditions = await AccessConditions.new(agreement.address)
             contracts = [
                 accessConditions.address,
                 paymentConditions.address,

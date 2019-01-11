@@ -1,6 +1,6 @@
 pragma solidity 0.4.25;
 
-import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
+import 'openzeppelin-eth/contracts/cryptography/ECDSA.sol';
 
 /**
  * @title Common (Abstract Contract)

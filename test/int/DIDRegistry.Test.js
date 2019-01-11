@@ -4,14 +4,26 @@
 
 const DIDRegistry = artifacts.require('DIDRegistry.sol')
 const utils = require('../helpers/utils.js')
+const ZeppelinHelper = require('../upgradability/ZeppelinHelper.js')
 
 const web3 = utils.getWeb3()
 
 contract('DIDRegistry', (accounts) => {
+    let registry
+
+    before(async () => {
+        let zos = new ZeppelinHelper('DIDRegistry')
+        await zos.restoreState(accounts[9])
+    })
+
+    beforeEach(async () => {
+        let zos = new ZeppelinHelper('DIDRegistry')
+        await zos.initialize(accounts[0], false)
+        registry = await DIDRegistry.at(zos.getProxyAddress('DIDRegistry'))
+    })
+
     describe('Register decentralised identifiers with attributes, fetch attributes by DID', () => {
         it('Should discover the attribute after registering it', async () => {
-            const registry = await DIDRegistry.new()
-
             const did = web3.utils.fromAscii('did:ocn:test-attr')
             const providerDID = 'did:ocn:provider'
             const provider = web3.utils.fromAscii('provider')
@@ -29,8 +41,6 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('Should find the event from the block number', async () => {
-            const registry = await DIDRegistry.new()
-
             const did = web3.utils.sha3('did:ocn:test-read-event-from-filter-using-block-number')
             const providerDID = 'did:ocn:provider'
             const providerKey = web3.utils.fromAscii('provider')
@@ -71,8 +81,6 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('Should not fail to register the same attribute twice', async () => {
-            const registry = await DIDRegistry.new()
-
             const did = web3.utils.fromAscii('did:ocn:test-attr-twice')
             const providerDID = 'did:ocn:provider'
             const provider = web3.utils.fromAscii('provider')
@@ -86,8 +94,6 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('Should not fail to register crazy long did', async () => {
-            const registry = await DIDRegistry.new()
-
             const crazyLongDID = 'did:ocn:test-attr-twice-crazy-long-dude-really-oh-yeah'
             const did = web3.utils.sha3(crazyLongDID)
             const providerDID = 'did:ocn:provider'
@@ -100,8 +106,6 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('Should register multiple attributes', async () => {
-            const registry = await DIDRegistry.new()
-
             const did = web3.utils.fromAscii('did:ocn:test-multiple-attrs')
             const providerDID = 'http://example.com'
             const provider = web3.utils.fromAscii('provider')
@@ -124,8 +128,6 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('Should only allow the owner to set an attribute', async () => {
-            const registry = await DIDRegistry.new()
-
             const did = web3.utils.fromAscii('did:ocn:test-ownership')
             const providerDID = 'did:ocn:provider'
             const provider = web3.utils.fromAscii('provider')
