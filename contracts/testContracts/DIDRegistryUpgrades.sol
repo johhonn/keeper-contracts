@@ -50,7 +50,7 @@ contract DIDRegistryExtraFunctionality is Initializable, Ownable {
         return didRegister[_did].owner;
     }
     //returns a number
-    function getNumber() public view returns(uint) {
+    function getNumber() public pure returns(uint) {
         return 42;
     }
 }

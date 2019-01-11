@@ -6,7 +6,7 @@ import '../SEA/ServiceExecutionAgreement.sol';
 
 contract ServiceAgreementExtraFunctionality is ServiceExecutionAgreement{
     //returns a number
-    function getNumber() public view returns(uint) {
+    function getNumber() public pure returns(uint) {
         return 42;
     }
 }

@@ -75,7 +75,7 @@ contract OceanTokenExtraFunctionality is ERC20 {
         return super.transferFrom(_from, _to, _value);
     }
     //returns a number
-    function getNumber() public view returns(uint) {
+    function getNumber() public pure returns(uint) {
         return 42;
     }
 }
