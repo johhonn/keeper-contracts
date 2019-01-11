@@ -50,7 +50,7 @@ contract Dispenser is Initializable, Ownable {
     }
 
     /**
-    * @dev Dispenser Constructor
+    * @dev Dispenser Initializer
     * @param oceanTokenAddress The deployed contract address of an OceanToken
     * Runs only on initial contract creation.
     */
