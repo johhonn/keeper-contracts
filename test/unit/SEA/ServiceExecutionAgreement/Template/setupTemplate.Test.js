@@ -37,7 +37,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             )
             // assert
             utils.assertEmitted(result, 1, 'TemplateSetup')
-            const status = await contract.getTemplateStatus(utils.templateId)
+            const status = await contract.isTemplateExisting(utils.templateId)
             assert.strictEqual(status, true)
         })
 
