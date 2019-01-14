@@ -1,24 +1,26 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
 /* global artifacts, assert, contract, describe, it */
-
+const ZeppelinHelper = require('../../helpers/ZeppelinHelper.js')
 const OceanToken = artifacts.require('OceanToken.sol')
 
 contract('OceanToken', (accounts) => {
     let token
 
     beforeEach(async () => {
-        token = await OceanToken.new({ from: accounts[0] })
-        await token.mint(accounts[0], 1000)
+        const zos = new ZeppelinHelper('OceanToken')
+        await zos.initialize(accounts[0], false)
+        token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
+        await token.mint(accounts[1], 1000)
     })
 
     describe('transfer', () => {
         it('Should transfer', async () => {
             // act
-            await token.transfer(accounts[1], 100, { from: accounts[0] })
+            await token.transfer(accounts[2], 100, { from: accounts[1] })
 
             // assert
-            const balance = await token.balanceOf(accounts[1])
+            const balance = await token.balanceOf(accounts[2])
             assert.strictEqual(balance.toNumber(), 100)
         })
 

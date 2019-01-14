@@ -24,7 +24,6 @@ contract OceanToken is Initializable, ERC20Capped, ERC20Detailed {
     {
         ERC20Detailed.initialize('OceanToken', 'OCN', 18);
         ERC20Capped.initialize(1400000000 * 10 ** 18, address(this));
-        renounceMinter();
     }
 
     /**

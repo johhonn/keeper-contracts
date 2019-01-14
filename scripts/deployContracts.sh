@@ -7,7 +7,7 @@
 OWNER='0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1'
 # Admin is the account used to deploy and manage upgrades.
 # After deployment the multisig wallet is set to Admin
-ADMIN='0x0eb1a7506477c89e0707a0abdb207c0216d9cba4'
+ADMIN='0x1df62f291b2e969fb0849d99d9ce41e2f137006e'
 # Config variables for initializers
 stake='10'
 maxSlots='1'
