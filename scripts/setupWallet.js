@@ -6,31 +6,42 @@
 const fs = require('fs')
 const MultiSigWallet = artifacts.require('MultiSigWallet')
 
-global.artifacts = artifacts
-global.web3 = web3
+const accountAmount = 4
+const threshold = 2
 
 async function setUpWallet() {
-    console.log('Setting accounts')
+    console.log('Setting up MultiSigWallet')
     let accounts
-    await web3.eth.getAccounts().then((i) => { accounts = i })
-    let multisig
-    await MultiSigWallet.new(accounts.slice(0, 4), 2, { from: accounts[0] }).then(i => {
-        multisig = i
-    })
+    // get accounts from web3
+    await web3.eth.getAccounts()
+        .then((i) => { accounts = i })
 
-    let addresses = {
-        wallet: multisig.address,
-        owners: accounts.slice(0, 4)
+    // create account list for MultiSig
+    const multiSigAccounts = accounts.slice(0, accountAmount)
+
+    // deploy wallet to the blockchain
+    const wallet = await MultiSigWallet
+        .new(multiSigAccounts, threshold, { from: accounts[0] })
+
+    let walletAddresses = {
+        wallet: wallet.address,
+        owners: multiSigAccounts
     }
-    console.log('Wallet address:', addresses)
 
-    await fs.writeFileSync('./wallet.json', JSON.stringify(addresses, null, 4), 'utf8', (err) => {
-        if (err) {
-            console.error('Erro writing file:', err)
-            return
-        }
-        console.log('Wallet file has been created')
-    })
+    const walletString = JSON.stringify(walletAddresses, null, 4)
+    console.log('Wallet addresses:', walletString)
+
+    // write to file
+    await fs.writeFileSync(
+        './wallet.json',
+        walletString,
+        'utf8', (err) => {
+            if (err) {
+                console.error('Error writing file:', err)
+                return
+            }
+            console.log('Wallet file has been created')
+        })
 }
 
 module.exports = function(cb) {
