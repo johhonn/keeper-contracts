@@ -4,12 +4,12 @@ import './Common.sol';
 import 'zos-lib/contracts/Initializable.sol';
 import './ServiceExecutionAgreement.sol';
 
+
 /**
  * @title On-premise compute conditions
  * @author Ocean Protocol Team
  * @notice This contract is WIP, don't use it for production
  */
-
 contract ComputeConditions is Common, Initializable {
 
     struct ProofOfUpload {

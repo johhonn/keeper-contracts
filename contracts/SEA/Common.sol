@@ -2,12 +2,12 @@ pragma solidity 0.4.25;
 
 import 'openzeppelin-eth/contracts/cryptography/ECDSA.sol';
 
+
 /**
  * @title Common (Abstract Contract)
  * @author Ocean Protocol Team
  * @dev All function calls are currently implemented without side effects
  */
-
 contract Common {
 
     /**

@@ -4,12 +4,12 @@ import './ServiceExecutionAgreement.sol';
 import 'zos-lib/contracts/Initializable.sol';
 import './ISecretStore.sol';
 
+
 /**
  * @title Secret Store Access Control
  * @author Ocean Protocol Team
  * @dev All function calls are currently implemented without side effects
  */
-
 contract AccessConditions is ISecretStore, Initializable {
 
     mapping(bytes32 => mapping(address => bool)) private assetPermissions;

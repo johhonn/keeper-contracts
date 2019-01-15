@@ -3,6 +3,7 @@ pragma solidity 0.4.25;
 import 'zos-lib/contracts/Initializable.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
+
 /**
  * @title DID Registry
  * @author Ocean Protocol Team

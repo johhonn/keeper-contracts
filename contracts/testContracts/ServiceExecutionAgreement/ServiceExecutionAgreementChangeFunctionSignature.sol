@@ -1,7 +1,7 @@
 /* solium-disable */
 pragma solidity 0.4.25;
 
-import '../SEA/ServiceExecutionAgreement.sol';
+import '../../SEA/ServiceExecutionAgreement.sol';
 
 
 contract ServiceExecutionAgreementChangeFunctionSignature{

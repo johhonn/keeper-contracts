@@ -4,6 +4,7 @@ import 'zos-lib/contracts/Initializable.sol';
 import 'openzeppelin-eth/contracts/math/SafeMath.sol';
 import './ServiceExecutionAgreement.sol';
 
+
 /**
  * @title Fitchain conditions
  * @author Ocean Protocol Team
@@ -16,7 +17,6 @@ import './ServiceExecutionAgreement.sol';
  * TODO: Implement slashing conditions
  * TODO: use enum VoteType rather than 1 and 2
  */
-
 contract FitchainConditions is Initializable{
 
     using SafeMath for uint256;
