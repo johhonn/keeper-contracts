@@ -4,7 +4,7 @@ pragma solidity 0.4.25;
 import 'openzeppelin-eth/contracts/cryptography/ECDSA.sol';
 
 
-contract ServiceAgreementWithBug {
+contract ServiceExecutionAgreementWithBug {
 
     struct ServiceAgreementTemplate {
         bool state; // 1 -> Available 0 -> revoked template

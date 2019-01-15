@@ -1,22 +1,10 @@
 /* solium-disable */
 pragma solidity 0.4.25;
 
-import '../SEA/ServiceExecutionAgreement.sol';
+import '../../SEA/ServiceExecutionAgreement.sol';
 
 
-contract ServiceAgreementExtraFunctionality is ServiceExecutionAgreement{
-    //returns a number
-    function getNumber() public pure returns(uint) {
-        return 42;
-    }
-}
-
-contract ServiceAgreementChangeInStorage is ServiceExecutionAgreement{
-    // keep track of how many times a function was called.
-    mapping (address=>uint256) public called;
-}
-
-contract ServiceAgreementChangeInStorageAndLogic  {
+contract ServiceExecutionAgreementChangeInStorageAndLogic  {
 
     struct ServiceAgreementTemplate {
         bool state; // 1 -> Available 0 -> revoked template

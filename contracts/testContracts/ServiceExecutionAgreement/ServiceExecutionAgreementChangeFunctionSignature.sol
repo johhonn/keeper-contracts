@@ -4,7 +4,7 @@ pragma solidity 0.4.25;
 import '../SEA/ServiceExecutionAgreement.sol';
 
 
-contract ServiceAgreementChangeFunctionSignature{
+contract ServiceExecutionAgreementChangeFunctionSignature{
 
     struct ServiceAgreementTemplate {
         bool state; // 1 -> Available 0 -> revoked template
