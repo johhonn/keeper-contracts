@@ -3,7 +3,7 @@
 /* global artifacts, assert, contract, describe, it */
 
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
-const utils = require('../../../../helpers/utils.js')
+const testUtils = require('../../../../helpers/utils.js')
 
 contract('ServiceExecutionAgreement', (accounts) => {
     let contract
@@ -20,24 +20,24 @@ contract('ServiceExecutionAgreement', (accounts) => {
             // TODO: why is the Id set and not generated?
             // act
             const result = await contract.setupTemplate(
-                utils.templateId,
+                testUtils.templateId,
                 [], [], [], [], 0, { from: accounts[0] }
             )
             // assert
             const { templateId } = result.logs[0].args
-            assert.strictEqual(templateId, utils.templateId,
+            assert.strictEqual(templateId, testUtils.templateId,
                 'Template Id should match indicating creating of agreement template')
         })
 
         it('Should setup agreement without contracts', async () => {
             // act
             const result = await contract.setupTemplate(
-                utils.templateId,
+                testUtils.templateId,
                 [], [], [], [], 0, { from: accounts[0] }
             )
             // assert
-            utils.assertEmitted(result, 1, 'TemplateSetup')
-            const status = await contract.isTemplateExisting(utils.templateId)
+            testUtils.assertEmitted(result, 1, 'TemplateSetup')
+            const status = await contract.isTemplateExisting(testUtils.templateId)
             assert.strictEqual(status, true)
         })
 
@@ -45,7 +45,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             // act-assert
             try {
                 await contract.setupTemplate(
-                    utils.templateId,
+                    testUtils.templateId,
                     [],
                     ['0x1234'],
                     [], [], 0, { from: accounts[0] })
@@ -60,8 +60,8 @@ contract('ServiceExecutionAgreement', (accounts) => {
             // act-assert
             try {
                 await contract.setupTemplate(
-                    utils.templateId,
-                    [utils.dummyAddress],
+                    testUtils.templateId,
+                    [testUtils.dummyAddress],
                     ['0x1234'],
                     [], [], 0, { from: accounts[0] })
             } catch (e) {
@@ -75,8 +75,8 @@ contract('ServiceExecutionAgreement', (accounts) => {
             // act-assert
             try {
                 await contract.setupTemplate(
-                    utils.templateId,
-                    [utils.dummyAddress],
+                    testUtils.templateId,
+                    [testUtils.dummyAddress],
                     ['0x1234'],
                     [1], [1, 2], 0, { from: accounts[0] })
             } catch (e) {
@@ -90,8 +90,8 @@ contract('ServiceExecutionAgreement', (accounts) => {
             // act-assert
             try {
                 await contract.setupTemplate(
-                    utils.templateId,
-                    [utils.dummyAddress],
+                    testUtils.templateId,
+                    [testUtils.dummyAddress],
                     ['0x1234'],
                     [1], [1], 2, { from: accounts[0] })
             } catch (e) {
@@ -104,28 +104,28 @@ contract('ServiceExecutionAgreement', (accounts) => {
         it('Should setup agreement with contracts', async () => {
             // act
             const result = await contract.setupTemplate(
-                utils.templateId,
-                [utils.dummyAddress],
+                testUtils.templateId,
+                [testUtils.dummyAddress],
                 ['0x1234'],
                 [1], [1], 1, { from: accounts[0] })
 
             // assert
-            utils.assertEmitted(result, 1, 'ConditionSetup')
-            utils.assertEmitted(result, 1, 'TemplateSetup')
-            const status = await contract.getTemplateStatus(utils.templateId)
+            testUtils.assertEmitted(result, 1, 'ConditionSetup')
+            testUtils.assertEmitted(result, 1, 'TemplateSetup')
+            const status = await contract.getTemplateStatus(testUtils.templateId)
             assert.strictEqual(status, true)
         })
 
         it('Should setup unique agreement only', async () => {
             // arrange
             await contract.setupTemplate(
-                utils.templateId,
+                testUtils.templateId,
                 [], [], [], [], 0, { from: accounts[0] })
 
             // act-assert
             try {
                 await contract.setupTemplate(
-                    utils.templateId,
+                    testUtils.templateId,
                     [], [], [], [], 0, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Template ID already exists')
@@ -149,13 +149,13 @@ contract('ServiceExecutionAgreement', (accounts) => {
         it('Should return template owner', async () => {
             // arrange
             await contract.setupTemplate(
-                utils.templateId,
-                [utils.dummyAddress],
+                testUtils.templateId,
+                [testUtils.dummyAddress],
                 fingerprints,
                 [0], [0], 0, { from: accounts[0] })
 
             // act
-            const result = await contract.getTemplateOwner(utils.templateId, { from: accounts[0] })
+            const result = await contract.getTemplateOwner(testUtils.templateId, { from: accounts[0] })
 
             // assert
             assert.strictEqual(result, accounts[0])

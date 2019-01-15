@@ -6,10 +6,10 @@ const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 
-const utils = require('../../../helpers/utils.js')
+const testUtils = require('../../../helpers/utils.js')
 const { initializeAgreement } = require('../../../helpers/initializeAgreement.js')
 
-const web3 = utils.getWeb3()
+const web3 = testUtils.getWeb3()
 
 contract('PaymentConditions', (accounts) => {
     const assetId = '0x0000000000000000000000000000000000000000000000000000000000000001'
@@ -32,11 +32,11 @@ contract('PaymentConditions', (accounts) => {
         paymentConditions = await PaymentConditions.new(sea.address, token.address, { from: accounts[0] })
         price = 1
         contracts = [paymentConditions.address]
-        fingerprints = [utils.getSelector(web3, PaymentConditions, 'lockPayment')]
+        fingerprints = [testUtils.getSelector(web3, PaymentConditions, 'lockPayment')]
         dependenciesBits = [0]
-        valueHashes = [utils.valueHash(['bytes32', 'uint256'], [assetId, price])]
+        valueHashes = [testUtils.valueHash(['bytes32', 'uint256'], [assetId, price])]
         timeoutValues = [0]
-        agreementId = utils.generateId()
+        agreementId = testUtils.generateId()
     })
 
     async function initializeAgreementWithValues() {
@@ -59,7 +59,7 @@ contract('PaymentConditions', (accounts) => {
 
             // act-assert
             try {
-                await paymentConditions.lockPayment(agreementId, utils.emptyBytes32, 1, { from: accounts[0] })
+                await paymentConditions.lockPayment(agreementId, testUtils.emptyBytes32, 1, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Only consumer can trigger lockPayment.')
                 return
@@ -77,7 +77,7 @@ contract('PaymentConditions', (accounts) => {
             const result = await paymentConditions.lockPayment(agreementId, assetId, price, { from: consumer })
 
             // assert
-            utils.assertEmitted(result, 1, 'PaymentLocked')
+            testUtils.assertEmitted(result, 1, 'PaymentLocked')
         })
 
         it('Should not lock payment when exist unfulfilled dependencies', async () => {
@@ -89,7 +89,7 @@ contract('PaymentConditions', (accounts) => {
             const result = await paymentConditions.lockPayment(agreementId, assetId, price, { from: consumer })
 
             // assert
-            utils.assertEmitted(result, 0, 'PaymentLocked')
+            testUtils.assertEmitted(result, 0, 'PaymentLocked')
         })
 
         it('Should not lock payment twice', async () => {
@@ -103,7 +103,7 @@ contract('PaymentConditions', (accounts) => {
             const result = await paymentConditions.lockPayment(agreementId, assetId, price, { from: consumer })
 
             // assert
-            utils.assertEmitted(result, 0, 'PaymentLocked')
+            testUtils.assertEmitted(result, 0, 'PaymentLocked')
         })
     })
 })

@@ -3,7 +3,7 @@
 /* global artifacts, assert, contract, describe, it */
 
 const AgreementTest = artifacts.require('ServiceExecutionAgreement.sol')
-const utils = require('../../../../helpers/utils.js')
+const testUtils = require('../../../../helpers/utils.js')
 const { initializeAgreement } = require('../../../../helpers/initializeAgreement.js')
 
 contract('ServiceExecutionAgreement', (accounts) => {
@@ -22,9 +22,9 @@ contract('ServiceExecutionAgreement', (accounts) => {
         contracts = [accounts[2]]
         fingerprints = ['0x2e0a37a5']
         dependenciesBits = [0]
-        valueHashes = [utils.valueHash(['bool'], [true])]
+        valueHashes = [testUtils.valueHash(['bool'], [true])]
         timeoutValues = [0]
-        agreementId = utils.generateId()
+        agreementId = testUtils.generateId()
     })
 
     async function initializeAgreementWithValues() {
@@ -73,7 +73,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
                 { from: accounts[2] })
 
             // assert
-            utils.assertEmitted(result, 1, 'ConditionFulfilled')
+            testUtils.assertEmitted(result, 1, 'ConditionFulfilled')
         })
 
         it('Should not fulfill condition with unfulfilled dependency', async () => {
@@ -110,7 +110,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
                 { from: accounts[2] })
 
             // assert
-            utils.assertEmitted(result, 1, 'ConditionFulfilled')
+            testUtils.assertEmitted(result, 1, 'ConditionFulfilled')
         })
     })
 })

@@ -1,7 +1,7 @@
 /* eslint-env mocha */
 /* global web3, artifacts, assert, contract, describe, it */
 
-const utils = require('../helpers/utils.js')
+const testUtils = require('../helpers/utils.js')
 const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
 
 const DIDRegistry = artifacts.require('DIDRegistry')
@@ -14,16 +14,6 @@ const DIDRegistryChangeFunctionSignature = artifacts.require('DIDRegistryChangeF
 global.artifacts = artifacts
 global.web3 = web3
 let zos
-
-async function assertRevert(promise) {
-    try {
-        await promise
-        assert.fail('Expected revert not received')
-    } catch (error) {
-        const revertFound = error.message.search('revert') >= 0
-        assert(revertFound, `Expected "revert", got ${error} instead`)
-    }
-}
 
 contract('DIDRegistry', (accounts) => {
     let pAddress
@@ -44,7 +34,7 @@ contract('DIDRegistry', (accounts) => {
             await zos.upgradeToNewContract('DIDRegistryExtraFunctionality')
             let p = await DIDRegistryExtraFunctionality.at(pAddress)
             // should not be able to be called before upgrade is approved
-            await assertRevert(p.getNumber())
+            await testUtils.assertRevert(p.getNumber())
 
             // Approve and call again
             await zos.approveLatestTransaction()
@@ -58,7 +48,7 @@ contract('DIDRegistry', (accounts) => {
             await zos.upgradeToNewContract('DIDRegistryChangeInStorage')
             let p = await DIDRegistryChangeInStorage.at(pAddress)
             // should not be able to be called before upgrade is approved
-            await assertRevert(p.timeOfRegister(did))
+            await testUtils.assertRevert(p.timeOfRegister(did))
 
             // Approve and call again
             await zos.approveLatestTransaction()
@@ -76,7 +66,7 @@ contract('DIDRegistry', (accounts) => {
             let valueType = 0
             let result = await registry.registerAttribute(did, valueType, provider, providerDID)
 
-            utils.assertEmitted(result, 1, 'DIDAttributeRegistered')
+            testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             let payload = result.logs[0].args
             assert.strictEqual('did:ocn:test-attr', web3.utils.hexToString(payload.did))
@@ -89,7 +79,7 @@ contract('DIDRegistry', (accounts) => {
             await zos.upgradeToNewContract('DIDRegistryChangeInStorageAndLogic')
             let p = await DIDRegistryChangeInStorageAndLogic.at(pAddress)
             // should not be able to be called before upgrade is approved
-            await assertRevert(p.timeOfRegister(did))
+            await testUtils.assertRevert(p.timeOfRegister(did))
 
             // Approve and call again
             await zos.approveLatestTransaction()
@@ -101,7 +91,7 @@ contract('DIDRegistry', (accounts) => {
             did = web3.utils.fromAscii('did:ocn:test-attrN')
             result = await registry.registerAttribute(did, valueType, provider, providerDID)
 
-            utils.assertEmitted(result, 1, 'DIDAttributeRegistered')
+            testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             payload = result.logs[0].args
             assert.strictEqual('did:ocn:test-attrN', web3.utils.hexToString(payload.did))
@@ -123,7 +113,7 @@ contract('DIDRegistry', (accounts) => {
             let valueType = 0
             let result = await registry.registerAttribute(did, valueType, provider, providerDID)
 
-            utils.assertEmitted(result, 1, 'DIDAttributeRegistered')
+            testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             let payload = result.logs[0].args
             assert.strictEqual('did:ocn:test-attr', web3.utils.hexToString(payload.did))
@@ -141,7 +131,7 @@ contract('DIDRegistry', (accounts) => {
             did = web3.utils.fromAscii('did:ocn:test-attrN')
             result = await registry.registerAttribute(did, valueType, provider, providerDID)
 
-            utils.assertEmitted(result, 1, 'DIDAttributeRegistered')
+            testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             payload = result.logs[0].args
             assert.strictEqual('did:ocn:test-attrN', web3.utils.hexToString(payload.did))
@@ -167,7 +157,7 @@ contract('DIDRegistry', (accounts) => {
             let provider = web3.utils.fromAscii('provider')
             let result = await p.registerAttribute(valueType, did, provider)
 
-            utils.assertEmitted(result, 1, 'DIDAttributeRegistered')
+            testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             let payload = result.logs[0].args
             assert.strictEqual('did:ocn:test-attr', web3.utils.hexToString(payload.did))

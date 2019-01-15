@@ -18,16 +18,6 @@ const ComputeConditionsChangeFunctionSignature = artifacts.require('ComputeCondi
 global.artifacts = artifacts
 global.web3 = web3
 
-async function assertRevert(promise) {
-    try {
-        await promise
-        assert.fail('Expected revert not received')
-    } catch (error) {
-        const revertFound = error.message.search('revert') >= 0
-        assert(revertFound, `Expected "revert", got ${error} instead`)
-    }
-}
-
 contract('ComputeConditions', (accounts) => {
     let zos
     let pAddress
@@ -108,7 +98,7 @@ contract('ComputeConditions', (accounts) => {
             await zos.upgradeToNewContract('ComputeConditionsExtraFunctionality')
             let p = await ComputeConditionsExtraFunctionality.at(pAddress)
             // should not be able to be called before upgrade is approved
-            await assertRevert(p.getNumber())
+            await testUtils.assertRevert(p.getNumber())
 
             // Approve and call again
             await zos.approveLatestTransaction()
@@ -122,7 +112,7 @@ contract('ComputeConditions', (accounts) => {
             await zos.upgradeToNewContract('ComputeConditionsChangeInStorage')
             let p = await ComputeConditionsChangeInStorage.at(pAddress)
             // should not be able to be called before upgrade is approved
-            await assertRevert(p.called(zos.owner))
+            await testUtils.assertRevert(p.called(zos.owner))
 
             // Approve and call again
             await zos.approveLatestTransaction()
@@ -156,7 +146,7 @@ contract('ComputeConditions', (accounts) => {
             await zos.upgradeToNewContract('ComputeConditionsWithBug')
             algorithmHash = web3.utils.soliditySha3({ type: 'string', value: algorithm }).toString('hex')
             const signature = await web3.eth.sign(algorithmHash, accounts[2])
-            await assertRevert(p.submitHashSignature(serviceAgreementId, signature))
+            await testUtils.assertRevert(p.submitHashSignature(serviceAgreementId, signature))
             await zos.approveLatestTransaction()
             await p.submitHashSignature(serviceAgreementId, signature)
         })
@@ -168,7 +158,7 @@ contract('ComputeConditions', (accounts) => {
             algorithmHash = web3.utils.soliditySha3({ type: 'string', value: algorithm }).toString('hex')
             const signature = await web3.eth.sign(algorithmHash, datascientist)
 
-            await assertRevert(p.submitHashSignature(true, signature, serviceAgreementId, { from: datascientist }))
+            await testUtils.assertRevert(p.submitHashSignature(true, signature, serviceAgreementId, { from: datascientist }))
 
             // should work after approval
             await zos.approveLatestTransaction()

@@ -6,10 +6,10 @@ const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 
-const utils = require('../../../helpers/utils.js')
+const testUtils = require('../../../helpers/utils.js')
 const { initializeAgreement } = require('../../../helpers/initializeAgreement.js')
 
-const web3 = utils.getWeb3()
+const web3 = testUtils.getWeb3()
 
 contract('PaymentConditions', (accounts) => {
     const assetId = '0x0000000000000000000000000000000000000000000000000000000000000001'
@@ -32,11 +32,11 @@ contract('PaymentConditions', (accounts) => {
         paymentConditions = await PaymentConditions.new(sea.address, token.address, { from: accounts[0] })
         price = 1
         contracts = [paymentConditions.address]
-        fingerprints = [utils.getSelector(web3, PaymentConditions, 'lockPayment')]
+        fingerprints = [testUtils.getSelector(web3, PaymentConditions, 'lockPayment')]
         dependenciesBits = [0]
-        valueHashes = [utils.valueHash(['bytes32', 'uint256'], [assetId, price])]
+        valueHashes = [testUtils.valueHash(['bytes32', 'uint256'], [assetId, price])]
         timeoutValues = [0]
-        agreementId = utils.generateId()
+        agreementId = testUtils.generateId()
     })
 
     async function initializeAgreementWithValues() {
@@ -59,7 +59,7 @@ contract('PaymentConditions', (accounts) => {
 
             // act-assert
             try {
-                await paymentConditions.refundPayment(agreementId, utils.emptyBytes32, 1, { from: accounts[0] })
+                await paymentConditions.refundPayment(agreementId, testUtils.emptyBytes32, 1, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Only consumer can trigger refundPayment.')
                 return
@@ -70,9 +70,9 @@ contract('PaymentConditions', (accounts) => {
         it('Should refund payment', async () => {
             // arrang
             contracts.push(paymentConditions.address)
-            fingerprints.push(utils.getSelector(web3, PaymentConditions, 'refundPayment'))
+            fingerprints.push(testUtils.getSelector(web3, PaymentConditions, 'refundPayment'))
             dependenciesBits = [0, 0]
-            valueHashes.push(utils.valueHash(['bytes32', 'uint256'], [assetId, price]))
+            valueHashes.push(testUtils.valueHash(['bytes32', 'uint256'], [assetId, price]))
             timeoutValues.push(0)
             await initializeAgreementWithValues()
             await token.mint(consumer, price)
@@ -83,15 +83,15 @@ contract('PaymentConditions', (accounts) => {
             const result = await paymentConditions.refundPayment(agreementId, assetId, price, { from: consumer })
 
             // assert
-            utils.assertEmitted(result, 1, 'PaymentRefund')
+            testUtils.assertEmitted(result, 1, 'PaymentRefund')
         })
 
         it('Should not refund payment twice', async () => {
             // arrang
             contracts.push(paymentConditions.address)
-            fingerprints.push(utils.getSelector(web3, PaymentConditions, 'refundPayment'))
+            fingerprints.push(testUtils.getSelector(web3, PaymentConditions, 'refundPayment'))
             dependenciesBits = [0, 1]
-            valueHashes.push(utils.valueHash(['bytes32', 'uint256'], [assetId, price]))
+            valueHashes.push(testUtils.valueHash(['bytes32', 'uint256'], [assetId, price]))
             timeoutValues.push(0)
             await initializeAgreementWithValues()
             await token.mint(consumer, price)
@@ -103,7 +103,7 @@ contract('PaymentConditions', (accounts) => {
             const result = await paymentConditions.refundPayment(agreementId, assetId, price, { from: consumer })
 
             // assert
-            utils.assertEmitted(result, 0, 'PaymentRefund')
+            testUtils.assertEmitted(result, 0, 'PaymentRefund')
         })
     })
 })

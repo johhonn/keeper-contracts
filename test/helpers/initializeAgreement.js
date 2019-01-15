@@ -1,5 +1,5 @@
 const { signAgreement } = require('./signAgreement.js')
-const utils = require('./utils.js')
+const testUtils = require('./utils.js')
 
 const initializeAgreement = async function initializeAgreement(
     serviceAgreementContract,
@@ -20,19 +20,19 @@ const initializeAgreement = async function initializeAgreement(
         agreementId,
         consumerAccount)
     await serviceAgreementContract.setupTemplate(
-        utils.templateId,
+        testUtils.templateId,
         contracts,
         fingerprints,
         dependenciesBits,
         [0], 0, { from: templateAccount })
     await serviceAgreementContract.initializeAgreement(
-        utils.templateId,
+        testUtils.templateId,
         signature,
         consumerAccount,
         valueHashes,
         timeoutValues,
         agreementId,
-        utils.templateId,
+        testUtils.templateId,
         { from: templateAccount })
 }
 

@@ -3,7 +3,7 @@
 /* global artifacts, assert, contract, describe, it */
 
 const AgreementTest = artifacts.require('ServiceExecutionAgreement.sol')
-const utils = require('../../../../helpers/utils.js')
+const testUtils = require('../../../../helpers/utils.js')
 const { signAgreement } = require('../../../../helpers/signAgreement.js')
 const { initializeAgreement } = require('../../../../helpers/initializeAgreement.js')
 
@@ -23,9 +23,9 @@ contract('ServiceExecutionAgreement', (accounts) => {
         contracts = [accounts[2]]
         fingerprints = ['0x2e0a37a5']
         dependenciesBits = [0]
-        valueHashes = [utils.valueHash(['bool'], [true])]
+        valueHashes = [testUtils.valueHash(['bool'], [true])]
         timeoutValues = [0]
-        agreementId = utils.generateId()
+        agreementId = testUtils.generateId()
     })
 
     async function initializeAgreementWithValues() {
@@ -51,7 +51,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             const result = await contract.fulfillAgreement(agreementId, { from: accounts[0] })
 
             // assert
-            utils.assertEmitted(result, 1, 'AgreementFulfilled')
+            testUtils.assertEmitted(result, 1, 'AgreementFulfilled')
             const isFulfilled = await contract.isAgreementFulfilled(agreementId, { from: accounts[0] })
             assert.strictEqual(isFulfilled, true)
         })
@@ -73,8 +73,8 @@ contract('ServiceExecutionAgreement', (accounts) => {
         it('Should not fulfill agreement with pending conditions when single operator', async () => {
             // arrange
             const signature = await signAgreement(contracts, fingerprints, valueHashes, timeoutValues, agreementId, consumer)
-            await contract.setupTemplate(utils.templateId, contracts, fingerprints, [0], [0], 1, { from: accounts[0] })
-            await contract.initializeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
+            await contract.setupTemplate(testUtils.templateId, contracts, fingerprints, [0], [0], 1, { from: accounts[0] })
+            await contract.initializeAgreement(testUtils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, testUtils.templateId, { from: accounts[0] })
 
             // act-assert
             try {
@@ -90,11 +90,11 @@ contract('ServiceExecutionAgreement', (accounts) => {
             // arrange
             contracts = [accounts[2], accounts[2]]
             fingerprints = ['0x2e0a37a5', '0x2e0a37a6']
-            valueHashes = [utils.valueHash(['bool'], [true]), utils.valueHash(['bool'], [true])]
+            valueHashes = [testUtils.valueHash(['bool'], [true]), testUtils.valueHash(['bool'], [true])]
             timeoutValues = [0, 0]
             const signature = await signAgreement(contracts, fingerprints, valueHashes, timeoutValues, agreementId, consumer)
-            await contract.setupTemplate(utils.templateId, contracts, fingerprints, [0, 0], [0, 1], 2, { from: accounts[0] })
-            await contract.initializeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
+            await contract.setupTemplate(testUtils.templateId, contracts, fingerprints, [0, 0], [0, 1], 2, { from: accounts[0] })
+            await contract.initializeAgreement(testUtils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, testUtils.templateId, { from: accounts[0] })
 
             // act-assert
             try {

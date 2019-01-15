@@ -3,7 +3,7 @@
 /* global artifacts, assert, contract, describe, it */
 
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
-const utils = require('../../../../helpers/utils.js')
+const testUtils = require('../../../../helpers/utils.js')
 const { initializeAgreement } = require('../../../../helpers/initializeAgreement.js')
 
 contract('ServiceExecutionAgreement', (accounts) => {
@@ -19,12 +19,12 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
     beforeEach(async () => {
         contract = await ServiceExecutionAgreement.new({ from: accounts[0] })
-        contracts = [utils.dummyAddress]
-        fingerprints = [utils.emptyBytes32]
+        contracts = [testUtils.dummyAddress]
+        fingerprints = [testUtils.emptyBytes32]
         dependenciesBits = [0]
-        valueHashes = [utils.valueHash(['bool'], [true])]
+        valueHashes = [testUtils.valueHash(['bool'], [true])]
         timeoutValues = [0]
-        agreementId = utils.generateId()
+        agreementId = testUtils.generateId()
     })
 
     async function initializeAgreementWithValues() {

@@ -3,7 +3,7 @@
 /* global artifacts, assert, contract, describe, it */
 
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
-const utils = require('../../../../helpers/utils.js')
+const testUtils = require('../../../../helpers/utils.js')
 const { signAgreement } = require('../../../../helpers/signAgreement.js')
 
 contract('ServiceExecutionAgreement', (accounts) => {
@@ -20,9 +20,9 @@ contract('ServiceExecutionAgreement', (accounts) => {
         contract = await ServiceExecutionAgreement.new({ from: accounts[0] })
         contracts = [accounts[2]]
         fingerprints = ['0x2e0a37a5']
-        valueHashes = [utils.valueHash(['bool'], [true])]
+        valueHashes = [testUtils.valueHash(['bool'], [true])]
         timeoutValues = [0]
-        agreementId = utils.generateId()
+        agreementId = testUtils.generateId()
     })
 
     describe('initialize', () => {
@@ -30,12 +30,12 @@ contract('ServiceExecutionAgreement', (accounts) => {
             // act-assert
             try {
                 await contract.initializeAgreement(
-                    utils.templateId,
+                    testUtils.templateId,
                     '0x10',
-                    utils.dummyAddress,
+                    testUtils.dummyAddress,
                     [], [],
-                    utils.emptyBytes32,
-                    utils.emptyBytes32,
+                    testUtils.emptyBytes32,
+                    testUtils.emptyBytes32,
                     { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Template does not exist')
@@ -47,20 +47,20 @@ contract('ServiceExecutionAgreement', (accounts) => {
         it('Should not initialize agreement with invalid timeout length', async () => {
             // arrange
             await contract.setupTemplate(
-                utils.templateId,
-                [utils.dummyAddress],
+                testUtils.templateId,
+                [testUtils.dummyAddress],
                 ['0x1234'],
                 [1], [1], 1, { from: accounts[0] })
 
             // act-assert
             try {
                 await contract.initializeAgreement(
-                    utils.templateId,
+                    testUtils.templateId,
                     '0x10',
-                    utils.dummyAddress,
+                    testUtils.dummyAddress,
                     [], [],
-                    utils.emptyBytes32,
-                    utils.emptyBytes32,
+                    testUtils.emptyBytes32,
+                    testUtils.emptyBytes32,
                     { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'invalid timeout values length')
@@ -72,19 +72,19 @@ contract('ServiceExecutionAgreement', (accounts) => {
         it('Should not initialize agreement (revert) when signature is not valid', async () => {
             // arrange
             await contract.setupTemplate(
-                utils.templateId,
+                testUtils.templateId,
                 [], [], [], [], 0,
                 { from: accounts[0] })
 
             // act-assert
             try {
                 await contract.initializeAgreement(
-                    utils.templateId,
+                    testUtils.templateId,
                     '0x10',
-                    utils.dummyAddress,
+                    testUtils.dummyAddress,
                     [], [],
-                    utils.emptyBytes32,
-                    utils.emptyBytes32,
+                    testUtils.emptyBytes32,
+                    testUtils.emptyBytes32,
                     { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Invalid consumer signature of service agreement')
@@ -153,7 +153,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
                 agreementId,
                 consumer)
             await contract.setupTemplate(
-                utils.templateId,
+                testUtils.templateId,
                 contracts,
                 fingerprints,
                 [0], [0], 0,
@@ -161,26 +161,26 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
             // act
             const result = await contract.initializeAgreement(
-                utils.templateId,
+                testUtils.templateId,
                 signature,
                 consumer,
                 valueHashes,
                 timeoutValues,
                 agreementId,
-                utils.templateId,
+                testUtils.templateId,
                 { from: accounts[0] })
 
             // assert
             assert.strictEqual(await contract.isAgreementExisting(agreementId), true, 'Agreement does not exist')
-            utils.assertEmitted(result, 1, 'ConditionInitialized')
-            utils.assertEmitted(result, 1, 'AgreementInitialized')
+            testUtils.assertEmitted(result, 1, 'ConditionInitialized')
+            testUtils.assertEmitted(result, 1, 'AgreementInitialized')
         })
 
         it('Should throw when signature is invalid', async () => {
             // arrange
             const signature = '0x000000'
             await contract.setupTemplate(
-                utils.templateId,
+                testUtils.templateId,
                 contracts,
                 fingerprints,
                 [0], [0], 0,
@@ -189,13 +189,13 @@ contract('ServiceExecutionAgreement', (accounts) => {
             // act
             try {
                 await contract.initializeAgreement(
-                    utils.templateId,
+                    testUtils.templateId,
                     signature,
                     consumer,
                     valueHashes,
                     timeoutValues,
                     agreementId,
-                    utils.templateId,
+                    testUtils.templateId,
                     { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(
@@ -210,11 +210,11 @@ contract('ServiceExecutionAgreement', (accounts) => {
             // arrange
             timeoutValues = [1]
             const signature = await signAgreement(contracts, fingerprints, valueHashes, timeoutValues, agreementId, consumer)
-            await contract.setupTemplate(utils.templateId, contracts, fingerprints, [0], [0], 0, { from: accounts[0] })
+            await contract.setupTemplate(testUtils.templateId, contracts, fingerprints, [0], [0], 0, { from: accounts[0] })
 
             // act-assert
             try {
-                await contract.initializeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
+                await contract.initializeAgreement(testUtils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, testUtils.templateId, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'invalid timeout with a margin (~ 30 to 40 seconds = 2 blocks intervals) to avoid race conditions')
                 return
@@ -226,14 +226,14 @@ contract('ServiceExecutionAgreement', (accounts) => {
             // arrange
             timeoutValues = [3]
             const signature = await signAgreement(contracts, fingerprints, valueHashes, timeoutValues, agreementId, consumer)
-            await contract.setupTemplate(utils.templateId, contracts, fingerprints, [0], [0], 0, { from: accounts[0] })
+            await contract.setupTemplate(testUtils.templateId, contracts, fingerprints, [0], [0], 0, { from: accounts[0] })
 
             // act
-            const result = await contract.initializeAgreement(utils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, utils.templateId, { from: accounts[0] })
+            const result = await contract.initializeAgreement(testUtils.templateId, signature, consumer, valueHashes, timeoutValues, agreementId, testUtils.templateId, { from: accounts[0] })
 
             // assert
-            utils.assertEmitted(result, 1, 'ConditionInitialized')
-            utils.assertEmitted(result, 1, 'AgreementInitialized')
+            testUtils.assertEmitted(result, 1, 'ConditionInitialized')
+            testUtils.assertEmitted(result, 1, 'AgreementInitialized')
         })
     })
 })

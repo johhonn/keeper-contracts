@@ -4,9 +4,9 @@
 
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const { hashAgreement } = require('../../helpers/hashAgreement.js')
-const utils = require('../../helpers/utils')
+const testUtils = require('../../helpers/utils')
 
-const web3 = utils.getWeb3()
+const web3 = testUtils.getWeb3()
 
 contract('ServiceExecutionAgreement', (accounts) => {
     let sea
@@ -14,7 +14,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
     const consumer = accounts[0]
     /* eslint-disable-next-line prefer-destructuring */
     const templateOwner = accounts[1]
-    const { templateId } = utils
+    const { templateId } = testUtils
     const contracts = accounts.slice(2, 6)
     const fingerprints = [
         '0x2e0a37a5',
@@ -23,18 +23,18 @@ contract('ServiceExecutionAgreement', (accounts) => {
         '0xc1964ded'
     ]
 
-    const agreementId = utils.generateId()
+    const agreementId = testUtils.generateId()
 
     const hashedValues = [
-        utils.valueHash(['bool'], [true]),
-        utils.valueHash(['bool'], [false]),
-        utils.valueHash(['uint'], [120]),
-        utils.valueHash(['string'], ['797FD5B9045B841FDFF72'])
+        testUtils.valueHash(['bool'], [true]),
+        testUtils.valueHash(['bool'], [false]),
+        testUtils.valueHash(['uint'], [120]),
+        testUtils.valueHash(['string'], ['797FD5B9045B841FDFF72'])
     ]
 
     const timeoutValues = [0, 0, 0, 3] // timeout 5 blocks @ condition 4
 
-    const conditionKeys = utils.generateConditionsKeys(
+    const conditionKeys = testUtils.generateConditionsKeys(
         templateId,
         contracts,
         fingerprints
@@ -82,13 +82,13 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
             // generate template fingerprint including all the conditions and
             const initializeResult = await sea.initializeAgreement(
-                utils.templateId,
+                testUtils.templateId,
                 signature,
                 consumer,
                 hashedValues,
                 timeoutValues,
                 agreementId,
-                utils.did,
+                testUtils.did,
                 { from: templateOwner }
             )
 
@@ -127,7 +127,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             assert.strictEqual(fulfillResult.isAgreementFulfilled, false,
                 'Agreement should be fulfilled')
 
-            // await utils.sleep(2000)
+            // await testUtils.sleep(2000)
             //
             // await sea.conditionTimedOut(agreementId, conditionKeys[3])
             //
@@ -148,7 +148,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             //     'Invalid condition state')
             // let conditionId4Status = await sea.getConditionStatus(agreementId, conditionKeys[3])
             // assert.strictEqual(1, conditionId4Status.toNumber(), 'Invalid condition state')
-            // await utils.sleep(3000)
+            // await testUtils.sleep(3000)
             //
             // await sea.conditionTimedOut(agreementId, conditionKeys[3])
             // conditionId4Status = await sea.getConditionStatus(agreementId, conditionKeys[3])

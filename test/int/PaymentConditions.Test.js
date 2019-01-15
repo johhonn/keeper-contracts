@@ -5,10 +5,10 @@ const OceanToken = artifacts.require('OceanToken.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
-const utils = require('../helpers/utils.js')
+const testUtils = require('../helpers/utils.js')
 const { hashAgreement } = require('../helpers/hashAgreement.js')
 
-const web3 = utils.getWeb3()
+const web3 = testUtils.getWeb3()
 const did = '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
 const serviceTemplateId = '0x419d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
 
@@ -60,9 +60,9 @@ contract('PaymentConditions', (accounts) => {
                 paymentConditions.address
             ]
             fingerprints = [
-                utils.getSelector(web3, accessConditions, 'grantAccess'),
-                utils.getSelector(web3, paymentConditions, 'lockPayment'),
-                utils.getSelector(web3, paymentConditions, 'releasePayment')
+                testUtils.getSelector(web3, accessConditions, 'grantAccess'),
+                testUtils.getSelector(web3, paymentConditions, 'lockPayment'),
+                testUtils.getSelector(web3, paymentConditions, 'releasePayment')
             ]
             dependencies = [0, 1, 2]
             const fulfillmentIndices = [0] // Root Condition
@@ -79,9 +79,9 @@ contract('PaymentConditions', (accounts) => {
             const { templateId } = result.logs[3].args
             testTemplateId = templateId
 
-            const lockPaymentHash = utils.valueHash(['bytes32', 'uint256'], [asset, price])
-            const releasePaymentHash = utils.valueHash(['bytes32', 'uint256'], [asset, price])
-            const grantAccessHash = utils.valueHash(['bytes32'], [asset])
+            const lockPaymentHash = testUtils.valueHash(['bytes32', 'uint256'], [asset, price])
+            const releasePaymentHash = testUtils.valueHash(['bytes32', 'uint256'], [asset, price])
+            const grantAccessHash = testUtils.valueHash(['bytes32'], [asset])
 
             hashes = [grantAccessHash, lockPaymentHash, releasePaymentHash]
         })
@@ -89,7 +89,7 @@ contract('PaymentConditions', (accounts) => {
         async function signAgreement(agreementId) {
             const hash = hashAgreement(
                 testTemplateId,
-                utils.generateConditionsKeys(testTemplateId, contracts, fingerprints),
+                testUtils.generateConditionsKeys(testTemplateId, contracts, fingerprints),
                 hashes,
                 timeouts,
                 agreementId
@@ -109,7 +109,7 @@ contract('PaymentConditions', (accounts) => {
         }
 
         it('Rejects to lock payments if conditions are not met', async () => {
-            const agreementId = await signAgreement(utils.generateId())
+            const agreementId = await signAgreement(testUtils.generateId())
 
             await paymentConditions.lockPayment(agreementId, asset, price)
             assert.strictEqual(
@@ -119,7 +119,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Locks payment if conditions are met', async () => {
-            const agreementId = await signAgreement(utils.generateId())
+            const agreementId = await signAgreement(testUtils.generateId())
 
             await accessConditions.grantAccess(
                 agreementId,
@@ -135,7 +135,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Does not lock twice', async () => {
-            const agreementId = await signAgreement(utils.generateId())
+            const agreementId = await signAgreement(testUtils.generateId())
 
             await accessConditions.grantAccess(
                 agreementId,
@@ -158,7 +158,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Rejects to release payment if conditions are not met', async () => {
-            const agreementId = await signAgreement(utils.generateId())
+            const agreementId = await signAgreement(testUtils.generateId())
 
             await paymentConditions.releasePayment(agreementId, asset, price)
             assert.strictEqual(
@@ -168,7 +168,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Releases payment if conditions are met', async () => {
-            const agreementId = await signAgreement(utils.generateId())
+            const agreementId = await signAgreement(testUtils.generateId())
 
             await accessConditions.grantAccess(
                 agreementId,
@@ -186,7 +186,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Does not release twice', async () => {
-            const agreementId = await signAgreement(utils.generateId())
+            const agreementId = await signAgreement(testUtils.generateId())
 
             await accessConditions.grantAccess(
                 agreementId,

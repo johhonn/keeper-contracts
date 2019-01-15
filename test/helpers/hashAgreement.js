@@ -1,5 +1,5 @@
-const utils = require('./utils.js')
-const web3 = utils.getWeb3()
+const testUtils = require('./utils.js')
+const web3 = testUtils.getWeb3()
 
 const hashAgreement = function(
     templateId,

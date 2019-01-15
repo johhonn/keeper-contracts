@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 /* global web3, artifacts, assert, contract, describe, it */
 const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
+const testUtils = require('../helpers/utils')
 
 const OceanToken = artifacts.require('OceanToken')
 const OceanTokenWithBug = artifacts.require('OceanTokenWithBug')
@@ -12,16 +13,6 @@ const OceanTokenChangeFunctionSignature = artifacts.require('OceanTokenChangeFun
 global.artifacts = artifacts
 global.web3 = web3
 let zos
-
-async function assertRevert(promise) {
-    try {
-        await promise
-        assert.fail('Expected revert not received')
-    } catch (error) {
-        const revertFound = error.message.search('revert') >= 0
-        assert(revertFound, `Expected "revert", got ${error} instead`)
-    }
-}
 
 contract('OceanToken', (accounts) => {
     let pAddress
@@ -44,7 +35,7 @@ contract('OceanToken', (accounts) => {
             await zos.upgradeToNewContract('OceanTokenExtraFunctionality')
             let p = await OceanTokenExtraFunctionality.at(pAddress)
             // should not be able to be called before upgrade is approved
-            await assertRevert(p.getNumber())
+            await testUtils.assertRevert(p.getNumber())
 
             // Approve and call again
             await zos.approveLatestTransaction()
@@ -57,7 +48,7 @@ contract('OceanToken', (accounts) => {
             await zos.upgradeToNewContract('OceanTokenChangeInStorage')
             let p = await OceanTokenChangeInStorage.at(pAddress)
             // should not be able to be called before upgrade is approved
-            await assertRevert(p.called(zos.owner))
+            await testUtils.assertRevert(p.called(zos.owner))
 
             // Approve and call again
             await zos.approveLatestTransaction()
@@ -83,7 +74,7 @@ contract('OceanToken', (accounts) => {
         it('Should be possible to fix/add a bug', async () => {
             let p = await OceanTokenWithBug.at(pAddress)
             await zos.upgradeToNewContract('OceanTokenWithBug')
-            await assertRevert(p.setReceiver(accounts[1]))
+            await testUtils.assertRevert(p.setReceiver(accounts[1]))
             // Approve to insert bug and call again
             await zos.approveLatestTransaction()
             // Upgraded version should have a bug

@@ -1,7 +1,7 @@
 /* eslint-env mocha */
 /* global web3, artifacts, assert, contract, describe, it */
 const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
-const utils = require('../helpers/utils.js')
+const testUtils = require('../helpers/utils.js')
 
 const ServiceAgreementWithBug = artifacts.require('ServiceAgreementWithBug')
 const ServiceAgreementChangeInStorage = artifacts.require('ServiceAgreementChangeInStorage')
@@ -12,16 +12,6 @@ const ServiceAgreementChangeFunctionSignature = artifacts.require('ServiceAgreem
 global.artifacts = artifacts
 global.web3 = web3
 let zos
-
-async function assertRevert(promise) {
-    try {
-        await promise
-        assert.fail('Expected revert not received')
-    } catch (error) {
-        const revertFound = error.message.search('revert') >= 0
-        assert(revertFound, `Expected "revert", got ${error} instead`)
-    }
-}
 
 contract('ServiceExecutionAgreement', (accounts) => {
     let pAddress
@@ -44,7 +34,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             await zos.upgradeToNewContract('ServiceAgreementExtraFunctionality')
             let p = await ServiceAgreementExtraFunctionality.at(pAddress)
             // should not be able to be called before upgrade is approved
-            await assertRevert(p.getNumber())
+            await testUtils.assertRevert(p.getNumber())
 
             // Approve and call again
             await zos.approveLatestTransaction()
@@ -57,7 +47,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             await zos.upgradeToNewContract('ServiceAgreementChangeInStorage')
             let p = await ServiceAgreementChangeInStorage.at(pAddress)
             // should not be able to be called before upgrade is approved
-            await assertRevert(p.called(zos.owner))
+            await testUtils.assertRevert(p.called(zos.owner))
 
             // Approve and call again
             await zos.approveLatestTransaction()
@@ -77,7 +67,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             const result = await p.setupAgreementTemplate(templateId, [], [], [], emptyBytes32, [], 0, { from: accounts[0] })
 
             // assert
-            utils.assertEmitted(result, 1, 'SetupAgreementTemplate')
+            testUtils.assertEmitted(result, 1, 'SetupAgreementTemplate')
             const status = await p.getTemplateStatus(templateId)
             assert.strictEqual(status, true)
             let n
@@ -93,7 +83,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             // add test
             const result = await p.setupAgreementTemplate(templateId, [], [], [], emptyBytes32, [], 0, { from: accounts[0] })
             // assert
-            utils.assertEmitted(result, 1, 'SetupAgreementTemplate')
+            testUtils.assertEmitted(result, 1, 'SetupAgreementTemplate')
             const status = await p.getTemplateStatus(templateId)
             assert.strictEqual(status, false)
         })
@@ -101,14 +91,14 @@ contract('ServiceExecutionAgreement', (accounts) => {
         it('Should be possible to change function signature', async () => {
             await zos.upgradeToNewContract('ServiceAgreementChangeFunctionSignature')
             let p = await ServiceAgreementChangeFunctionSignature.at(pAddress)
-            await assertRevert(p.setupAgreementTemplate(templateId, [], [], [], emptyBytes32, [], { from: accounts[0] }))
+            await testUtils.assertRevert(p.setupAgreementTemplate(templateId, [], [], [], emptyBytes32, [], { from: accounts[0] }))
 
             // Approve and test new logic
             await zos.approveLatestTransaction()
             const result = await p.setupAgreementTemplate(templateId, [], [], [], emptyBytes32, [], { from: accounts[0] })
 
             // assert
-            utils.assertEmitted(result, 1, 'SetupAgreementTemplate')
+            testUtils.assertEmitted(result, 1, 'SetupAgreementTemplate')
             const status = await p.getTemplateStatus(templateId)
             assert.strictEqual(status, true)
         })

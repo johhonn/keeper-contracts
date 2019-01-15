@@ -1,7 +1,7 @@
 /* eslint-env mocha */
 /* global web3, artifacts, assert, contract, describe, it */
 const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
-const utils = require('../helpers/utils.js')
+const testUtils = require('../helpers/utils.js')
 
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement')
 const AccessConditions = artifacts.require('AccessConditions')
@@ -14,16 +14,6 @@ const AccessConditionsChangeFunctionSignature = artifacts.require('AccessConditi
 global.artifacts = artifacts
 global.web3 = web3
 let zos
-
-async function assertRevert(promise) {
-    try {
-        await promise
-        assert.fail('Expected revert not received')
-    } catch (error) {
-        const revertFound = error.message.search('revert') >= 0
-        assert(revertFound, `Expected "revert", got ${error} instead`)
-    }
-}
 
 contract('AccessConditions', (accounts) => {
     let pAddress
@@ -41,8 +31,8 @@ contract('AccessConditions', (accounts) => {
     let serviceAgreementId
 
     function createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer) {
-        const conditionKeys = utils.generateConditionsKeys(templateId, contracts, fingerprints)
-        const hash = utils.createSLAHash(web3, templateId, conditionKeys, valueHashes, timeoutValues, serviceAgreementId)
+        const conditionKeys = testUtils.generateConditionsKeys(templateId, contracts, fingerprints)
+        const hash = testUtils.createSLAHash(web3, templateId, conditionKeys, valueHashes, timeoutValues, serviceAgreementId)
         return web3.eth.sign(hash, consumer)
     }
 
@@ -52,11 +42,11 @@ contract('AccessConditions', (accounts) => {
         /* eslint-disable-next-line prefer-destructuring */
         consumer = accounts[1]
         contracts = [pAddress]
-        fingerprints = [utils.getSelector(web3, p, 'grantAccess')]
+        fingerprints = [testUtils.getSelector(web3, p, 'grantAccess')]
         dependenciesBits = [0]
-        valueHashes = utils.valueHash(['bytes32', 'bytes32'], [assetId, assetId])
+        valueHashes = testUtils.valueHash(['bytes32', 'bytes32'], [assetId, assetId])
         timeoutValues = [0]
-        serviceAgreementId = utils.generateId(web3)
+        serviceAgreementId = testUtils.generateId(web3)
 
         const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
         await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, dependenciesBits, templateId, [0], 0, { from: accounts[0] })
@@ -79,7 +69,7 @@ contract('AccessConditions', (accounts) => {
             await zos.upgradeToNewContract('AccessConditionsExtraFunctionality')
             let p = await AccessConditionsExtraFunctionality.at(pAddress)
             // should not be able to be called before upgrade is approved
-            await assertRevert(p.getNumber())
+            await testUtils.assertRevert(p.getNumber())
 
             // Approve and call again
             await zos.approveLatestTransaction()
@@ -92,7 +82,7 @@ contract('AccessConditions', (accounts) => {
             await zos.upgradeToNewContract('AccessConditionsChangeInStorage')
             let p = await AccessConditionsChangeInStorage.at(pAddress)
             // should not be able to be called before upgrade is approved
-            await assertRevert(p.called(zos.owner))
+            await testUtils.assertRevert(p.called(zos.owner))
 
             // Approve and call again
             await zos.approveLatestTransaction()
@@ -120,7 +110,7 @@ contract('AccessConditions', (accounts) => {
             await initAgreement()
             let p = await AccessConditionsWithBug.at(pAddress)
             await zos.upgradeToNewContract('AccessConditionsWithBug')
-            await assertRevert(p.grantAccess(serviceAgreementId, emptyBytes32, emptyBytes32, { from: consumer })
+            await testUtils.assertRevert(p.grantAccess(serviceAgreementId, emptyBytes32, emptyBytes32, { from: consumer })
             )
             await zos.approveLatestTransaction()
             await p.grantAccess(serviceAgreementId, emptyBytes32, emptyBytes32, { from: consumer })
@@ -130,7 +120,7 @@ contract('AccessConditions', (accounts) => {
             await initAgreement()
             let p = await AccessConditionsChangeFunctionSignature.at(pAddress)
             await zos.upgradeToNewContract('AccessConditionsChangeFunctionSignature')
-            await assertRevert(p.grantAccess(serviceAgreementId, assetId, assetId, accounts[0]))
+            await testUtils.assertRevert(p.grantAccess(serviceAgreementId, assetId, assetId, accounts[0]))
 
             await zos.approveLatestTransaction()
             await p.grantAccess(serviceAgreementId, assetId, assetId, accounts[0], { from: accounts[0] })

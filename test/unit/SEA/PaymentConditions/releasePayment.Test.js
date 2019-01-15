@@ -6,10 +6,10 @@ const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 
-const utils = require('../../../helpers/utils.js')
+const testUtils = require('../../../helpers/utils.js')
 const { initializeAgreement } = require('../../../helpers/initializeAgreement.js')
 
-const web3 = utils.getWeb3()
+const web3 = testUtils.getWeb3()
 
 contract('PaymentConditions', (accounts) => {
     const assetId = '0x0000000000000000000000000000000000000000000000000000000000000001'
@@ -32,11 +32,11 @@ contract('PaymentConditions', (accounts) => {
         paymentConditions = await PaymentConditions.new(sea.address, token.address, { from: accounts[0] })
         price = 1
         contracts = [paymentConditions.address]
-        fingerprints = [utils.getSelector(web3, PaymentConditions, 'lockPayment')]
+        fingerprints = [testUtils.getSelector(web3, PaymentConditions, 'lockPayment')]
         dependenciesBits = [0]
-        valueHashes = [utils.valueHash(['bytes32', 'uint256'], [assetId, price])]
+        valueHashes = [testUtils.valueHash(['bytes32', 'uint256'], [assetId, price])]
         timeoutValues = [0]
-        agreementId = utils.generateId()
+        agreementId = testUtils.generateId()
     })
 
     async function initializeAgreementWithValues() {
@@ -59,7 +59,7 @@ contract('PaymentConditions', (accounts) => {
 
             // act-assert
             try {
-                await paymentConditions.releasePayment(agreementId, utils.emptyBytes32, 1, { from: consumer })
+                await paymentConditions.releasePayment(agreementId, testUtils.emptyBytes32, 1, { from: consumer })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Only service agreement publisher can trigger releasePayment.')
                 return
@@ -69,15 +69,15 @@ contract('PaymentConditions', (accounts) => {
 
         it('Should release payment', async () => {
             // arrang
-            fingerprints = [utils.getSelector(web3, PaymentConditions, 'releasePayment')]
-            valueHashes = [utils.valueHash(['bytes32', 'uint256'], [assetId, price])]
+            fingerprints = [testUtils.getSelector(web3, PaymentConditions, 'releasePayment')]
+            valueHashes = [testUtils.valueHash(['bytes32', 'uint256'], [assetId, price])]
             await initializeAgreementWithValues()
 
             // act
             const result = await paymentConditions.releasePayment(agreementId, assetId, price, { from: accounts[0] })
 
             // assert
-            utils.assertEmitted(result, 1, 'PaymentReleased')
+            testUtils.assertEmitted(result, 1, 'PaymentReleased')
         })
 
         it('Should not release payment when exist unfulfilled dependencies', async () => {
@@ -89,13 +89,13 @@ contract('PaymentConditions', (accounts) => {
             const result = await paymentConditions.releasePayment(agreementId, assetId, price, { from: accounts[0] })
 
             // assert
-            utils.assertEmitted(result, 0, 'PaymentReleased')
+            testUtils.assertEmitted(result, 0, 'PaymentReleased')
         })
 
         it('Should not release payment twice', async () => {
             // arrang
-            fingerprints = [utils.getSelector(web3, PaymentConditions, 'releasePayment')]
-            valueHashes = [utils.valueHash(['bytes32', 'uint256'], [assetId, price])]
+            fingerprints = [testUtils.getSelector(web3, PaymentConditions, 'releasePayment')]
+            valueHashes = [testUtils.valueHash(['bytes32', 'uint256'], [assetId, price])]
             await initializeAgreementWithValues()
             await paymentConditions.releasePayment(agreementId, assetId, price, { from: accounts[0] })
 
@@ -103,7 +103,7 @@ contract('PaymentConditions', (accounts) => {
             const result = await paymentConditions.releasePayment(agreementId, assetId, price, { from: accounts[0] })
 
             // assert
-            utils.assertEmitted(result, 0, 'PaymentReleased')
+            testUtils.assertEmitted(result, 0, 'PaymentReleased')
         })
     })
 })

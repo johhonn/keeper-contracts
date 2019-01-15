@@ -5,10 +5,10 @@
 const ComputeConditions = artifacts.require('ComputeConditions.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 
-const utils = require('../../../helpers/utils.js')
+const testUtils = require('../../../helpers/utils.js')
 const { initializeAgreement } = require('../../../helpers/initializeAgreement.js')
 
-const web3 = utils.getWeb3()
+const web3 = testUtils.getWeb3()
 
 contract('ComputeConditions', (accounts) => {
     let sea
@@ -26,11 +26,11 @@ contract('ComputeConditions', (accounts) => {
         sea = await ServiceExecutionAgreement.new({ from: accounts[0] })
         computeConditions = await ComputeConditions.new(sea.address, { from: accounts[0] })
         contracts = [computeConditions.address]
-        fingerprints = [utils.getSelector(web3, ComputeConditions, 'fulfillUpload')]
+        fingerprints = [testUtils.getSelector(web3, ComputeConditions, 'fulfillUpload')]
         dependenciesBits = [0]
-        valueHashes = [utils.valueHash(['bool'], [true])]
+        valueHashes = [testUtils.valueHash(['bool'], [true])]
         timeoutValues = [0]
-        agreementId = utils.generateId()
+        agreementId = testUtils.generateId()
     })
 
     async function initializeAgreementWithValues() {
@@ -50,7 +50,7 @@ contract('ComputeConditions', (accounts) => {
         it('Should not submit when sender is not consumer', async () => {
             // act-assert
             try {
-                await computeConditions.submitHashSignature(agreementId, utils.emptyBytes32, { from: accounts[0] })
+                await computeConditions.submitHashSignature(agreementId, testUtils.emptyBytes32, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Invalid data consumer address!')
                 return
@@ -63,23 +63,23 @@ contract('ComputeConditions', (accounts) => {
             await initializeAgreementWithValues()
 
             // act
-            const result = await computeConditions.submitHashSignature(agreementId, utils.emptyBytes32, { from: consumer })
+            const result = await computeConditions.submitHashSignature(agreementId, testUtils.emptyBytes32, { from: consumer })
 
             // assert
-            utils.assertEmitted(result, 1, 'HashSignatureSubmitted')
+            testUtils.assertEmitted(result, 1, 'HashSignatureSubmitted')
         })
 
         it('Should re-submit when call submit twice', async () => {
             // arrange
             await initializeAgreementWithValues()
-            await computeConditions.submitHashSignature(agreementId, utils.emptyBytes32, { from: consumer })
+            await computeConditions.submitHashSignature(agreementId, testUtils.emptyBytes32, { from: consumer })
 
             // act
-            const result = await computeConditions.submitHashSignature(agreementId, utils.emptyBytes32, { from: consumer })
+            const result = await computeConditions.submitHashSignature(agreementId, testUtils.emptyBytes32, { from: consumer })
 
             // assert
-            utils.assertEmitted(result, 1, 'HashSignatureSubmitted')
-            utils.assertEmitted(result, 1, 'ProofOfUploadInvalid')
+            testUtils.assertEmitted(result, 1, 'HashSignatureSubmitted')
+            testUtils.assertEmitted(result, 1, 'ProofOfUploadInvalid')
         })
     })
 })

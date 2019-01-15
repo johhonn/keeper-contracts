@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 /* global artifacts, assert, contract, describe, it */
 const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
+const testUtils = require('../helpers/utils.js')
 
 const FitchainConditionsWithBug = artifacts.require('FitchainConditionsWithBug')
 const FitchainConditionsChangeInStorage = artifacts.require('FitchainConditionsChangeInStorage')
@@ -11,16 +12,6 @@ const FitchainConditionsChangeFunctionSignature = artifacts.require('FitchainCon
 global.artifacts = artifacts
 
 let zos
-
-async function assertRevert(promise) {
-    try {
-        await promise
-        assert.fail('Expected revert not received')
-    } catch (error) {
-        const revertFound = error.message.search('revert') >= 0
-        assert(revertFound, `Expected "revert", got ${error} instead`)
-    }
-}
 
 contract('FitchainConditions', (accounts) => {
     let pAddress
@@ -42,7 +33,7 @@ contract('FitchainConditions', (accounts) => {
             await zos.upgradeToNewContract('FitchainConditionsExtraFunctionality')
             let p = await FitchainConditionsExtraFunctionality.at(pAddress)
             // should not be able to be called before upgrade is approved
-            await assertRevert(p.getNumber())
+            await testUtils.assertRevert(p.getNumber())
 
             // Approve and call again
             await zos.approveLatestTransaction()
@@ -55,7 +46,7 @@ contract('FitchainConditions', (accounts) => {
             await zos.upgradeToNewContract('FitchainConditionsChangeInStorage')
             let p = await FitchainConditionsChangeInStorage.at(pAddress)
             // should not be able to be called before upgrade is approved
-            await assertRevert(p.called(zos.owner))
+            await testUtils.assertRevert(p.called(zos.owner))
 
             // Approve and call again
             await zos.approveLatestTransaction()

@@ -4,7 +4,7 @@
 
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 
-const utils = require('../../../helpers/utils.js')
+const testUtils = require('../../../helpers/utils.js')
 
 contract('PaymentConditions constructor', (accounts) => {
     it('Should not deploy when agreement is empty', async () => {
@@ -21,7 +21,7 @@ contract('PaymentConditions constructor', (accounts) => {
     it('Should not deploy when token is empty', async () => {
         // act-assert
         try {
-            await PaymentConditions.new(utils.dummyAddress, 0x0, { from: accounts[0] })
+            await PaymentConditions.new(testUtils.dummyAddress, 0x0, { from: accounts[0] })
         } catch (e) {
             assert.strictEqual(e.reason, 'invalid address')
             return

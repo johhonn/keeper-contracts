@@ -2,10 +2,10 @@
 /* global artifacts, assert, contract, describe, it, beforeEach, before */
 
 const DIDRegistry = artifacts.require('DIDRegistry.sol')
-const utils = require('../../helpers/utils.js')
+const testUtils = require('../../helpers/utils.js')
 const ZeppelinHelper = require('../../helpers/ZeppelinHelper.js')
 
-const web3 = utils.getWeb3()
+const web3 = testUtils.getWeb3()
 
 contract('DIDRegistry', (accounts) => {
     let registry
@@ -29,7 +29,7 @@ contract('DIDRegistry', (accounts) => {
             const valueType = 0
             const result = await registry.registerAttribute(did, valueType, provider, providerDID)
 
-            utils.assertEmitted(result, 1, 'DIDAttributeRegistered')
+            testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             const payload = result.logs[0].args
             assert.strictEqual('did:ocn:test-attr', web3.utils.hexToString(payload.did))
@@ -46,7 +46,7 @@ contract('DIDRegistry', (accounts) => {
             const valueType = 0
             const result = await registry.registerAttribute(did, valueType, providerKey, providerDID)
 
-            utils.assertEmitted(result, 1, 'DIDAttributeRegistered')
+            testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             // get owner for a did
             const owner = await registry.getOwner(did)
@@ -89,7 +89,7 @@ contract('DIDRegistry', (accounts) => {
             // try to register the same attribute the second time
             const result = await registry.registerAttribute(did, valueType, provider, providerDID)
 
-            utils.assertEmitted(result, 1, 'DIDAttributeRegistered')
+            testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
         })
 
         it('Should not fail to register crazy long did', async () => {
@@ -116,7 +116,7 @@ contract('DIDRegistry', (accounts) => {
             const name = 'My asset.'
             const result = await registry.registerAttribute(did, valueType, nameKey, name)
 
-            utils.assertEmitted(result, 1, 'DIDAttributeRegistered')
+            testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             const payload = result.logs[0].args
             assert.strictEqual('did:ocn:test-multiple-attrs', web3.utils.hexToString(payload.did))

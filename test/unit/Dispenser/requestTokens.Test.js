@@ -3,7 +3,7 @@
 /* global artifacts, assert, contract, describe, it, before,beforeEach */
 
 const ZeppelinHelper = require('../../helpers/ZeppelinHelper.js')
-const utils = require('../../helpers/utils.js')
+const testUtils = require('../../helpers/utils.js')
 const Dispenser = artifacts.require('Dispenser.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 
@@ -48,7 +48,7 @@ contract('Dispenser', (accounts) => {
             // assert
             const balance = await token.balanceOf(accounts[1])
             assert.strictEqual(balance.toNumber(), 10)
-            utils.assertEmitted(result, 1, 'RequestFrequencyExceeded')
+            testUtils.assertEmitted(result, 1, 'RequestFrequencyExceeded')
         })
 
         it('Should not transfer more than max amount', async () => {
@@ -62,7 +62,7 @@ contract('Dispenser', (accounts) => {
             // assert
             const balance = await token.balanceOf(accounts[1])
             assert.strictEqual(balance.toNumber(), 0)
-            utils.assertEmitted(result, 1, 'RequestLimitExceeded')
+            testUtils.assertEmitted(result, 1, 'RequestLimitExceeded')
         })
     })
 })

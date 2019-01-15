@@ -3,7 +3,7 @@
 /* global artifacts, assert, contract, describe, it, beforeEach */
 
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
-const utils = require('../../../../helpers/utils.js')
+const testUtils = require('../../../../helpers/utils.js')
 const { initializeAgreement } = require('../../../../helpers/initializeAgreement')
 
 contract('ServiceExecutionAgreement', (accounts) => {
@@ -24,23 +24,23 @@ contract('ServiceExecutionAgreement', (accounts) => {
         contracts = [accounts[2]]
         fingerprints = ['0x2e0a37a5']
         dependenciesBits = [0]
-        valueHashes = [utils.valueHash(['bool'], [true])]
+        valueHashes = [testUtils.valueHash(['bool'], [true])]
         timeoutValues = [0]
-        agreementId = utils.generateId()
+        agreementId = testUtils.generateId()
     })
 
     describe('revokeTemplate', () => {
         it('Should not revoke by non template owner', async () => {
             // arrange
             await contract.setupTemplate(
-                utils.templateId,
-                [utils.dummyAddress],
+                testUtils.templateId,
+                [testUtils.dummyAddress],
                 fingerprints,
                 [0], [0], 0, { from: accounts[0] })
 
             // act-assert
             try {
-                await contract.revokeTemplate(utils.templateId, { from: accounts[2] })
+                await contract.revokeTemplate(testUtils.templateId, { from: accounts[2] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Not a template owner')
                 return
@@ -64,10 +64,10 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
             // act-assert
             try {
-                await contract.revokeTemplate(utils.templateId, { from: accounts[0] })
+                await contract.revokeTemplate(testUtils.templateId, { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Owner can not revoke template!')
-                assert.strictEqual(await contract.isTemplateRevoked(utils.templateId), false, 'Template did not revoked')
+                assert.strictEqual(await contract.isTemplateRevoked(testUtils.templateId), false, 'Template did not revoked')
                 return
             }
             assert.fail('Expected revert not received')
@@ -76,19 +76,19 @@ contract('ServiceExecutionAgreement', (accounts) => {
         it('Should revoke template', async () => {
             // arrange
             await contract.setupTemplate(
-                utils.templateId,
-                [utils.dummyAddress],
+                testUtils.templateId,
+                [testUtils.dummyAddress],
                 fingerprints,
                 [0], [0], 0, { from: accounts[0] })
 
             // act
-            const result = await contract.revokeTemplate(utils.templateId, { from: accounts[0] })
+            const result = await contract.revokeTemplate(testUtils.templateId, { from: accounts[0] })
 
             // assert
-            utils.assertEmitted(result, 1, 'TemplateRevoked')
-            const status = await contract.getTemplateStatus(utils.templateId)
+            testUtils.assertEmitted(result, 1, 'TemplateRevoked')
+            const status = await contract.getTemplateStatus(testUtils.templateId)
             assert.strictEqual(status, false)
-            assert.strictEqual(await contract.isTemplateRevoked(utils.templateId), true, 'Template did not revoked')
+            assert.strictEqual(await contract.isTemplateRevoked(testUtils.templateId), true, 'Template did not revoked')
         })
     })
 })
