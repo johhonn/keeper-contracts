@@ -18,17 +18,20 @@ class ZeppelinHelperBase {
         // remove config files
         try {
             execSync('rm zos.*', { stdio: 'ignore' })
+            if (verbose) {
+                console.log('Cleaned zos session.')
+            }
         } catch (e) {
             console.log(e)
             console.log('Continuing anyways')
         }
         // set zos session parameters
         // we need to identify if the network is coverage or if its development
-        let net = process.env.NETWORK
+        let network = process.env.NETWORK
         if (verbose) {
-            console.log(`Creating session with network: ${net} and admin: ${admin}`)
+            console.log(`Creating session with network: ${network} and admin: ${admin}`)
         }
-        execSync(`npx zos session --network ${net} --from ${admin} ${flags}`)
+        execSync(`npx zos session --network ${network} --from ${admin} ${flags}`)
 
         execSync(`npx zos init oceanprotocol v${pkg.version} --force ${flags}`)
         // add all contracts again
@@ -90,7 +93,7 @@ module.exports = class ZeppelinHelper extends ZeppelinHelperBase {
                     cmd = `DIDRegistry --init --args ${this.owner}`
                     break
                 case 'OceanToken':
-                    cmd = `OceanToken --init`
+                    cmd = `OceanToken --init initialize --args ${this.owner}`
                     break
                 case 'Dispenser':
                     cmd = `Dispenser --init initialize --args ${this.addresses['OceanToken']}, ${this.owner}`
