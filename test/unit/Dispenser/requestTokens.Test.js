@@ -23,7 +23,7 @@ contract('Dispenser', (accounts) => {
         token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
         dispenser = await Dispenser.at(zos.getProxyAddress('Dispenser'))
 
-        await token.addMinter(dispenser.address)
+        await token.addMinter(zos.getProxyAddress('Dispenser'))
     })
 
     describe('requestTokens', () => {
