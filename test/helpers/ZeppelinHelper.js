@@ -81,11 +81,13 @@ module.exports = class ZeppelinHelper extends ZeppelinHelperBase {
             if (verbose) {
                 console.log('Initializing: ', contract)
             }
-            for (let dep of this.dependencies[contract]) {
-                if (verbose) {
-                    console.log(`Adding dependencies ${dep}`)
+            if (this.dependencies[contract]) {
+                for (let dep of this.dependencies[contract]) {
+                    if (verbose) {
+                        console.log(`Adding dependencies ${dep}`)
+                    }
+                    await this.createContract(dep)
                 }
-                await this.createContract(dep)
             }
             let cmd
             switch (contract) {
