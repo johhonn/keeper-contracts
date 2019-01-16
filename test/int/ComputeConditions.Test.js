@@ -1,6 +1,5 @@
-/* global artifacts, contract, before, describe, it, assert, , before, beforeEach */
-/* eslint-disable no-console, max-len */
-
+/* global artifacts, contract, before, describe, it, assert, */
+/* eslint-disable max-len */
 
 const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
 const OceanToken = artifacts.require('OceanToken.sol')
@@ -31,7 +30,6 @@ contract('ComputeConditions', (accounts) => {
         let zos
 
         before(async () => {
-
             zos = new ZeppelinHelper('ComputeConditions')
             await zos.restoreState(accounts[9])
             zos.addDependency('PaymentConditions')
@@ -48,7 +46,12 @@ contract('ComputeConditions', (accounts) => {
             agreement = await ServiceExecutionAgreement.at(zos.getProxyAddress('ServiceExecutionAgreement'))
 
             // conditions
-            contracts = [paymentConditions.address, computeConditions.address, accessConditions.address, paymentConditions.address, paymentConditions.address]
+            contracts = [
+                paymentConditions.address,
+                computeConditions.address,
+                accessConditions.address,
+                paymentConditions.address,
+                paymentConditions.address]
             funcFingerPrints = [
                 testUtils.getSelector(web3, paymentConditions, 'lockPayment'),
                 testUtils.getSelector(web3, computeConditions, 'fulfillUpload'),

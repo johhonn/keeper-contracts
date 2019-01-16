@@ -33,8 +33,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
             // Approve and call again
             await zos.approveLatestTransaction()
-            let n
-            await p.getNumber().then(i => { n = i })
+            const n = await p.getNumber()
             assert.equal(n.toString(), '42', 'Error calling getNumber')
         })
 
@@ -47,8 +46,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             // Approve and call again
             await zos.approveLatestTransaction()
             // await p.setReceiver(accounts[0])
-            let n
-            await p.called(zos.owner).then(i => { n = i })
+            const n = await p.called(zos.owner)
             assert.equal(n.toNumber(), 0, 'Error calling added storage variable')
         })
 
@@ -66,15 +64,13 @@ contract('ServiceExecutionAgreement', (accounts) => {
                 [],
                 testUtils.emptyBytes32,
                 [],
-                0,
                 { from: accounts[0] })
 
             // assert
             testUtils.assertEmitted(result, 1, 'SetupAgreementTemplate')
             const status = await p.getTemplateStatus(testUtils.templateId)
             assert.strictEqual(status, true)
-            let n
-            await p.called(zos.owner).then(i => { n = i })
+            const n = await p.called(zos.owner)
             assert.equal(n.toNumber(), 1, 'Error calling added storage variable')
         })
 
@@ -91,7 +87,6 @@ contract('ServiceExecutionAgreement', (accounts) => {
                 [],
                 testUtils.emptyBytes32,
                 [],
-                0,
                 { from: accounts[0] })
             // assert
             testUtils.assertEmitted(result, 1, 'SetupAgreementTemplate')
@@ -109,7 +104,6 @@ contract('ServiceExecutionAgreement', (accounts) => {
                 [],
                 testUtils.emptyBytes32,
                 [],
-                0,
                 { from: accounts[0] }))
 
             // Approve and test new logic
@@ -121,7 +115,6 @@ contract('ServiceExecutionAgreement', (accounts) => {
                 [],
                 testUtils.emptyBytes32,
                 [],
-                0,
                 { from: accounts[0] })
 
             // assert

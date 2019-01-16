@@ -103,8 +103,7 @@ contract('ComputeConditions', (accounts) => {
             // Approve and call again
             await zos.approveLatestTransaction()
 
-            let n
-            await p.getNumber().then(i => { n = i })
+            let n = await p.getNumber()
             assert.equal(n.toString(), '42', 'Error calling getNumber')
         })
 
@@ -117,8 +116,7 @@ contract('ComputeConditions', (accounts) => {
             // Approve and call again
             await zos.approveLatestTransaction()
             // await p.setReceiver(accounts[0])
-            let n
-            await p.called(zos.owner).then(i => { n = i })
+            let n = await p.called(zos.owner)
             assert.equal(n.toNumber(), 0, 'Error calling added storage variable')
         })
 
@@ -135,8 +133,7 @@ contract('ComputeConditions', (accounts) => {
             const isSignatureSubmitted = testUtils.getEventArgsFromTx(submitAlgorithmSignature, 'HashSignatureSubmitted')
             assert.strictEqual(isSignatureSubmitted.state, true, 'Error: Unable to submit signature')
 
-            let n
-            await p.called(datascientist).then(i => { n = i })
+            let n = await p.called(datascientist)
             assert.equal(n.toNumber() > 0, true, 'time of registry not created')
         })
 

@@ -37,8 +37,7 @@ contract('FitchainConditions', (accounts) => {
 
             // Approve and call again
             await zos.approveLatestTransaction()
-            let n
-            await p.getNumber().then(i => { n = i })
+            const n = await p.getNumber()
             assert.equal(n.toString(), '42', 'Error calling getNumber')
         })
 
@@ -50,8 +49,7 @@ contract('FitchainConditions', (accounts) => {
 
             // Approve and call again
             await zos.approveLatestTransaction()
-            let n
-            await p.called(zos.owner).then(i => { n = i })
+            let n = await p.called(zos.owner)
             assert.equal(n.toNumber(), 0, 'Error calling added storage variable')
         })
 
@@ -62,8 +60,7 @@ contract('FitchainConditions', (accounts) => {
             await zos.approveLatestTransaction()
             const registerVerifier1 = await p.registerVerifier(1, { from: verifier1 })
             assert.strictEqual(verifier1, registerVerifier1.logs[0].args.verifier, 'invalid verifier address 1')
-            let n
-            await p.called(verifier1).then(i => { n = i })
+            let n = await p.called(verifier1)
             assert.equal(n.toNumber() > 0, true, 'Error calling added storage variable')
         })
 

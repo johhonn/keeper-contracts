@@ -28,8 +28,7 @@ contract('OceanToken', (accounts) => {
             await zos.approveLatestTransaction()
             await p.transfer(accounts[1], 100, { from: accounts[0] })
             await p.transfer(accounts[2], 100, { from: accounts[0] })
-            let n
-            await p.called(zos.owner).then(i => { n = i })
+            const n = await p.called(zos.owner)
             assert.equal(n.toNumber(), 2, 'Error on internal counter')
         })
     })

@@ -12,7 +12,6 @@ const { initializeAgreement } = require('../../../helpers/initializeAgreement.js
 const web3 = testUtils.getWeb3()
 
 contract('PaymentConditions', (accounts) => {
-    const assetId = '0x0000000000000000000000000000000000000000000000000000000000000001'
     let sea
     let token
     let paymentConditions
@@ -34,7 +33,7 @@ contract('PaymentConditions', (accounts) => {
         contracts = [paymentConditions.address]
         fingerprints = [testUtils.getSelector(web3, PaymentConditions, 'lockPayment')]
         dependenciesBits = [0]
-        valueHashes = [testUtils.valueHash(['bytes32', 'uint256'], [assetId, price])]
+        valueHashes = [testUtils.valueHash(['bytes32', 'uint256'], [testUtils.assetId, price])]
         timeoutValues = [0]
         agreementId = testUtils.generateId()
     })
@@ -59,7 +58,11 @@ contract('PaymentConditions', (accounts) => {
 
             // act-assert
             try {
-                await paymentConditions.lockPayment(agreementId, testUtils.emptyBytes32, 1, { from: accounts[0] })
+                await paymentConditions.lockPayment(
+                    agreementId,
+                    testUtils.emptyBytes32,
+                    1,
+                    { from: accounts[0] })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Only consumer can trigger lockPayment.')
                 return
@@ -74,7 +77,11 @@ contract('PaymentConditions', (accounts) => {
             await token.approve(paymentConditions.address, price, { from: consumer })
 
             // act
-            const result = await paymentConditions.lockPayment(agreementId, assetId, price, { from: consumer })
+            const result = await paymentConditions.lockPayment(
+                agreementId,
+                testUtils.assetId,
+                price,
+                { from: consumer })
 
             // assert
             testUtils.assertEmitted(result, 1, 'PaymentLocked')
@@ -86,7 +93,11 @@ contract('PaymentConditions', (accounts) => {
             await initializeAgreementWithValues()
 
             // act
-            const result = await paymentConditions.lockPayment(agreementId, assetId, price, { from: consumer })
+            const result = await paymentConditions.lockPayment(
+                agreementId,
+                testUtils.assetId,
+                price,
+                { from: consumer })
 
             // assert
             testUtils.assertEmitted(result, 0, 'PaymentLocked')
@@ -97,10 +108,18 @@ contract('PaymentConditions', (accounts) => {
             await initializeAgreementWithValues()
             await token.mint(consumer, price)
             await token.approve(paymentConditions.address, price, { from: consumer })
-            await paymentConditions.lockPayment(agreementId, assetId, price, { from: consumer })
+            await paymentConditions.lockPayment(
+                agreementId,
+                testUtils.assetId,
+                price,
+                { from: consumer })
 
             // act
-            const result = await paymentConditions.lockPayment(agreementId, assetId, price, { from: consumer })
+            const result = await paymentConditions.lockPayment(
+                agreementId,
+                testUtils.assetId,
+                price,
+                { from: consumer })
 
             // assert
             testUtils.assertEmitted(result, 0, 'PaymentLocked')

@@ -11,15 +11,9 @@ const AccessConditionsExtraFunctionality = artifacts.require('AccessConditionsEx
 const AccessConditionsChangeInStorageAndLogic = artifacts.require('AccessConditionsChangeInStorageAndLogic')
 const AccessConditionsChangeFunctionSignature = artifacts.require('AccessConditionsChangeFunctionSignature')
 
-global.artifacts = artifacts
-global.web3 = web3
-let zos
-
 contract('AccessConditions', (accounts) => {
+    let zos
     let pAddress
-    const assetId = '0x0000000000000000000000000000000000000000000000000000000000000001'
-    const templateId = '0x0000000000000000000000000000000000000000000000000000000000000002'
-    const emptyBytes32 = '0x0000000000000000000000000000000000000000000000000000000000000000'
     let agreement
     // let contract
     let consumer
@@ -31,8 +25,8 @@ contract('AccessConditions', (accounts) => {
     let serviceAgreementId
 
     function createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer) {
-        const conditionKeys = testUtils.generateConditionsKeys(templateId, contracts, fingerprints)
-        const hash = testUtils.createSLAHash(web3, templateId, conditionKeys, valueHashes, timeoutValues, serviceAgreementId)
+        const conditionKeys = testUtils.generateConditionsKeys(testUtils.templateId, contracts, fingerprints)
+        const hash = testUtils.createSLAHash(web3, testUtils.templateId, conditionKeys, valueHashes, timeoutValues, serviceAgreementId)
         return web3.eth.sign(hash, consumer)
     }
 
@@ -44,13 +38,13 @@ contract('AccessConditions', (accounts) => {
         contracts = [pAddress]
         fingerprints = [testUtils.getSelector(web3, p, 'grantAccess')]
         dependenciesBits = [0]
-        valueHashes = testUtils.valueHash(['bytes32', 'bytes32'], [assetId, assetId])
+        valueHashes = testUtils.valueHash(['bytes32', 'bytes32'], [testUtils.assetId, testUtils.assetId])
         timeoutValues = [0]
         serviceAgreementId = testUtils.generateId(web3)
 
         const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-        await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, dependenciesBits, templateId, [0], 0, { from: accounts[0] })
-        await agreement.executeAgreement(templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+        await agreement.setupAgreementTemplate(testUtils.templateId, contracts, fingerprints, dependenciesBits, testUtils.templateId, [0], 0, { from: accounts[0] })
+        await agreement.executeAgreement(testUtils.templateId, signature, consumer, [valueHashes], timeoutValues, serviceAgreementId, testUtils.templateId, { from: accounts[0] })
     }
 
     before('restore zos before all tests', async function() {
@@ -73,8 +67,7 @@ contract('AccessConditions', (accounts) => {
 
             // Approve and call again
             await zos.approveLatestTransaction()
-            let n
-            await p.getNumber().then(i => { n = i })
+            let n = await p.getNumber()
             assert.equal(n.toString(), '42', 'Error calling getNumber')
         })
 
@@ -86,8 +79,7 @@ contract('AccessConditions', (accounts) => {
 
             // Approve and call again
             await zos.approveLatestTransaction()
-            let n
-            await p.called(zos.owner).then(i => { n = i })
+            let n = await p.called(zos.owner)
             assert.equal(n.toNumber(), 0, 'Error calling added storage variable')
         })
 
@@ -100,9 +92,8 @@ contract('AccessConditions', (accounts) => {
             await zos.approveLatestTransaction()
 
             // act
-            await p.grantAccess(serviceAgreementId, assetId, assetId, { from: accounts[0] })
-            let n
-            await p.called(zos.owner).then(i => { n = i })
+            await p.grantAccess(serviceAgreementId, testUtils.assetId, testUtils.assetId, { from: accounts[0] })
+            let n = await p.called(zos.owner)
             assert.equal(n.toNumber(), 1, 'Error calling added storage variable')
         })
 
@@ -110,20 +101,20 @@ contract('AccessConditions', (accounts) => {
             await initAgreement()
             let p = await AccessConditionsWithBug.at(pAddress)
             await zos.upgradeToNewContract('AccessConditionsWithBug')
-            await testUtils.assertRevert(p.grantAccess(serviceAgreementId, emptyBytes32, emptyBytes32, { from: consumer })
+            await testUtils.assertRevert(p.grantAccess(serviceAgreementId, testUtils.emptyBytes32, testUtils.emptyBytes32, { from: consumer })
             )
             await zos.approveLatestTransaction()
-            await p.grantAccess(serviceAgreementId, emptyBytes32, emptyBytes32, { from: consumer })
+            await p.grantAccess(serviceAgreementId, testUtils.emptyBytes32, testUtils.emptyBytes32, { from: consumer })
         })
 
         it('Should be possible to change function signature', async () => {
             await initAgreement()
             let p = await AccessConditionsChangeFunctionSignature.at(pAddress)
             await zos.upgradeToNewContract('AccessConditionsChangeFunctionSignature')
-            await testUtils.assertRevert(p.grantAccess(serviceAgreementId, assetId, assetId, accounts[0]))
+            await testUtils.assertRevert(p.grantAccess(serviceAgreementId, testUtils.assetId, testUtils.assetId, accounts[0]))
 
             await zos.approveLatestTransaction()
-            await p.grantAccess(serviceAgreementId, assetId, assetId, accounts[0], { from: accounts[0] })
+            await p.grantAccess(serviceAgreementId, testUtils.assetId, testUtils.assetId, accounts[0], { from: accounts[0] })
         })
     })
 })

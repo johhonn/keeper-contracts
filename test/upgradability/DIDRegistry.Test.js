@@ -38,8 +38,7 @@ contract('DIDRegistry', (accounts) => {
 
             // Approve and call again
             await zos.approveLatestTransaction()
-            let n
-            await p.getNumber().then((i) => { n = i })
+            let n = await p.getNumber()
             assert.equal(n.toString(), '42', 'Error calling getNumber')
         })
 
@@ -52,8 +51,7 @@ contract('DIDRegistry', (accounts) => {
 
             // Approve and call again
             await zos.approveLatestTransaction()
-            let n
-            await p.timeOfRegister(did).then(i => { n = i })
+            let n = await p.timeOfRegister(did)
             assert.equal(n.toNumber(), 0, 'Error calling added storage variable')
         })
 
@@ -83,8 +81,7 @@ contract('DIDRegistry', (accounts) => {
 
             // Approve and call again
             await zos.approveLatestTransaction()
-            let n
-            await p.timeOfRegister(did).then(i => { n = i })
+            let n = await p.timeOfRegister(did)
             assert.equal(n.toNumber(), 0, 'Error calling added storage variable')
 
             // check new functionality works
