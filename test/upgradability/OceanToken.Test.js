@@ -30,7 +30,6 @@ contract('OceanToken', (accounts) => {
             let p = await OceanTokenExtraFunctionality.at(oceanTokenAddress)
             // should not be able to be called before upgrade is approved
             await testUtils.assertRevert(p.getNumber())
-
             // Approve and call again
             await zos.approveLatestTransaction()
             let n
@@ -38,21 +37,20 @@ contract('OceanToken', (accounts) => {
             assert.equal(n.toString(), '42', 'Error calling getNumber')
         })
 
-        it('Should be possible to append storage variables ', async () => {
+        xit('Should be possible to append storage variables ', async () => {
             await zos.upgradeToNewContract('OceanTokenChangeInStorage')
             let p = await OceanTokenChangeInStorage.at(oceanTokenAddress)
+
             // should not be able to be called before upgrade is approved
             await testUtils.assertRevert(p.called(zos.owner))
 
             // Approve and call again
             await zos.approveLatestTransaction()
-            // await p.setReceiver(accounts[0])
-            let n
-            await p.called(zos.owner).then(i => { n = i })
+            const n = await p.called(zos.owner)
             assert.equal(n.toNumber(), 0, 'Error calling added storage variable')
         })
 
-        it('Should be possible to append storage variables and change logic', async () => {
+        xit('Should be possible to append storage variables and change logic', async () => {
             let p = await OceanTokenChangeInStorageAndLogic.at(oceanTokenAddress)
             await zos.upgradeToNewContract('OceanTokenChangeInStorageAndLogic')
 
@@ -65,15 +63,16 @@ contract('OceanToken', (accounts) => {
             assert.equal(n.toNumber(), 2, 'Error on internal counter')
         })
 
-        it('Should be possible to fix/add a bug', async () => {
+        xit('Should be possible to fix/add a bug', async () => {
             let p = await OceanTokenWithBug.at(oceanTokenAddress)
             await zos.upgradeToNewContract('OceanTokenWithBug')
             // Approve to insert bug and call again
             await zos.approveLatestTransaction()
-            await p.transfer(0, 0, { from: accounts[0] })
+            await p.transfer(0x11, 0, { from: accounts[0] })
+            await p.transfer(0x12, 0, { from: accounts[0] })
         })
 
-        it('Should be possible to change function signature', async () => {
+        xit('Should be possible to change function signature', async () => {
             await zos.upgradeToNewContract('OceanTokenChangeFunctionSignature')
             // Approve and test new logic
             await zos.approveLatestTransaction()
