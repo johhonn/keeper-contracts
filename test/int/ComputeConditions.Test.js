@@ -1,6 +1,8 @@
-/* global artifacts, contract, before, describe, it, assert */
+/* global artifacts, contract, before, describe, it, assert, , before, beforeEach */
 /* eslint-disable no-console, max-len */
 
+
+const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
 const OceanToken = artifacts.require('OceanToken.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
@@ -26,14 +28,25 @@ contract('ComputeConditions', (accounts) => {
         const serviceTemplateId = testUtils.generateId()
         agreementId = testUtils.generateId()
         const algorithm = 'THIS IS FAKE CODE foo=Hello World!'
+        let zos
 
         before(async () => {
-            agreement = await ServiceExecutionAgreement.new({ from: accounts[0] })
-            token = await OceanToken.new({ from: accounts[0] })
+
+            zos = new ZeppelinHelper('ComputeConditions')
+            await zos.restoreState(accounts[9])
+            zos.addDependency('PaymentConditions')
+            zos.addDependency('AccessConditions')
+            await zos.initialize(accounts[0], false)
+
+            token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
+            await token.mint(publisher, 1000)
             await token.mint(datascientist, 1000)
-            paymentConditions = await PaymentConditions.new(agreement.address, token.address, { from: accounts[0] })
-            accessConditions = await AccessConditions.new(agreement.address, { from: accounts[0] })
-            computeConditions = await ComputeConditions.new(agreement.address, { from: accounts[0] })
+
+            paymentConditions = await PaymentConditions.at(zos.getProxyAddress('PaymentConditions'))
+            accessConditions = await AccessConditions.at(zos.getProxyAddress('AccessConditions'))
+            computeConditions = await ComputeConditions.at(zos.getProxyAddress('ComputeConditions'))
+            agreement = await ServiceExecutionAgreement.at(zos.getProxyAddress('ServiceExecutionAgreement'))
+
             // conditions
             contracts = [paymentConditions.address, computeConditions.address, accessConditions.address, paymentConditions.address, paymentConditions.address]
             funcFingerPrints = [
