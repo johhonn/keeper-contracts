@@ -96,13 +96,13 @@ module.exports = class ZeppelinHelper extends ZeppelinHelperBase {
                     cmd = `OceanToken --init initialize --args ${this.owner}`
                     break
                 case 'Dispenser':
-                    cmd = `Dispenser --init initialize --args ${this.addresses['OceanToken']}, ${this.owner}`
+                    cmd = `Dispenser --init initialize --args ${this.addresses['OceanToken']},${this.owner}`
                     break
                 case 'ServiceExecutionAgreement':
                     cmd = `ServiceExecutionAgreement`
                     break
                 case 'PaymentConditions':
-                    cmd = `PaymentConditions --init initialize --args ${this.addresses['ServiceExecutionAgreement']}, ${this.addresses['OceanToken']}`
+                    cmd = `PaymentConditions --init initialize --args ${this.addresses['ServiceExecutionAgreement']},${this.addresses['OceanToken']}`
                     break
                 case 'AccessConditions':
                     cmd = `AccessConditions --init initialize --args ${this.addresses['ServiceExecutionAgreement']}`
