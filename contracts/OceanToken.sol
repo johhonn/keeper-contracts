@@ -4,6 +4,7 @@ import 'openzeppelin-eth/contracts/token/ERC20/ERC20Capped.sol';
 import 'openzeppelin-eth/contracts/token/ERC20/ERC20Detailed.sol';
 import 'zos-lib/contracts/Initializable.sol';
 
+
 /**
  * @title Ocean Protocol ERC20 Token Contract
  * @author Ocean Protocol Team
@@ -17,11 +18,13 @@ contract OceanToken is Initializable, ERC20Detailed, ERC20Capped {
     * @dev OceanToken Initializer
     * Runs only on initial contract creation.
     */
-    function initialize()
+    function initialize(
+        address _minter
+    )
         public initializer()
     {
         ERC20Detailed.initialize('OceanToken', 'OCN', 18);
-        ERC20Capped.initialize(1400000000 * 10 ** 18, address(this));
+        ERC20Capped.initialize(1400000000 * 10 ** 18, _minter);
     }
 
     /**
