@@ -3,11 +3,11 @@
 const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
 const testUtils = require('../helpers/utils.js')
 
-const ServiceAgreementWithBug = artifacts.require('ServiceAgreementWithBug')
-const ServiceAgreementChangeInStorage = artifacts.require('ServiceAgreementChangeInStorage')
-const ServiceAgreementExtraFunctionality = artifacts.require('ServiceAgreementExtraFunctionality')
-const ServiceAgreementChangeInStorageAndLogic = artifacts.require('ServiceAgreementChangeInStorageAndLogic')
-const ServiceAgreementChangeFunctionSignature = artifacts.require('ServiceAgreementChangeFunctionSignature')
+const ServiceExecutionAgreementWithBug = artifacts.require('ServiceExecutionAgreementWithBug')
+const ServiceExecutionAgreementChangeInStorage = artifacts.require('ServiceExecutionAgreementChangeInStorage')
+const ServiceExecutionAgreementExtraFunctionality = artifacts.require('ServiceExecutionAgreementExtraFunctionality')
+const ServiceExecutionAgreementChangeInStorageAndLogic = artifacts.require('ServiceExecutionAgreementChangeInStorageAndLogic')
+const ServiceExecutionAgreementChangeFunctionSignature = artifacts.require('ServiceExecutionAgreementChangeFunctionSignature')
 
 global.artifacts = artifacts
 global.web3 = web3
@@ -29,10 +29,10 @@ contract('ServiceExecutionAgreement', (accounts) => {
         pAddress = zos.getProxyAddress('ServiceExecutionAgreement')
     })
 
-    describe('Test upgradability for ServiceAgreement', () => {
+    describe('Test upgradability for ServiceExecutionAgreement', () => {
         it('Should be able to call new method added after upgrade is approved', async () => {
-            await zos.upgradeToNewContract('ServiceAgreementExtraFunctionality')
-            let p = await ServiceAgreementExtraFunctionality.at(pAddress)
+            await zos.upgradeToNewContract('ServiceExecutionAgreementExtraFunctionality')
+            let p = await ServiceExecutionAgreementExtraFunctionality.at(pAddress)
             // should not be able to be called before upgrade is approved
             await testUtils.assertRevert(p.getNumber())
 
@@ -44,8 +44,8 @@ contract('ServiceExecutionAgreement', (accounts) => {
         })
 
         it('Should be possible to append storage variables ', async () => {
-            await zos.upgradeToNewContract('ServiceAgreementChangeInStorage')
-            let p = await ServiceAgreementChangeInStorage.at(pAddress)
+            await zos.upgradeToNewContract('ServiceExecutionAgreementChangeInStorage')
+            let p = await ServiceExecutionAgreementChangeInStorage.at(pAddress)
             // should not be able to be called before upgrade is approved
             await testUtils.assertRevert(p.called(zos.owner))
 
@@ -58,8 +58,8 @@ contract('ServiceExecutionAgreement', (accounts) => {
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
-            let p = await ServiceAgreementChangeInStorageAndLogic.at(pAddress)
-            await zos.upgradeToNewContract('ServiceAgreementChangeInStorageAndLogic')
+            let p = await ServiceExecutionAgreementChangeInStorageAndLogic.at(pAddress)
+            await zos.upgradeToNewContract('ServiceExecutionAgreementChangeInStorageAndLogic')
 
             // Approve and test new logic
             await zos.approveLatestTransaction()
@@ -77,8 +77,8 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
         it('Should be possible to fix/add a bug', async () => {
             /* eslint-disable-next-line no-unused-vars */
-            let p = await ServiceAgreementWithBug.at(pAddress)
-            await zos.upgradeToNewContract('ServiceAgreementWithBug')
+            let p = await ServiceExecutionAgreementWithBug.at(pAddress)
+            await zos.upgradeToNewContract('ServiceExecutionAgreementWithBug')
             await zos.approveLatestTransaction()
             // add test
             const result = await p.setupAgreementTemplate(templateId, [], [], [], emptyBytes32, [], 0, { from: accounts[0] })
@@ -89,8 +89,8 @@ contract('ServiceExecutionAgreement', (accounts) => {
         })
 
         it('Should be possible to change function signature', async () => {
-            await zos.upgradeToNewContract('ServiceAgreementChangeFunctionSignature')
-            let p = await ServiceAgreementChangeFunctionSignature.at(pAddress)
+            await zos.upgradeToNewContract('ServiceExecutionAgreementChangeFunctionSignature')
+            let p = await ServiceExecutionAgreementChangeFunctionSignature.at(pAddress)
             await testUtils.assertRevert(p.setupAgreementTemplate(templateId, [], [], [], emptyBytes32, [], { from: accounts[0] }))
 
             // Approve and test new logic
