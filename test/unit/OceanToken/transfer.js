@@ -18,8 +18,7 @@ contract('OceanToken', (accounts) => {
     describe('transfer', () => {
         beforeEach('mint tokens before each test', async () => {
             await zos.initialize(accounts[0], false)
-            // token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
-            token = await OceanToken.new()
+            token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
             await token.mint(spender, 1000)
         })
 
