@@ -163,8 +163,8 @@ module.exports = class ZeppelinHelper extends ZeppelinHelperBase {
     }
 
     async upgradeToNewContract(newContractName) {
-        execSync(`npx zos add ${newContractName}: ${this.contractName} --skip-compile ${flags}`, { stdio: stdio })
-        execSync(`npx zos push --skip-compile --force -v`, { stdio: stdio })
+        execSync(`npx zos add ${newContractName}:${this.contractName} --skip-compile ${flags}`, { stdio: stdio })
+        execSync(`npx zos push --skip-compile --force ${flags}`, { stdio: stdio })
         await this.readImplementationFromJson()
         const upgradeCallData = encodeCall('upgradeTo', ['address'], [this.implementationAddress])
         let tx = await this.wallet
