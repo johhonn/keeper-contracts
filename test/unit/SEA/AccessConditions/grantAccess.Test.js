@@ -1,7 +1,8 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, assert, contract, describe, it */
+/* global artifacts, assert, contract, describe, it, before, beforeEach */
 
+const ZeppelinHelper = require('../../../helpers/ZeppelinHelper.js')
 const AccessConditions = artifacts.require('AccessConditions.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 
@@ -22,10 +23,17 @@ contract('AccessConditions', (accounts) => {
     let valueHashes
     let timeoutValues
     let agreementId
+    let zos
+
+    before(async () => {
+        zos = new ZeppelinHelper('AccessConditions')
+        await zos.restoreState(accounts[9])
+    })
 
     beforeEach(async () => {
-        sea = await ServiceExecutionAgreement.new({ from: accounts[0] })
-        accessConditions = await AccessConditions.new(sea.address, { from: accounts[0] })
+        await zos.initialize(accounts[0], false)
+        sea = await ServiceExecutionAgreement.at(zos.getProxyAddress('ServiceExecutionAgreement'))
+        accessConditions = await AccessConditions.at(zos.getProxyAddress('AccessConditions'))
         contracts = [accessConditions.address]
         fingerprints = [testUtils.getSelector(web3, AccessConditions, 'grantAccess')]
         dependenciesBits = [0]
