@@ -1,21 +1,17 @@
 /* eslint-env mocha */
-/* global web3, artifacts, assert, contract, describe, it */
+/* global artifacts, assert, contract, describe, it, before, beforeEach */
 const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
 const testUtils = require('../helpers/utils')
 
-const OceanToken = artifacts.require('OceanToken')
 const OceanTokenWithBug = artifacts.require('OceanTokenWithBug')
 const OceanTokenChangeInStorage = artifacts.require('OceanTokenChangeInStorage')
 const OceanTokenExtraFunctionality = artifacts.require('OceanTokenExtraFunctionality')
 const OceanTokenChangeInStorageAndLogic = artifacts.require('OceanTokenChangeInStorageAndLogic')
 const OceanTokenChangeFunctionSignature = artifacts.require('OceanTokenChangeFunctionSignature')
 
-global.artifacts = artifacts
-global.web3 = web3
-let zos
-
 contract('OceanToken', (accounts) => {
-    let pAddress
+    let zos
+    let oceanTokenAddress
 
     before('restore zos before all tests', async function() {
         zos = new ZeppelinHelper('OceanToken')
@@ -25,15 +21,13 @@ contract('OceanToken', (accounts) => {
     beforeEach('Deploy with zos before each tests', async function() {
         zos = new ZeppelinHelper('OceanToken')
         await zos.initialize(accounts[0], true)
-        pAddress = zos.getProxyAddress('OceanToken')
-        let p = await OceanToken.at(pAddress)
-        await p.setReceiver(accounts[0])
+        oceanTokenAddress = zos.getProxyAddress('OceanToken')
     })
 
     describe('Test upgradability for OceanToken', () => {
         it('Should be able to call new method added after upgrade is approved', async () => {
             await zos.upgradeToNewContract('OceanTokenExtraFunctionality')
-            let p = await OceanTokenExtraFunctionality.at(pAddress)
+            let p = await OceanTokenExtraFunctionality.at(oceanTokenAddress)
             // should not be able to be called before upgrade is approved
             await testUtils.assertRevert(p.getNumber())
 
@@ -46,7 +40,7 @@ contract('OceanToken', (accounts) => {
 
         it('Should be possible to append storage variables ', async () => {
             await zos.upgradeToNewContract('OceanTokenChangeInStorage')
-            let p = await OceanTokenChangeInStorage.at(pAddress)
+            let p = await OceanTokenChangeInStorage.at(oceanTokenAddress)
             // should not be able to be called before upgrade is approved
             await testUtils.assertRevert(p.called(zos.owner))
 
@@ -59,7 +53,7 @@ contract('OceanToken', (accounts) => {
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
-            let p = await OceanTokenChangeInStorageAndLogic.at(pAddress)
+            let p = await OceanTokenChangeInStorageAndLogic.at(oceanTokenAddress)
             await zos.upgradeToNewContract('OceanTokenChangeInStorageAndLogic')
 
             // Approve and test new logic
@@ -72,22 +66,18 @@ contract('OceanToken', (accounts) => {
         })
 
         it('Should be possible to fix/add a bug', async () => {
-            let p = await OceanTokenWithBug.at(pAddress)
+            let p = await OceanTokenWithBug.at(oceanTokenAddress)
             await zos.upgradeToNewContract('OceanTokenWithBug')
-            await testUtils.assertRevert(p.setReceiver(accounts[1]))
             // Approve to insert bug and call again
             await zos.approveLatestTransaction()
-            // Upgraded version should have a bug
-            await p.setReceiver(accounts[1])
-            await p.setReceiver(accounts[2])
-            await p.setReceiver(accounts[0])
+            await p.transfer(0, 0, { from: accounts[0] })
         })
 
         it('Should be possible to change function signature', async () => {
             await zos.upgradeToNewContract('OceanTokenChangeFunctionSignature')
             // Approve and test new logic
             await zos.approveLatestTransaction()
-            let p = await OceanTokenChangeFunctionSignature.at(pAddress)
+            let p = await OceanTokenChangeFunctionSignature.at(oceanTokenAddress)
             await p.methods['transferFrom(uint256,address)'](100, accounts[2], { from: accounts[0] })
         })
     })

@@ -12,7 +12,6 @@ const { initializeAgreement } = require('../../../helpers/initializeAgreement.js
 const web3 = testUtils.getWeb3()
 
 contract('AccessConditions', (accounts) => {
-    const assetId = '0x0000000000000000000000000000000000000000000000000000000000000001'
     let sea
     let accessConditions
     /* eslint-disable-next-line prefer-destructuring */
@@ -37,7 +36,7 @@ contract('AccessConditions', (accounts) => {
         contracts = [accessConditions.address]
         fingerprints = [testUtils.getSelector(web3, AccessConditions, 'grantAccess')]
         dependenciesBits = [0]
-        valueHashes = [testUtils.valueHash(['bytes32'], [assetId])]
+        valueHashes = [testUtils.valueHash(['bytes32'], [testUtils.assetId])]
         timeoutValues = [0]
         agreementId = testUtils.generateId()
     })
@@ -62,7 +61,10 @@ contract('AccessConditions', (accounts) => {
 
             // act-assert
             try {
-                await accessConditions.grantAccess(agreementId, testUtils.emptyBytes32, { from: consumer })
+                await accessConditions.grantAccess(
+                    agreementId,
+                    testUtils.emptyBytes32,
+                    { from: consumer })
             } catch (e) {
                 assert.strictEqual(e.reason, 'Restricted access - only SLA publisher')
                 return
@@ -75,11 +77,17 @@ contract('AccessConditions', (accounts) => {
             await initializeAgreementWithValues()
 
             // act
-            const result = await accessConditions.grantAccess(agreementId, assetId, { from: accounts[0] })
+            const result = await accessConditions.grantAccess(
+                agreementId,
+                testUtils.assetId,
+                { from: accounts[0] })
 
             // assert
             testUtils.assertEmitted(result, 1, 'AccessGranted')
-            const hasPermission = await accessConditions.checkPermissions(consumer, assetId, { from: accounts[0] })
+            const hasPermission = await accessConditions.checkPermissions(
+                consumer,
+                testUtils.assetId,
+                { from: accounts[0] })
             assert.strictEqual(hasPermission, true)
         })
 
@@ -89,7 +97,10 @@ contract('AccessConditions', (accounts) => {
             await initializeAgreementWithValues()
 
             // act
-            const result = await accessConditions.grantAccess(agreementId, assetId, { from: accounts[0] })
+            const result = await accessConditions.grantAccess(
+                agreementId,
+                testUtils.assetId,
+                { from: accounts[0] })
 
             // assert
             testUtils.assertEmitted(result, 0, 'AccessGranted')

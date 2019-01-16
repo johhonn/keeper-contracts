@@ -1,11 +1,9 @@
 /* eslint-env mocha */
-/* eslint-disable no-console */
 /* global assert */
 const Web3 = require('web3')
 const abi = require('ethereumjs-abi')
 
 const utils = {
-
     emptyBytes32: '0x0000000000000000000000000000000000000000000000000000000000000000',
     templateId: '0x0000000000000000000000000000000000000000000000000000000000000001',
     dummyAddress: '0xeE9300b7961e0a01d9f0adb863C7A227A07AaD75',
@@ -97,6 +95,11 @@ const utils = {
 
     sleep: (millis) => {
         return new Promise(resolve => setTimeout(resolve, millis))
+    },
+
+    log: (args) => {
+        /* eslint-disable-next-line no-console */
+        console.log(...args)
     },
 
     assertRevert: async (promise) => {

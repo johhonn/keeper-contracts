@@ -53,7 +53,7 @@ module.exports = class ZeppelinHelper extends ZeppelinHelperBase {
             DIDRegistry: [],
             OceanToken: [],
             Dispenser: ['OceanToken'],
-            ServiceAgreement: [],
+            ServiceExecutionAgreement: [],
             AccessConditions: ['ServiceExecutionAgreement'],
             PaymentConditions: ['ServiceExecutionAgreement', 'OceanToken'],
             FitchainConditions: ['ServiceExecutionAgreement'],
