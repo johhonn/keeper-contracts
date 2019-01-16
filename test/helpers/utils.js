@@ -97,7 +97,7 @@ const utils = {
         return new Promise(resolve => setTimeout(resolve, millis))
     },
 
-    log: (args) => {
+    log: (...args) => {
         /* eslint-disable-next-line no-console */
         console.log(...args)
     },
