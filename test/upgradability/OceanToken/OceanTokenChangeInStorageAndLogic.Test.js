@@ -22,6 +22,7 @@ contract('OceanToken', (accounts) => {
     describe('Test upgradability for OceanToken', () => {
         it('Should be possible to append storage variables and change logic', async () => {
             let p = await OceanTokenChangeInStorageAndLogic.at(oceanTokenAddress)
+            await p.mint(accounts[0], 1000)
             await zos.upgradeToNewContract('OceanTokenChangeInStorageAndLogic')
 
             // Approve and test new logic
