@@ -24,7 +24,10 @@ contract('OceanToken', (accounts) => {
             await zos.upgradeToNewContract('OceanTokenChangeFunctionSignature')
             // Approve and test new logic
             await zos.approveLatestTransaction()
+
+            // act
             let p = await OceanTokenChangeFunctionSignature.at(oceanTokenAddress)
+            await p.mint(accounts[0], 1000)
             await p.methods['transferFrom(uint256,address)'](100, accounts[2], { from: accounts[0] })
         })
     })

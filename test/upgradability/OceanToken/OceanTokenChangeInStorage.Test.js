@@ -30,6 +30,8 @@ contract('OceanToken', (accounts) => {
 
             // Approve and call again
             await zos.approveLatestTransaction()
+
+            // check again
             const n = await p.called(zos.owner)
             assert.equal(n.toNumber(), 0, 'Error calling added storage variable')
         })
