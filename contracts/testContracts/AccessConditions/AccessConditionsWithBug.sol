@@ -1,61 +1,104 @@
-/* solium-disable */
 pragma solidity 0.4.25;
 
-import '../../SEA/AccessConditions.sol';
 import '../../SEA/ServiceExecutionAgreement.sol';
+import '../../SEA/ISecretStore.sol';
 import 'zos-lib/contracts/Initializable.sol';
 
 
-contract AccessConditionsWithBug is Initializable{
+/**
+ * @title Secret Store Access Control
+ * @author Ocean Protocol Team
+ * @dev All function calls are currently implemented without side effects
+ */
+contract AccessConditionsWithBug is ISecretStore, Initializable {
 
     mapping(bytes32 => mapping(address => bool)) private assetPermissions;
 
-    ServiceExecutionAgreement private serviceAgreementStorage;
-    event AccessGranted(bytes32 serviceId, bytes32 asset);
+    ServiceExecutionAgreement private agreementStorage;
+
+    event AccessGranted(
+        bytes32 indexed agreementId,
+        bytes32 asset
+    );
 
     modifier onlySLAPublisher(
-        bytes32 serviceId,
-        address publisher
-    )
+        bytes32 agreementId,
+        address publisher)
     {
         require(
-            serviceAgreementStorage.getAgreementPublisher(serviceId) == publisher,
+            agreementStorage.getAgreementPublisher(agreementId) == publisher,
             'Restricted access - only SLA publisher'
         );
         _;
     }
 
     function initialize(
-        address _serviceAgreementAddress
+        address _agreementAddress
     )
-    public initializer()
+        public initializer()
     {
         require(
-            _serviceAgreementAddress != address(0),
+            _agreementAddress != address(0),
             'invalid contract address'
         );
-        serviceAgreementStorage = ServiceExecutionAgreement(_serviceAgreementAddress);
+        agreementStorage = ServiceExecutionAgreement(_agreementAddress);
     }
 
+    /**
+    * @notice checkPermissions is called by Parity secret store
+    * @param consumer is the asset consumer address
+    * @param documentKeyId refers to the DID in which secret store will issue the decryption keys
+    * @return true if the access was granted
+    */
     function checkPermissions(
         address consumer,
         bytes32 documentKeyId
     )
-    public view
-    returns(bool)
+        public view
+        returns(bool permissionGranted)
     {
         return assetPermissions[documentKeyId][consumer];
     }
 
+    /**
+    * @notice grantAccess is called by asset/resource/DID owner/SLA Publisher
+    * @param agreementId is the SEA agreement ID
+    * @param documentKeyId refers to the DID in which secret store will issue the decryption keys
+    * @return true if the SLA publisher is able to grant access
+    */
     function grantAccess(
-        bytes32 serviceId,
-        bytes32 assetId,
+        bytes32 agreementId,
         bytes32 documentKeyId
     )
-    public
-    returns (bool)
+        external
+        // add bug here
+        /* onlySLAPublisher(agreementId, msg.sender) */
+        returns (bool)
     {
-        assetPermissions[documentKeyId][msg.sender] = true;
-        emit AccessGranted(serviceId, assetId);
+        // add big bug here
+        /*
+        bytes32 condition = agreementStorage.generateConditionKeyForId(
+            agreementId,
+            address(this),
+            this.grantAccess.selector
+        );
+
+        if (agreementStorage.hasUnfulfilledDependencies(agreementId, condition))
+            return;
+
+        bytes32 valueHash = keccak256(abi.encodePacked(documentKeyId));
+        require(
+            agreementStorage.fulfillCondition(
+                agreementId,
+                this.grantAccess.selector,
+                valueHash
+            ),
+            'Cannot fulfill grantAccess condition'
+        );
+        */
+
+        address consumer = agreementStorage.getAgreementConsumer(agreementId);
+        assetPermissions[documentKeyId][consumer] = true;
+        emit AccessGranted(agreementId, documentKeyId);
     }
 }
