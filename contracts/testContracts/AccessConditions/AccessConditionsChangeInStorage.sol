@@ -6,7 +6,7 @@ import '../../SEA/ServiceExecutionAgreement.sol';
 import 'zos-lib/contracts/Initializable.sol';
 
 
-contract AccessConditionsChangeInStorage is AccessConditions{
+contract AccessConditionsChangeInStorage is AccessConditions {
     // keep track of how many times a function was called.
     mapping (address=>uint256) public called;
 }

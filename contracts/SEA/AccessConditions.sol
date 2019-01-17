@@ -1,8 +1,8 @@
 pragma solidity 0.4.25;
 
 import './ServiceExecutionAgreement.sol';
-import 'zos-lib/contracts/Initializable.sol';
 import './ISecretStore.sol';
+import 'zos-lib/contracts/Initializable.sol';
 
 
 /**

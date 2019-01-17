@@ -1,74 +1,103 @@
-/* solium-disable */
 pragma solidity 0.4.25;
 
-import '../../SEA/AccessConditions.sol';
 import '../../SEA/ServiceExecutionAgreement.sol';
+import '../../SEA/ISecretStore.sol';
 import 'zos-lib/contracts/Initializable.sol';
 
 
-contract AccessConditionsChangeInStorageAndLogic is Initializable{
+/**
+ * @title Secret Store Access Control
+ * @author Ocean Protocol Team
+ * @dev All function calls are currently implemented without side effects
+ */
+contract AccessConditionsChangeInStorageAndLogic is ISecretStore, Initializable {
 
     mapping(bytes32 => mapping(address => bool)) private assetPermissions;
 
-    ServiceExecutionAgreement private serviceAgreementStorage;
-    event AccessGranted(bytes32 serviceId, bytes32 asset);
+    ServiceExecutionAgreement private agreementStorage;
+
+    // keep track of how many times a function was called.
     mapping (address=>uint256) public called;
 
-    modifier onlySLAPublisher(bytes32 serviceId, address publisher) {
+    event AccessGranted(
+        bytes32 indexed agreementId,
+        bytes32 asset
+    );
+
+    modifier onlySLAPublisher(
+        bytes32 agreementId,
+        address publisher)
+    {
         require(
-            serviceAgreementStorage.getAgreementPublisher(serviceId) == publisher,
+            agreementStorage.getAgreementPublisher(agreementId) == publisher,
             'Restricted access - only SLA publisher'
         );
         _;
     }
 
-    function initialize(address _serviceAgreementAddress) public initializer() {
+    function initialize(
+        address _agreementAddress
+    )
+        public initializer()
+    {
         require(
-            _serviceAgreementAddress != address(0),
+            _agreementAddress != address(0),
             'invalid contract address'
         );
-        serviceAgreementStorage = ServiceExecutionAgreement(_serviceAgreementAddress);
+        agreementStorage = ServiceExecutionAgreement(_agreementAddress);
     }
 
+    /**
+    * @notice checkPermissions is called by Parity secret store
+    * @param consumer is the asset consumer address
+    * @param documentKeyId refers to the DID in which secret store will issue the decryption keys
+    * @return true if the access was granted
+    */
     function checkPermissions(
         address consumer,
         bytes32 documentKeyId
     )
-    public view
-    returns(bool)
+        public view
+        returns(bool permissionGranted)
     {
         return assetPermissions[documentKeyId][consumer];
     }
 
+    /**
+    * @notice grantAccess is called by asset/resource/DID owner/SLA Publisher
+    * @param agreementId is the SEA agreement ID
+    * @param documentKeyId refers to the DID in which secret store will issue the decryption keys
+    * @return true if the SLA publisher is able to grant access
+    */
     function grantAccess(
-        bytes32 serviceId,
-        bytes32 assetId,
+        bytes32 agreementId,
         bytes32 documentKeyId
     )
-    public onlySLAPublisher(serviceId, msg.sender)
-    returns (bool)
+        external
+        onlySLAPublisher(agreementId, msg.sender)
+        returns (bool)
     {
         called[msg.sender] += 1;
-        bytes32 condition = serviceAgreementStorage.generateConditionKey(
-            serviceId,
+        bytes32 condition = agreementStorage.generateConditionKeyForId(
+            agreementId,
             address(this),
             this.grantAccess.selector
         );
-        bool allgood = !serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition);
-        if (!allgood)
+
+        if (agreementStorage.hasUnfulfilledDependencies(agreementId, condition))
             return;
 
-        bytes32 valueHash = keccak256(abi.encodePacked(assetId, documentKeyId));
+        bytes32 valueHash = keccak256(abi.encodePacked(documentKeyId));
         require(
-            serviceAgreementStorage.fulfillCondition(
-                serviceId,
+            agreementStorage.fulfillCondition(
+                agreementId,
                 this.grantAccess.selector,
                 valueHash
             ),
             'Cannot fulfill grantAccess condition'
         );
-        address consumer = serviceAgreementStorage.getAgreementConsumer(serviceId);
+        address consumer = agreementStorage.getAgreementConsumer(agreementId);
         assetPermissions[documentKeyId][consumer] = true;
-        emit AccessGranted(serviceId, assetId);
+        emit AccessGranted(agreementId, documentKeyId);
     }
 }
