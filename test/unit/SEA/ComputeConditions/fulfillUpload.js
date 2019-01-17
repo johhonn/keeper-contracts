@@ -33,7 +33,8 @@ contract('ComputeConditions', (accounts) => {
     beforeEach(async () => {
         await zos.initialize(accounts[0], false)
         sea = await ServiceExecutionAgreement.at(zos.getProxyAddress('ServiceExecutionAgreement'))
-        computeConditions = await ComputeConditions.new(zos.getProxyAddress('ComputeConditions'))
+        computeConditions = await ComputeConditions.at(zos.getProxyAddress('ComputeConditions'))
+
         contracts = [computeConditions.address]
         fingerprints = [testUtils.getSelector(web3, ComputeConditions, 'fulfillUpload')]
         dependenciesBits = [0]
