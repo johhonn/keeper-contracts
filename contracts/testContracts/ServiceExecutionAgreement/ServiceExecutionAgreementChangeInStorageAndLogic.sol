@@ -9,7 +9,9 @@ import '../../SEA/Common.sol';
  * @author Ocean Protocol Team
  * @dev All function calls are currently implemented without side effects
  */
-contract ServiceExecutionAgreementChangeInStorageAndLogic is Common, Initializable {
+contract ServiceExecutionAgreementChangeInStorageAndLogic
+    is Common, Initializable
+{
 
     struct Template {
         bool isExisting;
