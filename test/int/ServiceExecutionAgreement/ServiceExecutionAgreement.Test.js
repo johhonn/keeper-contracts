@@ -78,8 +78,8 @@ contract('ServiceExecutionAgreement', (accounts) => {
                 testUtils.valueHash(['bytes32', 'uint256'], [resourceId, resourcePrice]),
                 testUtils.valueHash(['bytes32', 'uint256'], [resourceId, resourcePrice])]
 
-            testUtils.log('conditions control contracts', contracts)
-            testUtils.log('functions: ', funcFingerPrints, valuesHashList)
+            //testUtils.log('conditions control contracts', contracts)
+            //testUtils.log('functions: ', funcFingerPrints, valuesHashList)
 
             const setupTx = await sea.setupTemplate(
                 serviceTemplateId,
@@ -96,7 +96,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
             testTemplateId = templateId
 
             conditionKeys = testUtils.generateConditionsKeys(templateId, contracts, funcFingerPrints)
-            testUtils.log('conditions: ', conditionKeys)
+            //testUtils.log('conditions: ', conditionKeys)
         })
 
         it('Consume asset happy path', async () => {
@@ -133,7 +133,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
                     [fn])[0]
                 await sea.getConditionStatus(serviceId, invalidKey)
             } catch (error) {
-                testUtils.log('invalid condition status: ', error)
+                testUtils.log('invalid condition status: ')
             }
 
             let locked = await sea.getConditionStatus(serviceId, conditionKeys[0])
@@ -149,14 +149,14 @@ contract('ServiceExecutionAgreement', (accounts) => {
                 'PaymentLocked').serviceId)
 
             locked = await sea.getConditionStatus(serviceId, conditionKeys[0])
-            testUtils.log('locked: ', locked.toNumber())
+            //testUtils.log('locked: ', locked.toNumber())
 
             const hasPermission = await accessConditions.checkPermissions(consumer, resourceId)
-            testUtils.log('consumer permission: ', hasPermission)
+            //testUtils.log('consumer permission: ', hasPermission)
 
             // grant access
             const dep = await sea.hasUnfulfilledDependencies(serviceId, conditionKeys[1])
-            testUtils.log('has dependencies: ', dep)
+            //testUtils.log('has dependencies: ', dep)
 
             await sea.getConditionStatus(serviceId, conditionKeys[1])
 
@@ -222,9 +222,9 @@ contract('ServiceExecutionAgreement', (accounts) => {
                 resourceId,
                 resourcePrice,
                 fromConsumer)
-            testUtils.log('lockpayment event: ', testUtils.getEventArgsFromTx(
-                payTx,
-                'PaymentLocked').agreementId)
+            //testUtils.log('lockpayment event: ', testUtils.getEventArgsFromTx(
+            //    payTx,
+            //    'PaymentLocked').agreementId)
             // Now refund should go through, after timeout
             await testUtils.sleep(4000)
             try {

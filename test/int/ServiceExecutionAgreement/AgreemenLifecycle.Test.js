@@ -110,7 +110,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
                 'Invalid condition state')
             assert.strictEqual(fulfillResult.isAgreementFulfilled, false,
                 'Agreement should not be fulfilled')
-            console.log(await sea.hasUnfulfilledDependencies(agreementId, conditionKeys[activeCondition]))
+            await sea.hasUnfulfilledDependencies(agreementId, conditionKeys[activeCondition])
 
             // fulfill condition 2
             fulfillResult = await fulfillCondition(2)
