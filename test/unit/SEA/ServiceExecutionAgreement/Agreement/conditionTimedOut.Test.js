@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, assert, contract, describe, it */
+/* global artifacts, assert, contract, describe, it, beforeEach */
 
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const testUtils = require('../../../../helpers/utils.js')

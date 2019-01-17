@@ -1,13 +1,13 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, assert, contract, describe, it */
+/* global artifacts, assert, contract, describe, it, beforeEach */
 
-const AgreementTest = artifacts.require('ServiceExecutionAgreement.sol')
+const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const testUtils = require('../../../../helpers/utils.js')
 const { initializeAgreement } = require('../../../../helpers/initializeAgreement.js')
 
 contract('ServiceExecutionAgreement', (accounts) => {
-    let contract
+    let sea
     /* eslint-disable-next-line prefer-destructuring */
     const consumer = accounts[1]
     let contracts
@@ -18,7 +18,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
     let agreementId
 
     beforeEach(async () => {
-        contract = await AgreementTest.new({ from: accounts[0] })
+        sea = await ServiceExecutionAgreement.new({ from: accounts[0] })
         contracts = [accounts[2]]
         fingerprints = ['0x2e0a37a5']
         dependenciesBits = [0]
@@ -29,7 +29,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
     async function initializeAgreementWithValues() {
         return initializeAgreement(
-            contract,
+            sea,
             accounts[0],
             consumer,
             contracts,
@@ -48,7 +48,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
             // act-assert
             try {
-                await contract.getConditionStatus(agreementId, testUtils.emptyBytes32, { from: accounts[0] })
+                await sea.getConditionStatus(agreementId, testUtils.emptyBytes32, { from: accounts[0] })
             } catch (e) {
                 return
             }
@@ -59,10 +59,10 @@ contract('ServiceExecutionAgreement', (accounts) => {
             // arrange
             dependenciesBits = [3]
             await initializeAgreementWithValues()
-            const conditionKey = await contract.generateConditionKeyForId(agreementId, contracts[0], fingerprints[0], { from: accounts[0] })
+            const conditionKey = await sea.generateConditionKeyForId(agreementId, contracts[0], fingerprints[0], { from: accounts[0] })
 
             // act
-            const result = await contract.getConditionStatus(agreementId, conditionKey, { from: accounts[0] })
+            const result = await sea.getConditionStatus(agreementId, conditionKey, { from: accounts[0] })
 
             // assert
             assert.strictEqual(result.toNumber(), 0)
