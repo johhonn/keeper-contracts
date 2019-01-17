@@ -136,7 +136,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
                 testUtils.log('invalid condition status: ')
             }
 
-            let locked = await sea.getConditionStatus(serviceId, conditionKeys[0])
+            await sea.getConditionStatus(serviceId, conditionKeys[0])
             await token.approve(paymentConditions.address, 200, fromConsumer)
 
             const payTx = await paymentConditions.lockPayment(
@@ -148,15 +148,12 @@ contract('ServiceExecutionAgreement', (accounts) => {
                 payTx,
                 'PaymentLocked').serviceId)
 
-            locked = await sea.getConditionStatus(serviceId, conditionKeys[0])
-            // testUtils.log('locked: ', locked.toNumber())
+            await sea.getConditionStatus(serviceId, conditionKeys[0])
 
-            const hasPermission = await accessConditions.checkPermissions(consumer, resourceId)
-            // testUtils.log('consumer permission: ', hasPermission)
+            await accessConditions.checkPermissions(consumer, resourceId)
 
             // grant access
-            const dep = await sea.hasUnfulfilledDependencies(serviceId, conditionKeys[1])
-            // testUtils.log('has dependencies: ', dep)
+            await sea.hasUnfulfilledDependencies(serviceId, conditionKeys[1])
 
             await sea.getConditionStatus(serviceId, conditionKeys[1])
 
@@ -217,15 +214,12 @@ contract('ServiceExecutionAgreement', (accounts) => {
             }
 
             await token.approve(paymentConditions.address, 200, fromConsumer)
-            const payTx = await paymentConditions.lockPayment(
+            await paymentConditions.lockPayment(
                 serviceId,
                 resourceId,
                 resourcePrice,
                 fromConsumer)
-            // testUtils.log('lockpayment event: ', testUtils.getEventArgsFromTx(
-            //    payTx,
-            //    'PaymentLocked').agreementId)
-            // Now refund should go through, after timeout
+
             await testUtils.sleep(4000)
             try {
                 const refundTx = await paymentConditions.refundPayment(serviceId, resourceId, resourcePrice, fromConsumer)

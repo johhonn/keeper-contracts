@@ -1,6 +1,5 @@
-/* global artifacts, contract, before, describe, it, assert, , before, beforeEach */
+/* global artifacts, contract, before, describe, it, assert, before */
 /* eslint-disable no-console, max-len */
-
 
 const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
 const OceanToken = artifacts.require('OceanToken.sol')
@@ -31,7 +30,6 @@ contract('ComputeConditions', (accounts) => {
         let zos
 
         before(async () => {
-
             zos = new ZeppelinHelper('ComputeConditions')
             await zos.restoreState(accounts[9])
             zos.addDependency('PaymentConditions')
