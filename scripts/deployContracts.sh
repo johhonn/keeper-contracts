@@ -32,7 +32,7 @@ rm -f zos.*
 # Project setup using zOS
 # -----------------------------------------------------------------------
 # List of contracts
-declare -a contracts=("DIDRegistry" "OceanToken" "Dispenser" "ServiceExecutionAgreement" "AccessConditions" "FitchainConditions" "ComputeConditions")
+declare -a contracts=("DIDRegistry" "OceanToken" "Dispenser" "ServiceExecutionAgreement" "AccessConditions" "FitchainConditions" "ComputeConditions" "PaymentConditions")
 # Initialize project zOS project
 # NOTE: Creates a zos.json file that keeps track of the project's details
 npx zos init oceanprotocol $VERSION -v
