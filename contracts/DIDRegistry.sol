@@ -33,7 +33,11 @@ contract DIDRegistry is Initializable, Ownable {
 
     mapping(bytes32 => DIDRegister) private didRegister;
 
-    function initialize(address _owner) public initializer() {
+    function initialize(
+        address _owner
+    )
+    public initializer()
+    {
         Ownable.initialize(_owner);
     }
 
