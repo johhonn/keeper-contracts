@@ -27,20 +27,25 @@ contract('ServiceExecutionAgreement', (accounts) => {
 
             // Approve and test new logic
             await zos.approveLatestTransaction()
+
             // add test
-            const result = await p.setupAgreementTemplate(
+            const result = await p.setupTemplate(
                 testUtils.templateId,
                 [],
                 [],
                 [],
-                testUtils.emptyBytes32,
                 [],
+                0,
                 { from: accounts[0] })
 
-            // assert
-            testUtils.assertEmitted(result, 1, 'SetupAgreementTemplate')
+            // assert emitted event
+            testUtils.assertEmitted(result, 1, 'TemplateSetup')
+
+            // assert status
             const status = await p.getTemplateStatus(testUtils.templateId)
             assert.strictEqual(status, true)
+
+            // assert that it was called once
             const n = await p.called(zos.owner)
             assert.equal(n.toNumber(), 1, 'Error calling added storage variable')
         })

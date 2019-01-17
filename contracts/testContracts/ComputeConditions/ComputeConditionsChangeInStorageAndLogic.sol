@@ -68,7 +68,7 @@ contract ComputeConditionsChangeInStorageAndLogic  is Initializable{
         }
         emit HashSignatureSubmitted(serviceAgreementId, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), true);
         proofs[serviceAgreementId].isLocked = false;
-        called[msg.sender]+=1;
+        called[msg.sender] += 1;
         return true;
 
     }
