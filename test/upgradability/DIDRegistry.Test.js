@@ -1,5 +1,5 @@
 /* eslint-env mocha */
-/* global web3, artifacts, assert, contract, describe, it */
+/* global web3, artifacts, assert, contract, describe, it, before, beforeEach */
 
 const testUtils = require('../helpers/utils.js')
 const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
@@ -11,12 +11,9 @@ const DIDRegistryExtraFunctionality = artifacts.require('DIDRegistryExtraFunctio
 const DIDRegistryChangeInStorageAndLogic = artifacts.require('DIDRegistryChangeInStorageAndLogic')
 const DIDRegistryChangeFunctionSignature = artifacts.require('DIDRegistryChangeFunctionSignature')
 
-global.artifacts = artifacts
-global.web3 = web3
-let zos
-
 contract('DIDRegistry', (accounts) => {
-    let pAddress
+    let zos
+    let dIDRegistryAddress
 
     before('Restore zos before all tests', async function() {
         zos = new ZeppelinHelper('DIDRegistry')
@@ -26,13 +23,13 @@ contract('DIDRegistry', (accounts) => {
     beforeEach('Deploy with zos before each tests', async function() {
         zos = new ZeppelinHelper('DIDRegistry')
         await zos.initialize(accounts[0], true)
-        pAddress = zos.getProxyAddress('DIDRegistry')
+        dIDRegistryAddress = zos.getProxyAddress('DIDRegistry')
     })
 
     describe('Test upgradability for DIDRegistry', () => {
         it('Should be able to call new method added after upgrade is approved', async () => {
             await zos.upgradeToNewContract('DIDRegistryExtraFunctionality')
-            let p = await DIDRegistryExtraFunctionality.at(pAddress)
+            let p = await DIDRegistryExtraFunctionality.at(dIDRegistryAddress)
             // should not be able to be called before upgrade is approved
             await testUtils.assertRevert(p.getNumber())
 
@@ -45,7 +42,7 @@ contract('DIDRegistry', (accounts) => {
         it('Should be possible to append storage variables ', async () => {
             let did = web3.utils.fromAscii('did:ocn:test-attr')
             await zos.upgradeToNewContract('DIDRegistryChangeInStorage')
-            let p = await DIDRegistryChangeInStorage.at(pAddress)
+            let p = await DIDRegistryChangeInStorage.at(dIDRegistryAddress)
             // should not be able to be called before upgrade is approved
             await testUtils.assertRevert(p.timeOfRegister(did))
 
@@ -57,7 +54,7 @@ contract('DIDRegistry', (accounts) => {
 
         it('Should be possible to append storage variables and change logic', async () => {
             // register attribute
-            let registry = await DIDRegistry.at(pAddress)
+            let registry = await DIDRegistry.at(dIDRegistryAddress)
             let did = web3.utils.fromAscii('did:ocn:test-attr')
             let providerDID = 'did:ocn:provider'
             let provider = web3.utils.fromAscii('provider')
@@ -75,7 +72,7 @@ contract('DIDRegistry', (accounts) => {
 
             // should not be possible to read storage variables before upgrade is approved
             await zos.upgradeToNewContract('DIDRegistryChangeInStorageAndLogic')
-            let p = await DIDRegistryChangeInStorageAndLogic.at(pAddress)
+            let p = await DIDRegistryChangeInStorageAndLogic.at(dIDRegistryAddress)
             // should not be able to be called before upgrade is approved
             await testUtils.assertRevert(p.timeOfRegister(did))
 
@@ -103,7 +100,7 @@ contract('DIDRegistry', (accounts) => {
 
         it('Should be possible to fix/add a bug', async () => {
             // register attribute
-            let registry = await DIDRegistry.at(pAddress)
+            let registry = await DIDRegistry.at(dIDRegistryAddress)
             let did = web3.utils.fromAscii('did:ocn:test-attr')
             let providerDID = 'did:ocn:provider'
             let provider = web3.utils.fromAscii('provider')
@@ -121,7 +118,7 @@ contract('DIDRegistry', (accounts) => {
 
             // Upgrade to insert bug
             await zos.upgradeToNewContract('DIDRegistryWithBug')
-            let p = await DIDRegistryWithBug.at(pAddress)
+            let p = await DIDRegistryWithBug.at(dIDRegistryAddress)
             await zos.approveLatestTransaction()
 
             // check functionality works
@@ -144,7 +141,7 @@ contract('DIDRegistry', (accounts) => {
 
         it('Should be possible to change function signature', async () => {
             // Get proxy and upgrade to new instance
-            let p = await DIDRegistryChangeFunctionSignature.at(pAddress)
+            let p = await DIDRegistryChangeFunctionSignature.at(dIDRegistryAddress)
             await zos.upgradeToNewContract('DIDRegistryChangeFunctionSignature')
             await zos.approveLatestTransaction()
 

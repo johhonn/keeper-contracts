@@ -1,5 +1,5 @@
 /* eslint-env mocha */
-/* global web3, artifacts, assert, contract, describe, it */
+/* global web3, artifacts, assert, contract, describe, it, before, beforeEach */
 const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
 const testUtils = require('../helpers/utils.js')
 
@@ -12,22 +12,17 @@ const PaymentConditionsExtraFunctionality = artifacts.require('PaymentConditions
 const PaymentConditionsChangeInStorageAndLogic = artifacts.require('PaymentConditionsChangeInStorageAndLogic')
 const PaymentConditionsChangeFunctionSignature = artifacts.require('PaymentConditionsChangeFunctionSignature')
 
-global.artifacts = artifacts
-global.web3 = web3
-let zos
-
 contract('PaymentConditions', (accounts) => {
+    let zos
     let token
     let pAddress
     let consumer = accounts[1]
-    const assetId = '0x0000000000000000000000000000000000000000000000000000000000000001'
-    const templateId = '0x0000000000000000000000000000000000000000000000000000000000000002'
     let serviceAgreementId = testUtils.generateId(web3)
     let price = 1
 
     function createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer) {
-        const conditionKeys = testUtils.generateConditionsKeys(templateId, contracts, fingerprints)
-        const hash = testUtils.createSLAHash(web3, templateId, conditionKeys, valueHashes, timeoutValues, serviceAgreementId)
+        const conditionKeys = testUtils.generateConditionsKeys(testUtils.templateId, contracts, fingerprints)
+        const hash = testUtils.createSLAHash(web3, testUtils.templateId, conditionKeys, valueHashes, timeoutValues, serviceAgreementId)
         return web3.eth.sign(hash, consumer)
     }
 
@@ -36,15 +31,15 @@ contract('PaymentConditions', (accounts) => {
         let contracts = [pAddress]
         let fingerprints = [testUtils.getSelector(web3, PaymentConditions, 'lockPayment')]
         let dependenciesBits = [0]
-        let valueHashes = [testUtils.valueHash(['bytes32', 'uint256'], [assetId, price])]
+        let valueHashes = [testUtils.valueHash(['bytes32', 'uint256'], [testUtils.assetId, price])]
         let timeoutValues = [0]
 
         token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
         let agreement = await ServiceExecutionAgreement.at(zos.getProxyAddress('ServiceExecutionAgreement'))
 
         const signature = await createSignature(contracts, fingerprints, valueHashes, timeoutValues, serviceAgreementId, consumer)
-        await agreement.setupAgreementTemplate(templateId, contracts, fingerprints, dependenciesBits, templateId, [0], 0, { from: accounts[0] })
-        await agreement.executeAgreement(templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, templateId, { from: accounts[0] })
+        await agreement.setupAgreementTemplate(testUtils.templateId, contracts, fingerprints, dependenciesBits, testUtils.templateId, [0], 0, { from: accounts[0] })
+        await agreement.executeAgreement(testUtils.templateId, signature, consumer, valueHashes, timeoutValues, serviceAgreementId, testUtils.templateId, { from: accounts[0] })
         await token.setReceiver(consumer, { from: accounts[0] })
         await token.approve(pAddress, price, { from: consumer })
     }
@@ -92,7 +87,7 @@ contract('PaymentConditions', (accounts) => {
 
             // Approve and test new logic
             await zos.approveLatestTransaction()
-            const result = await p.lockPayment(serviceAgreementId, assetId, price, { from: consumer })
+            const result = await p.lockPayment(serviceAgreementId, testUtils.assetId, price, { from: consumer })
             // assert
             testUtils.assertEmitted(result, 1, 'PaymentLocked')
 
@@ -105,7 +100,7 @@ contract('PaymentConditions', (accounts) => {
             let p = await PaymentConditionsWithBug.at(pAddress)
             await zos.upgradeToNewContract('PaymentConditionsWithBug')
             await zos.approveLatestTransaction()
-            const result = await p.lockPayment(serviceAgreementId, assetId, price, { from: consumer })
+            const result = await p.lockPayment(serviceAgreementId, testUtils.assetId, price, { from: consumer })
             testUtils.assertEmitted(result, 0, 'PaymentLocked')
         })
 
@@ -113,12 +108,12 @@ contract('PaymentConditions', (accounts) => {
             await initAgreement()
             await zos.upgradeToNewContract('PaymentConditionsChangeFunctionSignature')
             let p = await PaymentConditionsChangeFunctionSignature.at(pAddress)
-            await testUtils.assertRevert(p.lockPayment(serviceAgreementId, assetId, { from: consumer }))
+            await testUtils.assertRevert(p.lockPayment(serviceAgreementId, testUtils.assetId, { from: consumer }))
             await zos.approveLatestTransaction()
 
             // upgrade and test again
             try {
-                await p.methods['lockPayment(bytes32,bytes32)'](serviceAgreementId, assetId, { from: consumer })
+                await p.methods['lockPayment(bytes32,bytes32)'](serviceAgreementId, testUtils.assetId, { from: consumer })
                 assert.fail('Expected revert not received')
             } catch (error) {
                 assert.equal(error.reason, 'Invalid condition key', 'invalid revert reason')
