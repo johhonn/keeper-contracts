@@ -38,7 +38,6 @@ contract('PaymentConditions', (accounts) => {
         token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
         await token.mint(consumer, 1000)
         paymentConditions = await PaymentConditions.at(zos.getProxyAddress('PaymentConditions'))
-
         price = 1
         contracts = [paymentConditions.address]
         fingerprints = [testUtils.getSelector(web3, PaymentConditions, 'lockPayment')]
