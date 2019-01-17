@@ -10,7 +10,9 @@ import 'zos-lib/contracts/Initializable.sol';
  * @author Ocean Protocol Team
  * @dev All function calls are currently implemented without side effects
  */
-contract OceanTokenChangeFunctionSignature is Initializable, ERC20Detailed, ERC20Capped {
+contract OceanTokenChangeFunctionSignature
+    is Initializable, ERC20Detailed, ERC20Capped
+{
 
     using SafeMath for uint256;
 
