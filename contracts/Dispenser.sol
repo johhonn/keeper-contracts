@@ -66,9 +66,10 @@ contract Dispenser is Initializable, Ownable {
             'Token address is 0x0.'
         );
 
+        Ownable.initialize(_owner);
+
         // instantiate OceanToken contract
         oceanToken = OceanToken(_oceanTokenAddress);
-        Ownable.initialize(_owner);
 
         scale = 10 ** uint256(oceanToken.decimals());
         maxAmount = uint256(1000).mul(scale);
