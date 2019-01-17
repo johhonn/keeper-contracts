@@ -258,6 +258,8 @@ contract ServiceExecutionAgreementWithBug is Common, Initializable {
             fulfillmentOperator <= fulfillmentIndices.length,
             'Invalid fulfillment operator');
         // 2. generate conditions
+        // adding bug here
+        /*
         templates[templateId] = Template(
             true,
             false,
@@ -267,21 +269,20 @@ contract ServiceExecutionAgreementWithBug is Common, Initializable {
             fulfillmentIndices,
             fulfillmentOperator);
 
-        // adding bug here
-        //for (uint256 i = 0; i < contracts.length; i++) {
-        //    bytes32 conditionKey = generateConditionKey(
-        //        templateId,
-        //        contracts[i],
-        //        fingerprints[i]);
-        //    templates[templateId].conditionKeys.push(conditionKey);
-        //    conditionKeyToIndex[conditionKey] = i;
-        //    emit ConditionSetup(
-        //        templateId,
-        //        conditionKey,
-        //        msg.sender
-        //    );
-        //}
-
+        for (uint256 i = 0; i < contracts.length; i++) {
+            bytes32 conditionKey = generateConditionKey(
+                templateId,
+                contracts[i],
+                fingerprints[i]);
+            templates[templateId].conditionKeys.push(conditionKey);
+            conditionKeyToIndex[conditionKey] = i;
+            emit ConditionSetup(
+                templateId,
+                conditionKey,
+                msg.sender
+            );
+        }
+        */
         emit TemplateSetup(templateId, msg.sender);
         return true;
     }
