@@ -9,12 +9,9 @@ const FitchainConditionsExtraFunctionality = artifacts.require('FitchainConditio
 const FitchainConditionsChangeInStorageAndLogic = artifacts.require('FitchainConditionsChangeInStorageAndLogic')
 const FitchainConditionsChangeFunctionSignature = artifacts.require('FitchainConditionsChangeFunctionSignature')
 
-global.artifacts = artifacts
-
-let zos
-
 contract('FitchainConditions', (accounts) => {
-    let pAddress
+    let zos
+    let fitchainConditionsAddress
     const verifier1 = accounts[2]
 
     before('restore zos before all tests', async function() {
@@ -25,13 +22,13 @@ contract('FitchainConditions', (accounts) => {
     beforeEach('Deploy with zos before each tests', async function() {
         zos = new ZeppelinHelper('FitchainConditions')
         await zos.initialize(accounts[0], true)
-        pAddress = zos.getProxyAddress('FitchainConditions')
+        fitchainConditionsAddress = zos.getProxyAddress('FitchainConditions')
     })
 
     describe('Test upgradability for FitchainConditions', () => {
         it('Should be able to call new method added after upgrade is approved', async () => {
             await zos.upgradeToNewContract('FitchainConditionsExtraFunctionality')
-            let p = await FitchainConditionsExtraFunctionality.at(pAddress)
+            let p = await FitchainConditionsExtraFunctionality.at(fitchainConditionsAddress)
             // should not be able to be called before upgrade is approved
             await testUtils.assertRevert(p.getNumber())
 
@@ -43,7 +40,7 @@ contract('FitchainConditions', (accounts) => {
 
         it('Should be possible to append storage variables ', async () => {
             await zos.upgradeToNewContract('FitchainConditionsChangeInStorage')
-            let p = await FitchainConditionsChangeInStorage.at(pAddress)
+            let p = await FitchainConditionsChangeInStorage.at(fitchainConditionsAddress)
             // should not be able to be called before upgrade is approved
             await testUtils.assertRevert(p.called(zos.owner))
 
@@ -54,7 +51,7 @@ contract('FitchainConditions', (accounts) => {
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
-            let p = await FitchainConditionsChangeInStorageAndLogic.at(pAddress)
+            let p = await FitchainConditionsChangeInStorageAndLogic.at(fitchainConditionsAddress)
             await zos.upgradeToNewContract('FitchainConditionsChangeInStorageAndLogic')
             // Approve and test new logic
             await zos.approveLatestTransaction()
@@ -65,7 +62,7 @@ contract('FitchainConditions', (accounts) => {
         })
 
         it('Should be possible to fix/add a bug', async () => {
-            let p = await FitchainConditionsWithBug.at(pAddress)
+            let p = await FitchainConditionsWithBug.at(fitchainConditionsAddress)
             await zos.upgradeToNewContract('FitchainConditionsWithBug')
             await zos.approveLatestTransaction()
             const registerVerifier1 = await p.registerVerifier(1, { from: verifier1 })
@@ -74,7 +71,7 @@ contract('FitchainConditions', (accounts) => {
 
         it('Should be possible to change function signature', async () => {
             await zos.upgradeToNewContract('FitchainConditionsChangeFunctionSignature')
-            let p = await FitchainConditionsChangeFunctionSignature.at(pAddress)
+            let p = await FitchainConditionsChangeFunctionSignature.at(fitchainConditionsAddress)
             try {
                 await p.registerVerifier({ from: verifier1 })
                 assert.fail('Expected revert not received')

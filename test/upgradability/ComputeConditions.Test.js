@@ -1,5 +1,5 @@
 /* eslint-env mocha */
-/* global web3, artifacts, assert, contract, describe, it */
+/* global web3, artifacts, assert, contract, describe, it, before, beforeEach */
 const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
 const testUtils = require('../helpers/utils.js')
 
@@ -14,9 +14,6 @@ const ComputeConditionsChangeInStorage = artifacts.require('ComputeConditionsCha
 const ComputeConditionsExtraFunctionality = artifacts.require('ComputeConditionsExtraFunctionality')
 const ComputeConditionsChangeInStorageAndLogic = artifacts.require('ComputeConditionsChangeInStorageAndLogic')
 const ComputeConditionsChangeFunctionSignature = artifacts.require('ComputeConditionsChangeFunctionSignature')
-
-global.artifacts = artifacts
-global.web3 = web3
 
 contract('ComputeConditions', (accounts) => {
     let zos
