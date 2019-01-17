@@ -1,6 +1,5 @@
 /* eslint-env mocha */
-/* eslint-disable no-console */
-/* global artifacts, assert, contract, describe, it */
+/* global artifacts, assert, contract, describe, it, before, beforeEach */
 
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
@@ -12,7 +11,6 @@ const { initializeAgreement } = require('../../../helpers/initializeAgreement.js
 const web3 = testUtils.getWeb3()
 
 contract('PaymentConditions', (accounts) => {
-    const assetId = '0x0000000000000000000000000000000000000000000000000000000000000001'
     let sea
     let token
     let paymentConditions
@@ -34,7 +32,7 @@ contract('PaymentConditions', (accounts) => {
         contracts = [paymentConditions.address]
         fingerprints = [testUtils.getSelector(web3, PaymentConditions, 'lockPayment')]
         dependenciesBits = [0]
-        valueHashes = [testUtils.valueHash(['bytes32', 'uint256'], [assetId, price])]
+        valueHashes = [testUtils.valueHash(['bytes32', 'uint256'], [testUtils.assetId, price])]
         timeoutValues = [0]
         agreementId = testUtils.generateId()
     })
@@ -70,11 +68,11 @@ contract('PaymentConditions', (accounts) => {
         it('Should release payment', async () => {
             // arrang
             fingerprints = [testUtils.getSelector(web3, PaymentConditions, 'releasePayment')]
-            valueHashes = [testUtils.valueHash(['bytes32', 'uint256'], [assetId, price])]
+            valueHashes = [testUtils.valueHash(['bytes32', 'uint256'], [testUtils.assetId, price])]
             await initializeAgreementWithValues()
 
             // act
-            const result = await paymentConditions.releasePayment(agreementId, assetId, price, { from: accounts[0] })
+            const result = await paymentConditions.releasePayment(agreementId, testUtils.assetId, price, { from: accounts[0] })
 
             // assert
             testUtils.assertEmitted(result, 1, 'PaymentReleased')
@@ -86,7 +84,7 @@ contract('PaymentConditions', (accounts) => {
             await initializeAgreementWithValues()
 
             // act
-            const result = await paymentConditions.releasePayment(agreementId, assetId, price, { from: accounts[0] })
+            const result = await paymentConditions.releasePayment(agreementId, testUtils.assetId, price, { from: accounts[0] })
 
             // assert
             testUtils.assertEmitted(result, 0, 'PaymentReleased')
@@ -95,12 +93,12 @@ contract('PaymentConditions', (accounts) => {
         it('Should not release payment twice', async () => {
             // arrang
             fingerprints = [testUtils.getSelector(web3, PaymentConditions, 'releasePayment')]
-            valueHashes = [testUtils.valueHash(['bytes32', 'uint256'], [assetId, price])]
+            valueHashes = [testUtils.valueHash(['bytes32', 'uint256'], [testUtils.assetId, price])]
             await initializeAgreementWithValues()
-            await paymentConditions.releasePayment(agreementId, assetId, price, { from: accounts[0] })
+            await paymentConditions.releasePayment(agreementId, testUtils.assetId, price, { from: accounts[0] })
 
             // act
-            const result = await paymentConditions.releasePayment(agreementId, assetId, price, { from: accounts[0] })
+            const result = await paymentConditions.releasePayment(agreementId, testUtils.assetId, price, { from: accounts[0] })
 
             // assert
             testUtils.assertEmitted(result, 0, 'PaymentReleased')
