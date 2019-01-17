@@ -10,7 +10,9 @@ import 'zos-lib/contracts/Initializable.sol';
  * @author Ocean Protocol Team
  * @dev All function calls are currently implemented without side effects
  */
-contract AccessConditionsChangeFunctionSignature is ISecretStore, Initializable {
+contract AccessConditionsChangeFunctionSignature
+    is ISecretStore, Initializable
+{
 
     mapping(bytes32 => mapping(address => bool)) private assetPermissions;
 
@@ -84,10 +86,10 @@ contract AccessConditionsChangeFunctionSignature is ISecretStore, Initializable 
         if (agreementStorage.hasUnfulfilledDependencies(agreementId, condition))
             return;
 
-        bytes32 valueHash = keccak256(abi.encodePacked(documentKeyId));
-
         // removed for testing
         /*
+        bytes32 valueHash = keccak256(abi.encodePacked(documentKeyId));
+
         require(
             agreementStorage.fulfillCondition(
                 agreementId,

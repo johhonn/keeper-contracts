@@ -10,7 +10,9 @@ import 'zos-lib/contracts/Initializable.sol';
  * @author Ocean Protocol Team
  * @dev All function calls are currently implemented without side effects
  */
-contract AccessConditionsChangeInStorageAndLogic is ISecretStore, Initializable {
+contract AccessConditionsChangeInStorageAndLogic
+    is ISecretStore, Initializable
+{
 
     mapping(bytes32 => mapping(address => bool)) private assetPermissions;
 
