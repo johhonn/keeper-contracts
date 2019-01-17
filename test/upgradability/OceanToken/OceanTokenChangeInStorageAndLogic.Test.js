@@ -22,12 +22,18 @@ contract('OceanToken', (accounts) => {
     describe('Test upgradability for OceanToken', () => {
         it('Should be possible to append storage variables and change logic', async () => {
             let p = await OceanTokenChangeInStorageAndLogic.at(oceanTokenAddress)
+
+            await p.mint(accounts[0], 1000)
             await zos.upgradeToNewContract('OceanTokenChangeInStorageAndLogic')
 
             // Approve and test new logic
             await zos.approveLatestTransaction()
+
+            // act
             await p.transfer(accounts[1], 100, { from: accounts[0] })
             await p.transfer(accounts[2], 100, { from: accounts[0] })
+
+            // eval
             const n = await p.called(zos.owner)
             assert.equal(n.toNumber(), 2, 'Error on internal counter')
         })

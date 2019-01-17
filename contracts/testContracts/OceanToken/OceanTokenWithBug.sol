@@ -41,7 +41,7 @@ contract OceanTokenWithBug is Initializable, ERC20Detailed, ERC20Capped {
     {
         require(
             // bug different require
-            to != address(0x12),
+            to != address(0xf34d7653ec603f06e15965ff0009c157d112a714),
             'To address is 0x0.'
         );
         return super.transfer(to, value);
