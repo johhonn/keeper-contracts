@@ -9,12 +9,12 @@ contract('OceanToken', (accounts) => {
     let zos
     let oceanTokenAddress
 
-    before('restore zos before all tests', async function() {
+    before('restore zos before all tests', async () => {
         zos = new ZeppelinHelper('OceanToken')
         await zos.restoreState(accounts[9])
     })
 
-    beforeEach('Deploy with zos before each tests', async function() {
+    beforeEach('Deploy with zos before each tests', async () => {
         zos = new ZeppelinHelper('OceanToken')
         await zos.initialize(accounts[0], true)
         oceanTokenAddress = zos.getProxyAddress('OceanToken')

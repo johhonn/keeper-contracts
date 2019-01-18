@@ -26,14 +26,14 @@ contract('PaymentConditions', (accounts) => {
 
     const price = 1
 
-    before('restore zos before all tests', async function() {
+    before('restore zos before all tests', async () => {
         zos = new ZeppelinHelper('PaymentConditions')
         await zos.restoreState(accounts[9])
         /* eslint-disable-next-line */
         consumer = accounts[2]
     })
 
-    beforeEach('Deploy with zos before each tests', async function() {
+    beforeEach('Deploy with zos before each tests', async () => {
         zos = new ZeppelinHelper('PaymentConditions')
         await zos.initialize(accounts[0], true)
         paymentConditionsAddress = zos.getProxyAddress('PaymentConditions')

@@ -9,7 +9,7 @@ contract('ServiceExecutionAgreement', (accounts) => {
     let zos
     let serviceExecutionAgreementAddress
 
-    before('restore zos before all tests', async function() {
+    before('restore zos before all tests', async () => {
         zos = new ZeppelinHelper('ServiceExecutionAgreement')
         await zos.restoreState(accounts[9])
     })
