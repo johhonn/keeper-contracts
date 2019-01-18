@@ -58,7 +58,10 @@ contract('PaymentConditions', (accounts) => {
         )
 
         token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
+        // give funds to consumer
         await token.mint(consumer, 100)
+        // approve condition to spend them
+        await token.approve(paymentConditionsAddress, price, { from: consumer })
     })
 
     describe('Test upgradability for PaymentConditions', () => {
