@@ -1,9 +1,9 @@
 pragma solidity 0.4.25;
 
-import 'openzeppelin-eth/contracts/token/ERC20/ERC20.sol';
-import 'zos-lib/contracts/Initializable.sol';
 import '../OceanToken.sol';
 import './ServiceExecutionAgreement.sol';
+import 'openzeppelin-eth/contracts/token/ERC20/ERC20.sol';
+import 'zos-lib/contracts/Initializable.sol';
 
 
 /**
@@ -20,6 +20,7 @@ contract PaymentConditions is Initializable {
     }
 
     ServiceExecutionAgreement private agreementStorage;
+
     ERC20 private token;
 
     function initialize(
