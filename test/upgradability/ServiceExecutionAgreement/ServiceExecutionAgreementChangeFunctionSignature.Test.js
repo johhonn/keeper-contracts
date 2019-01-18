@@ -6,8 +6,8 @@ const testUtils = require('../../helpers/utils.js')
 const ServiceExecutionAgreementChangeFunctionSignature = artifacts.require('ServiceExecutionAgreementChangeFunctionSignature')
 
 contract('ServiceExecutionAgreement', (accounts) => {
-    let serviceExecutionAgreementAddress
     let zos
+    let serviceExecutionAgreementAddress
 
     before('restore zos before all tests', async function() {
         zos = new ZeppelinHelper('ServiceExecutionAgreement')
@@ -23,29 +23,32 @@ contract('ServiceExecutionAgreement', (accounts) => {
     describe('Test upgradability for ServiceExecutionAgreement', () => {
         it('Should be possible to change function signature', async () => {
             await zos.upgradeToNewContract('ServiceExecutionAgreementChangeFunctionSignature')
+
             let p = await ServiceExecutionAgreementChangeFunctionSignature.at(serviceExecutionAgreementAddress)
-            await testUtils.assertRevert(p.setupAgreementTemplate(
+
+            // expect revert
+            await testUtils.assertRevert(p.setupTemplate(
+                [],
                 testUtils.templateId,
                 [],
                 [],
                 [],
-                testUtils.emptyBytes32,
-                [],
-                { from: accounts[0] }))
+                0))
 
             // Approve and test new logic
             await zos.approveLatestTransaction()
-            const result = await p.setupAgreementTemplate(
+
+            // act
+            const result = await p.setupTemplate(
+                [],
                 testUtils.templateId,
                 [],
                 [],
                 [],
-                testUtils.emptyBytes32,
-                [],
-                { from: accounts[0] })
+                0)
 
-            // assert
-            testUtils.assertEmitted(result, 1, 'SetupAgreementTemplate')
+            // eval
+            testUtils.assertEmitted(result, 1, 'TemplateSetup')
             const status = await p.getTemplateStatus(testUtils.templateId)
             assert.strictEqual(status, true)
         })
