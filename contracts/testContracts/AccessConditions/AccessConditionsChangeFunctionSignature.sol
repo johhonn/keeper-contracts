@@ -71,9 +71,11 @@ contract AccessConditionsChangeFunctionSignature
     function grantAccess(
         bytes32 agreementId,
         bytes32 documentKeyId,
+        // added for testing
         address requester
     )
         external
+        // changed for testing
         onlySLAPublisher(agreementId, requester)
         returns (bool)
     {

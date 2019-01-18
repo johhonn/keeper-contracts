@@ -79,6 +79,7 @@ contract AccessConditionsChangeInStorageAndLogic
         onlySLAPublisher(agreementId, msg.sender)
         returns (bool)
     {
+        // added for testing
         called[msg.sender] += 1;
         bytes32 condition = agreementStorage.generateConditionKeyForId(
             agreementId,

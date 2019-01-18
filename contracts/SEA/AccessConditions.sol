@@ -15,6 +15,7 @@ contract AccessConditions is ISecretStore, Initializable {
     mapping(bytes32 => mapping(address => bool)) private assetPermissions;
 
     ServiceExecutionAgreement private agreementStorage;
+
     event AccessGranted(
         bytes32 indexed agreementId,
         bytes32 asset
@@ -91,6 +92,7 @@ contract AccessConditions is ISecretStore, Initializable {
             ),
             'Cannot fulfill grantAccess condition'
         );
+
         address consumer = agreementStorage.getAgreementConsumer(agreementId);
         assetPermissions[documentKeyId][consumer] = true;
         emit AccessGranted(agreementId, documentKeyId);
