@@ -28,12 +28,26 @@ contract('DIDRegistry', (accounts) => {
             await zos.upgradeToNewContract('DIDRegistryChangeFunctionSignature')
             await zos.approveLatestTransaction()
 
-            // check new functionality works
+            // prepare
             let valueType = 0
             let did = web3.utils.fromAscii('did:ocn:test-attr')
             let provider = web3.utils.fromAscii('provider')
-            let result = await p.registerAttribute(valueType, did, provider)
 
+            // should revert
+            await testUtils.assertRevert(p.registerAttribute(
+                valueType,
+                did,
+                provider,
+                'this is not the contract you are looking for'))
+
+            // act
+            let result = await p.registerAttribute(
+                valueType,
+                did,
+                provider,
+                'this is not the contract you are looking for')
+
+            // eval
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             let payload = result.logs[0].args
