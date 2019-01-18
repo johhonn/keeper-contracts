@@ -9,7 +9,9 @@ import 'zos-lib/contracts/Initializable.sol';
  * @author Ocean Protocol Team
  * @dev All function calls are currently implemented without side effects
  */
-contract ServiceExecutionAgreementChangeFunctionSignature is Common, Initializable {
+contract ServiceExecutionAgreementChangeFunctionSignature
+    is Common, Initializable
+{
 
     struct Template {
         bool isExisting;

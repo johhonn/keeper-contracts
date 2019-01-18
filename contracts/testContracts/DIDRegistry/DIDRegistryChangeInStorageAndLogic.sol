@@ -1,11 +1,17 @@
 pragma solidity 0.4.25;
 
-// Contain upgraded version of the contracts for test
 import 'zos-lib/contracts/Initializable.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
 
-contract DIDRegistryChangeInStorageAndLogic is Initializable, Ownable {
+/**
+ * @title DID Registry
+ * @author Ocean Protocol Team
+ * @dev All function calls are currently implemented without side effects
+ */
+contract DIDRegistryChangeInStorageAndLogic
+    is Initializable, Ownable
+{
     enum ValueType {
         DID,                // DID string e.g. 'did:op:xxx'
         DIDRef,             // hash of DID same as in parameter (bytes32 _did) in text 0x0123abc.. or 0123abc..
@@ -28,31 +34,77 @@ contract DIDRegistryChangeInStorageAndLogic is Initializable, Ownable {
     );
 
     mapping(bytes32 => DIDRegister) private didRegister;
+
     // New variables should be added after the last variable
     // Old variables should be kept even if unused
     // https://github.com/jackandtheblockstalk/upgradeable-proxy#331-you-can-1
     mapping(bytes32 => uint256) public timeOfRegister;
 
-    function initialize(address _owner) initializer() public {
+    function initialize(
+        address _owner
+    )
+        public initializer()
+    {
         Ownable.initialize(_owner);
     }
-    // Update the function mark the newly added mapping
-    function registerAttribute(bytes32 _did, ValueType _type, bytes32 _key, string _value) public {
+
+    /**
+	 * @notice registerAttribute is called only by DID owner.
+	 * @dev this function registers DID attributes
+	 * @param did refers to decentralized identifier (a byte32 length ID)
+	 * @param valueType includes DID, DID reference , URL, or DDO
+	 * @param key represents the attribute key
+	 * @param value refers to the attribute value
+	 */
+    function registerAttribute(
+        bytes32 did,
+        ValueType valueType,
+        bytes32 key,
+        string value
+    )
+    public
+    {
         address currentOwner;
-        currentOwner = didRegister[_did].owner;
-        require(currentOwner == address(0x0) || currentOwner == msg.sender, 'Attributes must be registered by the DID owners.');
+        currentOwner = didRegister[did].owner;
+        require(
+            currentOwner == address(0x0) || currentOwner == msg.sender,
+            'Attributes must be registered by the DID owners.'
+        );
 
-        didRegister[_did] = DIDRegister(msg.sender, block.number);
-        emit DIDAttributeRegistered(_did, msg.sender, _key, _value, _type, block.number);
+        didRegister[did] = DIDRegister(msg.sender, block.number);
+        emit DIDAttributeRegistered(
+            did,
+            msg.sender,
+            key,
+            value,
+            valueType,
+            block.number
+        );
 
-        timeOfRegister[_did] = now;
+        timeOfRegister[did] = now;
     }
 
-    function getUpdateAt(bytes32 _did) public view returns(uint) {
-        return didRegister[_did].updateAt;
+    /**
+	 * @notice getUpdateAt is called by anyone.
+	 * @param did refers to decentralized identifier (a byte32 length ID)
+	 * @return last modified (update) time of a DID
+	 */
+    function getUpdateAt(bytes32 did)
+        public view
+        returns(uint)
+    {
+        return didRegister[did].updateAt;
     }
 
-    function getOwner(bytes32 _did) public view returns(address) {
-        return didRegister[_did].owner;
+    /**
+	 * @notice getOwner is called by anyone.
+	 * @param did refers to decentralized identifier (a byte32 length ID)
+	 * @return the address of the owner
+	 */
+    function getOwner(bytes32 did)
+        public view
+        returns(address)
+    {
+        return didRegister[did].owner;
     }
 }

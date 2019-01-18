@@ -1,7 +1,7 @@
 pragma solidity 0.4.25;
 
 // Contain upgraded version of the contracts for test
-import "../../DIDRegistry.sol";
+import '../../DIDRegistry.sol';
 
 
 contract DIDRegistryChangeInStorage is DIDRegistry {

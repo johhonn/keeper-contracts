@@ -1,6 +1,7 @@
 pragma solidity 0.4.25;
 
-import "../../DIDRegistry.sol";
+// Contain upgraded version of the contracts for test
+import '../../DIDRegistry.sol';
 
 
 contract DIDRegistryExtraFunctionality is DIDRegistry {

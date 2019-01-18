@@ -211,9 +211,9 @@ contract ComputeConditionsChangeFunctionSignature is Common, Initializable {
 
         if (
             proofs[agreementId].dataConsumer == recoverAddress(
-            prefixHash(proofs[agreementId].algorithmHash),
-            proofs[agreementId].algorithmHashSignature)
-        )
+                prefixHash(proofs[agreementId].algorithmHash),
+                proofs[agreementId].algorithmHashSignature)
+            )
         {
             agreementStorage.fulfillCondition(
                 agreementId,

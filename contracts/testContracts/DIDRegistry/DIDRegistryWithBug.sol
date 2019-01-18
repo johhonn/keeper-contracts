@@ -55,7 +55,7 @@ contract DIDRegistryWithBug is Initializable, Ownable {
         bytes32 key,
         string value
     )
-    public
+        public
     {
         address currentOwner;
         currentOwner = didRegister[did].owner;
@@ -64,7 +64,8 @@ contract DIDRegistryWithBug is Initializable, Ownable {
             'Attributes must be registered by the DID owners.'
         );
 
-        didRegister[did] = DIDRegister(msg.sender, block.number);
+        // add bug here
+        didRegister[did] = DIDRegister(msg.sender, 42);
         emit DIDAttributeRegistered(
             did,
             msg.sender,
@@ -81,8 +82,8 @@ contract DIDRegistryWithBug is Initializable, Ownable {
 	 * @return last modified (update) time of a DID
 	 */
     function getUpdateAt(bytes32 did)
-    public view
-    returns(uint)
+        public view
+        returns(uint)
     {
         return didRegister[did].updateAt;
     }
@@ -93,8 +94,8 @@ contract DIDRegistryWithBug is Initializable, Ownable {
 	 * @return the address of the owner
 	 */
     function getOwner(bytes32 did)
-    public view
-    returns(address)
+        public view
+        returns(address)
     {
         return didRegister[did].owner;
     }
