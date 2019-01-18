@@ -1,7 +1,7 @@
 pragma solidity 0.4.25;
 
-import 'zos-lib/contracts/Initializable.sol';
 import './Common.sol';
+import 'zos-lib/contracts/Initializable.sol';
 
 
 /**
@@ -305,7 +305,9 @@ contract ServiceExecutionAgreement is Common, Initializable {
     * @param templateId is the service execution agreement template ID
     * @return template owner address
     */
-    function getTemplateOwner(bytes32 templateId) public view returns (address)
+    function getTemplateOwner(bytes32 templateId)
+        public view
+        returns (address)
     {
         return templates[templateId].owner;
     }
@@ -315,14 +317,18 @@ contract ServiceExecutionAgreement is Common, Initializable {
     * @param agreementId is the service execution agreement ID
     * @return service execution template ID
     */
-    function getTemplateId(bytes32 agreementId) public view returns (bytes32)
+    function getTemplateId(bytes32 agreementId)
+        public view
+        returns (bytes32)
     {
         return agreements[agreementId].templateId;
     }
 
     /// @notice getTemplateStatus is deprecated, use isTemplateRevoked instead (TODO)
-    function getTemplateStatus(bytes32 templateId) public
-      view returns (bool status){
+    function getTemplateStatus(bytes32 templateId)
+        public view
+        returns (bool status)
+    {
         return !templates[templateId].isRevoked &&
         templates[templateId].isExisting;
     }
@@ -332,7 +338,9 @@ contract ServiceExecutionAgreement is Common, Initializable {
     * @param templateId is the service execution agreement template ID
     * @return true if the template exists
     */
-    function isTemplateExisting(bytes32 templateId) public view returns (bool)
+    function isTemplateExisting(bytes32 templateId)
+        public view
+        returns (bool)
     {
         return templates[templateId].isExisting;
     }
@@ -342,7 +350,9 @@ contract ServiceExecutionAgreement is Common, Initializable {
     * @param templateId is the service execution agreement template ID
     * @return true if the template is revoked
     */
-    function isTemplateRevoked(bytes32 templateId) public view returns (bool)
+    function isTemplateRevoked(bytes32 templateId)
+        public view
+        returns (bool)
     {
         return templates[templateId].isRevoked;
     }
@@ -592,12 +602,11 @@ contract ServiceExecutionAgreement is Common, Initializable {
         bytes32 agreementId,
         bytes32 conditionKey
     )
-        public
+        public view
         onlyExistConditionKey(
             agreementId,
             conditionKey
         )
-        view
         returns (uint8)
     {
         return agreements[agreementId]
