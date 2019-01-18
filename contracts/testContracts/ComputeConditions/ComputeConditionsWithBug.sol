@@ -1,12 +1,16 @@
-/* solium-disable */
 pragma solidity 0.4.25;
 
-import '../../SEA/ComputeConditions.sol';
+import '../../SEA/Common.sol';
 import '../../SEA/ServiceExecutionAgreement.sol';
 import 'zos-lib/contracts/Initializable.sol';
 
 
-contract ComputeConditionsWithBug is Initializable{
+/**
+ * @title On-premise compute conditions
+ * @author Ocean Protocol Team
+ * @notice This contract is WIP, don't use it for production
+ */
+contract ComputeConditionsWithBug is Common, Initializable {
 
     struct ProofOfUpload {
         bool exists;
@@ -17,110 +21,218 @@ contract ComputeConditionsWithBug is Initializable{
         bytes algorithmHashSignature;
     }
 
-    ServiceExecutionAgreement private serviceAgreementStorage;
+    ServiceExecutionAgreement private agreementStorage;
+
     mapping (bytes32 => ProofOfUpload) proofs;
 
     //events
-    event HashSignatureSubmitted(bytes32 serviceAgreementId, address dataScientist, address publisher, bool state);
-    event HashSubmitted(bytes32 serviceAgreementId, address dataScientist, address publisher, bool state);
-    event ProofOfUploadValid(bytes32 serviceAgreementId, address dataScientist, address publisher);
-    event ProofOfUploadInvalid(bytes32 serviceAgreementId, address dataScientist, address publisher);
+    event HashSignatureSubmitted(
+        bytes32 indexed agreementId,
+        address indexed consumer,
+        address indexed publisher,
+        bool state
+    );
+    event HashSubmitted(
+        bytes32 indexed agreementId,
+        address indexed consumer,
+        address indexed publisher,
+        bool state
+    );
+    event ProofOfUploadValid(
+        bytes32 indexed agreementId,
+        address indexed consumer,
+        address indexed publisher
+    );
+    event ProofOfUploadInvalid(
+        bytes32 indexed agreementId,
+        address indexed consumer,
+        address indexed publisher
+    );
 
-    modifier onlyDataConsumer(bytes32 serviceAgreementId) {
-        require(msg.sender == serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), 'Invalid data scientist address!');
+    modifier onlyDataConsumer(bytes32 agreementId) {
+        require(
+            msg.sender == agreementStorage.getAgreementConsumer(agreementId),
+            'Invalid data consumer address!'
+        );
         _;
     }
 
-    modifier onlyComputePublisher(bytes32 serviceAgreementId) {
-        require(msg.sender == serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), 'Invalid publisher address');
+    modifier onlyComputePublisher(bytes32 agreementId) {
+        require(
+            msg.sender == agreementStorage.getAgreementPublisher(agreementId),
+            'Invalid publisher address');
         _;
 
     }
 
-    modifier onlyStakeholders(bytes32 serviceAgreementId) {
-        require(msg.sender == serviceAgreementStorage.getAgreementPublisher(serviceAgreementId) || msg.sender == serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), 'Access denied');
-        require(!proofs[serviceAgreementId].isValid, 'avoid replay attack');
+    modifier onlyStakeholders(bytes32 agreementId) {
+        require(
+            msg.sender == agreementStorage.getAgreementPublisher(agreementId) ||
+            msg.sender == agreementStorage.getAgreementConsumer(agreementId),
+            'Access denied');
+        require(
+            !proofs[agreementId].isValid,
+            'avoid replay attack'
+        );
         _;
     }
 
-    function initialize(address serviceAgreementAddress) public initializer(){
-        require(serviceAgreementAddress != address(0), 'invalid service agreement contract address');
-        serviceAgreementStorage = ServiceExecutionAgreement(serviceAgreementAddress);
+    function initialize(
+        address agreementAddress
+    )
+        public initializer()
+    {
+        require(
+            agreementAddress != address(0),
+            'invalid service agreement contract address'
+        );
+        agreementStorage = ServiceExecutionAgreement(agreementAddress);
     }
 
-    /// @notice submitHashSignature is called only by the data-scientist address.
-    /// @dev At first It checks if the proof state is created or not then checks that the hash
-    /// has been submitted by the publisher in order to call fulfillUpload. This preserves
-    /// the message integrity and proof that both parties agree on the same algorithm file/s
-    /// @param serviceAgreementId , the service level agreement Id
-    /// @param signature data scientist signature = signed_hash(uploaded_algorithm_file/s)
-    function submitHashSignature(bytes32 serviceAgreementId, bytes signature) public returns(bool status) {
-        if(proofs[serviceAgreementId].exists){
-            if(proofs[serviceAgreementId].isLocked) { // avoid race conditions
-                emit HashSignatureSubmitted(serviceAgreementId, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), false);
-                return false;
-            }
-            proofs[serviceAgreementId].isLocked = true;
-            proofs[serviceAgreementId].algorithmHashSignature = signature;
-            fulfillUpload(serviceAgreementId, true);
+    /**
+	 * @notice submitHashSignature is called only by the data-consumer address.
+	 * @dev At first It checks if the proof state is created or not then checks that the hash
+	 * has been submitted by the publisher. This preserves the message integrity
+	 * it also proof that both parties agree on the same algorithm file(s)
+	 * @param agreementId is the service level agreement Id
+	 * @param signature data scientist signature = signed_hash(uploaded_algorithm_file/s)
+	 */
+    function submitHashSignature(
+        bytes32 agreementId,
+        bytes signature
+    )
+        external
+        // add bug here
+        // onlyDataConsumer(agreementId)
+        returns(bool status)
+    {
+        if (proofs[agreementId].exists) {
+            require(
+                !proofs[agreementId].isLocked,
+                'avoid race conditions'
+            );
+            proofs[agreementId].isLocked = true;
+            proofs[agreementId].algorithmHashSignature = signature;
+            fulfillUpload(agreementId, true);
         }else{
-            proofs[serviceAgreementId] = ProofOfUpload(true, false, true, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), bytes32(0), signature);
+            proofs[agreementId] = ProofOfUpload(
+                true,
+                false,
+                true,
+                agreementStorage.getAgreementConsumer(agreementId),
+                bytes32(0),
+                signature
+            );
         }
-        emit HashSignatureSubmitted(serviceAgreementId, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), true);
-        proofs[serviceAgreementId].isLocked = false;
+        emit HashSignatureSubmitted(
+            agreementId,
+            agreementStorage.getAgreementConsumer(agreementId),
+            agreementStorage.getAgreementPublisher(agreementId),
+            true
+        );
+        proofs[agreementId].isLocked = false;
         return true;
 
     }
 
-    /// @notice submitAlgorithmHash is called only by the on-premise address.
-    /// @dev At first It checks if the proof state is created or not then checks if the signature
-    /// has been submitted by the data scientist in order to call fulfillUpload. This preserves
-    /// the message integrity and proof that both parties agree on the same algorithm file/s
-    /// @param serviceAgreementId the service level agreement Id
-    /// @param hash = kekccak(uploaded_algorithm_file/s)
-    function submitAlgorithmHash(bytes32 serviceAgreementId, bytes32 hash) public onlyComputePublisher(serviceAgreementId) returns(bool status) {
-        if(proofs[serviceAgreementId].exists){
-            if(proofs[serviceAgreementId].isLocked) { // avoid race conditions
-                emit HashSubmitted(serviceAgreementId, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), false);
-                return false;
-            }
-            proofs[serviceAgreementId].isLocked = true;
-            proofs[serviceAgreementId].algorithmHash = hash;
-            fulfillUpload(serviceAgreementId, true);
+    /**
+	 * @notice submitAlgorithmHash is called only by the compute publisher.
+	 * @dev At first It checks if the proof state is created or not then checks if the signature
+	 * has been submitted by the data scientist in order to call fulfillUpload. This preserves
+	 * the message integrity and proof that both parties agree on the same algorithm file/s
+	 * @param agreementId the service level agreement Id
+	 * @param hash = kekccak(uploaded_algorithm_file/s)
+	 * @return true if the compute publisher is able to send the right algorithm hash
+	 */
+    function submitAlgorithmHash(
+        bytes32 agreementId,
+        bytes32 hash
+    )
+        external
+        onlyComputePublisher(agreementId)
+        returns(bool)
+    {
+        if (proofs[agreementId].exists) {
+            require(
+                !proofs[agreementId].isLocked,
+                'avoid race conditions'
+            );
+            proofs[agreementId].isLocked = true;
+            proofs[agreementId].algorithmHash = hash;
+            fulfillUpload(agreementId, true);
         }else{
-            proofs[serviceAgreementId] = ProofOfUpload(true, false, true, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), hash, new bytes(0));
+            proofs[agreementId] = ProofOfUpload(
+                true,
+                false,
+                true,
+                agreementStorage.getAgreementConsumer(agreementId),
+                hash,
+                new bytes(0)
+            );
         }
-        emit HashSubmitted(serviceAgreementId, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId), true);
-        proofs[serviceAgreementId].isLocked = false;
+        emit HashSubmitted(
+            agreementId,
+            agreementStorage.getAgreementConsumer(agreementId),
+            agreementStorage.getAgreementPublisher(agreementId),
+            true
+        );
+        proofs[agreementId].isLocked = false;
         return true;
     }
 
-    /// @notice fulfillUpload is called by anyone of the stakeholders [publisher or data scientist]
-    /// @dev check if there are unfulfilled dependency condition, if false, it verifies the signature
-    /// using the submitted hash (by publisher), the signature (by data scientist) then call
-    /// fulfillCondition in service level agreement storage contract
-    /// @param serviceAgreementId the service level agreement Id
-    /// @param state get be used fo input value hash for this condition indicating the state of verification
-    function fulfillUpload(bytes32 serviceAgreementId, bool state) public returns(bool status) {
-        bytes32 condition = serviceAgreementStorage.generateConditionKey(serviceAgreementId, address(this), this.fulfillUpload.selector);
-        if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceAgreementId, condition)){
-            emit ProofOfUploadInvalid(serviceAgreementId, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId));
-            return false;
-        }
+    /**
+	 * @notice fulfillUpload is called by anyone of the stakeholders [compute publisher or compute consumer]
+	 * @dev check if there are unfulfilled dependency condition, if false, it verifies the signature
+	 * using the submitted hash (by publisher), the signature (by data scientist/consumer) then call
+	 * fulfillCondition in service level agreement storage contract
+	 * @param agreementId the service level agreement Id
+	 * @param state get be used fo input value hash for this condition indicating the state of verification
+	 */
+    function fulfillUpload(
+        bytes32 agreementId,
+        bool state
+    )
+        public
+        onlyStakeholders(agreementId)
+        returns(bool status)
+    {
+        bytes32 condition = agreementStorage.generateConditionKeyForId(
+            agreementId,
+            address(this),
+            this.fulfillUpload.selector
+        );
+        require(
+            !agreementStorage.hasUnfulfilledDependencies(
+            agreementId,
+            condition
+        ),
+            'condition has unfulfilled dependencies'
+        );
 
-        if (serviceAgreementStorage.getConditionStatus(serviceAgreementId, condition) == 1) {
-            emit ProofOfUploadValid(serviceAgreementId, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId));
+        if (
+            proofs[agreementId].dataConsumer == recoverAddress(
+            prefixHash(proofs[agreementId].algorithmHash),
+            proofs[agreementId].algorithmHashSignature)
+        )
+        {
+            agreementStorage.fulfillCondition(
+                agreementId,
+                this.fulfillUpload.selector,
+                keccak256(abi.encodePacked(state))
+            );
+            emit ProofOfUploadValid(
+                agreementId,
+                agreementStorage.getAgreementConsumer(agreementId),
+                agreementStorage.getAgreementPublisher(agreementId)
+            );
+            proofs[agreementId].isValid = true;
             return true;
         }
-
-        if(proofs[serviceAgreementId].dataConsumer == ECDSA.recover(ECDSA.toEthSignedMessageHash(proofs[serviceAgreementId].algorithmHash), proofs[serviceAgreementId].algorithmHashSignature)) {
-            serviceAgreementStorage.fulfillCondition(serviceAgreementId, this.fulfillUpload.selector, keccak256(abi.encodePacked(state)));
-            emit ProofOfUploadValid(serviceAgreementId, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId));
-            proofs[serviceAgreementId].isValid = true;
-            return true;
-        }
-        emit ProofOfUploadInvalid(serviceAgreementId, serviceAgreementStorage.getAgreementConsumer(serviceAgreementId), serviceAgreementStorage.getAgreementPublisher(serviceAgreementId));
+        emit ProofOfUploadInvalid(
+            agreementId,
+            agreementStorage.getAgreementConsumer(agreementId),
+            agreementStorage.getAgreementPublisher(agreementId)
+        );
         return false;
     }
-
 }

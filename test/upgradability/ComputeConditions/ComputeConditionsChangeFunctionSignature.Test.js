@@ -1,7 +1,7 @@
 /* eslint-env mocha */
 /* global web3, artifacts, assert, contract, describe, it, before, beforeEach */
-const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
-const testUtils = require('../helpers/utils.js')
+const ZeppelinHelper = require('../../helpers/ZeppelinHelper.js')
+const testUtils = require('../../helpers/utils.js')
 
 const OceanToken = artifacts.require('OceanToken.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
@@ -9,10 +9,6 @@ const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const AccessConditions = artifacts.require('AccessConditions.sol')
 const ComputeConditions = artifacts.require('ComputeConditions.sol')
 
-const ComputeConditionsWithBug = artifacts.require('ComputeConditionsWithBug')
-const ComputeConditionsChangeInStorage = artifacts.require('ComputeConditionsChangeInStorage')
-const ComputeConditionsExtraFunctionality = artifacts.require('ComputeConditionsExtraFunctionality')
-const ComputeConditionsChangeInStorageAndLogic = artifacts.require('ComputeConditionsChangeInStorageAndLogic')
 const ComputeConditionsChangeFunctionSignature = artifacts.require('ComputeConditionsChangeFunctionSignature')
 
 contract('ComputeConditions', (accounts) => {
@@ -28,9 +24,9 @@ contract('ComputeConditions', (accounts) => {
     const dependencies = [0, 1, 4, 16, 3]
     const price = 5 // 5 OCN tokens
     const timeouts = [0, 0, 0, 0, 100]
-    const did = testUtils.generateId(web3)
-    const serviceTemplateId = testUtils.generateId(web3)
-    serviceAgreementId = testUtils.generateId(web3)
+    const did = testUtils.generateId()
+    const serviceTemplateId = testUtils.generateId()
+    serviceAgreementId = testUtils.generateId()
     const algorithm = 'THIS IS FAKE CODE foo=Hello World!'
 
     before('restore zos before all tests', async function() {
@@ -91,60 +87,6 @@ contract('ComputeConditions', (accounts) => {
     }
 
     describe('Test upgradability for ComputeConditions', () => {
-        it('Should be able to call new method added after upgrade is approved', async () => {
-            await zos.upgradeToNewContract('ComputeConditionsExtraFunctionality')
-            let p = await ComputeConditionsExtraFunctionality.at(pAddress)
-            // should not be able to be called before upgrade is approved
-            await testUtils.assertRevert(p.getNumber())
-
-            // Approve and call again
-            await zos.approveLatestTransaction()
-
-            let n = await p.getNumber()
-            assert.equal(n.toString(), '42', 'Error calling getNumber')
-        })
-
-        it('Should be possible to append storage variables ', async () => {
-            await zos.upgradeToNewContract('ComputeConditionsChangeInStorage')
-            let p = await ComputeConditionsChangeInStorage.at(pAddress)
-            // should not be able to be called before upgrade is approved
-            await testUtils.assertRevert(p.called(zos.owner))
-
-            // Approve and call again
-            await zos.approveLatestTransaction()
-            // await p.setReceiver(accounts[0])
-            let n = await p.called(zos.owner)
-            assert.equal(n.toNumber(), 0, 'Error calling added storage variable')
-        })
-
-        it('Should be possible to append storage variables and change logic', async () => {
-            await setupContracts()
-            await zos.upgradeToNewContract('ComputeConditionsChangeInStorageAndLogic')
-            let p = await ComputeConditionsChangeInStorageAndLogic.at(pAddress)
-            algorithmHash = web3.utils.soliditySha3({ type: 'string', value: algorithm }).toString('hex')
-            const signature = await web3.eth.sign(algorithmHash, datascientist)
-            // should work after approval
-            await zos.approveLatestTransaction()
-            const submitAlgorithmSignature = await p.submitHashSignature(serviceAgreementId, signature, { from: datascientist })
-
-            const isSignatureSubmitted = testUtils.getEventArgsFromTx(submitAlgorithmSignature, 'HashSignatureSubmitted')
-            assert.strictEqual(isSignatureSubmitted.state, true, 'Error: Unable to submit signature')
-
-            let n = await p.called(datascientist)
-            assert.equal(n.toNumber() > 0, true, 'time of registry not created')
-        })
-
-        it('Should be possible to fix/add a bug', async () => {
-            await setupContracts()
-            let p = await ComputeConditionsWithBug.at(pAddress)
-            await zos.upgradeToNewContract('ComputeConditionsWithBug')
-            algorithmHash = web3.utils.soliditySha3({ type: 'string', value: algorithm }).toString('hex')
-            const signature = await web3.eth.sign(algorithmHash, accounts[2])
-            await testUtils.assertRevert(p.submitHashSignature(serviceAgreementId, signature))
-            await zos.approveLatestTransaction()
-            await p.submitHashSignature(serviceAgreementId, signature)
-        })
-
         it('Should be possible to change function signature', async () => {
             await setupContracts()
             await zos.upgradeToNewContract('ComputeConditionsChangeFunctionSignature')
