@@ -5,9 +5,6 @@ set -ex
 # -----------------------------------------------------------------------
 # Script configuration
 # -----------------------------------------------------------------------
-# Admin is the account used to deploy and manage upgrades.
-# After deployment the multisig wallet is set to Admin
-ADMIN='0xf6b77193dfb4c1d94cb23ac8beb454fc3df840c5'
 # Config variables for initializers
 stake='10'
 maxSlots='1'
