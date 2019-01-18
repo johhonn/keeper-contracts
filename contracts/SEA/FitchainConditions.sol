@@ -1,8 +1,8 @@
 pragma solidity 0.4.25;
 
+import './ServiceExecutionAgreement.sol';
 import 'zos-lib/contracts/Initializable.sol';
 import 'openzeppelin-eth/contracts/math/SafeMath.sol';
-import './ServiceExecutionAgreement.sol';
 
 
 /**
@@ -17,7 +17,7 @@ import './ServiceExecutionAgreement.sol';
  * TODO: Implement slashing conditions
  * TODO: use enum VoteType rather than 1 and 2
  */
-contract FitchainConditions is Initializable{
+contract FitchainConditions is Initializable {
 
     using SafeMath for uint256;
 
@@ -176,11 +176,11 @@ contract FitchainConditions is Initializable{
     }
 
     function initialize(
-        address agreementAddress, 
+        address agreementAddress,
         uint256 _stake,
         uint256 _maxSlots
-    ) 
-    public initializer()
+    )
+        public initializer()
     {
         require(
             agreementAddress != address(0),
@@ -215,7 +215,7 @@ contract FitchainConditions is Initializable{
         // TODO: cut this stake from the verifier's balance
         verifiers[msg.sender] = Actor(true, stake * slots, slots, slots);
         for(uint256 i = 0; i < slots; i++)
-            //TODO: the below line prone to 51% attack
+            // TODO: the below line prone to 51% attack
             registry.push(msg.sender);
         emit VerifierRegistered(msg.sender, slots);
         return true;
@@ -488,7 +488,8 @@ contract FitchainConditions is Initializable{
     * @return true if a verifier is able to free its slots
     */
     function freeMySlots(bytes32 modelId)
-        external onlyVerifiers(modelId)
+        external
+        onlyVerifiers(modelId)
         returns(bool)
     {
         uint256 slots = verifiers[msg.sender].slots;
@@ -508,7 +509,10 @@ contract FitchainConditions is Initializable{
     * @dev returns the number of available verifiers using registry length
     * @return number of available verifiers
     */
-    function getAvailableVerifiersCount() public view returns(uint256) {
+    function getAvailableVerifiersCount()
+        public view
+        returns(uint256)
+    {
         return registry.length;
     }
 
@@ -517,7 +521,10 @@ contract FitchainConditions is Initializable{
     * @dev verifiers will not be able to register if they are supplying slots > maxSlots
     * @return number of maximum slots
     */
-    function getMaximumNumberOfSlots() public view returns(uint256) {
+    function getMaximumNumberOfSlots()
+        public view
+        returns(uint256)
+    {
         return maxSlots;
     }
 
@@ -525,7 +532,10 @@ contract FitchainConditions is Initializable{
     * @notice getMyFreeSlots returns the verifier free slots
     * @return number of free slots for a verifier
     */
-    function getMyFreeSlots() public view returns(uint256) {
+    function getMyFreeSlots()
+        public view
+        returns(uint256)
+    {
         return verifiers[msg.sender].slots;
     }
 
