@@ -19,12 +19,15 @@ VERSION=v$(jq -r '.version' package.json)
 # -----------------------------------------------------------------------
 # Script setup
 # -----------------------------------------------------------------------
-# Set zos session (network, admin, timeout)
-npx zos session --network $NETWORK --from $ADMIN --expires 36000
 # Setup multisig wallet
 npx truffle exec scripts/setupWallet.js
 # Get wallet address
 MULTISIG=$(jq -r '.wallet' wallet.json)
+# Admin is the account used to deploy and manage upgrades.
+# After deployment the multisig wallet is set to Admin
+ADMIN=$(jq -r '.owners[0]' wallet.json)
+# Set zos session (network, admin, timeout)
+npx zos session --network $NETWORK --from $ADMIN --expires 36000
 # Clean up
 rm -f zos.*
 
