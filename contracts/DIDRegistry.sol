@@ -36,7 +36,7 @@ contract DIDRegistry is Initializable, Ownable {
     function initialize(
         address _owner
     )
-    public initializer()
+        public initializer()
     {
         Ownable.initialize(_owner);
     }
