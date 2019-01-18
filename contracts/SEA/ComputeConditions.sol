@@ -216,8 +216,8 @@ contract ComputeConditions is Common, Initializable {
         {
             agreementStorage.fulfillCondition(
                 agreementId,
-                    this.fulfillUpload.selector,
-                    keccak256(abi.encodePacked(state))
+                this.fulfillUpload.selector,
+                keccak256(abi.encodePacked(state))
             );
             emit ProofOfUploadValid(
                 agreementId,
