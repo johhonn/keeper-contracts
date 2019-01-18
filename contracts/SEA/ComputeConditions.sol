@@ -1,8 +1,8 @@
 pragma solidity 0.4.25;
 
 import './Common.sol';
-import 'zos-lib/contracts/Initializable.sol';
 import './ServiceExecutionAgreement.sol';
+import 'zos-lib/contracts/Initializable.sol';
 
 
 /**
@@ -22,6 +22,7 @@ contract ComputeConditions is Common, Initializable {
     }
 
     ServiceExecutionAgreement private agreementStorage;
+
     mapping (bytes32 => ProofOfUpload) proofs;
 
     //events
@@ -103,7 +104,7 @@ contract ComputeConditions is Common, Initializable {
         external
         onlyDataConsumer(agreementId)
         returns(bool status)
-        {
+    {
         if (proofs[agreementId].exists) {
             require(
                 !proofs[agreementId].isLocked,
@@ -112,7 +113,7 @@ contract ComputeConditions is Common, Initializable {
             proofs[agreementId].isLocked = true;
             proofs[agreementId].algorithmHashSignature = signature;
             fulfillUpload(agreementId, true);
-        }else{
+        } else {
             proofs[agreementId] = ProofOfUpload(
                 true,
                 false,
@@ -158,7 +159,7 @@ contract ComputeConditions is Common, Initializable {
             proofs[agreementId].isLocked = true;
             proofs[agreementId].algorithmHash = hash;
             fulfillUpload(agreementId, true);
-        }else{
+        } else {
             proofs[agreementId] = ProofOfUpload(
                 true,
                 false,
