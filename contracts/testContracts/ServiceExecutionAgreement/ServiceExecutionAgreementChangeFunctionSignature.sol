@@ -235,16 +235,16 @@ contract ServiceExecutionAgreementChangeFunctionSignature
 	 * @return true if the owner is able to setup the service execution agreement template
 	 */
     function setupTemplate(
+        bytes4[] fingerprints,
         bytes32 templateId,
         address[] contracts,
-        bytes4[] fingerprints,
         uint256[] dependenciesBits,
         uint8[] fulfillmentIndices,
         uint8 fulfillmentOperator
     )
-    public
-    isValidTemplateId(templateId)
-    returns (bool)
+	    public
+	    isValidTemplateId(templateId)
+	    returns (bool)
     {
         // TODO: whitelisting the contracts/fingerprints
         require(
@@ -292,10 +292,10 @@ contract ServiceExecutionAgreementChangeFunctionSignature
 	 * @return true if the service execution agreement template was revoked
 	 */
     function revokeTemplate(bytes32 templateId)
-    public
-    isTemplateOwner(templateId)
-    canRevokeTemplate(templateId)
-    returns (bool)
+	    public
+	    isTemplateOwner(templateId)
+	    canRevokeTemplate(templateId)
+	    returns (bool)
     {
         templates[templateId].isRevoked = true;
         emit TemplateRevoked(templateId, true);
@@ -307,7 +307,9 @@ contract ServiceExecutionAgreementChangeFunctionSignature
 	 * @param templateId is the service execution agreement template ID
 	 * @return template owner address
 	 */
-    function getTemplateOwner(bytes32 templateId) public view returns (address)
+    function getTemplateOwner(bytes32 templateId)
+        public view
+        returns (address)
     {
         return templates[templateId].owner;
     }
@@ -317,14 +319,18 @@ contract ServiceExecutionAgreementChangeFunctionSignature
 	 * @param agreementId is the service execution agreement ID
 	 * @return service execution template ID
 	 */
-    function getTemplateId(bytes32 agreementId) public view returns (bytes32)
+    function getTemplateId(bytes32 agreementId)
+        public view
+        returns (bytes32)
     {
         return agreements[agreementId].templateId;
     }
 
     /// @notice getTemplateStatus is deprecated, use isTemplateRevoked instead (TODO)
-    function getTemplateStatus(bytes32 templateId) public
-    view returns (bool status){
+    function getTemplateStatus(bytes32 templateId)
+        public view
+        returns (bool status)
+    {
         return !templates[templateId].isRevoked &&
         templates[templateId].isExisting;
     }
@@ -334,7 +340,9 @@ contract ServiceExecutionAgreementChangeFunctionSignature
 	 * @param templateId is the service execution agreement template ID
 	 * @return true if the template exists
 	 */
-    function isTemplateExisting(bytes32 templateId) public view returns (bool)
+    function isTemplateExisting(bytes32 templateId)
+        public view
+        returns (bool)
     {
         return templates[templateId].isExisting;
     }
@@ -344,7 +352,9 @@ contract ServiceExecutionAgreementChangeFunctionSignature
 	 * @param templateId is the service execution agreement template ID
 	 * @return true if the template is revoked
 	 */
-    function isTemplateRevoked(bytes32 templateId) public view returns (bool)
+    function isTemplateRevoked(bytes32 templateId)
+        public view
+        returns (bool)
     {
         return templates[templateId].isRevoked;
     }
@@ -370,12 +380,12 @@ contract ServiceExecutionAgreementChangeFunctionSignature
         bytes32 agreementId,
         bytes32 did
     )
-    public
-    isValidExecuteRequest(
-        templateId,
-        agreementId
-    )
-    returns (bool)
+	    public
+	    isValidExecuteRequest(
+	        templateId,
+	        agreementId
+	    )
+	    returns (bool)
     {
         Template memory template = templates[templateId];
 
@@ -442,9 +452,9 @@ contract ServiceExecutionAgreementChangeFunctionSignature
     * @return true if all the conditions are fulfilled according to the fulfillment criteria otherwise returns false
     */
     function fulfillAgreement(bytes32 agreementId)
-    public
-    noPendingFulfillments(agreementId)
-    returns (bool)
+        public
+        noPendingFulfillments(agreementId)
+        returns (bool)
     {
         Agreement storage agreement = agreements[agreementId];
         agreement.isExisting = true;
@@ -473,8 +483,8 @@ contract ServiceExecutionAgreementChangeFunctionSignature
         uint256[] timeoutValues,
         bytes32 agreementId
     )
-    public pure
-    returns (bytes32)
+        public pure
+        returns (bytes32)
     {
         return keccak256(
             abi.encodePacked(
@@ -493,8 +503,8 @@ contract ServiceExecutionAgreementChangeFunctionSignature
     * @return publisher address
     */
     function getAgreementPublisher(bytes32 agreementId)
-    public view
-    returns (address)
+        public view
+        returns (address)
     {
         return agreements[agreementId].publisher;
     }
@@ -505,8 +515,8 @@ contract ServiceExecutionAgreementChangeFunctionSignature
     * @return consumer address
     */
     function getAgreementConsumer(bytes32 agreementId)
-    public view
-    returns (address)
+        public view
+        returns (address)
     {
         return agreements[agreementId].consumer;
     }
@@ -517,8 +527,8 @@ contract ServiceExecutionAgreementChangeFunctionSignature
     * @return true if the service execution agreement fulfilled
     */
     function isAgreementFulfilled(bytes32 agreementId)
-    public view
-    returns(bool)
+        public view
+        returns(bool)
     {
         return agreements[agreementId].isFulfilled;
     }
@@ -529,8 +539,8 @@ contract ServiceExecutionAgreementChangeFunctionSignature
     * @return true if the service execution agreement exists
     */
     function isAgreementExisting(bytes32 agreementId)
-    public view
-    returns (bool)
+        public view
+        returns (bool)
     {
         return agreements[agreementId].isExisting;
     }
@@ -551,13 +561,13 @@ contract ServiceExecutionAgreementChangeFunctionSignature
         bytes4 fingerprint,
         bytes32 valueHash
     )
-    public
-    isValidConditionHandler(
-        agreementId,
-        fingerprint,
-        valueHash
-    )
-    returns (bool)
+	    public
+	    isValidConditionHandler(
+	        agreementId,
+	        fingerprint,
+	        valueHash
+	    )
+	    returns (bool)
     {
 
         Agreement storage agreement = agreements[agreementId];
@@ -594,13 +604,12 @@ contract ServiceExecutionAgreementChangeFunctionSignature
         bytes32 agreementId,
         bytes32 conditionKey
     )
-    public
-    onlyExistConditionKey(
-        agreementId,
-        conditionKey
-    )
-    view
-    returns (uint8)
+        public view
+	    onlyExistConditionKey(
+	        agreementId,
+	        conditionKey
+	    )
+	    returns (uint8)
     {
         return agreements[agreementId]
         .conditionsState[conditionKeyToIndex[conditionKey]];
@@ -616,8 +625,8 @@ contract ServiceExecutionAgreementChangeFunctionSignature
         bytes32 conditionKey,
         bytes32 valueHash
     )
-    public pure
-    returns (bytes32)
+        public pure
+        returns (bytes32)
     {
         return keccak256(abi.encodePacked(conditionKey, valueHash));
     }
@@ -635,8 +644,8 @@ contract ServiceExecutionAgreementChangeFunctionSignature
         address contractAddress,
         bytes4 fingerprint
     )
-    public pure
-    returns (bytes32)
+        public pure
+        returns (bytes32)
     {
         return keccak256(
             abi.encodePacked(
