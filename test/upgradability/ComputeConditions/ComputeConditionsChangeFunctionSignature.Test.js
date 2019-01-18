@@ -1,105 +1,117 @@
 /* eslint-env mocha */
 /* global web3, artifacts, assert, contract, describe, it, before, beforeEach */
+
 const ZeppelinHelper = require('../../helpers/ZeppelinHelper.js')
 const testUtils = require('../../helpers/utils.js')
 
-const OceanToken = artifacts.require('OceanToken.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
-const PaymentConditions = artifacts.require('PaymentConditions.sol')
-const AccessConditions = artifacts.require('AccessConditions.sol')
 const ComputeConditions = artifacts.require('ComputeConditions.sol')
-
 const ComputeConditionsChangeFunctionSignature = artifacts.require('ComputeConditionsChangeFunctionSignature')
 
+const { initializeAgreement } = require('../../helpers/initializeAgreement.js')
+
 contract('ComputeConditions', (accounts) => {
-    let zos
-    let pAddress
-    let token, market, serviceAgreement, paymentConditions, accessConditions, computeConditions, valuesHashList, serviceId, conditionKeys, templateId
-    let funcFingerPrints, contracts, serviceAgreementId, slaMsgHash, signature, algorithmHash
-    const publisher = accounts[0]
-    const datascientist = accounts[1]
+    // template setup
     // for more info about the Compute use case dependencyBits: https://github.com/oceanprotocol/dev-ocean/pull/85
-    const fulfillmentIndices = [3, 4] // Root Conditions
+    const fulfillmentIndices = [0] // Root Conditions
     const fulfilmentOperator = 1 // OR
-    const dependencies = [0, 1, 4, 16, 3]
-    const price = 5 // 5 OCN tokens
-    const timeouts = [0, 0, 0, 0, 100]
-    const did = testUtils.generateId()
-    const serviceTemplateId = testUtils.generateId()
-    serviceAgreementId = testUtils.generateId()
+    const dependenciesBits = [0]
+    const timeoutValues = [0]
+    const templateId = testUtils.generateId()
+    const agreementId = testUtils.generateId()
     const algorithm = 'THIS IS FAKE CODE foo=Hello World!'
+
+    let zos
+    let computeConditionsAddress
+    let serviceExecutionAgreement
+    let computeConditions
+    let valueHashes
+    let fingerprints
+    let contracts
+    let algorithmHash
+    let datascientist
 
     before('restore zos before all tests', async function() {
         zos = new ZeppelinHelper('ComputeConditions')
         await zos.restoreState(accounts[9])
+        /* eslint-disable-next-line */
+        datascientist = accounts[2]
     })
 
     beforeEach('Deploy with zos before each tests', async function() {
+        // init zos
         zos = new ZeppelinHelper('ComputeConditions')
-        zos.addDependency('PaymentConditions')
-        zos.addDependency('AccessConditions')
         await zos.initialize(accounts[0], true)
-        pAddress = zos.getProxyAddress('ComputeConditions')
-    })
 
-    async function setupContracts() {
-        token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
-        serviceAgreement = await ServiceExecutionAgreement.at(zos.getProxyAddress('ServiceExecutionAgreement'))
-        paymentConditions = await PaymentConditions.at(zos.getProxyAddress('PaymentConditions'))
-        accessConditions = await AccessConditions.at(zos.getProxyAddress('AccessConditions'))
+        // get access to the contracts
+        computeConditionsAddress = zos.getProxyAddress('ComputeConditions')
+        serviceExecutionAgreement = await ServiceExecutionAgreement.at(zos.getProxyAddress('ServiceExecutionAgreement'))
         computeConditions = await ComputeConditions.at(zos.getProxyAddress('ComputeConditions'))
 
-        await market.requestTokens(testUtils.toBigNumber(1000), { from: datascientist })
         // conditions
-        contracts = [paymentConditions.address, computeConditions.address, accessConditions.address, paymentConditions.address, paymentConditions.address]
-        funcFingerPrints = [
-            testUtils.getSelector(web3, paymentConditions, 'lockPayment'),
-            testUtils.getSelector(web3, computeConditions, 'fulfillUpload'),
-            testUtils.getSelector(web3, accessConditions, 'grantAccess'),
-            testUtils.getSelector(web3, paymentConditions, 'releasePayment'),
-            testUtils.getSelector(web3, paymentConditions, 'refundPayment')
+        contracts = [
+            computeConditions.address
         ]
-        valuesHashList = [
-            testUtils.valueHash(['bytes32', 'uint256'], [did, price]),
-            testUtils.valueHash(['bool'], [true]),
-            testUtils.valueHash(['bytes32', 'bytes32'], [did, did]),
-            testUtils.valueHash(['bytes32', 'uint256'], [did, price]),
-            testUtils.valueHash(['bytes32', 'uint256'], [did, price])
+
+        fingerprints = [
+            testUtils.getSelector(web3, computeConditions, 'fulfillUpload')
         ]
+
+        valueHashes = [
+            testUtils.valueHash(['bool'], [true])
+        ]
+
         // create new on-premise compute template
-        const createAgreementTemplate = await serviceAgreement.setupAgreementTemplate(
-            serviceTemplateId, contracts, funcFingerPrints, dependencies,
-            web3.utils.fromAscii('on-premise-compute'), fulfillmentIndices,
-            fulfilmentOperator, { from: publisher }
-        )
-        templateId = testUtils.getEventArgsFromTx(createAgreementTemplate, 'SetupAgreementTemplate').serviceTemplateId
+        await serviceExecutionAgreement.setupTemplate(
+            templateId,
+            contracts,
+            fingerprints,
+            dependenciesBits,
+            fulfillmentIndices,
+            fulfilmentOperator)
+
         // create new agreement instance
-        conditionKeys = testUtils.generateConditionsKeys(templateId, contracts, funcFingerPrints)
-        slaMsgHash = testUtils.createSLAHash(web3, templateId, conditionKeys, valuesHashList, timeouts, serviceAgreementId)
-        signature = await web3.eth.sign(slaMsgHash, datascientist)
-        serviceId = await testUtils.signAgreement(
-            serviceAgreement, templateId, signature,
-            datascientist, valuesHashList, timeouts,
-            serviceAgreementId, did, { from: publisher }
+        await initializeAgreement(
+            serviceExecutionAgreement,
+            accounts[0],
+            datascientist,
+            contracts,
+            agreementId,
+            fingerprints,
+            valueHashes,
+            timeoutValues,
+            dependenciesBits
         )
-        assert.strictEqual(serviceId, serviceAgreementId, 'Error: unable to retrieve service agreement Id')
-        await token.approve(paymentConditions.address, testUtils.toBigNumber(200), { from: datascientist })
-    }
+    })
 
     describe('Test upgradability for ComputeConditions', () => {
         it('Should be possible to change function signature', async () => {
-            await setupContracts()
             await zos.upgradeToNewContract('ComputeConditionsChangeFunctionSignature')
-            let p = await ComputeConditionsChangeFunctionSignature.at(pAddress)
+
+            let p = await ComputeConditionsChangeFunctionSignature.at(computeConditionsAddress)
+
             algorithmHash = web3.utils.soliditySha3({ type: 'string', value: algorithm }).toString('hex')
             const signature = await web3.eth.sign(algorithmHash, datascientist)
 
-            await testUtils.assertRevert(p.submitHashSignature(true, signature, serviceAgreementId, { from: datascientist }))
+            // expect revert
+            await testUtils.assertRevert(p.submitHashSignature(
+                true,
+                signature,
+                agreementId,
+                { from: datascientist }))
 
             // should work after approval
             await zos.approveLatestTransaction()
-            const submitAlgorithmSignature = await p.methods['submitHashSignature(bool,bytes,bytes32)'](true, signature, serviceAgreementId, { from: datascientist })
 
+            // act
+            const submitAlgorithmSignature =
+                await p.methods['submitHashSignature(bool,bytes,bytes32)'](
+                    true,
+                    signature,
+                    agreementId,
+                    { from: datascientist })
+
+            // eval
             const isSignatureSubmitted = testUtils.getEventArgsFromTx(submitAlgorithmSignature, 'HashSignatureSubmitted')
             assert.strictEqual(isSignatureSubmitted.state, true, 'Error: Unable to submit signature')
         })

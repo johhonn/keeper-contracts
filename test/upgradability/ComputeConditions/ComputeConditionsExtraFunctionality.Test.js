@@ -16,8 +16,6 @@ contract('ComputeConditions', (accounts) => {
 
     beforeEach('Deploy with zos before each tests', async function() {
         zos = new ZeppelinHelper('ComputeConditions')
-        zos.addDependency('PaymentConditions')
-        zos.addDependency('AccessConditions')
         await zos.initialize(accounts[0], true)
         computeConditionsAddress = zos.getProxyAddress('ComputeConditions')
     })
