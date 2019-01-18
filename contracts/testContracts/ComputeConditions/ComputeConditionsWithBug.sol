@@ -89,14 +89,14 @@ contract ComputeConditionsWithBug is Common, Initializable {
         agreementStorage = ServiceExecutionAgreement(agreementAddress);
     }
 
-    /**
-	 * @notice submitHashSignature is called only by the data-consumer address.
-	 * @dev At first It checks if the proof state is created or not then checks that the hash
-	 * has been submitted by the publisher. This preserves the message integrity
-	 * it also proof that both parties agree on the same algorithm file(s)
-	 * @param agreementId is the service level agreement Id
-	 * @param signature data scientist signature = signed_hash(uploaded_algorithm_file/s)
-	 */
+   /**
+    * @notice submitHashSignature is called only by the data-consumer address.
+    * @dev At first It checks if the proof state is created or not then checks that the hash
+    * has been submitted by the publisher. This preserves the message integrity
+    * it also proof that both parties agree on the same algorithm file(s)
+    * @param agreementId is the service level agreement Id
+    * @param signature data scientist signature = signed_hash(uploaded_algorithm_file/s)
+    */
     function submitHashSignature(
         bytes32 agreementId,
         bytes signature
@@ -114,7 +114,7 @@ contract ComputeConditionsWithBug is Common, Initializable {
             proofs[agreementId].isLocked = true;
             proofs[agreementId].algorithmHashSignature = signature;
             fulfillUpload(agreementId, true);
-        }else{
+        } else {
             proofs[agreementId] = ProofOfUpload(
                 true,
                 false,
@@ -135,15 +135,15 @@ contract ComputeConditionsWithBug is Common, Initializable {
 
     }
 
-    /**
-	 * @notice submitAlgorithmHash is called only by the compute publisher.
-	 * @dev At first It checks if the proof state is created or not then checks if the signature
-	 * has been submitted by the data scientist in order to call fulfillUpload. This preserves
-	 * the message integrity and proof that both parties agree on the same algorithm file/s
-	 * @param agreementId the service level agreement Id
-	 * @param hash = kekccak(uploaded_algorithm_file/s)
-	 * @return true if the compute publisher is able to send the right algorithm hash
-	 */
+   /**
+    * @notice submitAlgorithmHash is called only by the compute publisher.
+    * @dev At first It checks if the proof state is created or not then checks if the signature
+    * has been submitted by the data scientist in order to call fulfillUpload. This preserves
+    * the message integrity and proof that both parties agree on the same algorithm file/s
+    * @param agreementId the service level agreement Id
+    * @param hash = kekccak(uploaded_algorithm_file/s)
+    * @return true if the compute publisher is able to send the right algorithm hash
+    */
     function submitAlgorithmHash(
         bytes32 agreementId,
         bytes32 hash
@@ -160,7 +160,7 @@ contract ComputeConditionsWithBug is Common, Initializable {
             proofs[agreementId].isLocked = true;
             proofs[agreementId].algorithmHash = hash;
             fulfillUpload(agreementId, true);
-        }else{
+        } else {
             proofs[agreementId] = ProofOfUpload(
                 true,
                 false,
@@ -180,14 +180,14 @@ contract ComputeConditionsWithBug is Common, Initializable {
         return true;
     }
 
-    /**
-	 * @notice fulfillUpload is called by anyone of the stakeholders [compute publisher or compute consumer]
-	 * @dev check if there are unfulfilled dependency condition, if false, it verifies the signature
-	 * using the submitted hash (by publisher), the signature (by data scientist/consumer) then call
-	 * fulfillCondition in service level agreement storage contract
-	 * @param agreementId the service level agreement Id
-	 * @param state get be used fo input value hash for this condition indicating the state of verification
-	 */
+   /**
+    * @notice fulfillUpload is called by anyone of the stakeholders [compute publisher or compute consumer]
+    * @dev check if there are unfulfilled dependency condition, if false, it verifies the signature
+    * using the submitted hash (by publisher), the signature (by data scientist/consumer) then call
+    * fulfillCondition in service level agreement storage contract
+    * @param agreementId the service level agreement Id
+    * @param state get be used fo input value hash for this condition indicating the state of verification
+    */
     function fulfillUpload(
         bytes32 agreementId,
         bool state
@@ -203,9 +203,9 @@ contract ComputeConditionsWithBug is Common, Initializable {
         );
         require(
             !agreementStorage.hasUnfulfilledDependencies(
-            agreementId,
-            condition
-        ),
+                agreementId,
+                condition
+            ),
             'condition has unfulfilled dependencies'
         );
 
@@ -213,7 +213,7 @@ contract ComputeConditionsWithBug is Common, Initializable {
             proofs[agreementId].dataConsumer == recoverAddress(
                 prefixHash(proofs[agreementId].algorithmHash),
                 proofs[agreementId].algorithmHashSignature)
-            )
+        )
         {
             agreementStorage.fulfillCondition(
                 agreementId,
