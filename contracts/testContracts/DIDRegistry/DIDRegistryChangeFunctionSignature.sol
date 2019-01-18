@@ -43,14 +43,14 @@ contract DIDRegistryChangeFunctionSignature
         Ownable.initialize(_owner);
     }
 
-    /**
-	 * @notice registerAttribute is called only by DID owner.
-	 * @dev this function registers DID attributes
-	 * @param did refers to decentralized identifier (a byte32 length ID)
-	 * @param valueType includes DID, DID reference , URL, or DDO
-	 * @param key represents the attribute key
-	 * @param value refers to the attribute value
-	 */
+   /**
+    * @notice registerAttribute is called only by DID owner.
+    * @dev this function registers DID attributes
+    * @param did refers to decentralized identifier (a byte32 length ID)
+    * @param valueType includes DID, DID reference , URL, or DDO
+    * @param key represents the attribute key
+    * @param value refers to the attribute value
+    */
     function registerAttribute(
         ValueType valueType,
         bytes32 did,
@@ -77,11 +77,11 @@ contract DIDRegistryChangeFunctionSignature
         );
     }
 
-    /**
-	 * @notice getUpdateAt is called by anyone.
-	 * @param did refers to decentralized identifier (a byte32 length ID)
-	 * @return last modified (update) time of a DID
-	 */
+   /**
+    * @notice getUpdateAt is called by anyone.
+    * @param did refers to decentralized identifier (a byte32 length ID)
+    * @return last modified (update) time of a DID
+    */
     function getUpdateAt(bytes32 did)
         public view
         returns(uint)
@@ -89,11 +89,11 @@ contract DIDRegistryChangeFunctionSignature
         return didRegister[did].updateAt;
     }
 
-    /**
-	 * @notice getOwner is called by anyone.
-	 * @param did refers to decentralized identifier (a byte32 length ID)
-	 * @return the address of the owner
-	 */
+   /**
+    * @notice getOwner is called by anyone.
+    * @param did refers to decentralized identifier (a byte32 length ID)
+    * @return the address of the owner
+    */
     function getOwner(bytes32 did)
         public view
         returns(address)
