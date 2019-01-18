@@ -68,3 +68,8 @@ for contract in "${contracts[@]}"
 do
     npx zos set-admin $contract $MULTISIG --yes
 done
+
+# -----------------------------------------------------------------------
+# export artifacts
+# -----------------------------------------------------------------------
+node ./scripts/exportArtifacts.js
