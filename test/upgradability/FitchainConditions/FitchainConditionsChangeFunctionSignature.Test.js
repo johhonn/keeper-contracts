@@ -1,6 +1,8 @@
 /* eslint-env mocha */
 /* global artifacts, assert, contract, describe, it, before, beforeEach */
+
 const ZeppelinHelper = require('../../helpers/ZeppelinHelper.js')
+const testUtils = require('../../helpers/utils.js')
 
 const FitchainConditionsChangeFunctionSignature = artifacts.require('FitchainConditionsChangeFunctionSignature')
 
@@ -22,17 +24,20 @@ contract('FitchainConditions', (accounts) => {
 
     describe('Test upgradability for FitchainConditions', () => {
         it('Should be possible to change function signature', async () => {
-            await zos.upgradeToNewContract('FitchainConditionsChangeFunctionSignature')
             let p = await FitchainConditionsChangeFunctionSignature.at(fitchainConditionsAddress)
-            try {
-                await p.registerVerifier({ from: verifier1 })
-                assert.fail('Expected revert not received')
-            } catch (e) {
-                /* eslint-disable-next-line no-empty */
-            }
+
+            // upgrade
+            await zos.upgradeToNewContract('FitchainConditionsChangeFunctionSignature')
+
+            testUtils.assertRevert(p.registerVerifier({ from: verifier1 }))
+
             // Approve and test new logic
             await zos.approveLatestTransaction()
+
+            // act
             const registerVerifier1 = await p.registerVerifier({ from: verifier1 })
+
+            // eval
             assert.strictEqual(verifier1, registerVerifier1.logs[0].args.verifier, 'invalid verifier address 1')
         })
     })

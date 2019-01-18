@@ -9,12 +9,12 @@ contract('FitchainConditions', (accounts) => {
     let fitchainConditionsAddress
     const verifier1 = accounts[2]
 
-    before('restore zos before all tests', async function() {
+    before('restore zos before all tests', async () => {
         zos = new ZeppelinHelper('FitchainConditions')
         await zos.restoreState(accounts[9])
     })
 
-    beforeEach('Deploy with zos before each tests', async function() {
+    beforeEach('Deploy with zos before each tests', async () => {
         zos = new ZeppelinHelper('FitchainConditions')
         await zos.initialize(accounts[0], true)
         fitchainConditionsAddress = zos.getProxyAddress('FitchainConditions')
@@ -23,12 +23,24 @@ contract('FitchainConditions', (accounts) => {
     describe('Test upgradability for FitchainConditions', () => {
         it('Should be possible to append storage variables and change logic', async () => {
             let p = await FitchainConditionsChangeInStorageAndLogic.at(fitchainConditionsAddress)
+
+            // ugrade
             await zos.upgradeToNewContract('FitchainConditionsChangeInStorageAndLogic')
+
             // Approve and test new logic
             await zos.approveLatestTransaction()
-            const registerVerifier1 = await p.registerVerifier(1, { from: verifier1 })
+
+            // act
+            const registerVerifier1 = await p.registerVerifier(
+                1,
+                { from: verifier1 })
+
+            // eval
             assert.strictEqual(verifier1, registerVerifier1.logs[0].args.verifier, 'invalid verifier address 1')
+
+            // act
             let n = await p.called(verifier1)
+            // eval
             assert.equal(n.toNumber() > 0, true, 'Error calling added storage variable')
         })
     })

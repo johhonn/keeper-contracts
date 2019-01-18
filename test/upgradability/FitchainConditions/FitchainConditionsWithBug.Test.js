@@ -23,11 +23,19 @@ contract('FitchainConditions', (accounts) => {
     describe('Test upgradability for FitchainConditions', () => {
         it('Should be possible to fix/add a bug', async () => {
             let p = await FitchainConditionsWithBug.at(fitchainConditionsAddress)
+
+            // upgrade
             await zos.upgradeToNewContract('FitchainConditionsWithBug')
+
+            // approve
             await zos.approveLatestTransaction()
+
+            // act
             const registerVerifier1 = await p.registerVerifier(
                 1,
                 { from: verifier1 })
+
+            // eval
             assert.strictEqual(5, registerVerifier1.logs[0].args.slots.toNumber(), 'invalid verifier slots')
         })
     })

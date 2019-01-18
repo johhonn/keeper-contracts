@@ -22,14 +22,21 @@ contract('FitchainConditions', (accounts) => {
 
     describe('Test upgradability for FitchainConditions', () => {
         it('Should be possible to append storage variables ', async () => {
-            await zos.upgradeToNewContract('FitchainConditionsChangeInStorage')
             let p = await FitchainConditionsChangeInStorage.at(fitchainConditionsAddress)
+
+            // upgrade
+            await zos.upgradeToNewContract('FitchainConditionsChangeInStorage')
+
             // should not be able to be called before upgrade is approved
             await testUtils.assertRevert(p.called(zos.owner))
 
             // Approve and call again
             await zos.approveLatestTransaction()
+
+            // act
             let n = await p.called(zos.owner)
+
+            // eval
             assert.equal(n.toNumber(), 0, 'Error calling added storage variable')
         })
     })
