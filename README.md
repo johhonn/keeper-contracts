@@ -136,17 +136,16 @@ The transaction should show up on the account: `0x90eE7A30339D05E07d9c6e65747132
 
 The contract addresses deployed on Ocean Nile testnet:
 
-| Contract           | Version | Address                                      |
-|--------------------|---------|----------------------------------------------|
-| AccessConditions   | v0.5.3  | `0x771136ebC55A1747B52722D1bb95323D98550293` |
-| ComputeConditions  | v0.5.3  | `0xc1E945362f7fE01Acc9ACA60A417138f80DaF627` |
-| DIDRegistry        | v0.5.3  | `0x8c4a2cC4572B6CD68c58BFc220f04CD1143230a0` |
-| FitchainConditions | v0.5.3  | `0x5396Bf17658321B5d9Fc449470f9441F5D935914` |
-| OceanAuth          | v0.5.3  | `0xb8D436b29CBF1ef690DD3b0972Cce2090ECb09bc` |
-| OceanMarket        | v0.5.3  | `0xfC6DB8141144831a8B7d858f356D0d1148d8F11d` |
-| OceanToken         | v0.5.3  | `0xe6CeA58707df303b6d9D1DF5BA8Bf88fF4A5920D` |
-| PaymentConditions  | v0.5.3  | `0x38ba43fFa8C7715F0f2A5d52E78a392d2bD71176` |
-| ServiceAgreement   | v0.5.3  | `0xdAAb92eABB4F2D7fC51948E44A88aa4fd986EDa9` |
+| Contract                  | Version | Address                                      |
+|---------------------------|---------|----------------------------------------------|
+| AccessConditions          | v0.6.0  | `0x416276914b5a6dd1b88bb0e35096200b08131113` |
+| ComputeConditions         | v0.6.0  | `0x575ab120a815488ced316545ef32a25be1e93d3f` |
+| DIDRegistry               | v0.6.0  | `0xc3a017f586a92b836525814733a479eaf744e03c` |
+| Dispenser                 | v0.6.0  | `0x8f5ceb3faffa39d265dfcaff3791d9aa5a621e31` |
+| FitchainConditions        | v0.6.0  | `0x9068f22f687f328f66323e8472fef29fde70fe8a` |
+| OceanToken                | v0.6.0  | `0xdf4c75a5a64c86e22ac5aa2282c96bee7ae6f951` |
+| PaymentConditions         | v0.6.0  | `0x918e5bce975865bf2ff3435b1d3b4cacfd89b91c` |
+| ServiceExecutionAgreement | v0.6.0  | `0x57ae92819e5ea05d6c7af0686617e96d741a54c9` |
 
 #### Kovan Testnet
 
@@ -164,17 +163,16 @@ The transaction should show up on: `https://kovan.etherscan.io/address/0x2c0d5f4
 
 The contract addresses deployed on Kovan testnet:
 
-| Contract           | Version | Address                                      |
-|--------------------|---------|----------------------------------------------|
-| AccessConditions   | v0.5.3  | `0xD82184412E6bbe2F737A35867ec6242A477ca440` |
-| ComputeConditions  | v0.5.3  | `0xFC11E68470bd76cBA31A63861ac6c615B0A04e0F` |
-| DIDRegistry        | v0.5.3  | `0x3cBCAaB6b5223136d21E1Aad37Db25bB01D1A603` |
-| FitchainConditions | v0.5.3  | `0xC840aEf9090018F804C6e598610accD786E5EfCB` |
-| OceanAuth          | v0.5.3  | `0x2a7008cEb2527042162C96F491110154C231af6A` |
-| OceanMarket        | v0.5.3  | `0x551f2854E4C7cBD954B5DBdddE902F8A04A16435` |
-| OceanToken         | v0.5.3  | `0x798D0F9104C1C758b721b447F58927ca4FcFE666` |
-| PaymentConditions  | v0.5.3  | `0x8fE425e8EAe09aA65511186eab2F6a4D07f123A1` |
-| ServiceAgreement   | v0.5.3  | `0x2243B639CBD840c88600506f257f56429235c8D8` |
+| Contract                  | Version | Address                                      |
+|---------------------------|---------|----------------------------------------------|
+| AccessConditions          | v0.6.0  | `0x294aabd9559b547069c48b45d14bb1ea8d81e440` |
+| ComputeConditions         | v0.6.0  | `0x7319f48f48868b0894071e7a654705723371b785` |
+| DIDRegistry               | v0.6.0  | `0x2499c2969b6170c7484044cbecf26ea9d3c3903b` |
+| Dispenser                 | v0.6.0  | `0x06e303d09d79a396dbe3fd2d00cfdc39906e6306` |
+| FitchainConditions        | v0.6.0  | `0xa5c5114d62119754ab2b123352ce482bbafb9452` |
+| OceanToken                | v0.6.0  | `0x3df8b3699bc735c8ac7a6132052b791c24d3a3c4` |
+| PaymentConditions         | v0.6.0  | `0xde5c235c92a828c119532e6fad1d63f77f676d21` |
+| ServiceExecutionAgreement | v0.6.0  | `0xd7ab46800adfd662ffe47af8bcc46e3297bef822` |
 
 ## Libraries
 
