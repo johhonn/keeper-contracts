@@ -1,4 +1,3 @@
-/* eslint-env mocha */
 /* eslint-disable no-console */
 /* global artifacts, web3 */
 
@@ -11,17 +10,29 @@ const threshold = 2
 
 async function setUpWallet() {
     console.log('Setting up MultiSigWallet')
-    let accounts
     // get accounts from web3
-    await web3.eth.getAccounts()
-        .then((i) => { accounts = i })
+    const accounts = await web3.eth.getAccounts()
+
+    if (accounts.length < accountAmount) {
+        throw new Error('Unable to create wallet, too few accounts on this node.')
+    }
 
     // create account list for MultiSig
     const multiSigAccounts = accounts.slice(0, accountAmount)
 
+    const block = await web3.eth.getBlock('latest')
+    const { gasLimit } = block
+
+    console.log(
+        'gasLimit', gasLimit,
+        'multiSigAccounts', JSON.stringify(multiSigAccounts, null, 2),
+        'threshold', threshold)
+
     // deploy wallet to the blockchain
-    const wallet = await MultiSigWallet
-        .new(multiSigAccounts, threshold, { from: accounts[0] })
+    const wallet = await MultiSigWallet.new(
+        multiSigAccounts,
+        threshold,
+        { from: accounts[0] })
 
     let walletAddresses = {
         wallet: wallet.address,
@@ -44,7 +55,7 @@ async function setUpWallet() {
         })
 }
 
-module.exports = function(cb) {
+module.exports = (cb) => {
     setUpWallet()
         .then(() => cb())
         .catch(err => cb(err))
