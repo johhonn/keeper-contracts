@@ -3,6 +3,8 @@ const HDWalletProvider = require('truffle-hdwallet-provider')
 const rpcHost = process.env.KEEPER_RPC_HOST
 const rpcPort = process.env.KEEPER_RPC_PORT
 const url = process.env.KEEPER_RPC_URL
+const walletIndex = 0
+const walletAccounts = 5
 
 module.exports = {
     networks: {
@@ -23,9 +25,12 @@ module.exports = {
             gas: 0xfffffffffff,
             gasPrice: 0x01
         },
-        // spree from docker
+        // spree from docker with HDWallet
         spree_wallet: {
-            provider: () => new HDWalletProvider(process.env.NMEMORIC, url || `http://localhost:8545`),
+            provider: () => new HDWalletProvider(
+                process.env.NMEMORIC, url || `http://localhost:8545`,
+                walletIndex,
+                walletAccounts),
             network_id: 0x2324,
             gas: 4500000
         },
@@ -39,7 +44,10 @@ module.exports = {
         },
         // nile the ocean testnet
         nile: {
-            provider: () => new HDWalletProvider(process.env.NMEMORIC, url || `https://nile.dev-ocean.com`),
+            provider: () => new HDWalletProvider(
+                process.env.NMEMORIC, url || `https://nile.dev-ocean.com`,
+                walletIndex,
+                walletAccounts),
             network_id: 0x2323,
             gas: 6000000,
             gasPrice: 10000,
@@ -47,7 +55,10 @@ module.exports = {
         },
         // kovan testnet
         kovan: {
-            provider: () => new HDWalletProvider(process.env.NMEMORIC, url || `https://kovan.infura.io/v2/${process.env.INFURA_TOKEN}`),
+            provider: () => new HDWalletProvider(
+                process.env.NMEMORIC, url || `https://kovan.infura.io/v2/${process.env.INFURA_TOKEN}`,
+                walletIndex,
+                walletAccounts),
             network_id: '42',
             from: '0x2c0d5f47374b130ee398f4c34dbe8168824a8616'
         }
