@@ -572,7 +572,7 @@ contract FitchainConditions is Initializable {
             if (verifiers[registry[i]].slots == 0) {
                 require(
                     !removeVerifierFromRegistry(registry[i]),
-                    'unable to remove verifier from registry'
+                    'unable to remove verifier from registry during verifiers election'
                 );
             }
         }
