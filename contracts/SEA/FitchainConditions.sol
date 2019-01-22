@@ -21,6 +21,8 @@ contract FitchainConditions is Initializable {
 
     using SafeMath for uint256;
 
+    enum VerifierType { GPC , VPC }
+
     struct Verifier{
         bool exists;
         bool vote;
@@ -279,7 +281,7 @@ contract FitchainConditions is Initializable {
         );
         // get k GPC verifiers
         require(
-            electRRKVerifiers(modelId, k, 1, timeout),
+            electRRKVerifiers(modelId, k, uint8(VerifierType.GPC), timeout),
             'unable to allocate resources'
         );
         emit PoTInitialized(true);
@@ -313,7 +315,7 @@ contract FitchainConditions is Initializable {
             'verifiers are not available'
         );
         require(
-            electRRKVerifiers(modelId, k, 2, timeout),
+            electRRKVerifiers(modelId, k, uint8(VerifierType.VPC), timeout),
             'unable to allocate resources'
         );
         emit VPCInitialized(true);
@@ -557,10 +559,10 @@ contract FitchainConditions is Initializable {
         returns(bool)
     {
         for(uint256 i = 0; i < k && i < registry.length ; i++) {
-            if (vType == 1) {
+            if (vType == 0) {
                 models[modelId].GPCVerifiers[registry[i]] = Verifier(true, false, false, timeout);
             }
-            if (vType == 2) {
+            if (vType == 1) {
                 models[modelId].VPCVerifiers[registry[i]] = Verifier(true, false, false, timeout);
             }
             verifiers[registry[i]].slots.sub(1);
@@ -568,9 +570,10 @@ contract FitchainConditions is Initializable {
         }
         for(uint256 j = 0; j < registry.length; j++) {
             if (verifiers[registry[i]].slots == 0) {
-                if (!removeVerifierFromRegistry(registry[i])){
-                    return false;
-                }
+                require(
+                    !removeVerifierFromRegistry(registry[i]),
+                    'unable to remove verifier from registry during verifiers election'
+                );
             }
         }
         return true;
