@@ -14,5 +14,9 @@ artifacts/*.development.json
 .eggs/
 zos.dev-*
 .zos.session
+.zos.lock
 zos.json
 wallet.json
+mythrilReport.md
+securifyReport.txt
+KeeperContracts.png

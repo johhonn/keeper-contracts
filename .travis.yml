@@ -6,6 +6,8 @@ node_js:
 python:
     - "3.6"
 
+dist: xenial
+
 services:
     - docker
 
@@ -23,12 +25,19 @@ matrix:
 
 before_install:
     - npm install -g npm
-    - npm install -g ganache-cli@~6.1.8 release-it greenkeeper-lockfile codacy-coverage
+    - npm install -g ganache-cli@~6.1.8 release-it greenkeeper-lockfile codacy-coverage surya@0.2.7
+    - pyenv global system 3.6.7
+    - |
+        if [ "${TRAVIS_BRANCH}" = "develop" ]; then
+            sudo apt-get -y install python3-apt dot2tex
+            pip3 install -r requirements_dev.txt
+            docker pull chainsecurity/securify
+        fi
     - |
         if [ "${DEPLOY_PACKAGE}" = "true" ] && [ ! -z "${TRAVIS_TAG}" ]; then
-          sudo apt-get -y install python3-pip gnupg-agent
+          sudo apt-get -y install gnupg-agent python3-setuptools
           gpg-agent --daemon --no-grab --write-env-file $HOME/.gpg-agent-info
-          pip3 install --user twine six==1.10.0 wheel==0.31.0
+          pip3 install --upgrade --user twine six==1.10.0 wheel==0.31.0 setuptools
           sudo apt-get install oracle-java8-set-default maven
           java -version
           mvn -version
@@ -45,7 +54,6 @@ before_install:
           export release_version
           echo "Release version: $release_version"
         fi
-
 before_script:
     - greenkeeper-lockfile-update
     - ganache-cli > ganache-cli.log &
@@ -54,13 +62,45 @@ script:
     - npm run lint
     - npm run test:cover
     - npm run report-coverage
+    - npm run compile
     - npm run migrate
     - git status
     - git add package-lock.json
     - git diff-index --quiet HEAD || git commit -m "Travis update"
+    - |
+        if [ "${TRAVIS_BRANCH}" = "develop" ]; then
+            python2 -c 'import os,sys,fcntl; flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL); fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags&~os.O_NONBLOCK);'
+            npm run security:surya
+            mkdir -p $HOME/.mythril && curl -L -o $HOME/.mythril/signatures.db https://github.com/ConsenSys/mythril-classic/raw/develop/signatures.db
+            npm run security:mythril
+            travis_wait 30 npm run security:securify
+        fi
 
 after_script:
     - greenkeeper-lockfile-upload
+
+after_success:
+  - |
+        if [ "${TRAVIS_BRANCH}" = "develop" ]; then
+            BRANCHNAME=${TRAVIS_BRANCH//\//_}
+            declare -r SSH_FILE="$(mktemp -u $HOME/.ssh/XXXXX)"
+            openssl aes-256-cbc -K $encrypted_387ed244ad7b_key -iv $encrypted_387ed244ad7b_iv -in .travis/travis_keeper-contracts-security-reports.enc -out $SSH_FILE -d
+            chmod 600 "$SSH_FILE" \
+            && printf "%s\n" \
+                  "Host github.com" \
+                  "  IdentityFile $SSH_FILE" \
+                  "  LogLevel ERROR" >> ~/.ssh/config
+
+            git clone git@github.com:oceanprotocol/keeper-contracts-security-reports.git
+            cp -rp mythrilReport.md keeper-contracts-security-reports/${BRANCHNAME}_mythrilReport.md
+            cp -rp securifyReport.txt keeper-contracts-security-reports/${BRANCHNAME}_securifyReport.txt
+            cp -rp KeeperContracts.png keeper-contracts-security-reports/${BRANCHNAME}_KeeperContracts.png
+            cd keeper-contracts-security-reports
+            git add .
+            git commit -m "UPSERT ${BRANCHNAME}"
+            git push
+            cd ..
+        fi
 
 notifications:
     email: false
