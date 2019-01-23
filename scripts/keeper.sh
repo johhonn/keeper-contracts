@@ -10,6 +10,7 @@ then
     rm -f /keeper-contracts/artifacts/ready
 
     npm run clean
+    npm run compile
     npm run migrate -- --network=${NETWORK_NAME}
 
     # set flag to indicate contracts are ready
