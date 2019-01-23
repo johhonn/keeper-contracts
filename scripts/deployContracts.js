@@ -4,6 +4,7 @@ const { execSync } = require('child_process')
 const fs = require('fs')
 const pkg = require('../package.json')
 const { exportArtifacts } = require('./exportArtifacts')
+const { setupWallet } = require('./setupWallet')
 
 const OceanToken = artifacts.require('OceanToken.sol')
 
@@ -41,11 +42,7 @@ async function createWallet() {
     if (fs.existsSync(walletPath)) {
         console.log('wallet.json already exists')
     } else {
-        const res = execSync(
-            `npx truffle exec ./scripts/setupWallet.js --compile --network ${NETWORK}`
-        ).toString().trim()
-
-        console.log(res)
+        await setupWallet(web3, artifacts)
     }
     return JSON.parse(fs.readFileSync(walletPath, 'utf-8').toString())
 }
