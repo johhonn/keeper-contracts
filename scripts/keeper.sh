@@ -16,4 +16,11 @@ then
     touch /keeper-contracts/artifacts/ready
 fi
 
+# Fix file permissions
+EXECUTION_UID=$(id -u)
+EXECUTION_GID=$(id -g)
+USER_ID=${LOCAL_USER_ID:-$EXECUTION_UID}
+GROUP_ID=${LOCAL_GROUP_ID:-$EXECUTION_GID}
+chown -R $USER_ID:$GROUP_ID /keeper-contracts/artifacts
+
 tail -f /dev/null
