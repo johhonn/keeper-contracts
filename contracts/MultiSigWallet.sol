@@ -301,8 +301,7 @@ contract MultiSigWallet {
     /// @param transactionId Transaction ID.
     /// @return Confirmation status.
     function isConfirmed(uint transactionId)
-        public
-        constant
+        public view
         returns (bool)
     {
         uint count = 0;
@@ -345,8 +344,7 @@ contract MultiSigWallet {
     /// @param transactionId Transaction ID.
     /// @return Number of confirmations.
     function getConfirmationCount(uint transactionId)
-        public
-        constant
+        public view
         returns (uint count)
     {
         for (uint i=0; i<owners.length; i++) {
@@ -361,8 +359,7 @@ contract MultiSigWallet {
     /// @param executed Include executed transactions.
     /// @return Total number of transactions after filters are applied.
     function getTransactionCount(bool pending, bool executed)
-        public
-        constant
+        public view
         returns (uint count)
     {
         for (uint i=0; i<transactionCount; i++) {
@@ -376,8 +373,7 @@ contract MultiSigWallet {
     /// @dev Returns list of owners.
     /// @return List of owner addresses.
     function getOwners()
-        public
-        constant
+        public view
         returns (address[])
     {
         return owners;
@@ -387,8 +383,7 @@ contract MultiSigWallet {
     /// @param transactionId Transaction ID.
     /// @return Returns array of owner addresses.
     function getConfirmations(uint transactionId)
-        public
-        constant
+        public view
         returns (address[] _confirmations)
     {
         address[] memory confirmationsTemp = new address[](owners.length);
@@ -411,8 +406,7 @@ contract MultiSigWallet {
     /// @param executed Include executed transactions.
     /// @return Returns array of transaction IDs.
     function getTransactionIds(uint from, uint to, bool pending, bool executed)
-        public
-        constant
+        public view
         returns (uint[] _transactionIds)
     {
         uint[] memory transactionIdsTemp = new uint[](transactionCount);

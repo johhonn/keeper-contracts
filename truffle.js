@@ -63,7 +63,7 @@ module.exports = {
                 url || `https://nile.dev-ocean.com`),
             network_id: 0x2323,
             gas: 6000000,
-            gasPrice: 22220000,
+            gasPrice: 10000,
             from: '0x90eE7A30339D05E07d9c6e65747132933ff6e624'
         },
         // kovan testnet
@@ -77,13 +77,13 @@ module.exports = {
     },
     compilers: {
         solc: {
-            version: '0.4.25'
-        }
-    },
-    solc: {
-        optimizer: {
-            enabled: true,
-            runs: 200
+            version: '0.4.25',
+            settings: {
+                optimizer: {
+                    enabled: true,
+                    runs: 200
+                }
+            }
         }
     }
 }

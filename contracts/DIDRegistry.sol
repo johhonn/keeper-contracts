@@ -49,11 +49,11 @@ contract DIDRegistry is Initializable, Ownable {
     * @param key represents the attribute key
     * @param value refers to the attribute value
     */
-    function registerAttribute(
+    function registerAttribute (
         bytes32 did,
         ValueType valueType,
         bytes32 key,
-        string value
+        string memory value
     )
         public
     {
