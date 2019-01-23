@@ -4,8 +4,6 @@ echo "deploy contracts is ${DEPLOY_CONTRACTS}"
 
 if [ "${DEPLOY_CONTRACTS}" = "true" ]
 then
-    echo "deploy contracts is ${DEPLOY_CONTRACTS}"
-
     # remove ready flag if we deploy contracts
     rm -f /keeper-contracts/artifacts/ready
 
