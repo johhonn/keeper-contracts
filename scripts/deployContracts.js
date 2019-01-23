@@ -1,9 +1,11 @@
 /* eslint-disable no-console */
-/* globals web3 */
+/* globals web3, artifacts */
 const { execSync } = require('child_process')
 const fs = require('fs')
 const pkg = require('../package.json')
 const { exportArtifacts } = require('./exportArtifacts')
+
+const OceanToken = artifacts.require('OceanToken.sol')
 
 process.chdir('../')
 
@@ -34,8 +36,6 @@ const contracts = [
     'PaymentConditions'
 ]
 
-let accounts
-
 // prepare multisig wallet
 async function createWallet() {
     if (fs.existsSync(walletPath)) {
@@ -59,7 +59,7 @@ async function deployContracts() {
     // Clean ups
     execSync('rm -f ./zos.* ./.zos.*', { stdio: 'ignore' })
 
-    accounts = await web3.eth.getAccounts()
+    const accounts = await web3.eth.getAccounts()
 
     const wallet = await createWallet()
 
@@ -69,6 +69,7 @@ async function deployContracts() {
     // Admin is the account used to deploy and manage upgrades.
     // After deployment the multisig wallet is set to Admin
     const ADMIN = accounts[0]
+    const OWNER = accounts[1]
 
     // Set zos session (network, admin, timeout)
     execSync(`npx zos session --network ${NETWORK} --from ${ADMIN} --expires 36000`)
@@ -97,15 +98,24 @@ async function deployContracts() {
     // Since each contract initialize function could be different we can not use a loop
     // NOTE: A dapp could now use the address of the proxy specified in zos.<network_name>.json
     // instance=MyContract.at(proxyAddress)
-    execSync(`npx zos create DIDRegistry --init initialize --args ${ADMIN} -v`)
-    const tokenAddress = execSync(`npx zos create OceanToken --init --args ${ADMIN} -v`).toString().trim()
-    console.log('token addr', tokenAddress)
-    execSync(`npx zos create Dispenser --init initialize --args ${tokenAddress},${ADMIN} -v`)
+    execSync(`npx zos create DIDRegistry --init initialize --args ${OWNER} -v`)
+    const tokenAddress = execSync(`npx zos create OceanToken --init --args ${OWNER} -v`).toString().trim()
+    const dispenserAddress = execSync(`npx zos create Dispenser --init initialize --args ${tokenAddress},${OWNER} -v`).toString().trim()
     const serviceExecutionAgreementAddress = execSync(`npx zos create ServiceExecutionAgreement -v`).toString().trim()
     execSync(`npx zos create AccessConditions --init initialize --args ${serviceExecutionAgreementAddress} -v`)
     execSync(`npx zos create PaymentConditions --init initialize --args ${serviceExecutionAgreementAddress},${tokenAddress} -v`)
     execSync(`npx zos create FitchainConditions --init initialize --args ${serviceExecutionAgreementAddress},${stake},${maxSlots} -v`)
     execSync(`npx zos create ComputeConditions --init initialize --args ${serviceExecutionAgreementAddress} -v`)
+
+    /*
+     * -----------------------------------------------------------------------
+     * setup deployed contracts
+     * -----------------------------------------------------------------------
+     */
+    const oceanToken = await OceanToken.at(tokenAddress)
+    await oceanToken.addMinter(
+        dispenserAddress,
+        { from: OWNER })
 
     /*
      * -----------------------------------------------------------------------
