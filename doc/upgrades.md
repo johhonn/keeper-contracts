@@ -4,7 +4,7 @@ This documents explains in detail how [keeper-contracts](https://github.com/ocea
 
 ## Quickstart
 
-The first step to work with `zos` is to install dependencies then initialize the project. Then compile contracts and add contracts to the project. Finally push the contracts into the network and create the  upgradable instances. Once the contracts are deployed they can be tested and upgraded. Also we change the proxy administrator to a MultiSignature wallet to approve upgrades. To deploy the contracts we use a [deployment script](../scripts/deployContracts.sh), for more details on each step please keep reading.
+The first step to work with `zos` is to install dependencies then initialize the project. Then compile contracts and add contracts to the project. Finally push the contracts into the network and create the  upgradable instances. Once the contracts are deployed they can be tested and upgraded. Also we change the proxy administrator to a MultiSignature wallet to approve upgrades. To deploy the contracts we use a [deployment script](../scripts/deployContracts.js), for more details on each step please keep reading.
 
 ## Details
 
@@ -18,7 +18,7 @@ Install dependencies
 $npm install
 ```
 
-`zos` does not support migrations, hence all the initial configuration should be performed with a [deployment script](../scripts/deployContracts.sh). Contract constructors are ignored so the initial setup of the contract should be made in a [`initialize`](https://docs.zeppelinos.org/docs/advanced.html#initializers-vs-constructors) function that will be executed only once after the initial deployment.
+`zos` does not support migrations, hence all the initial configuration should be performed with a [deployment script](../scripts/deployContracts.js). Contract constructors are ignored so the initial setup of the contract should be made in a [`initialize`](https://docs.zeppelinos.org/docs/advanced.html#initializers-vs-constructors) function that will be executed only once after the initial deployment.
 
 To get started first we initialize the zeppelin applications which will create a configuration file [`zos.json`](https://docs.zeppelinos.org/docs/advanced.html#format-of-zosjson-and-zos-network-json-files) that keeps track of the project's details. we use the command [`zos init`](https://docs.zeppelinos.org/docs/init.html)
 
