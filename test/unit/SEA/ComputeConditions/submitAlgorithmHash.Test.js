@@ -81,12 +81,14 @@ contract('ComputeConditions', (accounts) => {
             await initializeAgreementWithValues()
             await computeConditions.submitAlgorithmHash(agreementId, testUtils.emptyBytes32, { from: accounts[0] })
 
-            // act
-            const result = await computeConditions.submitAlgorithmHash(agreementId, testUtils.emptyBytes32, { from: accounts[0] })
-
-            // assert
-            testUtils.assertEmitted(result, 1, 'HashSubmitted')
-            testUtils.assertEmitted(result, 1, 'ProofOfUploadInvalid')
+            // act-assert
+            try {
+                await computeConditions.submitAlgorithmHash(agreementId, testUtils.emptyBytes32, { from: accounts[0] })
+            } catch (e) {
+                assert.strictEqual(e.reason, 'invalid signature or hash size')
+                return
+            }
+            assert.fail('Expected revert not received on invalid submission of the signature')
         })
     })
 })
