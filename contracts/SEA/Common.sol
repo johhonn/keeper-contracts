@@ -35,8 +35,8 @@ contract Common {
         )
     {
         require(
-            signature.length == 65,
-            'invalid signature size'
+            signature.length == 65 && hash.length == 32,
+            'invalid signature or hash size'
         );
         return ECDSA.recover(hash, signature);
     }
