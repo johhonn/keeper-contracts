@@ -8,7 +8,7 @@ const { execSync } = require('child_process')
 const glob = require('glob')
 const fs = require('fs')
 
-const verbose = true
+const verbose = false
 const MultiSigWallet = artifacts.require('MultiSigWallet')
 const flags = verbose ? ' -v' : ' -s'
 const stdio = 'inherit'
