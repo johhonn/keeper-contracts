@@ -18,7 +18,7 @@
     "test:unit": "npm run test -- $(find ./test/unit/ -name '*.js')",
     "test:integration": "npm run test -- $(find ./test/int/ -name '*.js')",
     "test:upgradability": "npm run test -- $(find ./test/upgradability/ -name '*.js')",
-    "test": "if [ -z ${NETWORK} ]; then export NETWORK='development'; fi && if [ ! -f wallet.json ]; then truffle exec scripts/setupWallet.js --network $NETWORK; fi && truffle test",
+    "test": "if [ -z ${NETWORK} ]; then export NETWORK='development'; fi && if [ ! -f ./wallet.json ]; then truffle exec ./scripts/setupWalletWrapper.js --network $NETWORK; fi && truffle test",
     "test:cover": "export NETWORK='coverage' && solidity-coverage",
     "report-coverage": "cat ./coverage/lcov.info | codacy-coverage --token b95545c0da4b45848cc5eef363c2711e  --prefix ./",
     "release": "./bumpversion.sh patch",
