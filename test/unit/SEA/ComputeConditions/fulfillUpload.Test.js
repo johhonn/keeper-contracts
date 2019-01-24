@@ -104,7 +104,7 @@ contract('ComputeConditions', (accounts) => {
                     agreementId,
                     testUtils.emptyBytes32,
                     { from: accounts[0] }
-                    )
+                )
             )
         })
 
