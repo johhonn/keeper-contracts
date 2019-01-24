@@ -8,14 +8,6 @@ Documentation:
 @dev All function calls are currently implemented without side effects
 ```
 
-## Structs
-
-## Variables
-
-## Events
-
-## Modifiers
-
 ## Functions
 
 ### public initialize

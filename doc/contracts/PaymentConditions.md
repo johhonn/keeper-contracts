@@ -47,8 +47,6 @@ Parameters:
 * address receiver
 * uint256 amount
 
-## Modifiers
-
 ## Functions
 
 ### public initialize

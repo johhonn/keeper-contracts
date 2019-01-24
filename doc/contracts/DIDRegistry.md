@@ -30,8 +30,6 @@ Parameters:
 * enum DIDRegistry.ValueType valueType
 * uint256 updatedAt
 
-## Modifiers
-
 ## Functions
 
 ### public initialize

@@ -157,36 +157,45 @@ ${this.report.contract.documentation}
 `
         }
 
-        output += '\n## Structs\n'
+        if (this.report.contract.structs.length > 0) {
+            output += '\n## Structs\n'
 
-        for (const struct of this.report.contract.structs) {
-            logItem(struct)
+            for (const struct of this.report.contract.structs) {
+                logItem(struct)
+            }
         }
 
-        output += '\n## Variables\n'
+        if (this.report.contract.variables.length > 0) {
+            output += '\n## Variables\n'
 
-        for (const event of this.report.contract.variables) {
-            logItem(event)
+            for (const event of this.report.contract.variables) {
+                logItem(event)
+            }
         }
 
-        output += '\n## Events\n'
+        if (this.report.contract.events.length > 0) {
+            output += '\n## Events\n'
 
-        for (const event of this.report.contract.events) {
-            logItem(event)
+            for (const event of this.report.contract.events) {
+                logItem(event)
+            }
         }
 
-        output += '\n## Modifiers\n'
+        if (this.report.contract.modifiers.length > 0) {
+            output += '\n## Modifiers\n'
 
-        for (const modifier of this.report.contract.modifiers) {
-            logItem(modifier)
+            for (const modifier of this.report.contract.modifiers) {
+                logItem(modifier)
+            }
         }
 
-        output += '\n## Functions\n'
+        if (this.report.contract.functions.length > 0) {
+            output += '\n## Functions\n'
 
-        for (const func of this.report.contract.functions) {
-            logItem(func)
+            for (const func of this.report.contract.functions) {
+                logItem(func)
+            }
         }
-
         return output.toString()
     }
 }
