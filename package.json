@@ -9,7 +9,7 @@
   "main": "truffle.js",
   "scripts": {
     "compile": "truffle compile",
-    "migrate": "npx truffle exec ./scripts/deployContracts.js",
+    "migrate": "npx truffle exec ./scripts/deployContracts.js --network ${NETWORK:-development}",
     "migrate:spree": "export NETWORK=spree&&npm run migrate",
     "migrate:nile": "export NETWORK=nile&&npm run migrate",
     "migrate:kovan": "export NETWORK=kovan&&npm run migrate",
