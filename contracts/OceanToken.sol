@@ -23,8 +23,10 @@ contract OceanToken is Initializable, ERC20Detailed, ERC20Capped {
     )
         public initializer()
     {
+        uint256 CAP = 1400000000;
+        uint256 TOTALSUPPLY = CAP.mul(10 ** 18);
         ERC20Detailed.initialize('OceanToken', 'OCN', 18);
-        ERC20Capped.initialize(1400000000 * 10 ** 18, _minter);
+        ERC20Capped.initialize(TOTALSUPPLY, _minter);
     }
 
     /**
