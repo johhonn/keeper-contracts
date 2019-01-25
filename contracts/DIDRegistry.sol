@@ -57,15 +57,17 @@ contract DIDRegistry is Initializable, Ownable {
     )
         public
     {
-        address currentOwner;
-        currentOwner = didRegister[did].owner;
+        address currentOwner = didRegister[did].owner;
+        //TODO: input validation required
+        //TODO: restrict string size
         require(
             currentOwner == address(0x0) || currentOwner == msg.sender,
             'Attributes must be registered by the DID owners.'
         );
 
         didRegister[did] = DIDRegister(msg.sender, block.number);
-        emit DIDAttributeRegistered(
+
+         emit DIDAttributeRegistered(
             did,
             msg.sender,
             key,
