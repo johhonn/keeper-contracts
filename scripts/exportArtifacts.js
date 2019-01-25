@@ -1,6 +1,7 @@
 const fs = require('fs')
 const glob = require('glob')
 const pkg = require('../package.json')
+const { name } = require('../zos.json')
 
 const buildDir = './build/contracts/'
 const outDir = './artifacts/'
@@ -12,7 +13,7 @@ function exportArtifacts() {
     const zosFile = glob.sync('./zos.*.json', 'utf-8')[0]
     /* eslint-disable-next-line security/detect-non-literal-fs-filename */
     const migration = JSON.parse(fs.readFileSync(zosFile, 'utf-8').toString())
-    const { contracts } = migration
+    const { contracts, proxies } = migration
 
     const contractNames = Object.keys(contracts)
 
@@ -26,7 +27,7 @@ function exportArtifacts() {
         const artifact = {
             abi: contract.abi,
             bytecode: contract.bytecode,
-            address: contracts[contractName].address,
+            address: proxies[`${name}/${contractName}`][0].address,
             version
         }
 
