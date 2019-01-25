@@ -35,7 +35,7 @@ Ocean Keeper implementation where we put the following modules together:
   - [Documentation](#documentation)
      - [Use Case 1: Register data asset](#use-case-1-register-data-asset)
      - [Use Case 2: Authorize access with OceanAuth contract](#use-case-2-authorize-access-with-oceanauth-contract)
-  - [New version](#version)
+  - [New Version / New Release](#new-version-new-release)
   - [Contributing](#contributing)
   - [Prior Art](#prior-art)
   - [License](#license)
@@ -62,7 +62,7 @@ or simply pull it from docker hub:
 
 ```bash
 docker pull oceanprotocol/keeper-contracts
-docker run -d -p 8545:8545 oceanprotocol/keeper-contracts 
+docker run -d -p 8545:8545 oceanprotocol/keeper-contracts
 ```
 
 Which will expose the Ethereum RPC client with all contracts loaded under localhost:8545, which you can add to your `truffle.js`:
@@ -84,7 +84,7 @@ module.exports = {
 
 As a pre-requisite, you need:
 
-- Node.js >=6, <=v9 (because of ursa, see https://github.com/JoshKaufman/ursa/issues/175)
+- Node.js >=6, <=v10.13.0
 - npm
 
 Clone the project and install all dependencies:
@@ -136,17 +136,16 @@ The transaction should show up on the account: `0x90eE7A30339D05E07d9c6e65747132
 
 The contract addresses deployed on Ocean Nile testnet:
 
-| Contract           | Version | Address                                      |
-|--------------------|---------|----------------------------------------------|
-| AccessConditions   | v0.5.0  | `0x38ba43fFa8C7715F0f2A5d52E78a392d2bD71176` |
-| ComputeConditions  | v0.5.0  | `0x771136ebC55A1747B52722D1bb95323D98550293` |
-| DIDRegistry        | v0.5.0  | `0xe6CeA58707df303b6d9D1DF5BA8Bf88fF4A5920D` |
-| FitchainConditions | v0.5.0  | `0x4563092EE6736a5D920882D2c39c91EAf7956f07` |
-| OceanAuth          | v0.5.0  | `0xfC6DB8141144831a8B7d858f356D0d1148d8F11d` |
-| OceanMarket        | v0.5.0  | `0x8c4a2cC4572B6CD68c58BFc220f04CD1143230a0` |
-| OceanToken         | v0.5.0  | `0x5e29AcdE5285E24eb7A211d9F4313E5a9Ed07F36` |
-| PaymentConditions  | v0.5.0  | `0xdAAb92eABB4F2D7fC51948E44A88aa4fd986EDa9` |
-| ServiceAgreement   | v0.5.0  | `0xb8D436b29CBF1ef690DD3b0972Cce2090ECb09bc` |
+| Contract                  | Version | Address                                      |
+|---------------------------|---------|----------------------------------------------|
+| AccessConditions          | v0.6.0  | `0x416276914b5a6dd1b88bb0e35096200b08131113` |
+| ComputeConditions         | v0.6.0  | `0x575ab120a815488ced316545ef32a25be1e93d3f` |
+| DIDRegistry               | v0.6.0  | `0xc3a017f586a92b836525814733a479eaf744e03c` |
+| Dispenser                 | v0.6.0  | `0x8f5ceb3faffa39d265dfcaff3791d9aa5a621e31` |
+| FitchainConditions        | v0.6.0  | `0x9068f22f687f328f66323e8472fef29fde70fe8a` |
+| OceanToken                | v0.6.0  | `0xdf4c75a5a64c86e22ac5aa2282c96bee7ae6f951` |
+| PaymentConditions         | v0.6.0  | `0x918e5bce975865bf2ff3435b1d3b4cacfd89b91c` |
+| ServiceExecutionAgreement | v0.6.0  | `0x57ae92819e5ea05d6c7af0686617e96d741a54c9` |
 
 #### Kovan Testnet
 
@@ -164,17 +163,16 @@ The transaction should show up on: `https://kovan.etherscan.io/address/0x2c0d5f4
 
 The contract addresses deployed on Kovan testnet:
 
-| Contract           | Version | Address                                      |
-|--------------------|---------|----------------------------------------------|
-| AccessConditions   | v0.5.0  | `0x0aF8734b1DB51464a01F83FE4167054a2f7F6794` |
-| ComputeConditions  | v0.5.0  | `0x138F020dDdd65cA6Ce4E799adFD32cbfEbE384f6` |
-| DIDRegistry        | v0.5.0  | `0x6DCbE42F6bF7c350F5A8a86FC5fCfea0b3EDe9f6` |
-| FitchainConditions | v0.5.0  | `0xE4498F5B1a9E890F3A0A4Bbd6aF4fCC8b54D96ff` |
-| OceanAuth          | v0.5.0  | `0x094E34848e884411684BDC5422BAcF251d046D8B` |
-| OceanMarket        | v0.5.0  | `0xb5bEfAB48835547Ac3A22608c74CFe2ce973d110` |
-| OceanToken         | v0.5.0  | `0x63A94230DA3aa27E5f68F22F8854CE3FcA702695` |
-| PaymentConditions  | v0.5.0  | `0x34D6dFB10fb29441Ee6B053f86AE58D3A8a7D869` |
-| ServiceAgreement   | v0.5.0  | `0xd13998e9c0B40c0028412b59e36213f5cAaA9C6E` |
+| Contract                  | Version | Address                                      |
+|---------------------------|---------|----------------------------------------------|
+| AccessConditions          | v0.6.0  | `0x294aabd9559b547069c48b45d14bb1ea8d81e440` |
+| ComputeConditions         | v0.6.0  | `0x7319f48f48868b0894071e7a654705723371b785` |
+| DIDRegistry               | v0.6.0  | `0x2499c2969b6170c7484044cbecf26ea9d3c3903b` |
+| Dispenser                 | v0.6.0  | `0x06e303d09d79a396dbe3fd2d00cfdc39906e6306` |
+| FitchainConditions        | v0.6.0  | `0xa5c5114d62119754ab2b123352ce482bbafb9452` |
+| OceanToken                | v0.6.0  | `0x3df8b3699bc735c8ac7a6132052b791c24d3a3c4` |
+| PaymentConditions         | v0.6.0  | `0xde5c235c92a828c119532e6fad1d63f77f676d21` |
+| ServiceExecutionAgreement | v0.6.0  | `0xd7ab46800adfd662ffe47af8bcc46e3297bef822` |
 
 ## Libraries
 
@@ -196,7 +194,7 @@ npm test -- test/Auth.Test.js
 
 ### Code Linting
 
-Linting is setup for JavaScript with [ESLint](https://eslint.org) & Solidity with [Solium](https://github.com/duaraghav8/Solium).
+Linting is setup for JavaScript with [ESLint](https://eslint.org) & Solidity with [Ethlint](https://github.com/duaraghav8/Ethlint).
 
 Code style is enforced through the CI test process, builds will fail if there're any linting errors.
 
@@ -204,7 +202,8 @@ Code style is enforced through the CI test process, builds will fail if there're
 
 * [**Main Documentation: TCR, Market and Ocean Tokens**](doc/)
 * [Architecture (pdf)](doc/files/Smart-Contract-UML-class-diagram.pdf)
-* [Packaging of libraries](docs/packaging.md)
+* [Packaging of libraries](doc/packaging.md)
+* [Upgrading contracts](doc/upgrades.md)
 
 ### Use Case 1: Register data asset
 
@@ -282,9 +281,9 @@ const fixedMsgSha = web3.sha3(fixedMsg)
 await auth.verifyAccessTokenDelivery(accessId, accounts[1], fixedMsgSha, sig.v, sig.r, sig.s, { from: accounts[0] })
 ```
 
-## New Version
+## New Version / New Release
 
-The `bumpversion.sh` script helps to bump the project version. You can execute the script using as first argument {major|minor|patch} to bump accordingly the version. Also you can provide the option `--tag` to automatically create the version tag.
+See [RELEASE_PROCESS.md](RELEASE_PROCESS.md)
 
 ## Contributing
 
