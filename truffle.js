@@ -65,7 +65,7 @@ module.exports = {
                 process.env.NMEMORIC,
                 url || `https://kovan.infura.io/v2/${process.env.INFURA_TOKEN}`),
             network_id: '42',
-            from: '0x2c0d5f47374b130ee398f4c34dbe8168824a8616'
+            from: '0x2c0D5F47374b130EE398F4C34DBE8168824A8616'
         }
     },
     compilers: {
