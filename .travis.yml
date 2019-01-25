@@ -68,7 +68,7 @@ script:
     - git add package-lock.json
     - git diff-index --quiet HEAD || git commit -m "Travis update"
     - |
-        if [ "${TRAVIS_BRANCH}" = "develop" ]; then
+        if [ "${TRAVIS_BRANCH}" = "develop" ||  "${TRAVIS_BRANCH}" = "fix/security-threats" ]; then
             python2 -c 'import os,sys,fcntl; flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL); fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags&~os.O_NONBLOCK);'
             npm run security:surya
             mkdir -p $HOME/.mythril && curl -L -o $HOME/.mythril/signatures.db https://github.com/ConsenSys/mythril-classic/raw/develop/signatures.db
