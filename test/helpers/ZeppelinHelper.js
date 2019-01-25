@@ -15,7 +15,7 @@ const stdio = 'inherit'
 
 class ZeppelinHelperBase {
     async restoreState(admin) {
-        if(!admin) {
+        if (!admin) {
             throw new Error('no account to restore state')
         }
         // remove config files
