@@ -67,7 +67,7 @@ contract DIDRegistry is Initializable, Ownable {
 
         didRegister[did] = DIDRegister(msg.sender, block.number);
 
-         emit DIDAttributeRegistered(
+        emit DIDAttributeRegistered(
             did,
             msg.sender,
             key,
