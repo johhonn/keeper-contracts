@@ -40,21 +40,14 @@ module.exports = {
             gas: 0xfffffffffff,
             gasPrice: 0x01
         },
-        // spree from docker with HDWallet
-        spree_wallet: {
+        // spree from docker
+        spree: {
             provider: () => setupWallet(
                 process.env.NMEMORIC,
                 url || `http://localhost:8545`),
             network_id: 0x2324,
-            gas: 4500000
-        },
-        // spree from docker
-        spree: {
-            host: rpcHost || 'localhost',
-            port: rpcPort || 8545,
-            network_id: 0x2324,
             gas: 4500000,
-            from: '0x00bd138abd70e2f00903268f3db08f2d25677c9e'
+            from: '0xe2DD09d719Da89e5a3D0F2549c7E24566e947260'
         },
         // nile the ocean testnet
         nile: {

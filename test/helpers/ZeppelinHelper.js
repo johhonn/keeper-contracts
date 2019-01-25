@@ -20,7 +20,7 @@ class ZeppelinHelperBase {
         }
         // remove config files
         try {
-            execSync('rm -f zos.*', { stdio: 'ignore' })
+            execSync('rm -f zos.* .zos.*', { stdio: 'ignore' })
             if (verbose) {
                 console.log('Cleaned zos session.')
             }
