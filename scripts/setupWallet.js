@@ -1,15 +1,14 @@
 /* eslint-disable no-console */
-/* global artifacts, web3 */
-
-// Run with npx truffle exec setUpWallet.js
 const fs = require('fs')
-const MultiSigWallet = artifacts.require('MultiSigWallet')
 
 const accountAmount = 4
 const threshold = 2
 
-async function setUpWallet() {
+async function setupWallet(web3, artifacts) {
     console.log('Setting up MultiSigWallet')
+
+    const MultiSigWallet = artifacts.require('MultiSigWallet')
+
     // get accounts from web3
     const accounts = await web3.eth.getAccounts()
 
@@ -55,8 +54,6 @@ async function setUpWallet() {
         })
 }
 
-module.exports = (cb) => {
-    setUpWallet()
-        .then(() => cb())
-        .catch(err => cb(err))
+module.exports = {
+    setupWallet
 }
