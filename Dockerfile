@@ -6,7 +6,6 @@ RUN apk add --no-cache --update\
       g++\
       gcc\
       git\
-      jq\
       krb5-dev\
       krb5-libs\
       krb5\

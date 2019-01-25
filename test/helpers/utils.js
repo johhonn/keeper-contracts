@@ -12,7 +12,7 @@ const utils = {
     fingerprint: '0x2e0a37a5',
 
     getWeb3: () => {
-        const nodeUrl = `http://localhost:${process.env.ETHEREUM_RPC_PORT ? process.env.ETHEREUM_RPC_PORT : '8545'}`
+        const nodeUrl = `http://localhost:${process.env.ETHEREUM_RPC_PORT || '8545'}`
         return new Web3(new Web3.providers.HttpProvider(nodeUrl))
     },
 
