@@ -1,4 +1,4 @@
-pragma solidity 0.4.25;
+pragma solidity 0.5.3;
 
 import 'openzeppelin-eth/contracts/cryptography/ECDSA.sol';
 
@@ -28,7 +28,10 @@ contract Common {
     * @param signature is an ECDSA based signature
     * @return signer address
     */
-    function recoverAddress(bytes32 hash, bytes signature)
+    function recoverAddress(
+        bytes32 hash,
+        bytes memory signature
+    )
         public pure
         returns (
             address recoveredAddress

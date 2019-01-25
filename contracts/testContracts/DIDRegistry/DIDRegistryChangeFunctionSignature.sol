@@ -1,4 +1,4 @@
-pragma solidity 0.4.25;
+pragma solidity 0.5.3;
 
 import 'zos-lib/contracts/Initializable.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
@@ -51,11 +51,11 @@ contract DIDRegistryChangeFunctionSignature
     * @param key represents the attribute key
     * @param value refers to the attribute value
     */
-    function registerAttribute(
+    function registerAttribute (
         ValueType valueType,
         bytes32 did,
         bytes32 key,
-        string value
+        string memory value
     )
         public
     {

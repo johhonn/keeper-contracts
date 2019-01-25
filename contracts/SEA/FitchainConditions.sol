@@ -1,4 +1,4 @@
-pragma solidity 0.4.25;
+pragma solidity 0.5.3;
 
 import './ServiceExecutionAgreement.sol';
 import 'zos-lib/contracts/Initializable.sol';
@@ -569,9 +569,9 @@ contract FitchainConditions is Initializable {
             emit VerifierElected(registry[i], modelId);
         }
         for(uint256 j = 0; j < registry.length; j++) {
-            if (verifiers[registry[i]].slots == 0) {
+            if (verifiers[registry[j]].slots == 0) {
                 require(
-                    !removeVerifierFromRegistry(registry[i]),
+                    !removeVerifierFromRegistry(registry[j]),
                     'unable to remove verifier from registry during verifiers election'
                 );
             }

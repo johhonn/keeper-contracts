@@ -8,13 +8,16 @@ const { execSync } = require('child_process')
 const glob = require('glob')
 const fs = require('fs')
 
-const verbose = false
+const verbose = process.env.VERBOSE || false
 const MultiSigWallet = artifacts.require('MultiSigWallet')
 const flags = verbose ? ' -v' : ' -s'
 const stdio = 'inherit'
 
 class ZeppelinHelperBase {
     async restoreState(admin) {
+        if(!admin) {
+            throw new Error('no account to restore state')
+        }
         // remove config files
         try {
             execSync('rm -f zos.*', { stdio: 'ignore' })

@@ -1,4 +1,4 @@
-pragma solidity 0.4.25;
+pragma solidity 0.5.3;
 
 import '../../SEA/Common.sol';
 import 'zos-lib/contracts/Initializable.sol';
@@ -234,10 +234,10 @@ contract ServiceExecutionAgreementWithBug is Common, Initializable {
     */
     function setupTemplate(
         bytes32 templateId,
-        address[] contracts,
-        bytes4[] fingerprints,
-        uint256[] dependenciesBits,
-        uint8[] fulfillmentIndices,
+        address[] memory contracts,
+        bytes4[] memory fingerprints,
+        uint256[] memory dependenciesBits,
+        uint8[] memory fulfillmentIndices,
         uint8 fulfillmentOperator
     )
         public
@@ -374,10 +374,10 @@ contract ServiceExecutionAgreementWithBug is Common, Initializable {
     */
     function initializeAgreement(
         bytes32 templateId,
-        bytes signature,
+        bytes memory signature,
         address consumer,
-        bytes32[] valueHashes,
-        uint256[] timeoutValues,
+        bytes32[] memory valueHashes,
+        uint256[] memory timeoutValues,
         bytes32 agreementId,
         bytes32 did
     )
@@ -479,9 +479,9 @@ contract ServiceExecutionAgreementWithBug is Common, Initializable {
     */
     function hashAgreement(
         bytes32 templateId,
-        bytes32[] conditionKeys,
-        bytes32[] valueHashes,
-        uint256[] timeoutValues,
+        bytes32[] memory conditionKeys,
+        bytes32[] memory valueHashes,
+        uint256[] memory timeoutValues,
         bytes32 agreementId
     )
         public pure
@@ -752,8 +752,8 @@ contract ServiceExecutionAgreementWithBug is Common, Initializable {
     function initializeConditions(
         bytes32 templateId,
         bytes32 agreementId,
-        bytes32[] valueHash,
-        uint256[] timeoutValues,
+        bytes32[] memory valueHash,
+        uint256[] memory timeoutValues,
         bytes32 did
     )
         private
@@ -853,7 +853,7 @@ contract ServiceExecutionAgreementWithBug is Common, Initializable {
     */
     function isValidSignature(
         bytes32 hash,
-        bytes signature,
+        bytes memory signature,
         address consumer
     )
         public pure

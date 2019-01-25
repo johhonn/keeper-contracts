@@ -1,4 +1,4 @@
-pragma solidity 0.4.25;
+pragma solidity 0.5.3;
 
 import '../../SEA/ServiceExecutionAgreement.sol';
 import '../../SEA/ISecretStore.sol';
@@ -84,7 +84,7 @@ contract AccessConditionsWithBug is ISecretStore, Initializable {
         );
 
         if (agreementStorage.hasUnfulfilledDependencies(agreementId, condition))
-            return;
+            return false;
 
         bytes32 valueHash = keccak256(abi.encodePacked(documentKeyId));
         require(
