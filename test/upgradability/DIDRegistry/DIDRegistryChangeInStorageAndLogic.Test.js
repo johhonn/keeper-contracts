@@ -26,7 +26,7 @@ contract('DIDRegistry', (accounts) => {
         it('Should be possible to append storage variables and change logic', async () => {
             // register attribute
             let registry = await DIDRegistry.at(dIDRegistryAddress)
-            const did = web3.utils.sha3('did:ocn:test-attr')
+            let did = web3.utils.sha3('did:ocn:test-attr')
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
 
@@ -34,7 +34,7 @@ contract('DIDRegistry', (accounts) => {
 
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
-            const payload = result.logs[0].args
+            let payload = result.logs[0].args
             assert.strictEqual(did, payload.did)
             assert.strictEqual(accounts[0], payload.owner)
             assert.strictEqual(checksum, payload.checksum)
