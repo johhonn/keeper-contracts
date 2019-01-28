@@ -29,33 +29,24 @@ contract('DIDRegistry', (accounts) => {
             await zos.approveLatestTransaction()
 
             // prepare
-            let valueType = 0
-            let did = web3.utils.fromAscii('did:ocn:test-attr')
-            let provider = web3.utils.fromAscii('provider')
+            const did = web3.utils.sha3('did:ocn:test-attr')
+            const checksum = testUtils.generateId()
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
 
             // should revert
-            await testUtils.assertRevert(p.registerAttribute(
-                valueType,
-                did,
-                provider,
-                'this is not the contract you are looking for'))
+            await testUtils.assertRevert(p.registerAttribute(checksum, did, value))
 
             // act
-            let result = await p.registerAttribute(
-                valueType,
-                did,
-                provider,
-                'this is not the contract you are looking for')
+            let result = await p.registerAttribute(checksum, did, value)
 
             // eval
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
-            let payload = result.logs[0].args
-            assert.strictEqual('did:ocn:test-attr', web3.utils.hexToString(payload.did))
+            const payload = result.logs[0].args
+            assert.strictEqual(did, web3.utils.hexToString(payload.did))
             assert.strictEqual(accounts[0], payload.owner)
-            assert.strictEqual(0, web3.utils.toDecimal(payload.valueType))
-            assert.strictEqual('provider', web3.utils.hexToString(payload.key))
-            assert.strictEqual('this is not the contract you are looking for', payload.value)
+            assert.strictEqual(checksum, payload.checksum)
+            assert.strictEqual(value, payload.value)
         })
     })
 })
