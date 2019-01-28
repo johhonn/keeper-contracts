@@ -26,20 +26,19 @@ contract('DIDRegistry', (accounts) => {
         it('Should be possible to append storage variables and change logic', async () => {
             // register attribute
             let registry = await DIDRegistry.at(dIDRegistryAddress)
-            let did = web3.utils.fromAscii('did:ocn:test-attr')
-            let providerDID = 'did:ocn:provider'
-            let provider = web3.utils.fromAscii('provider')
-            let valueType = 0
-            let result = await registry.registerAttribute(did, valueType, provider, providerDID)
+            const did = web3.utils.sha3('did:ocn:test-attr')
+            const checksum = testUtils.generateId()
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+
+            let result = await registry.registerAttribute(checksum, did, value)
 
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
-            let payload = result.logs[0].args
-            assert.strictEqual('did:ocn:test-attr', web3.utils.hexToString(payload.did))
+            const payload = result.logs[0].args
+            assert.strictEqual(did, payload.did)
             assert.strictEqual(accounts[0], payload.owner)
-            assert.strictEqual(0, web3.utils.toDecimal(payload.valueType))
-            assert.strictEqual('provider', web3.utils.hexToString(payload.key))
-            assert.strictEqual(providerDID, payload.value)
+            assert.strictEqual(checksum, payload.checksum)
+            assert.strictEqual(value, payload.value)
 
             // should not be possible to read storage variables before upgrade is approved
             await zos.upgradeToNewContract('DIDRegistryChangeInStorageAndLogic')
@@ -54,16 +53,15 @@ contract('DIDRegistry', (accounts) => {
 
             // check new functionality works
             did = web3.utils.fromAscii('did:ocn:test-attrN')
-            result = await registry.registerAttribute(did, valueType, provider, providerDID)
+            result = await registry.registerAttribute(checksum, did, value)
 
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             payload = result.logs[0].args
             assert.strictEqual('did:ocn:test-attrN', web3.utils.hexToString(payload.did))
             assert.strictEqual(accounts[0], payload.owner)
-            assert.strictEqual(0, web3.utils.toDecimal(payload.valueType))
-            assert.strictEqual('provider', web3.utils.hexToString(payload.key))
-            assert.strictEqual(providerDID, payload.value)
+            assert.strictEqual(checksum, payload.checksum)
+            assert.strictEqual(value, payload.value)
 
             await p.timeOfRegister(did).then(i => { n = i })
             assert.equal(n.toNumber() > 0, true, 'time of registry not created')

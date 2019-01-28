@@ -43,7 +43,7 @@ contract('DIDRegistry', (accounts) => {
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             const payload = result.logs[0].args
-            assert.strictEqual(did, web3.utils.hexToString(payload.did))
+            assert.strictEqual(did, payload.did)
             assert.strictEqual(accounts[0], payload.owner)
             assert.strictEqual(checksum, payload.checksum)
             assert.strictEqual(value, payload.value)
