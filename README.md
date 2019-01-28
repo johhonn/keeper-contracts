@@ -210,9 +210,11 @@ Code style is enforced through the CI test process, builds will fail if there're
 ```Javascript
 const Market = artifacts.require('OceanMarket.sol')
 ...
+
 // get instance of OceanMarket contract
 const market = await Market.deployed()
 ...
+
 // generate resource id
 const name = 'resource name'
 const resourceId = await market.generateId(name, { from: accounts[0] })
