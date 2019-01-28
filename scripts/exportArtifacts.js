@@ -1,7 +1,6 @@
 const fs = require('fs')
 const glob = require('glob')
 const pkg = require('../package.json')
-const { name } = require('../zos.json')
 
 const buildDir = './build/contracts/'
 const outDir = './artifacts/'
@@ -9,7 +8,7 @@ const outDir = './artifacts/'
 const network = process.env.NETWORK || 'development'
 const version = `v${pkg.version}`
 
-function exportArtifacts() {
+function exportArtifacts(name) {
     const zosFile = glob.sync('./zos.*.json', 'utf-8')[0]
     /* eslint-disable-next-line security/detect-non-literal-fs-filename */
     const migration = JSON.parse(fs.readFileSync(zosFile, 'utf-8').toString())
