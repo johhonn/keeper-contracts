@@ -138,14 +138,14 @@ The contract addresses deployed on Ocean Nile testnet:
 
 | Contract                  | Version | Address                                      |
 |---------------------------|---------|----------------------------------------------|
-| AccessConditions          | v0.6.10 | `0x6bd5fdc37b9c87ba73dda230e5dc18e9fda71ff9` |
-| ComputeConditions         | v0.6.10 | `0xb3086de47926bce35327926916b63e1b0c07aada` |
-| DIDRegistry               | v0.6.10 | `0x1c6429a37802ea7541b6bd71d5996a18cc5a95df` |
-| Dispenser                 | v0.6.10 | `0xddd8a7d2ae6bd24bc133842fecbca5357b670134` |
-| FitchainConditions        | v0.6.10 | `0x832a138f90c4170d2f28e40880136c6e9988d914` |
-| OceanToken                | v0.6.10 | `0xf98f9d6726bf2c2e9db9a964c1511908ac8e48e5` |
-| PaymentConditions         | v0.6.10 | `0xcc3784c45c513138c82ebe7b53f65ef6205747b1` |
-| ServiceExecutionAgreement | v0.6.10 | `0x6bb499133842a0a743fd2781ffad4f49a985e66b` |
+| AccessConditions          | v0.6.11 | `0x2db2cec56a7ff5f330ee4c845c06043e1ff71c7f` |
+| ComputeConditions         | v0.6.11 | `0x5a63db88e5b7e46ef613470fb5c603b7ea020a58` |
+| DIDRegistry               | v0.6.11 | `0xcb8f98360c71c4540a8269c6eb89ad3a76c5f807` |
+| Dispenser                 | v0.6.11 | `0xf183b418681a169f7bfab67279ce9c66a9c4b13d` |
+| FitchainConditions        | v0.6.11 | `0x205259a26d773636606ad668e3e2c3fc0c8268f0` |
+| OceanToken                | v0.6.11 | `0xa698632ac1a125a710e3d303044f9ff229d792f8` |
+| PaymentConditions         | v0.6.11 | `0xb83b7ec51160715783dd267275c18c37afc4f0a0` |
+| ServiceExecutionAgreement | v0.6.11 | `0xad3653a10fbd001d506718912cda2e9ee56f0601` |
 
 #### Kovan Testnet
 
