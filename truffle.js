@@ -1,8 +1,25 @@
 const HDWalletProvider = require('truffle-hdwallet-provider')
+const NonceTrackerSubprovider = require('web3-provider-engine/subproviders/nonce-tracker')
 
 const rpcHost = process.env.KEEPER_RPC_HOST
 const rpcPort = process.env.KEEPER_RPC_PORT
 const url = process.env.KEEPER_RPC_URL
+const walletIndex = 0
+const walletAccounts = 5
+
+let wallet
+
+const setupWallet = (nmemoric, url) => {
+    if (!wallet) {
+        wallet = new HDWalletProvider(
+            nmemoric,
+            url,
+            walletIndex,
+            walletAccounts)
+        wallet.engine.addProvider(new NonceTrackerSubprovider())
+    }
+    return wallet
+}
 
 module.exports = {
     networks: {
@@ -24,22 +41,19 @@ module.exports = {
             gasPrice: 0x01
         },
         // spree from docker
-        spree_wallet: {
-            provider: () => new HDWalletProvider(process.env.NMEMORIC, url || `http://localhost:8545`),
-            network_id: 0x2324,
-            gas: 4500000
-        },
-        // spree from docker
         spree: {
-            host: rpcHost || 'localhost',
-            port: rpcPort || 8545,
+            provider: () => setupWallet(
+                process.env.NMEMORIC,
+                url || `http://localhost:8545`),
             network_id: 0x2324,
             gas: 4500000,
-            from: '0x00bd138abd70e2f00903268f3db08f2d25677c9e'
+            from: '0xe2DD09d719Da89e5a3D0F2549c7E24566e947260'
         },
         // nile the ocean testnet
         nile: {
-            provider: () => new HDWalletProvider(process.env.NMEMORIC, url || `https://nile.dev-ocean.com`),
+            provider: () => setupWallet(
+                process.env.NMEMORIC,
+                url || `https://nile.dev-ocean.com`),
             network_id: 0x2323,
             gas: 6000000,
             gasPrice: 10000,
@@ -47,20 +61,22 @@ module.exports = {
         },
         // kovan testnet
         kovan: {
-            provider: () => new HDWalletProvider(process.env.NMEMORIC, url || `https://kovan.infura.io/v2/${process.env.INFURA_TOKEN}`),
+            provider: () => setupWallet(
+                process.env.NMEMORIC,
+                url || `https://kovan.infura.io/v2/${process.env.INFURA_TOKEN}`),
             network_id: '42',
-            from: '0x2c0d5f47374b130ee398f4c34dbe8168824a8616'
+            from: '0x2c0D5F47374b130EE398F4C34DBE8168824A8616'
         }
     },
     compilers: {
         solc: {
-            version: '0.4.25'
-        }
-    },
-    solc: {
-        optimizer: {
-            enabled: true,
-            runs: 200
+            version: '0.4.25',
+            settings: {
+                optimizer: {
+                    enabled: true,
+                    runs: 200
+                }
+            }
         }
     }
 }

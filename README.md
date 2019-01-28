@@ -35,7 +35,7 @@ Ocean Keeper implementation where we put the following modules together:
   - [Documentation](#documentation)
      - [Use Case 1: Register data asset](#use-case-1-register-data-asset)
      - [Use Case 2: Authorize access with OceanAuth contract](#use-case-2-authorize-access-with-oceanauth-contract)
-  - [New version](#version)
+  - [New Version / New Release](#new-version-new-release)
   - [Contributing](#contributing)
   - [Prior Art](#prior-art)
   - [License](#license)
@@ -136,17 +136,16 @@ The transaction should show up on the account: `0x90eE7A30339D05E07d9c6e65747132
 
 The contract addresses deployed on Ocean Nile testnet:
 
-| Contract           | Version | Address                                      |
-|--------------------|---------|----------------------------------------------|
-| AccessConditions   | v0.5.2  | `0x31a64a1DCdD9e1b8db84ef94431a61C6B462Ad0c` |
-| ComputeConditions  | v0.5.2  | `0xb28BC9489c55be810858F206602cf91c83DF816f` |
-| DIDRegistry        | v0.5.2  | `0xBDFeAc66c022165Bdb320264398977bf8A54e3C0` |
-| FitchainConditions | v0.5.2  | `0x549A383bE23615B61d0E40cf90cD558D889b5632` |
-| OceanAuth          | v0.5.2  | `0x0C84ECe5A68059220ff114de2b11457Fa7d7Fc45` |
-| OceanMarket        | v0.5.2  | `0x0959092E0D313F0BD3a6441151B2E2685d7350b5` |
-| OceanToken         | v0.5.2  | `0x8cCD9073B23689ca2BB76a049Eb33dfF5e16228D` |
-| PaymentConditions  | v0.5.2  | `0x78D2CA96F19e0e5b97Ca19Da179CEBF0fC5101BC` |
-| ServiceAgreement   | v0.5.2  | `0xCa925335D4EC611f35388eEeA9b9F7B0a6947d32` |
+| Contract                  | Version | Address                                      |
+|---------------------------|---------|----------------------------------------------|
+| AccessConditions          | v0.6.10 | `0x6bd5fdc37b9c87ba73dda230e5dc18e9fda71ff9` |
+| ComputeConditions         | v0.6.10 | `0xb3086de47926bce35327926916b63e1b0c07aada` |
+| DIDRegistry               | v0.6.10 | `0x1c6429a37802ea7541b6bd71d5996a18cc5a95df` |
+| Dispenser                 | v0.6.10 | `0xddd8a7d2ae6bd24bc133842fecbca5357b670134` |
+| FitchainConditions        | v0.6.10 | `0x832a138f90c4170d2f28e40880136c6e9988d914` |
+| OceanToken                | v0.6.10 | `0xf98f9d6726bf2c2e9db9a964c1511908ac8e48e5` |
+| PaymentConditions         | v0.6.10 | `0xcc3784c45c513138c82ebe7b53f65ef6205747b1` |
+| ServiceExecutionAgreement | v0.6.10 | `0x6bb499133842a0a743fd2781ffad4f49a985e66b` |
 
 #### Kovan Testnet
 
@@ -164,17 +163,16 @@ The transaction should show up on: `https://kovan.etherscan.io/address/0x2c0d5f4
 
 The contract addresses deployed on Kovan testnet:
 
-| Contract           | Version | Address                                      |
-|--------------------|---------|----------------------------------------------|
-| AccessConditions   | v0.5.2  | `0x53CF7c49188C3d5c6e22d2d25619bA5e51367344` |
-| ComputeConditions  | v0.5.2  | `0x7DAa90122f4d6Fe4A30B1Be6759Aec6982202102` |
-| DIDRegistry        | v0.5.2  | `0x1Acbe77Ef52bfE4952D2bB31a2BB008FD8b44AE9` |
-| FitchainConditions | v0.5.2  | `0xc8c2B83986157754D37e9DB4eeDfb0E80b9c4644` |
-| OceanAuth          | v0.5.2  | `0x3Cfb6C5812A31F741Ecb535A25DB949F0Eb614fa` |
-| OceanMarket        | v0.5.2  | `0x5C710A2AAd4f7Bd21b997F1BC2cC47b4AFb21242` |
-| OceanToken         | v0.5.2  | `0x9aF3CBE3e26878836D6a5f7923870e7ed48a5347` |
-| PaymentConditions  | v0.5.2  | `0x7e299E4c4ae90775363dAb771Ba93a736A7cD01D` |
-| ServiceAgreement   | v0.5.2  | `0x5ec66884C7419fd227F642209590A604244596Aa` |
+| Contract                  | Version | Address                                      |
+|---------------------------|---------|----------------------------------------------|
+| AccessConditions          | v0.6.10 | `0xa5a8c65a5db8f1d18ccbb4759692e4dbe1434974` |
+| ComputeConditions         | v0.6.10 | `0xa33b8526f2842bb21d996a27f58e285f3fc1e355` |
+| DIDRegistry               | v0.6.10 | `0xe838039bc5a796e63cfbc35e68cd21b16b34d9a6` |
+| Dispenser                 | v0.6.10 | `0x7077fb27fbcd4fc8369cbd188c1808d27df54aad` |
+| FitchainConditions        | v0.6.10 | `0xe48abe6c24c6cf0a43578622964b6a09f51db415` |
+| OceanToken                | v0.6.10 | `0xdb003f6eec829d4e936ecee2b4d9db98e676bc5f` |
+| PaymentConditions         | v0.6.10 | `0xf15c29421c85bcddfe4e14b945aa5fc1c15315bb` |
+| ServiceExecutionAgreement | v0.6.10 | `0x513e54350ecbb1513b5c63132a86e340edda34b8` |
 
 ## Libraries
 
@@ -204,7 +202,8 @@ Code style is enforced through the CI test process, builds will fail if there're
 
 * [**Main Documentation: TCR, Market and Ocean Tokens**](doc/)
 * [Architecture (pdf)](doc/files/Smart-Contract-UML-class-diagram.pdf)
-* [Packaging of libraries](docs/packaging.md)
+* [Packaging of libraries](doc/packaging.md)
+* [Upgrading contracts](doc/upgrades.md)
 
 ### Use Case 1: Register data asset
 
@@ -282,9 +281,9 @@ const fixedMsgSha = web3.sha3(fixedMsg)
 await auth.verifyAccessTokenDelivery(accessId, accounts[1], fixedMsgSha, sig.v, sig.r, sig.s, { from: accounts[0] })
 ```
 
-## New Version
+## New Version / New Release
 
-The `bumpversion.sh` script helps to bump the project version. You can execute the script using as first argument {major|minor|patch} to bump accordingly the version. Also you can provide the option `--tag` to automatically create the version tag.
+See [RELEASE_PROCESS.md](RELEASE_PROCESS.md)
 
 ## Contributing
 
