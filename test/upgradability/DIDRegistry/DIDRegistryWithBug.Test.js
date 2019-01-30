@@ -47,13 +47,13 @@ contract('DIDRegistry', (accounts) => {
             await zos.approveLatestTransaction()
 
             // check functionality works
-            did = web3.utils.fromAscii('did:ocn:test-attrN')
+            did = web3.utils.sha3('did:ocn:test-attrN')
             result = await registry.registerAttribute(checksum, did, value)
 
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             payload = result.logs[0].args
-            assert.strictEqual('did:ocn:test-attrN', web3.utils.hexToString(payload.did))
+            assert.strictEqual(did, payload.did)
             assert.strictEqual(accounts[0], payload.owner)
             assert.strictEqual(checksum, payload.checksum)
             assert.strictEqual(value, payload.value)
