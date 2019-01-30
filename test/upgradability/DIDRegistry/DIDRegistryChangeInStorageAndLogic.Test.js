@@ -30,7 +30,7 @@ contract('DIDRegistry', (accounts) => {
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
 
-            let result = await registry.registerAttribute(checksum, did, value)
+            let result = await registry.registerAttribute(did, checksum, value)
 
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
@@ -53,7 +53,7 @@ contract('DIDRegistry', (accounts) => {
 
             // check new functionality works
             did = web3.utils.sha3('did:ocn:test-attrN')
-            result = await registry.registerAttribute(checksum, did, value)
+            result = await registry.registerAttribute(did, checksum, value)
 
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
