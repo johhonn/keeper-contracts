@@ -35,10 +35,6 @@ contract DIDRegistryChangeInStorageAndLogic
             'Attributes must be registered by the DID owners.'
         );
         require(
-            checksum != bytes32(0),
-            'Invalid checksum'
-        );
-        require(
             //TODO: 2048 should be changed in the future
             bytes(value).length <= 2048,
             'Invalid url size'
