@@ -28,7 +28,7 @@ library EpochLibrary {
 
    /**
     * @notice create creates new Epoch
-    * @param _self is the Epoch pointer
+    * @param _self is the Epoch storage pointer
     * @param _timeLock value in block count (can not fulfill before)
     * @param _timeOut value in block count (can not fulfill after)
     */
@@ -43,7 +43,7 @@ library EpochLibrary {
 
    /**
     * @notice isTimeOutOver means you cannot fulfill after
-    * @param _self is the Epoch pointer
+    * @param _self is the Epoch storage pointer
     * @return true if the current block number is gt timeOut
     */
     function isTimeOutOver(Epoch storage _self)
@@ -58,7 +58,7 @@ library EpochLibrary {
 
    /**
     * @notice isTimeLockOver means you cannot fulfill before
-    * @param _self is the Epoch pointer
+    * @param _self is the Epoch storage pointer
     * @return true if the current block number is gt timeLock
     */
     function isTimeLockOver(Epoch storage _self)
@@ -82,4 +82,29 @@ library EpochLibrary {
     {
         return block.number;
     }
+
+   /**
+    * @notice getEpochTimeOut
+    * @param _self is the Epoch storage pointer
+    */
+    function getEpochTimeOut(Epoch storage _self)
+        public
+        view
+        returns(uint256)
+    {
+        return _self.timeOut.add(_self.blockNumber);
+    }
+
+    /**
+    * @notice getEpochTimeLock
+    * @param _self is the Epoch storage pointer
+    */
+    function getEpochTimeLock(Epoch storage _self)
+        public
+        view
+        returns(uint256)
+    {
+        return _self.timeLock.add(_self.blockNumber);
+    }
+
 }
