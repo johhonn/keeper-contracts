@@ -83,11 +83,14 @@ contract('ComputeConditions', (accounts) => {
             // arrange
             await initializeAgreementWithValues()
 
-            // act
-            const result = await computeConditions.fulfillUpload(agreementId, testUtils.emptyBytes32, { from: accounts[0] })
-
-            // assert
-            testUtils.assertEmitted(result, 1, 'ProofOfUploadValid')
+            // act and assert (expected: invalid signature or hash size)
+            await testUtils.assertRevert(
+                computeConditions.fulfillUpload(
+                    agreementId,
+                    testUtils.emptyBytes32,
+                    { from: accounts[0] }
+                )
+            )
         })
 
         it('Should not fulfill upload when hash exists, signature is not valid', async () => {
@@ -95,11 +98,14 @@ contract('ComputeConditions', (accounts) => {
             await initializeAgreementWithValues()
             await computeConditions.submitHashSignature(agreementId, testUtils.emptyBytes32, { from: consumer })
 
-            // act
-            const result = await computeConditions.fulfillUpload(agreementId, testUtils.emptyBytes32, { from: accounts[0] })
-
-            // assert
-            testUtils.assertEmitted(result, 1, 'ProofOfUploadInvalid')
+            // act and assert (expected: invalid signature or hash size)
+            await testUtils.assertRevert(
+                computeConditions.fulfillUpload(
+                    agreementId,
+                    testUtils.emptyBytes32,
+                    { from: accounts[0] }
+                )
+            )
         })
 
         it('Should not fulfill upload when unfulfilled dependencies exist', async () => {
