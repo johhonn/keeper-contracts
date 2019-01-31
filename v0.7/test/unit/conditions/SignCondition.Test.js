@@ -7,14 +7,11 @@ const SignCondition = artifacts.require('SignCondition.sol')
 const constants = require('../../helpers/constants.js')
 
 contract('SignCondition constructor', (accounts) => {
-
     describe('deploy and setup', () => {
-
         it('contract should deploy', async () => {
             let conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
             await SignCondition.new(conditionStoreManager.address, { from: accounts[0] })
         })
-
     })
 
     describe('fulfill non existing condition', () => {
@@ -57,7 +54,7 @@ contract('SignCondition constructor', (accounts) => {
         })
 
         it('should fulfill if conditions exist for bytes32 message', async () => {
-            let nonce = constants.bytes32.one;
+            let nonce = constants.bytes32.one
             let {
                 message,
                 publicKey,
@@ -91,10 +88,10 @@ contract('SignCondition constructor', (accounts) => {
         })
 
         it('wrong signature should fail to fulfill if conditions exist for bytes32 message', async () => {
-            let nonce = constants.bytes32.one;
+            let nonce = constants.bytes32.one
             let {
                 message,
-                publicKey,
+                publicKey
             } = constants.condition.sign.bytes32
 
             let hashValues = await signCondition.hashValues(message, publicKey)
@@ -107,7 +104,7 @@ contract('SignCondition constructor', (accounts) => {
             try {
                 await signCondition.fulfill(
                     nonce, message, publicKey,
-                    constants.bytes32.one,
+                    constants.bytes32.one
                 )
             } catch (e) {
                 assert.strictEqual(e.reason, 'Could not recover signature')
@@ -117,7 +114,7 @@ contract('SignCondition constructor', (accounts) => {
         })
 
         it('right signature should fail to fulfill if conditions already fulfilled for bytes32', async () => {
-            let nonce = constants.bytes32.one;
+            let nonce = constants.bytes32.one
             let {
                 message,
                 publicKey,
@@ -144,7 +141,7 @@ contract('SignCondition constructor', (accounts) => {
         })
 
         it('should fail to fulfill if conditions has different type ref', async () => {
-            let nonce = constants.bytes32.one;
+            let nonce = constants.bytes32.one
             let {
                 message,
                 publicKey,
