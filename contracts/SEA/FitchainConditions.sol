@@ -215,7 +215,7 @@ contract FitchainConditions is Initializable {
         returns(bool)
     {
         // TODO: cut this stake from the verifier's balance
-        verifiers[msg.sender] = Actor(true, stake * slots, slots, slots);
+        verifiers[msg.sender] = Actor(true, stake.mul(slots), slots, slots);
         for(uint256 i = 0; i < slots; i++)
             // TODO: the below line prone to 51% attack
             registry.push(msg.sender);
