@@ -12,6 +12,20 @@ const constants = require('../../helpers/constants.js')
 
 contract('ConditionStore constructor', (accounts) => {
 
+    async function setupTest({
+        conditionId = constants.bytes32.one,
+        conditionType = constants.address.dummy,
+        createRole = accounts[0],
+        setupConditionStoreManager = true
+    } = {}) {
+        const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+        const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
+        if (setupConditionStoreManager) {
+            await conditionStoreManager.setup(createRole)
+        }
+        return {epochLibrary, conditionStoreManager, conditionId, conditionType, createRole}
+    }
+
     describe('deploy and setup', () => {
 
         it('contract should deploy', async () => {
@@ -64,27 +78,6 @@ contract('ConditionStore constructor', (accounts) => {
     })
 
     describe('create conditions', () => {
-
-        let conditionStoreManager
-        let createRole
-
-        async function setupTest({
-            conditionId = constants.bytes32.one,
-            conditionType = constants.address.dummy,
-            createRole = accounts[0],
-            setupConditionStoreManager = true
-        } = {}) {
-            const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
-            const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            if (setupConditionStoreManager) {
-                await conditionStoreManager.setup(createRole)
-            }
-            return {epochLibrary, conditionStoreManager, conditionId, conditionType, createRole}
-        }
-
-        beforeEach(async () => {
-            conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-        })
 
         it('createRole should create', async () => {
             const { conditionStoreManager, conditionId, conditionType } = await setupTest()
@@ -153,36 +146,18 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('invalid address should not create', async () => {
-            createRole = accounts[0]
-            await conditionStoreManager.setup(createRole)
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({conditionType: constants.address.zero})
 
-            let conditionId = constants.bytes32.one
-            let conditionType = constants.address.zero
-
-            // should fail with invalid type address
-            try {
-                await conditionStoreManager.createCondition(conditionId, conditionType)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid address: 0x0')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                conditionStoreManager.createCondition(conditionId, conditionType),
+                'Invalid address: 0x0'
+            )
         })
     })
 
     describe('get conditions', () => {
-        let conditionStoreManager
-        let createRole
-
-        beforeEach(async () => {
-            conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            createRole = accounts[0]
-            await conditionStoreManager.setup(createRole)
-        })
-
         it('successful create should get unfulfilled condition', async () => {
-            let conditionId = constants.bytes32.one
-            let conditionType = constants.address.dummy
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest()
 
             // returns true on create
             await conditionStoreManager.createCondition(conditionId, conditionType)
@@ -200,7 +175,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('no create should get uninitialized Condition', async () => {
-            let conditionId = constants.bytes32.one
+            const { conditionStoreManager, conditionId } = await setupTest()
 
             let { typeRef, state } = await conditionStoreManager.getCondition(conditionId)
             assert.strictEqual(constants.address.zero, typeRef)
@@ -209,42 +184,23 @@ contract('ConditionStore constructor', (accounts) => {
     })
 
     describe('exists', () => {
-        let conditionStoreManager
-        let createRole
-
-        beforeEach(async () => {
-            conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            createRole = accounts[0]
-            await conditionStoreManager.setup(createRole)
-        })
-
         it('successful create should exist', async () => {
-            let conditionId = constants.bytes32.one
-            let conditionType = constants.address.dummy
-
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest()
+            
             // returns true on create
             await conditionStoreManager.createCondition(conditionId, conditionType)
             assert.strictEqual(true, await conditionStoreManager.exists(conditionId))
         })
 
         it('no create should not exist', async () => {
-            let conditionId = constants.bytes32.one
+            const { conditionStoreManager, conditionId } = await setupTest()
             assert.strictEqual(false, await conditionStoreManager.exists(conditionId))
         })
     })
 
     describe('update condition state', () => {
-        let conditionStoreManager
-        let createRole
-
-        beforeEach(async () => {
-            conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            createRole = accounts[0]
-            await conditionStoreManager.setup(createRole)
-        })
-
         it('should not transition from uninitialized', async () => {
-            let conditionId = constants.bytes32.one
+            const { conditionStoreManager, conditionId } = await setupTest()
             let newState = constants.condition.state.unfulfilled
             try {
                 await conditionStoreManager.updateConditionState(conditionId, newState)
@@ -256,8 +212,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('correct role should transition from unfulfilled to fulfilled', async () => {
-            let conditionId = constants.bytes32.one
-            let conditionType = accounts[0]
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({conditionType: accounts[0]})
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             let newState = constants.condition.state.fulfilled
@@ -267,8 +222,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('correct role should transition from unfulfilled to aborted', async () => {
-            let conditionId = constants.bytes32.one
-            let conditionType = accounts[0]
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({conditionType: accounts[0]})
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             let newState = constants.condition.state.aborted
@@ -278,8 +232,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('correct role should not transition from unfulfilled to uninitialized', async () => {
-            let conditionId = constants.bytes32.one
-            let conditionType = accounts[0]
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({conditionType: accounts[0]})
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             let newState = constants.condition.state.uninitialized
@@ -293,8 +246,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('correct role should not transition from unfulfilled to unfulfilled', async () => {
-            let conditionId = constants.bytes32.one
-            let conditionType = accounts[0]
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({conditionType: accounts[0]})
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             let newState = constants.condition.state.unfulfilled
@@ -308,8 +260,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('correct role should not transition from fulfilled to unfulfilled', async () => {
-            let conditionId = constants.bytes32.one
-            let conditionType = accounts[0]
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({conditionType: accounts[0]})
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
@@ -323,8 +274,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('correct role should not transition from fulfilled to unfulfilled', async () => {
-            let conditionId = constants.bytes32.one
-            let conditionType = accounts[0]
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({conditionType: accounts[0]})
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
@@ -338,8 +288,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('correct role should not transition from aborted to unfulfilled', async () => {
-            let conditionId = constants.bytes32.one
-            let conditionType = accounts[0]
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({conditionType: accounts[0]})
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
@@ -353,8 +302,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('correct role should not transition from fulfilled to uninitialized', async () => {
-            let conditionId = constants.bytes32.one
-            let conditionType = accounts[0]
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({conditionType: accounts[0]})
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
@@ -368,8 +316,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('correct role should not transition from aborted to uninitialized', async () => {
-            let conditionId = constants.bytes32.one
-            let conditionType = accounts[0]
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({conditionType: accounts[0]})
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
@@ -383,8 +330,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('correct role should not transition from fulfilled to aborted', async () => {
-            let conditionId = constants.bytes32.one
-            let conditionType = accounts[0]
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({conditionType: accounts[0]})
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
@@ -398,8 +344,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('correct role should not transition from aborted to fulfilled', async () => {
-            let conditionId = constants.bytes32.one
-            let conditionType = accounts[0]
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({conditionType: accounts[0]})
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
@@ -413,8 +358,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('correct role should not transition from fulfilled to fulfilled', async () => {
-            let conditionId = constants.bytes32.one
-            let conditionType = accounts[0]
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({conditionType: accounts[0]})
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
@@ -428,8 +372,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('correct role should not transition from aborted to aborted', async () => {
-            let conditionId = constants.bytes32.one
-            let conditionType = accounts[0]
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({conditionType: accounts[0]})
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
@@ -443,8 +386,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('wrong role should not update', async () => {
-            let conditionId = constants.bytes32.one
-            let conditionType = constants.address.dummy
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest()
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             let newState = constants.condition.state.unfulfilled
@@ -458,7 +400,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('no create should not exist', async () => {
-            let conditionId = constants.bytes32.one
+            const { conditionStoreManager, conditionId } = await setupTest({conditionType: accounts[0]})
             assert.strictEqual(false, await conditionStoreManager.exists(conditionId))
         })
     })
