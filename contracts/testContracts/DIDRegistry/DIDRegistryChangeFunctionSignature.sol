@@ -27,7 +27,12 @@ contract DIDRegistryChangeFunctionSignature
 
     mapping(bytes32 => DIDRegister) private didRegister;
 
-    modifier onlyValidDIDArgs(bytes32 did, bytes32 checksum, string value){
+    modifier onlyValidDIDArgs(
+        bytes32 did,
+        bytes32 checksum,
+        string memory value
+    )
+    {
         address currentOwner = didRegister[did].owner;
         require(
             currentOwner == address(0x0) || currentOwner == msg.sender,
