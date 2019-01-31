@@ -110,7 +110,7 @@ contract('ConditionStore constructor', (accounts) => {
 
             let conditionId = constants.bytes32.one
             let conditionType = constants.address.dummy
-            let conditionTimeLock = 10
+            let conditionTimeLock = 1
             let conditionTimeOut = 10
 
             let currentBlockNumber = await epochLibrary.getCurrentBlockNumber()
