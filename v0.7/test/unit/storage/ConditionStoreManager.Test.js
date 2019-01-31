@@ -51,13 +51,10 @@ contract('ConditionStore constructor', (accounts) => {
 
             // setup with zero fails
             let createRole = constants.address.zero
-            try {
-                await conditionStoreManager.setup(createRole)
-            } catch (e) {
-                assert.strictEqual(e.reason, constants.address.error.invalidAddress0x0)
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                conditionStoreManager.setup(createRole),
+                constants.address.error.invalidAddress0x0
+            )
         })
 
         it('anyone should not change createRole after setup', async () => {
@@ -202,13 +199,10 @@ contract('ConditionStore constructor', (accounts) => {
         it('should not transition from uninitialized', async () => {
             const { conditionStoreManager, conditionId } = await setupTest()
             let newState = constants.condition.state.unfulfilled
-            try {
-                await conditionStoreManager.updateConditionState(conditionId, newState)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid UpdateRole')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                conditionStoreManager.updateConditionState(conditionId, newState),
+                'Invalid UpdateRole'
+            )
         })
 
         it('correct role should transition from unfulfilled to fulfilled', async () => {
@@ -236,13 +230,10 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             let newState = constants.condition.state.uninitialized
-            try {
-                await conditionStoreManager.updateConditionState(conditionId, newState)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid state transition')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                conditionStoreManager.updateConditionState(conditionId, newState),
+                'Invalid state transition'
+            )
         })
 
         it('correct role should not transition from unfulfilled to unfulfilled', async () => {
@@ -250,13 +241,10 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             let newState = constants.condition.state.unfulfilled
-            try {
-                await conditionStoreManager.updateConditionState(conditionId, newState)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid state transition')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                conditionStoreManager.updateConditionState(conditionId, newState),
+                'Invalid state transition'
+            )
         })
 
         it('correct role should not transition from fulfilled to unfulfilled', async () => {
@@ -264,13 +252,10 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
-            try {
-                await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.unfulfilled)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid state transition')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                conditionStoreManager.updateConditionState(conditionId, constants.condition.state.unfulfilled),
+                'Invalid state transition'
+            )
         })
 
         it('correct role should not transition from fulfilled to unfulfilled', async () => {
@@ -278,13 +263,10 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
-            try {
-                await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.unfulfilled)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid state transition')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                conditionStoreManager.updateConditionState(conditionId, constants.condition.state.unfulfilled),
+                'Invalid state transition'
+            )
         })
 
         it('correct role should not transition from aborted to unfulfilled', async () => {
@@ -292,13 +274,10 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
-            try {
-                await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.unfulfilled)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid state transition')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                conditionStoreManager.updateConditionState(conditionId, constants.condition.state.unfulfilled),
+                'Invalid state transition'
+            )
         })
 
         it('correct role should not transition from fulfilled to uninitialized', async () => {
@@ -306,13 +285,10 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
-            try {
-                await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.uninitialized)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid state transition')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                conditionStoreManager.updateConditionState(conditionId, constants.condition.state.uninitialized),
+                'Invalid state transition'
+            )
         })
 
         it('correct role should not transition from aborted to uninitialized', async () => {
@@ -320,13 +296,10 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
-            try {
-                await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.uninitialized)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid state transition')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                conditionStoreManager.updateConditionState(conditionId, constants.condition.state.uninitialized),
+                'Invalid state transition'
+            )
         })
 
         it('correct role should not transition from fulfilled to aborted', async () => {
@@ -334,13 +307,10 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
-            try {
-                await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid state transition')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted),
+                'Invalid state transition'
+            )
         })
 
         it('correct role should not transition from aborted to fulfilled', async () => {
@@ -348,13 +318,10 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
-            try {
-                await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid state transition')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled),
+                'Invalid state transition'
+            )
         })
 
         it('correct role should not transition from fulfilled to fulfilled', async () => {
@@ -362,13 +329,10 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
-            try {
-                await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid state transition')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled),
+                'Invalid state transition'
+            )
         })
 
         it('correct role should not transition from aborted to aborted', async () => {
@@ -376,13 +340,10 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
-            try {
-                await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid state transition')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted),
+                'Invalid state transition'
+            )
         })
 
         it('wrong role should not update', async () => {
@@ -390,13 +351,10 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
             let newState = constants.condition.state.unfulfilled
-            try {
-                await conditionStoreManager.updateConditionState(conditionId, newState)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid UpdateRole')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                conditionStoreManager.updateConditionState(conditionId, newState),
+                'Invalid UpdateRole'
+            )
         })
 
         it('no create should not exist', async () => {
