@@ -1,25 +1,21 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
 /* global artifacts, assert, contract, describe, it, before, beforeEach */
-const ZeppelinHelper = require('../../helpers/ZeppelinHelper.js')
 const OceanToken = artifacts.require('OceanToken.sol')
 
 contract('OceanToken', (accounts) => {
     let token
-    let zos
     let spender
 
-    before('restore zos state before all tests', async () => {
-        zos = new ZeppelinHelper('OceanToken')
-        await zos.restoreState(accounts[9])
+    before('restore state before all tests', async () => {
         /* eslint-disable-next-line */
         spender = accounts[1]
     })
 
     describe('transferFrom', () => {
         beforeEach('mint tokens before each test', async () => {
-            await zos.initialize(accounts[0], false)
-            token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
+            token = await OceanToken.new()
+            await token.initialize(accounts[0])
             await token.mint(spender, 1000)
         })
 

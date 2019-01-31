@@ -3,22 +3,15 @@
 
 const DIDRegistry = artifacts.require('DIDRegistry.sol')
 const testUtils = require('../../helpers/utils.js')
-const ZeppelinHelper = require('../../helpers/ZeppelinHelper.js')
 
 const web3 = testUtils.getWeb3()
 
 contract('DIDRegistry', (accounts) => {
     let registry
 
-    before('restore zos state', async () => {
-        let zos = new ZeppelinHelper('DIDRegistry')
-        await zos.restoreState(accounts[9])
-    })
-
     beforeEach(async () => {
-        let zos = new ZeppelinHelper('DIDRegistry')
-        await zos.initialize(accounts[0], false)
-        registry = await DIDRegistry.at(zos.getProxyAddress('DIDRegistry'))
+        registry = await DIDRegistry.new()
+        await registry.initialize(accounts[0])
     })
 
     describe('Register decentralised identifiers with attributes, fetch attributes by DID', () => {
