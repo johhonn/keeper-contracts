@@ -1,0 +1,30 @@
+{
+  "name": "sea-poc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "compile": "truffle compile",
+    "test": "truffle test",
+    "security:surya": "surya graph contracts/**/*.sol | dot -Tpng > analysis/keeper_v0.7.png",
+    "security:mythril": "truffle compile && myth -x --truffle --max-depth 8 --outform markdown 2>&1 | tee analysis/mythrilReport.md || true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oceanprotocol/SEA-poc.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/oceanprotocol/SEA-poc/issues"
+  },
+  "homepage": "https://github.com/oceanprotocol/SEA-poc#readme",
+  "devDependencies": {
+    "openzeppelin-solidity": "^2.1.2",
+    "surya": "^0.2.7",
+    "solc-js": "^0.5.5"
+  }
+}
