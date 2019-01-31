@@ -1,7 +1,7 @@
 const fs = require('fs')
 const glob = require('glob')
 const pkg = require('../package.json')
-
+const { generateFunctionSignaturesInABI } = require('./generateFunctionSignaturesInABI')
 const buildDir = './build/contracts/'
 const outDir = './artifacts/'
 
@@ -22,6 +22,8 @@ function exportArtifacts(name) {
     contractNames.forEach((contractName) => {
         /* eslint-disable-next-line security/detect-non-literal-fs-filename */
         const contract = JSON.parse(fs.readFileSync(`${buildDir}${contractName}.json`, 'utf-8').toString())
+
+        generateFunctionSignaturesInABI(contract.abi)
 
         const artifact = {
             abi: contract.abi,
