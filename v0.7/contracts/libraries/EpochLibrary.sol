@@ -26,7 +26,7 @@ library EpochLibrary {
         _;
     }
 
-    /**
+   /**
     * @notice create creates new Epoch
     * @param _self is the Epoch pointer
     * @param _timeLock value in block count (can not fulfill before)
@@ -41,7 +41,7 @@ library EpochLibrary {
         _self.blockNumber = getCurrentBlockNumber();
     }
 
-    /**
+   /**
     * @notice isTimeOutOver means you cannot fulfill after
     * @param _self is the Epoch pointer
     * @return true if the current block number is gt timeOut
@@ -71,7 +71,7 @@ library EpochLibrary {
         return true;
     }
 
-    /**
+   /**
     * @notice getCurrentBlockNumber get block number
     * @return the current block number
     */
