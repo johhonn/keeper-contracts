@@ -14,18 +14,17 @@ library EpochLibrary {
 
     modifier onlyValidTimeMargin(
         uint256 timeLock,
-        uint256 timeOut
-    )
+        uint256 timeOut)
     {
-        //TODO: check out what is the valid margin value i.e 1 block ?
-        require(
-            (timeLock == 0 && timeOut == 0) ||
-            (timeOut  >= timeLock.add(1)),
-            'Invalid time margin'
-        );
+        uint256 currentBlock = getCurrentBlockNumber();
+        if(timeOut > 0 && timeLock > 0){
+            require(
+                timeLock.add(currentBlock) < timeOut.add(currentBlock),
+                'Invalid time margin'
+            );
+        }
         _;
     }
-
     function create(Epoch storage _self, uint256 _timeLock, uint256 _timeOut)
         public
         onlyValidTimeMargin(_timeLock, _timeOut)
@@ -34,6 +33,28 @@ library EpochLibrary {
         _self.timeOut = _timeOut;
         _self.blockNumber = getCurrentBlockNumber();
     }
+
+
+    function isTimeOutOver(Epoch storage _self)
+        public
+        view
+        returns(bool)
+    {
+        if(_self.timeOut == 0 || _self.timeOut.add(_self.blockNumber) > getCurrentBlockNumber())
+            return false;
+        return true;
+    }
+
+    function isTimeLockOver(Epoch storage _self)
+        public
+        view
+        returns(bool)
+    {
+        if(_self.timeLock == 0 || _self.timeLock.add(_self.blockNumber) > getCurrentBlockNumber())
+            return false;
+        return true;
+    }
+
 
     function getCurrentBlockNumber()
         public
