@@ -17,20 +17,12 @@ library EpochLibrary {
         uint256 timeOut
     )
     {
-        uint256 currentBlock = getCurrentBlockNumber();
-        if(timeLock != 0 && timeOut !=0){
-            require(
-                timeLock >= currentBlock &&
-                timeOut >= timeLock.add(currentBlock + 1),
-                'Invalid time margin'
-            );
-        }
-        else{
-            require(
-                timeLock == 0 && timeOut == 0,
-                'Invalid time window'
-            );
-        }
+        //TODO: check out what is the valid margin value i.e 1 block ?
+        require(
+            (timeLock == 0 && timeOut == 0) ||
+            (timeOut  >= timeLock.add(1)),
+            'Invalid time margin'
+        );
         _;
     }
 
