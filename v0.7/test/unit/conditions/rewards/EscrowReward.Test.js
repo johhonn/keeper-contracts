@@ -5,15 +5,16 @@
 const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 const LockRewardCondition = artifacts.require('LockRewardCondition.sol')
-const constants = require('../../helpers/constants.js')
-const getBalance = require('../../helpers/getBalance.js')
+const EscrowReward = artifacts.require('EscrowReward.sol')
+const constants = require('../../../helpers/constants.js')
+const getBalance = require('../../../helpers/getBalance.js')
 
-contract('LockRewardCondition constructor', (accounts) => {
+contract('EscrowReward constructor', (accounts) => {
     describe('deploy and setup', () => {
         it('contract should deploy', async () => {
             let conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
             let oceanToken = await OceanToken.new({ from: accounts[0] })
-            await LockRewardCondition.new(
+            await EscrowReward.new(
                 conditionStoreManager.address,
                 oceanToken.address,
                 { from: accounts[0] })
@@ -24,6 +25,7 @@ contract('LockRewardCondition constructor', (accounts) => {
         let conditionStoreManager
         let oceanToken
         let lockRewardCondition
+        let escrowReward
         let createRole = accounts[0]
 
         beforeEach(async () => {
@@ -31,6 +33,10 @@ contract('LockRewardCondition constructor', (accounts) => {
             await conditionStoreManager.setup(createRole)
             oceanToken = await OceanToken.new({ from: createRole })
             lockRewardCondition = await LockRewardCondition.new(
+                conditionStoreManager.address,
+                oceanToken.address,
+                { from: createRole })
+            escrowReward = await EscrowReward.new(
                 conditionStoreManager.address,
                 oceanToken.address,
                 { from: createRole })
@@ -38,30 +44,33 @@ contract('LockRewardCondition constructor', (accounts) => {
 
         it('should not fulfill if conditions do not exist', async () => {
             let nonce = constants.bytes32.one
-            let rewardAddress = accounts[2]
+            let lockConditionId = accounts[2]
+            let releaseConditionId = accounts[3]
             let sender = accounts[0]
+            let receiver = accounts[1]
             let amount = 10
 
-            await oceanToken.mint(sender, amount)
-            await oceanToken.approve(
-                lockRewardCondition.address,
-                amount,
-                { from: sender })
-
             try {
-                await lockRewardCondition.fulfill(nonce, rewardAddress, amount)
+                await escrowReward.fulfill(
+                    nonce,
+                    amount,
+                    receiver,
+                    sender,
+                    lockConditionId,
+                    releaseConditionId)
             } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid UpdateRole')
+                assert.strictEqual(e.reason, 'LockCondition needs to be Fulfilled')
                 return
             }
             assert.fail('Expected revert not received')
-        })
+       })
     })
 
     describe('fulfill existing condition', () => {
         let conditionStoreManager
         let oceanToken
         let lockRewardCondition
+        let escrowReward
         let createRole = accounts[0]
 
         beforeEach(async () => {
@@ -72,20 +81,43 @@ contract('LockRewardCondition constructor', (accounts) => {
                 conditionStoreManager.address,
                 oceanToken.address,
                 { from: createRole })
+            escrowReward = await EscrowReward.new(
+                conditionStoreManager.address,
+                oceanToken.address,
+                { from: createRole })
         })
 
         it('should fulfill if conditions exist for account address', async () => {
             let nonce = constants.bytes32.one
-            let rewardAddress = accounts[2]
             let sender = accounts[0]
+            let receiver = accounts[1]
             let amount = 10
 
-            let hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
-            let conditionId = await lockRewardCondition.generateId(nonce, hashValues)
+            let hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
+            let conditionLockId = await lockRewardCondition.generateId(nonce, hashValuesLock)
+
+            await conditionStoreManager.createCondition(
+                conditionLockId,
+                lockRewardCondition.address)
+            
+            let lockConditionId = conditionLockId
+            let releaseConditionId = conditionLockId
+            
+            let hashValues = await escrowReward.hashValues(
+                amount,
+                receiver,
+                sender,
+                lockConditionId,
+                releaseConditionId)
+            let conditionId = await escrowReward.generateId(nonce, hashValues)
+
+            await conditionStoreManager.createCondition(
+                constants.bytes32.one,
+                escrowReward.address)
 
             await conditionStoreManager.createCondition(
                 conditionId,
-                lockRewardCondition.address)
+                escrowReward.address)
 
             await oceanToken.mint(sender, amount)
             await oceanToken.approve(
@@ -93,11 +125,18 @@ contract('LockRewardCondition constructor', (accounts) => {
                 amount,
                 { from: sender })
 
-            await lockRewardCondition.fulfill(nonce, rewardAddress, amount)
-            let { state } = await conditionStoreManager.getCondition(conditionId)
-            assert.strictEqual(constants.condition.state.fulfilled, state.toNumber())
-            let rewardBalance = await getBalance(oceanToken, rewardAddress)
-            assert.strictEqual(rewardBalance, amount)
+            await lockRewardCondition.fulfill(nonce, escrowReward.address, amount)
+
+            await escrowReward.fulfill(
+                nonce,
+                amount,
+                receiver,
+                sender,
+                lockConditionId,
+                releaseConditionId)
+
+            let state = await conditionStoreManager.getConditionState(conditionId)
+            assert.strictEqual(state.toNumber(), constants.condition.state.fulfilled)
         })
     })
 

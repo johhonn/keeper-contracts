@@ -8,33 +8,45 @@ contract LockRewardCondition is Condition {
 
     OceanToken private token;
 
-    constructor(address _conditionStoreManagerAddress, address _tokenAddress) public {
+    constructor(
+        address _conditionStoreManagerAddress,
+        address _tokenAddress
+    )
+        public
+    {
         conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
         token = OceanToken(_tokenAddress);
     }
 
-    function hashValues(address rewardContractAddress, uint256 amount) public pure returns (bytes32) {
-        return keccak256(abi.encodePacked(rewardContractAddress, amount));
+    function hashValues(
+        address _rewardAddress,
+        uint256 _amount
+    )
+        public
+        pure
+        returns (bytes32)
+    {
+        return keccak256(abi.encodePacked(_rewardAddress, _amount));
     }
 
     function fulfill(
-        bytes32 agreementId,
-        address rewardContractAddress,
-        uint256 amount
+        bytes32 _agreementId,
+        address _rewardAddress,
+        uint256 _amount
     )
         public
         returns (ConditionStoreLibrary.ConditionState)
     {
         require(
-            token.transferFrom(msg.sender, address(this), amount),
+            token.transferFrom(msg.sender, address(this), _amount),
             'Could not transfer token'
         );
         require(
-            token.transfer(rewardContractAddress, amount),
+            token.transfer(_rewardAddress, _amount),
             'Could not transfer token'
         );
         return super.fulfill(
-            generateId(agreementId, hashValues(rewardContractAddress, amount)),
+            generateId(_agreementId, hashValues(_rewardAddress, _amount)),
             ConditionStoreLibrary.ConditionState.Fulfilled
         );
     }
