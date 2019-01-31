@@ -35,7 +35,7 @@ contract('HashLockCondition constructor', (accounts) => {
                     constants.condition.hashlock.uint.preimage
                 )
             } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid UpdateRole')
+                assert.strictEqual(e.reason, 'Condition needs to be Unfulfilled')
                 return
             }
             assert.fail('Expected revert not received')
@@ -51,7 +51,7 @@ contract('HashLockCondition constructor', (accounts) => {
                     constants.condition.hashlock.string.preimage
                 )
             } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid UpdateRole')
+                assert.strictEqual(e.reason, 'Condition needs to be Unfulfilled')
                 return
             }
             assert.fail('Expected revert not received')
@@ -67,7 +67,7 @@ contract('HashLockCondition constructor', (accounts) => {
                     constants.condition.hashlock.bytes32.preimage
                 )
             } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid UpdateRole')
+                assert.strictEqual(e.reason, 'Condition needs to be Unfulfilled')
                 return
             }
             assert.fail('Expected revert not received')
@@ -176,7 +176,7 @@ contract('HashLockCondition constructor', (accounts) => {
                     constants.condition.hashlock.uint.preimage + 333,
                 )
             } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid UpdateRole')
+                assert.strictEqual(e.reason, 'Condition needs to be Unfulfilled')
                 return
             }
             assert.fail('Expected revert not received')
@@ -199,7 +199,7 @@ contract('HashLockCondition constructor', (accounts) => {
                     constants.condition.hashlock.uint.preimage + 'some bogus',
                 )
             } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid UpdateRole')
+                assert.strictEqual(e.reason, 'Condition needs to be Unfulfilled')
                 return
             }
             assert.fail('Expected revert not received')
@@ -222,7 +222,7 @@ contract('HashLockCondition constructor', (accounts) => {
                     constants.condition.hashlock.uint.preimage,
                 )
             } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid UpdateRole')
+                assert.strictEqual(e.reason, 'Condition needs to be Unfulfilled')
                 return
             }
             assert.fail('Expected revert not received')
@@ -245,7 +245,7 @@ contract('HashLockCondition constructor', (accounts) => {
                     constants.condition.hashlock.bytes32.preimage,
                 )
             } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid UpdateRole')
+                assert.strictEqual(e.reason, 'Condition needs to be Unfulfilled')
                 return
             }
             assert.fail('Expected revert not received')
@@ -274,7 +274,7 @@ contract('HashLockCondition constructor', (accounts) => {
                     constants.condition.hashlock.uint.preimage,
                 )
             } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid state transition')
+                assert.strictEqual(e.reason, 'Condition needs to be Unfulfilled')
                 return
             }
             assert.fail('Expected revert not received')

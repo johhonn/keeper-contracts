@@ -15,6 +15,14 @@ contract Condition {
         _;
     }
 
+    modifier onlyValidFulfillState(ConditionStoreLibrary.ConditionState _state) {
+        require(
+            _state > ConditionStoreLibrary.ConditionState.Unfulfilled,
+            'New state needs to be higher than Unfulfilled'
+        );
+        _;
+    }
+
     function generateId(
         bytes32 _agreementId,
         bytes32 _valueHash
@@ -32,8 +40,10 @@ contract Condition {
     )
         internal
         onlyUnfulfilled(_id)
+        onlyValidFulfillState(_newState)
         returns (ConditionStoreLibrary.ConditionState)
     {
+        // _newState can be Fulfilled or Aborted
         return conditionStoreManager.updateConditionState(_id, _newState);
     }
 

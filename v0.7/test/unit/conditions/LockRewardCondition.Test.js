@@ -51,7 +51,7 @@ contract('LockRewardCondition constructor', (accounts) => {
             try {
                 await lockRewardCondition.fulfill(nonce, rewardAddress, amount)
             } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid UpdateRole')
+                assert.strictEqual(e.reason, 'Condition needs to be Unfulfilled')
                 return
             }
             assert.fail('Expected revert not received')

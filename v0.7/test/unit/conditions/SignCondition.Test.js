@@ -34,7 +34,7 @@ contract('SignCondition constructor', (accounts) => {
             try {
                 await signCondition.fulfill(nonce, message, publicKey, signature)
             } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid UpdateRole')
+                assert.strictEqual(e.reason, 'Condition needs to be Unfulfilled')
                 return
             }
             assert.fail('Expected revert not received')
@@ -134,7 +134,7 @@ contract('SignCondition constructor', (accounts) => {
             try {
                 await signCondition.fulfill(nonce, message, publicKey, signature)
             } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid state transition')
+                assert.strictEqual(e.reason, 'Condition needs to be Unfulfilled')
                 return
             }
             assert.fail('Expected revert not received')
