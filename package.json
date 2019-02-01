@@ -1,6 +1,6 @@
 {
   "name": "@oceanprotocol/keeper-contracts",
-  "version": "0.6.10",
+  "version": "0.6.12",
   "description": "Integration of TCRs, CPM and Ocean Tokens in Solidity",
   "bugs": {
     "url": "https://github.com/oceanprotocol/keeper-contracts/issues"
@@ -22,7 +22,7 @@
     "test:cover": "export NETWORK='coverage' && solidity-coverage",
     "report-coverage": "cat ./coverage/lcov.info | codacy-coverage --token b95545c0da4b45848cc5eef363c2711e  --prefix ./",
     "release": "./bumpversion.sh patch",
-    "clean": "rm -rf ./build/ ./artifacts/*.development.json ./coverage/ ./coverageEnv/ ./coverage.json zos.* .zos.session wallent.json",
+    "clean": "rm -rf ./build/ ./artifacts/*.development.json ./coverage/ ./coverageEnv/ ./coverage.json ./zos.* ./.zos.session ./wallet.json",
     "lint": "npm run lint:eslint && npm run lint:ethlint",
     "lint:eslint": "eslint --ignore-pattern '/coverage/' .",
     "lint:ethlint": "solium -d ./contracts/",

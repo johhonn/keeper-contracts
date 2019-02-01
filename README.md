@@ -138,14 +138,14 @@ The contract addresses deployed on Ocean Nile testnet:
 
 | Contract                  | Version | Address                                      |
 |---------------------------|---------|----------------------------------------------|
-| AccessConditions          | v0.6.10 | `0x6bd5fdc37b9c87ba73dda230e5dc18e9fda71ff9` |
-| ComputeConditions         | v0.6.10 | `0xb3086de47926bce35327926916b63e1b0c07aada` |
-| DIDRegistry               | v0.6.10 | `0x1c6429a37802ea7541b6bd71d5996a18cc5a95df` |
-| Dispenser                 | v0.6.10 | `0xddd8a7d2ae6bd24bc133842fecbca5357b670134` |
-| FitchainConditions        | v0.6.10 | `0x832a138f90c4170d2f28e40880136c6e9988d914` |
-| OceanToken                | v0.6.10 | `0xf98f9d6726bf2c2e9db9a964c1511908ac8e48e5` |
-| PaymentConditions         | v0.6.10 | `0xcc3784c45c513138c82ebe7b53f65ef6205747b1` |
-| ServiceExecutionAgreement | v0.6.10 | `0x6bb499133842a0a743fd2781ffad4f49a985e66b` |
+| AccessConditions          | v0.6.12 | `0x1be580a31d79a7facf1f5c70d8f2727f2ede75bd` |
+| ComputeConditions         | v0.6.12 | `0x3a0dd5af939cce8df99acadd6a13afa13957cd59` |
+| DIDRegistry               | v0.6.12 | `0x9d306ca587ff4b311c7963e62f48f3d6b59ec1a1` |
+| Dispenser                 | v0.6.12 | `0xb8b0ec3ac0bf28ebb47b3cce4b1b7607dd7fa2db` |
+| FitchainConditions        | v0.6.12 | `0xb875d1126a4d17ef1cccb44707e8585ccd5b854e` |
+| OceanToken                | v0.6.12 | `0x88caa68f41dd7cfdd431bca036e11bd20ef58882` |
+| PaymentConditions         | v0.6.12 | `0xc00b256ff109edaa5a375799cfb7386221863329` |
+| ServiceExecutionAgreement | v0.6.12 | `0xffcb6bea15bbf19dd3bcdc82f1864a92f359284a` |
 
 #### Kovan Testnet
 
@@ -210,9 +210,11 @@ Code style is enforced through the CI test process, builds will fail if there're
 ```Javascript
 const Market = artifacts.require('OceanMarket.sol')
 ...
+
 // get instance of OceanMarket contract
 const market = await Market.deployed()
 ...
+
 // generate resource id
 const name = 'resource name'
 const resourceId = await market.generateId(name, { from: accounts[0] })
