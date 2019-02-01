@@ -109,6 +109,7 @@ async function deployContracts() {
      * setup deployed contracts
      * -----------------------------------------------------------------------
      */
+    console.log(`adding minter ${dispenserAddress} from ${OWNER}`)
     const oceanToken = await OceanToken.at(tokenAddress)
     await oceanToken.addMinter(
         dispenserAddress,

@@ -1,4 +1,4 @@
-pragma solidity 0.4.25;
+pragma solidity 0.5.3;
 
 import '../../SEA/Common.sol';
 import '../../SEA/ServiceExecutionAgreement.sol';
@@ -100,7 +100,7 @@ contract ComputeConditionsChangeFunctionSignature is Common, Initializable {
     function submitHashSignature(
         // changed for testing
         bool exists,
-        bytes signature,
+        bytes calldata signature,
         bytes32 agreementId
     )
         external
