@@ -13,6 +13,7 @@ const constants = require('../../helpers/constants.js')
 contract('ConditionStore constructor', (accounts) => {
     let conditionId
     let conditionType
+
     async function setupTest({
         conditionId = constants.bytes32.one,
         conditionType = constants.address.dummy,
