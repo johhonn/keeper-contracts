@@ -17,13 +17,24 @@ contract Template is Ownable {
         bytes32 indexed templateId
     );
 
-    function _create(bytes32 templateId, address[] memory conditionTypes, address[] memory rewardTypes) internal returns (bool) {
+    function _create(
+        bytes32 templateId,
+        address[] memory conditionTypes,
+        address[] memory rewardTypes
+    )
+        internal
+        returns (bool)
+    {
         templateStore.init(templateId);
-        for(uint256 i=0; i < conditionTypes.length; i++){
+        for(uint256 i = 0; i < conditionTypes.length; i++){
             if(templateStore.addConditionType(templateId, conditionTypes[i])){
                 //TODO: This example implies that condition could have multiple rewards
                 if(rewardTypes[i] != address(0)){
-                    templateStore.addRewardType(templateId, conditionTypes[i], rewardTypes[i]);
+                    templateStore.addRewardType(
+                        templateId,
+                        conditionTypes[i],
+                        rewardTypes[i]
+                    );
                 }
             }
 

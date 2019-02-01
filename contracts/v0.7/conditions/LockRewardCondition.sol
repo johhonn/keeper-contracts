@@ -8,12 +8,20 @@ contract LockRewardCondition is Condition {
 
     OceanToken private token;
 
-    constructor(address _conditionStoreManagerAddress, address _tokenAddress) public {
-        conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
+    constructor(address _conditionStoreManagerAddress, address _tokenAddress)
+        public
+    {
+        conditionStoreManager = ConditionStoreManager(
+            _conditionStoreManagerAddress
+            );
         token = OceanToken(_tokenAddress);
     }
 
-    function hashValues(address rewardContractAddress, uint256 amount) public pure returns (bytes32) {
+    function hashValues(address rewardContractAddress, uint256 amount)
+        public
+        pure
+        returns (bytes32)
+    {
         return keccak256(abi.encodePacked(rewardContractAddress, amount));
     }
 
