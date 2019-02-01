@@ -5,7 +5,6 @@ const OceanToken = artifacts.require('OceanToken.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const FitchainConditions = artifacts.require('FitchainConditions.sol')
-const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
 const testUtils = require('../helpers/utils')
 const { hashAgreement } = require('../helpers/hashAgreement.js')
 
@@ -13,7 +12,7 @@ const web3 = testUtils.getWeb3()
 
 contract('FitchainConditions', (accounts) => {
     describe('Test integration of Fitchain conditions in SEA', () => {
-        let token, agreement, paymentConditions, valuesHashList, serviceId, conditionKeys
+        let token, sea, paymentConditions, valuesHashList, serviceId, conditionKeys
         let fingerPrints, contracts, agreementId, slaMsgHash, signature, fitchainConditions, GPCVerifiers, VPCVerifiers, i, myFreeSlots
 
         const publisher = accounts[0]
@@ -34,15 +33,15 @@ contract('FitchainConditions', (accounts) => {
         agreementId = testUtils.generateId()
         GPCVerifiers = []
         VPCVerifiers = []
+
         before(async () => {
-            let zos = new ZeppelinHelper('FitchainConditions')
-            await zos.restoreState(accounts[9])
-            zos.addDependency('PaymentConditions')
-            await zos.initialize(accounts[0], false)
-            token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
-            agreement = await ServiceExecutionAgreement.at(zos.getProxyAddress('ServiceExecutionAgreement'))
-            paymentConditions = await PaymentConditions.at(zos.getProxyAddress('PaymentConditions'))
-            fitchainConditions = await FitchainConditions.at(zos.getProxyAddress('FitchainConditions'))
+            token = await OceanToken.new()
+            await token.initialize(accounts[0])
+            sea = await ServiceExecutionAgreement.new()
+            paymentConditions = await PaymentConditions.new()
+            await paymentConditions.initialize(sea.address, token.address)
+            fitchainConditions = await FitchainConditions.new()
+            await fitchainConditions.initialize(sea.address, 10, 1)
 
             await token.mint(consumer, 1000)
             await token.mint(publisher, 1000)
@@ -52,7 +51,14 @@ contract('FitchainConditions', (accounts) => {
             await token.mint(verifier4, 1000)
 
             // conditions
-            contracts = [paymentConditions.address, fitchainConditions.address, fitchainConditions.address, paymentConditions.address, paymentConditions.address]
+            contracts = [
+                paymentConditions.address,
+                fitchainConditions.address,
+                fitchainConditions.address,
+                paymentConditions.address,
+                paymentConditions.address
+            ]
+
             fingerPrints = [
                 testUtils.getSelector(web3, paymentConditions, 'lockPayment'),
                 testUtils.getSelector(web3, fitchainConditions, 'setPoT'),
@@ -69,7 +75,7 @@ contract('FitchainConditions', (accounts) => {
                 testUtils.valueHash(['bytes32', 'uint256'], [did, price])
             ]
             // create new on-premise compute template
-            const createAgreementTemplate = await agreement.setupTemplate(
+            const createAgreementTemplate = await sea.setupTemplate(
                 serviceTemplateId,
                 contracts,
                 fingerPrints,
@@ -89,7 +95,7 @@ contract('FitchainConditions', (accounts) => {
             )
             signature = await web3.eth.sign(slaMsgHash, consumer)
             serviceId = await testUtils.initializeAgreement(
-                agreement, templateId, signature,
+                sea, templateId, signature,
                 consumer, valuesHashList, timeouts,
                 agreementId, did, { from: publisher }
             )
@@ -102,7 +108,7 @@ contract('FitchainConditions', (accounts) => {
         it('should data scientist locks payment for the data-compute provider', async () => {
             await token.approve(paymentConditions.address, price, { from: consumer })
             await paymentConditions.lockPayment(serviceId, did, price, { from: consumer })
-            const locked = await agreement.getConditionStatus(agreementId, conditionKeys[0])
+            const locked = await sea.getConditionStatus(agreementId, conditionKeys[0])
             assert.strictEqual(locked.toNumber(), 1, 'Error: Unable to lock payment!')
         })
         it('should verifiers register and stake based on the number of slots', async () => {

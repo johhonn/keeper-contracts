@@ -1,9 +1,13 @@
 pragma solidity ^0.4.15;
 
+import 'openzeppelin-eth/contracts/math/SafeMath.sol';
 
 /// @title Multisignature wallet - Allows multiple parties to agree on transactions before execution.
 /// @author Stefan George - <stefan.george@consensys.net>
 contract MultiSigWallet {
+
+    using SafeMath for uint256;
+    using SafeMath for uint;
 
     /*
      *  Events
@@ -166,9 +170,10 @@ contract MultiSigWallet {
         ownerExists(owner)
     {
         isOwner[owner] = false;
-        for (uint i=0; i<owners.length - 1; i++)
+        uint256 ownersNewCount = owners.length.sub(1);
+        for (uint i=0; i< ownersNewCount ; i++)
             if (owners[i] == owner) {
-                owners[i] = owners[owners.length - 1];
+                owners[i] = owners[ownersNewCount];
                 break;
             }
         owners.length -= 1;

@@ -1,7 +1,5 @@
 /* eslint-env mocha */
 /* global artifacts, assert, contract, describe, it, before, beforeEach */
-
-const ZeppelinHelper = require('../../../helpers/ZeppelinHelper.js')
 const ComputeConditions = artifacts.require('ComputeConditions.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 
@@ -13,7 +11,6 @@ const { initializeAgreement } = require('../../../helpers/initializeAgreement.js
 const web3 = testUtils.getWeb3()
 
 contract('ComputeConditions', (accounts) => {
-    let zos
     let sea
     let computeConditions
     /* eslint-disable-next-line prefer-destructuring */
@@ -25,15 +22,10 @@ contract('ComputeConditions', (accounts) => {
     let timeoutValues
     let agreementId
 
-    before(async () => {
-        zos = new ZeppelinHelper('ComputeConditions')
-        await zos.restoreState(accounts[9])
-    })
-
     beforeEach(async () => {
-        await zos.initialize(accounts[0], false)
-        sea = await ServiceExecutionAgreement.at(zos.getProxyAddress('ServiceExecutionAgreement'))
-        computeConditions = await ComputeConditions.at(zos.getProxyAddress('ComputeConditions'))
+        sea = await ServiceExecutionAgreement.new()
+        computeConditions = await ComputeConditions.new()
+        await computeConditions.initialize(sea.address)
 
         contracts = [computeConditions.address]
         fingerprints = [testUtils.getSelector(web3, ComputeConditions, 'fulfillUpload')]
@@ -83,11 +75,14 @@ contract('ComputeConditions', (accounts) => {
             // arrange
             await initializeAgreementWithValues()
 
-            // act
-            const result = await computeConditions.fulfillUpload(agreementId, testUtils.emptyBytes32, { from: accounts[0] })
-
-            // assert
-            testUtils.assertEmitted(result, 1, 'ProofOfUploadValid')
+            // act and assert (expected: invalid signature or hash size)
+            await testUtils.assertRevert(
+                computeConditions.fulfillUpload(
+                    agreementId,
+                    testUtils.emptyBytes32,
+                    { from: accounts[0] }
+                )
+            )
         })
 
         it('Should not fulfill upload when hash exists, signature is not valid', async () => {
@@ -95,11 +90,14 @@ contract('ComputeConditions', (accounts) => {
             await initializeAgreementWithValues()
             await computeConditions.submitHashSignature(agreementId, testUtils.emptyBytes32, { from: consumer })
 
-            // act
-            const result = await computeConditions.fulfillUpload(agreementId, testUtils.emptyBytes32, { from: accounts[0] })
-
-            // assert
-            testUtils.assertEmitted(result, 1, 'ProofOfUploadInvalid')
+            // act and assert (expected: invalid signature or hash size)
+            await testUtils.assertRevert(
+                computeConditions.fulfillUpload(
+                    agreementId,
+                    testUtils.emptyBytes32,
+                    { from: accounts[0] }
+                )
+            )
         })
 
         it('Should not fulfill upload when unfulfilled dependencies exist', async () => {
