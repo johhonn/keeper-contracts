@@ -1,7 +1,5 @@
 /* eslint-env mocha */
 /* global artifacts, assert, contract, describe, it, before, beforeEach */
-
-const ZeppelinHelper = require('../../../helpers/ZeppelinHelper.js')
 const ComputeConditions = artifacts.require('ComputeConditions.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 
@@ -13,7 +11,6 @@ const { initializeAgreement } = require('../../../helpers/initializeAgreement.js
 const web3 = testUtils.getWeb3()
 
 contract('ComputeConditions', (accounts) => {
-    let zos
     let sea
     let computeConditions
     /* eslint-disable-next-line prefer-destructuring */
@@ -25,15 +22,10 @@ contract('ComputeConditions', (accounts) => {
     let timeoutValues
     let agreementId
 
-    before(async () => {
-        zos = new ZeppelinHelper('ComputeConditions')
-        await zos.restoreState(accounts[9])
-    })
-
     beforeEach(async () => {
-        await zos.initialize(accounts[0], false)
-        sea = await ServiceExecutionAgreement.at(zos.getProxyAddress('ServiceExecutionAgreement'))
-        computeConditions = await ComputeConditions.at(zos.getProxyAddress('ComputeConditions'))
+        sea = await ServiceExecutionAgreement.new()
+        computeConditions = await ComputeConditions.new()
+        await computeConditions.initialize(sea.address)
 
         contracts = [computeConditions.address]
         fingerprints = [testUtils.getSelector(web3, ComputeConditions, 'fulfillUpload')]
