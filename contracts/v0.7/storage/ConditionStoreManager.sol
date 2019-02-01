@@ -102,8 +102,15 @@ contract ConditionStoreManager {
         return conditionList.updateState(_id, _newState);
     }
 
-    function exists(bytes32 _id) public view returns (bool) {
-        return conditionList.conditions[_id].state != ConditionStoreLibrary.ConditionState.Uninitialized;
+    function exists(bytes32 _id)
+        public
+        view
+        returns (bool)
+    {
+        return (
+                conditionList.conditions[_id].state !=
+                ConditionStoreLibrary.ConditionState.Uninitialized
+        );
     }
 
     function getCondition(bytes32 _id)
