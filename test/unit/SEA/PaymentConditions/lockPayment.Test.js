@@ -1,8 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
 /* global artifacts, assert, contract, describe, it , before, beforeEach */
-
-const ZeppelinHelper = require('../../../helpers/ZeppelinHelper.js')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
@@ -24,20 +22,15 @@ contract('PaymentConditions', (accounts) => {
     let valueHashes
     let timeoutValues
     let agreementId
-    let zos
-
-    before(async () => {
-        zos = new ZeppelinHelper('PaymentConditions')
-        await zos.restoreState(accounts[9])
-    })
 
     beforeEach(async () => {
-        await zos.initialize(accounts[0], false)
-        sea = await ServiceExecutionAgreement.at(zos.getProxyAddress('ServiceExecutionAgreement'))
-        token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
-        await token.mint(consumer, 1000)
+        sea = await ServiceExecutionAgreement.new()
+        token = await OceanToken.new()
+        await token.initialize(accounts[0])
+        paymentConditions = await PaymentConditions.new()
+        await paymentConditions.initialize(sea.address, token.address)
 
-        paymentConditions = await PaymentConditions.at(zos.getProxyAddress('PaymentConditions'))
+        await token.mint(consumer, 1000)
 
         price = 1
         contracts = [paymentConditions.address]

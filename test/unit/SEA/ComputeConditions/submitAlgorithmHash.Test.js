@@ -1,7 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
 /* global artifacts, assert, contract, describe, it, before, beforeEach */
-const ZeppelinHelper = require('../../../helpers/ZeppelinHelper.js')
 const ComputeConditions = artifacts.require('ComputeConditions.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const testUtils = require('../../../helpers/utils.js')
@@ -20,17 +19,11 @@ contract('ComputeConditions', (accounts) => {
     let valueHashes
     let timeoutValues
     let agreementId
-    let zos
-
-    before(async () => {
-        zos = new ZeppelinHelper('ComputeConditions')
-        await zos.restoreState(accounts[9])
-    })
 
     beforeEach(async () => {
-        await zos.initialize(accounts[0], false)
-        sea = await ServiceExecutionAgreement.at(zos.getProxyAddress('ServiceExecutionAgreement'))
-        computeConditions = await ComputeConditions.at(zos.getProxyAddress('ComputeConditions'))
+        sea = await ServiceExecutionAgreement.new()
+        computeConditions = await ComputeConditions.new()
+        await computeConditions.initialize(sea.address)
 
         contracts = [computeConditions.address]
         fingerprints = [testUtils.getSelector(web3, ComputeConditions, 'fulfillUpload')]
@@ -81,12 +74,14 @@ contract('ComputeConditions', (accounts) => {
             await initializeAgreementWithValues()
             await computeConditions.submitAlgorithmHash(agreementId, testUtils.emptyBytes32, { from: accounts[0] })
 
-            // act
-            const result = await computeConditions.submitAlgorithmHash(agreementId, testUtils.emptyBytes32, { from: accounts[0] })
-
-            // assert
-            testUtils.assertEmitted(result, 1, 'HashSubmitted')
-            testUtils.assertEmitted(result, 1, 'ProofOfUploadInvalid')
+            // act-assert
+            try {
+                await computeConditions.submitAlgorithmHash(agreementId, testUtils.emptyBytes32, { from: accounts[0] })
+            } catch (e) {
+                assert.strictEqual(e.reason, 'invalid signature or hash size')
+                return
+            }
+            assert.fail('Expected revert not received on invalid submission of the signature')
         })
     })
 })
