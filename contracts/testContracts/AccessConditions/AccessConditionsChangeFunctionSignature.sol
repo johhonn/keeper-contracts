@@ -1,4 +1,4 @@
-pragma solidity 0.4.25;
+pragma solidity 0.5.3;
 
 import '../../SEA/ServiceExecutionAgreement.sol';
 import '../../SEA/ISecretStore.sol';
@@ -86,7 +86,7 @@ contract AccessConditionsChangeFunctionSignature
         );
 
         if (agreementStorage.hasUnfulfilledDependencies(agreementId, condition))
-            return;
+            return false;
 
         // removed for testing
         /*

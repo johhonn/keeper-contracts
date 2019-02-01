@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.3;
 
 import '../storage/TemplateStore.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';

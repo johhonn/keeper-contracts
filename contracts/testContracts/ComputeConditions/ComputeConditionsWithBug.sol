@@ -1,4 +1,4 @@
-pragma solidity 0.4.25;
+pragma solidity 0.5.3;
 
 import '../../SEA/Common.sol';
 import '../../SEA/ServiceExecutionAgreement.sol';
@@ -99,7 +99,7 @@ contract ComputeConditionsWithBug is Common, Initializable {
     */
     function submitHashSignature(
         bytes32 agreementId,
-        bytes signature
+        bytes calldata signature
     )
         external
         // add bug here
