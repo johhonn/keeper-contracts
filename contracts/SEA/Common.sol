@@ -34,6 +34,10 @@ contract Common {
             address recoveredAddress
         )
     {
+        require(
+            signature.length == 65 && hash.length == 32,
+            'invalid signature or hash size'
+        );
         return ECDSA.recover(hash, signature);
     }
 }

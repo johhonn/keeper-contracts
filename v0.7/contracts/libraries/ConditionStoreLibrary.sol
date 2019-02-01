@@ -1,6 +1,6 @@
 pragma solidity 0.5.0;
 
-import './EpochLibrary.sol';
+import { EpochLibrary } from './EpochLibrary.sol';
 
 library ConditionStoreLibrary {
 
@@ -18,6 +18,7 @@ library ConditionStoreLibrary {
         mapping(bytes32 => Condition) conditions;
         bytes32[] conditionIds;
     }
+
 
     modifier onlyValidStateTransition(
         ConditionList storage _self,
@@ -42,21 +43,15 @@ library ConditionStoreLibrary {
         ConditionList storage _self,
         bytes32 _id,
         address _typeRef,
-        uint _timeLock,
-        uint _timeOut
+        uint256 _timeLock,
+        uint256 _timeOut
     )
         internal
         returns (uint size)
     {
-        _self.conditions[_id] = Condition({
-            typeRef: _typeRef,
-            state: ConditionState.Unfulfilled,
-            epoch: EpochLibrary.Epoch({
-                timeLock: _timeLock,
-                timeOut: _timeOut,
-                blockNumber: EpochLibrary.getCurrentBlockNumber()
-            })
-        });
+        _self.conditions[_id].typeRef = _typeRef;
+        _self.conditions[_id].state = ConditionState.Unfulfilled;
+        _self.conditions[_id].epoch.create(_timeLock, _timeOut);
         _self.conditionIds.push(_id);
         return _self.conditionIds.length;
     }

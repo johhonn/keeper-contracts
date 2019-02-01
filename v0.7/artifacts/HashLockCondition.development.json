@@ -1,0 +1,218 @@
+{
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "agreementId",
+          "type": "bytes32"
+        },
+        {
+          "name": "valueHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "generateId",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0xcb4e57e8"
+    },
+    {
+      "inputs": [
+        {
+          "name": "_conditionStoreManagerAddress",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor",
+      "signature": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "agreementId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "_type",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "id",
+          "type": "bytes32"
+        }
+      ],
+      "name": "ConditionFulfilled",
+      "type": "event",
+      "signature": "0x88f49caff85283284af1610d2474b1f2552b9490b97212581828ef5ea3110f7e"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "preimage",
+          "type": "bytes32"
+        }
+      ],
+      "name": "hashValues",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function",
+      "signature": "0x80d16806"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "preimage",
+          "type": "uint256"
+        }
+      ],
+      "name": "hashValues",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function",
+      "signature": "0xb613eb5c"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "preimage",
+          "type": "bytes"
+        }
+      ],
+      "name": "hashValues",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function",
+      "signature": "0xca08ce43"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "preimage",
+          "type": "string"
+        }
+      ],
+      "name": "hashValues",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function",
+      "signature": "0xd0ac9b09"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_agreementId",
+          "type": "bytes32"
+        },
+        {
+          "name": "_preimage",
+          "type": "bytes32"
+        }
+      ],
+      "name": "fulfill",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x042f2b65"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_agreementId",
+          "type": "bytes32"
+        },
+        {
+          "name": "_preimage",
+          "type": "string"
+        }
+      ],
+      "name": "fulfill",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x37441996"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_agreementId",
+          "type": "bytes32"
+        },
+        {
+          "name": "_preimage",
+          "type": "uint256"
+        }
+      ],
+      "name": "fulfill",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x4357855e"
+    }
+  ],
+  "bytecode": "0x608060405234801561001057600080fd5b506040516020806105dd8339810180604052602081101561003057600080fd5b505160008054600160a060020a03909216600160a060020a031990921691909117905561057b806100626000396000f3fe60806040526004361061008d5763ffffffff7c0100000000000000000000000000000000000000000000000000000000600035041663042f2b65811461009257806337441996146100e65780634357855e1461009257806380d16806146101a0578063b613eb5c146101a0578063ca08ce43146101dc578063cb4e57e81461028f578063d0ac9b09146102bf575b600080fd5b34801561009e57600080fd5b506100c2600480360360408110156100b557600080fd5b5080359060200135610372565b604051808260038111156100d257fe5b60ff16815260200191505060405180910390f35b3480156100f257600080fd5b506100c26004803603604081101561010957600080fd5b8135919081019060408101602082013564010000000081111561012b57600080fd5b82018360208201111561013d57600080fd5b8035906020019184600183028401116401000000008311171561015f57600080fd5b91908080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250929550610395945050505050565b3480156101ac57600080fd5b506101ca600480360360208110156101c357600080fd5b50356103a7565b60408051918252519081900360200190f35b3480156101e857600080fd5b506101ca600480360360208110156101ff57600080fd5b81019060208101813564010000000081111561021a57600080fd5b82018360208201111561022c57600080fd5b8035906020019184600183028401116401000000008311171561024e57600080fd5b91908080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920191909152509295506103d7945050505050565b34801561029b57600080fd5b506101ca600480360360408110156102b257600080fd5b50803590602001356103e2565b3480156102cb57600080fd5b506101ca600480360360208110156102e257600080fd5b8101906020810181356401000000008111156102fd57600080fd5b82018360208201111561030f57600080fd5b8035906020019184600183028401116401000000008311171561033157600080fd5b91908080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250929550610423945050505050565b600061038e61038984610384856103a7565b6103e2565b610494565b9392505050565b600061038e6103898461038485610423565b60006103d182604051602001808281526020019150506040516020818303038152906040526103d7565b92915050565b805160209091012090565b60408051602080820194909452306c010000000000000000000000000281830152605480820193909352815180820390930183526074019052805191012090565b60006103d1826040516020018082805190602001908083835b6020831061045b5780518252601f19909201916020918201910161043c565b6001836020036101000a0380198251168184511680821785525050505050509050019150506040516020818303038152906040526103d7565b600080546040517f52bc0e46000000000000000000000000000000000000000000000000000000008152600481018481526103d1928592600292869273ffffffffffffffffffffffffffffffffffffffff16916352bc0e469186918691906024018260ff16815260200192505050602060405180830381600087803b15801561051c57600080fd5b505af1158015610530573d6000803e3d6000fd5b505050506040513d602081101561054657600080fd5b5051939250505056fea165627a7a72305820819e6bf3b3b5172cd58991e2996a0c0b31e408a1d5f5e838cbfc71ef98b687ba0029",
+  "address": "0x53528b326424EDf7Bd6626775554D323426dcDC6",
+  "version": "v1.0.0"
+}

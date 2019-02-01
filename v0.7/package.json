@@ -23,8 +23,10 @@
   },
   "homepage": "https://github.com/oceanprotocol/SEA-poc#readme",
   "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
     "openzeppelin-solidity": "^2.1.2",
-    "surya": "^0.2.7",
-    "solc-js": "^0.5.5"
+    "solc-js": "^0.5.5",
+    "surya": "^0.2.7"
   }
 }
