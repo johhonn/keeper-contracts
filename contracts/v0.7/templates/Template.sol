@@ -25,7 +25,7 @@ contract Template is Initializable, Ownable {
         internal
         returns (bool)
     {
-        templateStore.init(templateId);
+        templateStore.setup(templateId);
         for(uint256 i = 0; i < conditionTypes.length; i++){
             if(templateStore.addConditionType(templateId, conditionTypes[i])){
                 //TODO: This example implies that condition could have multiple rewards

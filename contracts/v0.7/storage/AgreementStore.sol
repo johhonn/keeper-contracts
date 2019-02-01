@@ -36,28 +36,12 @@ contract AgreementStore is Initializable {
         bytes32[] memory rewardIds,
         bytes32 did
     ) public returns (bool) {
-<<<<<<< HEAD
-        _agreements[agreementId] = Agreement(templateId, did, conditionIds, rewardIds);
-=======
-
-//        for(uint256 i = 0; i < _templates[templateId].conditionTypes.length; i++) {
-//            //TODO: replace msg.sender with condition owner
-//            _conditionStore.create(
-//                conditionIds[i], _templates[templateId].conditionTypes[i]);
-//        }
-//
-//        for(uint256 j = 0; j < _templates[templateId].rewardTypes.length; j++) {
-//            //TODO: replace msg.sender with condition owner
-//            _conditionStore.create(rewardIds[j], _templates[templateId].rewardTypes[j]);
-//        }
-
         _agreements[agreementId] = Agreement(
             templateId,
             did,
             conditionIds,
             rewardIds
             );
->>>>>>> 46aa0c440e79842b74f45b357e0fbd8113f6decc
         return true;
     }
 
