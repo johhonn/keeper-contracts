@@ -4,7 +4,7 @@
 
 const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
 const HashLockCondition = artifacts.require('HashLockCondition.sol')
-const constants = require('../../helpers/constants.js')
+const constants = require('../helpers/constants.js')
 
 contract('HashLockCondition constructor', (accounts) => {
 
