@@ -2,13 +2,19 @@ pragma solidity 0.5.3;
 
 import './Condition.sol';
 import '../OceanToken.sol';
-import '../libraries/ConditionStoreLibrary.sol';
+import 'zos-lib/contracts/Initializable.sol';
 
-contract LockRewardCondition is Condition {
+contract LockRewardCondition is Initializable, Condition {
 
     OceanToken private token;
 
-    constructor(address _conditionStoreManagerAddress, address _tokenAddress) public {
+    function initialize(
+        address _conditionStoreManagerAddress,
+        address _tokenAddress
+    )
+        public
+        initializer()
+    {
         conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
         token = OceanToken(_tokenAddress);
     }

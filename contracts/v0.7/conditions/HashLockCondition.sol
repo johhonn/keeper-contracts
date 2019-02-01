@@ -1,10 +1,14 @@
 pragma solidity 0.5.3;
 
 import './Condition.sol';
+import 'zos-lib/contracts/Initializable.sol';
 
-contract HashLockCondition is Condition {
+contract HashLockCondition is Initializable, Condition {
 
-    constructor(address _conditionStoreManagerAddress) public {
+    function initialize(address _conditionStoreManagerAddress)
+        public
+        initializer()
+    {
         conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
     }
 

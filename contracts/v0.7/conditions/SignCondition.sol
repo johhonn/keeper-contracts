@@ -3,10 +3,14 @@ pragma solidity 0.5.3;
 import './Condition.sol';
 import '../libraries/ConditionStoreLibrary.sol';
 import 'openzeppelin-eth/contracts/cryptography/ECDSA.sol';
+import 'zos-lib/contracts/Initializable.sol';
 
-contract SignCondition is Condition {
+contract SignCondition is Initializable, Condition {
 
-    constructor(address _conditionStoreManagerAddress) public {
+    function initialize(address _conditionStoreManagerAddress)
+        public
+        initializer()
+    {
         conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
     }
 

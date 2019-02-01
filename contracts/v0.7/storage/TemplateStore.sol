@@ -28,7 +28,7 @@ contract TemplateStore {
         _;
     }
 
-    function init(bytes32 templateId)
+    function setup(bytes32 templateId)
     public
     onlyValidTemplateId(templateId)
     {
