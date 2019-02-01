@@ -4,7 +4,7 @@ import './Condition.sol';
 import '../OceanToken.sol';
 import '../libraries/ConditionStoreLibrary.sol';
 
-contract LockPaymentCondition is Condition {
+contract LockRewardCondition is Condition {
 
     OceanToken private token;
 
@@ -23,7 +23,6 @@ contract LockPaymentCondition is Condition {
         uint256 amount
     )
         public
-        payable
         returns (ConditionStoreLibrary.ConditionState)
     {
         require(
