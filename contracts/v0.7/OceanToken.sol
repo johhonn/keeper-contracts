@@ -2,6 +2,7 @@ pragma solidity 0.5.3;
 
 import 'openzeppelin-eth/contracts/token/ERC20/ERC20Capped.sol';
 import 'openzeppelin-eth/contracts/token/ERC20/ERC20Detailed.sol';
+import 'zos-lib/contracts/Initializable.sol';
 
 
 /**
@@ -9,7 +10,7 @@ import 'openzeppelin-eth/contracts/token/ERC20/ERC20Detailed.sol';
  * @author Ocean Protocol Team
  * @dev All function calls are currently implemented without side effects
  */
-contract OceanToken is ERC20Detailed, ERC20Capped {
+contract OceanToken is Initializable, ERC20Detailed, ERC20Capped {
 
     using SafeMath for uint256;
 
@@ -17,11 +18,17 @@ contract OceanToken is ERC20Detailed, ERC20Capped {
     * @dev OceanToken Initializer
     * Runs only on initial contract creation.
     */
-    constructor()
+    function initialize(
+        address _minter
+    )
         public
-        ERC20Detailed('OceanToken', 'OCN', 18)
-        ERC20Capped(1400000000 * 10 ** 18)
-    {}
+        initializer()
+    {
+        uint256 CAP = 1400000000;
+        uint256 TOTALSUPPLY = CAP.mul(10 ** 18);
+        ERC20Detailed.initialize('OceanToken', 'OCN', 18);
+        ERC20Capped.initialize(TOTALSUPPLY, _minter);
+    }
 
     /**
     * @dev Transfer token for a specified address when not paused
