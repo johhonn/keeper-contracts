@@ -4,7 +4,7 @@
 
 const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
 const SignCondition = artifacts.require('SignCondition.sol')
-const constants = require('../../helpers/constants.js')
+const constants = require('../helpers/constants.js')
 
 contract('SignCondition constructor', (accounts) => {
     describe('deploy and setup', () => {
