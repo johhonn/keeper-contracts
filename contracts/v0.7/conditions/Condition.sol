@@ -6,10 +6,27 @@ import 'zos-lib/contracts/Initializable.sol';
 contract Condition is Initializable {
     ConditionStoreManager internal conditionStoreManager;
 
-    event ConditionFulfilled(bytes32 indexed agreementId, address indexed _type, bytes32 id);
+    event ConditionFulfilled(
+        bytes32 indexed agreementId,
+        address indexed _type,
+        bytes32 id
+    );
 
-    function generateId(bytes32 agreementId, bytes32 valueHash) public view returns (bytes32){
-        return keccak256(abi.encodePacked(agreementId, address(this), valueHash));
+    function generateId(
+        bytes32 agreementId,
+        bytes32 valueHash
+    )
+        public
+        view
+        returns (bytes32)
+    {
+        return keccak256(
+            abi.encodePacked(
+                agreementId,
+                address(this),
+                valueHash
+            )
+        );
     }
 
     function fulfill(

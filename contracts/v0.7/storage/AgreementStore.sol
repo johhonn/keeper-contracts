@@ -36,19 +36,55 @@ contract AgreementStore is Initializable {
         bytes32[] memory rewardIds,
         bytes32 did
     ) public returns (bool) {
+<<<<<<< HEAD
         _agreements[agreementId] = Agreement(templateId, did, conditionIds, rewardIds);
+=======
+
+//        for(uint256 i = 0; i < _templates[templateId].conditionTypes.length; i++) {
+//            //TODO: replace msg.sender with condition owner
+//            _conditionStore.create(
+//                conditionIds[i], _templates[templateId].conditionTypes[i]);
+//        }
+//
+//        for(uint256 j = 0; j < _templates[templateId].rewardTypes.length; j++) {
+//            //TODO: replace msg.sender with condition owner
+//            _conditionStore.create(rewardIds[j], _templates[templateId].rewardTypes[j]);
+//        }
+
+        _agreements[agreementId] = Agreement(
+            templateId,
+            did,
+            conditionIds,
+            rewardIds
+            );
+>>>>>>> 46aa0c440e79842b74f45b357e0fbd8113f6decc
         return true;
     }
 
-    function create(bytes32 id, address[] memory conditionTypes, address[] memory rewardTypes) public returns (bool) {
+    function create(
+        bytes32 id,
+        address[] memory conditionTypes,
+        address[] memory rewardTypes
+    )
+        public
+        returns (bool)
+    {
         _templates[id] = Template(conditionTypes, rewardTypes);
     }
 
-    function getConditionTypes(bytes32 id) public view returns (address[] memory) {
+    function getConditionTypes(bytes32 id)
+        public
+        view
+        returns (address[] memory)
+    {
         return _templates[id].conditionTypes;
     }
 
-    function getRewardTypes(bytes32 id) public view returns (address[] memory) {
+    function getRewardTypes(bytes32 id)
+        public
+        view
+        returns (address[] memory)
+    {
         return _templates[id].rewardTypes;
     }
 }
