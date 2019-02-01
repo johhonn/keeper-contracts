@@ -130,7 +130,8 @@ async function deployContracts() {
      * export artifacts
      * -----------------------------------------------------------------------
      */
-    exportArtifacts()
+    const { name } = require('../zos.json')
+    exportArtifacts(name)
 }
 
 module.exports = (cb) => {
