@@ -12,19 +12,36 @@ contract HashLockCondition is Initializable, Condition {
         conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
     }
 
-    function hashValues(uint256 preimage) public pure returns (bytes32) {
+    function hashValues(uint256 preimage)
+        public
+        pure
+        returns (bytes32)
+    {
         return hashValues(abi.encodePacked(preimage));
     }
 
-    function hashValues(string memory preimage) public pure returns (bytes32) {
+    function hashValues(string memory preimage)
+        public
+        pure
+        returns (bytes32)
+    {
         return hashValues(abi.encodePacked(preimage));
     }
 
-    function hashValues(bytes32 preimage) public pure returns (bytes32) {
+    function hashValues(bytes32 preimage)
+        public
+        pure
+        returns
+        (bytes32)
+    {
         return hashValues(abi.encodePacked(preimage));
     }
 
-    function hashValues(bytes memory preimage) public pure returns (bytes32) {
+    function hashValues(bytes memory preimage)
+        public
+        pure
+        returns (bytes32)
+    {
         return keccak256(preimage);
     }
 

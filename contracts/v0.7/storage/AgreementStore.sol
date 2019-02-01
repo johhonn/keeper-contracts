@@ -48,19 +48,39 @@ contract AgreementStore {
 //            _conditionStore.create(rewardIds[j], _templates[templateId].rewardTypes[j]);
 //        }
 
-        _agreements[agreementId] = Agreement(templateId, did, conditionIds, rewardIds);
+        _agreements[agreementId] = Agreement(
+            templateId,
+            did,
+            conditionIds,
+            rewardIds
+            );
         return true;
     }
 
-    function create(bytes32 id, address[] memory conditionTypes, address[] memory rewardTypes) public returns (bool) {
+    function create(
+        bytes32 id,
+        address[] memory conditionTypes,
+        address[] memory rewardTypes
+    )
+        public
+        returns (bool)
+    {
         _templates[id] = Template(conditionTypes, rewardTypes);
     }
 
-    function getConditionTypes(bytes32 id) public view returns (address[] memory) {
+    function getConditionTypes(bytes32 id)
+        public
+        view
+        returns (address[] memory)
+    {
         return _templates[id].conditionTypes;
     }
 
-    function getRewardTypes(bytes32 id) public view returns (address[] memory) {
+    function getRewardTypes(bytes32 id)
+        public
+        view
+        returns (address[] memory)
+    {
         return _templates[id].rewardTypes;
     }
 }

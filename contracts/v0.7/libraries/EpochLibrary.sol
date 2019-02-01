@@ -51,7 +51,9 @@ library EpochLibrary {
         view
         returns(bool)
     {
-        if(_self.timeOut == 0 || _self.timeOut.add(_self.blockNumber) > getCurrentBlockNumber())
+        uint256 currentBlock = getCurrentBlockNumber();
+        if((_self.timeOut == 0) ||
+           (_self.timeOut.add(_self.blockNumber) > currentBlock))
             return false;
         return true;
     }
@@ -66,7 +68,9 @@ library EpochLibrary {
         view
         returns(bool)
     {
-        if(_self.timeLock == 0 || _self.timeLock.add(_self.blockNumber) > getCurrentBlockNumber())
+        uint256 currentBlock = getCurrentBlockNumber();
+        if((_self.timeLock == 0) ||
+           (_self.timeLock.add(_self.blockNumber) > currentBlock))
             return false;
         return true;
     }

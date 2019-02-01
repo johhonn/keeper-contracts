@@ -19,7 +19,11 @@ contract LockRewardCondition is Initializable, Condition {
         token = OceanToken(_tokenAddress);
     }
 
-    function hashValues(address rewardContractAddress, uint256 amount) public pure returns (bytes32) {
+    function hashValues(address rewardContractAddress, uint256 amount)
+        public
+        pure
+        returns (bytes32)
+    {
         return keccak256(abi.encodePacked(rewardContractAddress, amount));
     }
 
