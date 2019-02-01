@@ -4,7 +4,7 @@
 
 const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
 const SignCondition = artifacts.require('SignCondition.sol')
-const constants = require('../../helpers/constants.js')
+const constants = require('../helpers/constants.js')
 
 contract('SignCondition constructor', (accounts) => {
     describe('deploy and setup', () => {
@@ -44,11 +44,10 @@ contract('SignCondition constructor', (accounts) => {
     describe('fulfill existing condition', () => {
         let conditionStoreManager
         let signCondition
-        let createRole
+        let createRole = accounts[0]
 
         beforeEach(async () => {
             conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            createRole = accounts[0]
             await conditionStoreManager.setup(createRole)
             signCondition = await SignCondition.new(conditionStoreManager.address, { from: accounts[0] })
         })
@@ -78,11 +77,10 @@ contract('SignCondition constructor', (accounts) => {
     describe('fail to fulfill existing condition', () => {
         let conditionStoreManager
         let signCondition
-        let createRole
+        let createRole = accounts[0]
 
         beforeEach(async () => {
             conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            createRole = accounts[0]
             await conditionStoreManager.setup(createRole)
             signCondition = await SignCondition.new(conditionStoreManager.address, { from: accounts[0] })
         })
