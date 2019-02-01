@@ -1,11 +1,8 @@
-/* global artifacts, contract, describe, it, before, beforeEach */
-
+/* global artifacts, contract, describe, it, beforeEach */
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const AccessConditions = artifacts.require('AccessConditions.sol')
-
-const ZeppelinHelper = require('../../helpers/ZeppelinHelper.js')
 const { hashAgreement } = require('../../helpers/hashAgreement.js')
 const testUtils = require('../../helpers/utils')
 
@@ -16,7 +13,6 @@ contract('ServiceExecutionAgreement', (accounts) => {
         valuesHashList, serviceId, conditionKeys, testTemplateId
 
     let funcFingerPrints, contracts
-    let zos
     const provider = accounts[0]
     const consumer = accounts[1]
     const fromProvider = { from: provider }
@@ -29,26 +25,15 @@ contract('ServiceExecutionAgreement', (accounts) => {
     const did = '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
     const serviceTemplateId = '0x419d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
 
-    before(async () => {
-        // warning: when holding this wrong a circular dependency may appear
-        zos = new ZeppelinHelper('PaymentConditions')
-        zos.addDependency('AccessConditions')
-
-        await zos.restoreState(accounts[9])
-    })
-
     describe('Test Access Service Agreement', () => {
         beforeEach(async () => {
-            // load contracts
-            await zos.initialize(accounts[0], false)
-            token = await OceanToken.at(
-                zos.getProxyAddress('OceanToken'))
-            sea = await ServiceExecutionAgreement.at(
-                zos.getProxyAddress('ServiceExecutionAgreement'))
-            paymentConditions = await PaymentConditions.at(
-                zos.getProxyAddress('PaymentConditions'))
-            accessConditions = await AccessConditions.at(
-                zos.getProxyAddress('AccessConditions'))
+            token = await OceanToken.new()
+            await token.initialize(accounts[0])
+            sea = await ServiceExecutionAgreement.new()
+            paymentConditions = await PaymentConditions.new()
+            await paymentConditions.initialize(sea.address, token.address)
+            accessConditions = await AccessConditions.new()
+            await accessConditions.initialize(sea.address)
 
             // Do some preperations: give consumer funds, add an asset
             // consumer request initial funds to play

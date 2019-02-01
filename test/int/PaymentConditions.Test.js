@@ -3,7 +3,6 @@
 const AccessConditions = artifacts.require('AccessConditions.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
-const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const testUtils = require('../helpers/utils.js')
 const { hashAgreement } = require('../helpers/hashAgreement.js')
@@ -18,7 +17,7 @@ contract('PaymentConditions', (accounts) => {
 
         let token
 
-        let agreement
+        let sea
         let accessConditions
         let paymentConditions
 
@@ -38,14 +37,13 @@ contract('PaymentConditions', (accounts) => {
         let walletBalance = 0
 
         before(async () => {
-            let zos = new ZeppelinHelper('PaymentConditions')
-            await zos.restoreState(accounts[9])
-            zos.addDependency('AccessConditions')
-            await zos.initialize(accounts[0], false)
-            token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
-            agreement = await ServiceExecutionAgreement.at(zos.getProxyAddress('ServiceExecutionAgreement'))
-            paymentConditions = await PaymentConditions.at(zos.getProxyAddress('PaymentConditions'))
-            accessConditions = await AccessConditions.at(zos.getProxyAddress('AccessConditions'))
+            token = await OceanToken.new()
+            await token.initialize(accounts[0])
+            sea = await ServiceExecutionAgreement.new()
+            paymentConditions = await PaymentConditions.new()
+            await paymentConditions.initialize(sea.address, token.address)
+            accessConditions = await AccessConditions.new()
+            await accessConditions.initialize(sea.address)
 
             await token.mint(consumer, walletAllowance)
 
@@ -68,7 +66,7 @@ contract('PaymentConditions', (accounts) => {
             const fulfillmentIndices = [0] // Root Condition
             const fulfilmentOperator = 0 // AND
 
-            const result = await agreement.setupTemplate(
+            const result = await sea.setupTemplate(
                 serviceTemplateId,
                 contracts,
                 fingerprints,
@@ -95,7 +93,7 @@ contract('PaymentConditions', (accounts) => {
                 agreementId
             )
             signature = await web3.eth.sign(hash, consumer)
-            const result = await agreement.initializeAgreement(
+            const result = await sea.initializeAgreement(
                 testTemplateId,
                 signature,
                 consumer,
@@ -163,7 +161,7 @@ contract('PaymentConditions', (accounts) => {
             await paymentConditions.releasePayment(agreementId, asset, price)
             assert.strictEqual(
                 0,
-                web3.utils.toDecimal(await token.balanceOf.call(agreement.address))
+                web3.utils.toDecimal(await token.balanceOf.call(sea.address))
             )
         })
 

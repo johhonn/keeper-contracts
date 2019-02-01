@@ -1,7 +1,5 @@
 /* global artifacts, contract, before, describe, it, assert, before */
 /* eslint-disable no-console, max-len */
-
-const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
 const OceanToken = artifacts.require('OceanToken.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
@@ -13,7 +11,7 @@ const web3 = testUtils.getWeb3()
 
 contract('ComputeConditions', (accounts) => {
     describe('Test integration of On-Premise compute conditions in SEA', () => {
-        let token, agreement, paymentConditions, accessConditions, computeConditions, valuesHashList, serviceId, conditionKeys
+        let token, sea, paymentConditions, accessConditions, computeConditions, valuesHashList, serviceId, conditionKeys
         let funcFingerPrints, contracts, agreementId, slaMsgHash, signature, algorithmHash
         const publisher = accounts[0]
         const datascientist = accounts[1]
@@ -27,26 +25,30 @@ contract('ComputeConditions', (accounts) => {
         const serviceTemplateId = testUtils.generateId()
         agreementId = testUtils.generateId()
         const algorithm = 'THIS IS FAKE CODE foo=Hello World!'
-        let zos
 
         before(async () => {
-            zos = new ZeppelinHelper('ComputeConditions')
-            await zos.restoreState(accounts[9])
-            zos.addDependency('PaymentConditions')
-            zos.addDependency('AccessConditions')
-            await zos.initialize(accounts[0], false)
-
-            token = await OceanToken.at(zos.getProxyAddress('OceanToken'))
+            token = await OceanToken.new()
+            await token.initialize(accounts[0])
             await token.mint(publisher, 1000)
             await token.mint(datascientist, 1000)
 
-            paymentConditions = await PaymentConditions.at(zos.getProxyAddress('PaymentConditions'))
-            accessConditions = await AccessConditions.at(zos.getProxyAddress('AccessConditions'))
-            computeConditions = await ComputeConditions.at(zos.getProxyAddress('ComputeConditions'))
-            agreement = await ServiceExecutionAgreement.at(zos.getProxyAddress('ServiceExecutionAgreement'))
+            sea = await ServiceExecutionAgreement.new()
+            paymentConditions = await PaymentConditions.new()
+            await paymentConditions.initialize(sea.address, token.address)
+            accessConditions = await AccessConditions.new()
+            await accessConditions.initialize(sea.address)
+            computeConditions = await ComputeConditions.new()
+            await computeConditions.initialize(sea.address)
 
             // conditions
-            contracts = [paymentConditions.address, computeConditions.address, accessConditions.address, paymentConditions.address, paymentConditions.address]
+            contracts = [
+                paymentConditions.address,
+                computeConditions.address,
+                accessConditions.address,
+                paymentConditions.address,
+                paymentConditions.address
+            ]
+
             funcFingerPrints = [
                 testUtils.getSelector(web3, paymentConditions, 'lockPayment'),
                 testUtils.getSelector(web3, computeConditions, 'fulfillUpload'),
@@ -62,7 +64,7 @@ contract('ComputeConditions', (accounts) => {
                 testUtils.valueHash(['bytes32', 'uint256'], [did, price])
             ]
             // create new on-premise compute template
-            const createAgreementTemplate = await agreement.setupTemplate(
+            const createAgreementTemplate = await sea.setupTemplate(
                 serviceTemplateId,
                 contracts,
                 funcFingerPrints,
@@ -83,7 +85,7 @@ contract('ComputeConditions', (accounts) => {
             )
             signature = await web3.eth.sign(slaMsgHash, datascientist)
             serviceId = await testUtils.initializeAgreement(
-                agreement, templateId, signature,
+                sea, templateId, signature,
                 datascientist, valuesHashList, timeouts,
                 agreementId, did, { from: publisher }
             )
@@ -93,7 +95,7 @@ contract('ComputeConditions', (accounts) => {
 
         it('Data Scientist should be able to lock payment for on-premise compute', async () => {
             await paymentConditions.lockPayment(serviceId, did, price, { from: datascientist })
-            const locked = await agreement.getConditionStatus(agreementId, conditionKeys[0])
+            const locked = await sea.getConditionStatus(agreementId, conditionKeys[0])
             assert.strictEqual(locked.toNumber(), 1, 'Error: Unable to lock payment!')
         })
 
@@ -109,31 +111,31 @@ contract('ComputeConditions', (accounts) => {
             const submitAlgorithmHash = await computeConditions.submitAlgorithmHash(agreementId, algorithmHash, { from: publisher })
             const isHashSubmitted = testUtils.getEventArgsFromTx(submitAlgorithmHash, 'HashSubmitted')
             assert.strictEqual(isHashSubmitted.state, true, 'Error: Unable to submit algorithm hash')
-            const fulfillUploadConditionState = await agreement.getConditionStatus(agreementId, conditionKeys[1])
+            const fulfillUploadConditionState = await sea.getConditionStatus(agreementId, conditionKeys[1])
             assert.strictEqual(fulfillUploadConditionState.toNumber(), 1, 'Error: unable to fulfill the upload condition')
         })
 
         it('Service publisher should be able to grant access for derived asset to the data scientist', async () => {
             await accessConditions.grantAccess(agreementId, did, { from: publisher })
-            const fulfillAccessConditionState = await agreement.getConditionStatus(agreementId, conditionKeys[2])
+            const fulfillAccessConditionState = await sea.getConditionStatus(agreementId, conditionKeys[2])
             assert.strictEqual(fulfillAccessConditionState.toNumber(), 1, 'Error: unable to fulfill granted access to derived asset condition')
         })
 
         it('Service publisher should be able to release payment', async () => {
             await paymentConditions.releasePayment(agreementId, did, price, { from: publisher })
-            const fulfillReleasePaymentConditionState = await agreement.getConditionStatus(agreementId, conditionKeys[3])
+            const fulfillReleasePaymentConditionState = await sea.getConditionStatus(agreementId, conditionKeys[3])
             assert.strictEqual(fulfillReleasePaymentConditionState.toNumber(), 1, 'Error: unable to fulfill release payment condition')
         })
 
         it('data scientist should not be able to make refund payment', async () => {
             await paymentConditions.refundPayment(agreementId, did, price, { from: datascientist })
-            const fulfillRefundPaymentConditionState = await agreement.getConditionStatus(agreementId, conditionKeys[4])
+            const fulfillRefundPaymentConditionState = await sea.getConditionStatus(agreementId, conditionKeys[4])
             assert.strictEqual(fulfillRefundPaymentConditionState.toNumber(), 0, 'Error: unable to fulfill refund payment condition')
         })
 
         it('Service agreement should be fulfilled', async () => {
-            await agreement.fulfillAgreement(agreementId, { from: publisher })
-            const agreementFulfilled = await agreement.isAgreementFulfilled(agreementId, { from: publisher })
+            await sea.fulfillAgreement(agreementId, { from: publisher })
+            const agreementFulfilled = await sea.isAgreementFulfilled(agreementId, { from: publisher })
             assert.strictEqual(agreementFulfilled, true, 'Error: unable to fulfill or terminate the agreement')
         })
     })
