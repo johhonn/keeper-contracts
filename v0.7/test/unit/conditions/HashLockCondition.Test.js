@@ -7,14 +7,11 @@ const HashLockCondition = artifacts.require('HashLockCondition.sol')
 const constants = require('../../helpers/constants.js')
 
 contract('HashLockCondition constructor', (accounts) => {
-
     describe('deploy and setup', () => {
-
         it('contract should deploy', async () => {
             let conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
             await HashLockCondition.new(conditionStoreManager.address, { from: accounts[0] })
         })
-
     })
 
     describe('fulfill non existing condition', () => {
@@ -27,7 +24,6 @@ contract('HashLockCondition constructor', (accounts) => {
         })
 
         it('should not fulfill if conditions do not exist for uint preimage', async () => {
-
             let nonce = constants.bytes32.one
             try {
                 await hashLockCondition.fulfill(
@@ -42,7 +38,6 @@ contract('HashLockCondition constructor', (accounts) => {
         })
 
         it('should not fulfill if conditions do not exist for string preimage', async () => {
-
             let nonce = constants.bytes32.one
 
             try {
@@ -58,7 +53,6 @@ contract('HashLockCondition constructor', (accounts) => {
         })
 
         it('should not fulfill if conditions do not exist for bytes32 preimage', async () => {
-
             let nonce = constants.bytes32.one
 
             try {
@@ -77,17 +71,16 @@ contract('HashLockCondition constructor', (accounts) => {
     describe('fulfill existing condition', () => {
         let conditionStoreManager
         let hashLockCondition
-        let createRole
+        let createRole = accounts[0]
 
         beforeEach(async () => {
             conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            createRole = accounts[0]
             await conditionStoreManager.setup(createRole)
             hashLockCondition = await HashLockCondition.new(conditionStoreManager.address, { from: accounts[0] })
         })
 
         it('should fulfill if conditions exist for uint preimage', async () => {
-            let nonce = constants.bytes32.one;
+            let nonce = constants.bytes32.one
 
             let conditionId = await hashLockCondition.generateId(
                 nonce,
@@ -99,7 +92,7 @@ contract('HashLockCondition constructor', (accounts) => {
 
             await hashLockCondition.fulfill(
                 nonce,
-                constants.condition.hashlock.uint.preimage,
+                constants.condition.hashlock.uint.preimage
             )
 
             let { state } = await conditionStoreManager.getCondition(conditionId)
@@ -107,7 +100,7 @@ contract('HashLockCondition constructor', (accounts) => {
         })
 
         it('should fulfill if conditions exist for string preimage', async () => {
-            let nonce = constants.bytes32.one;
+            let nonce = constants.bytes32.one
 
             let conditionId = await hashLockCondition.generateId(
                 nonce,
@@ -119,7 +112,7 @@ contract('HashLockCondition constructor', (accounts) => {
 
             await hashLockCondition.methods['fulfill(bytes32,string)'](
                 nonce,
-                constants.condition.hashlock.string.preimage,
+                constants.condition.hashlock.string.preimage
             )
 
             let { state } = await conditionStoreManager.getCondition(conditionId)
@@ -127,7 +120,7 @@ contract('HashLockCondition constructor', (accounts) => {
         })
 
         it('should fulfill if conditions exist for bytes32 preimage', async () => {
-            let nonce = constants.bytes32.one;
+            let nonce = constants.bytes32.one
 
             let conditionId = await hashLockCondition.generateId(
                 nonce,
@@ -139,7 +132,7 @@ contract('HashLockCondition constructor', (accounts) => {
 
             await hashLockCondition.methods['fulfill(bytes32,bytes32)'](
                 nonce,
-                constants.condition.hashlock.bytes32.preimage,
+                constants.condition.hashlock.bytes32.preimage
             )
 
             let { state } = await conditionStoreManager.getCondition(conditionId)
@@ -150,17 +143,16 @@ contract('HashLockCondition constructor', (accounts) => {
     describe('fail to fulfill existing condition', () => {
         let conditionStoreManager
         let hashLockCondition
-        let createRole
+        let createRole = accounts[0]
 
         beforeEach(async () => {
             conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            createRole = accounts[0]
             await conditionStoreManager.setup(createRole)
             hashLockCondition = await HashLockCondition.new(conditionStoreManager.address, { from: accounts[0] })
         })
 
         it('wrong preimage should fail to fulfill if conditions exist for uint preimage', async () => {
-            let nonce = constants.bytes32.one;
+            let nonce = constants.bytes32.one
 
             let conditionId = await hashLockCondition.generateId(
                 nonce,
@@ -173,7 +165,7 @@ contract('HashLockCondition constructor', (accounts) => {
             try {
                 await hashLockCondition.fulfill(
                     nonce,
-                    constants.condition.hashlock.uint.preimage + 333,
+                    constants.condition.hashlock.uint.preimage + 333
                 )
             } catch (e) {
                 assert.strictEqual(e.reason, 'Invalid UpdateRole')
@@ -183,7 +175,7 @@ contract('HashLockCondition constructor', (accounts) => {
         })
 
         it('wrong preimage should fail to fulfill if conditions exist for uint preimage with string', async () => {
-            let nonce = constants.bytes32.one;
+            let nonce = constants.bytes32.one
 
             let conditionId = await hashLockCondition.generateId(
                 nonce,
@@ -196,7 +188,7 @@ contract('HashLockCondition constructor', (accounts) => {
             try {
                 await hashLockCondition.methods['fulfill(bytes32,string)'](
                     nonce,
-                    constants.condition.hashlock.uint.preimage + 'some bogus',
+                    constants.condition.hashlock.uint.preimage + 'some bogus'
                 )
             } catch (e) {
                 assert.strictEqual(e.reason, 'Invalid UpdateRole')
@@ -206,7 +198,7 @@ contract('HashLockCondition constructor', (accounts) => {
         })
 
         it('wrong preimage should fail to fulfill if conditions exist for string preimage', async () => {
-            let nonce = constants.bytes32.one;
+            let nonce = constants.bytes32.one
 
             let conditionId = await hashLockCondition.generateId(
                 nonce,
@@ -219,7 +211,7 @@ contract('HashLockCondition constructor', (accounts) => {
             try {
                 await hashLockCondition.fulfill(
                     nonce,
-                    constants.condition.hashlock.uint.preimage,
+                    constants.condition.hashlock.uint.preimage
                 )
             } catch (e) {
                 assert.strictEqual(e.reason, 'Invalid UpdateRole')
@@ -229,7 +221,7 @@ contract('HashLockCondition constructor', (accounts) => {
         })
 
         it('wrong preimage should fail to fulfill if conditions exist for uint preimage with bytes32', async () => {
-            let nonce = constants.bytes32.one;
+            let nonce = constants.bytes32.one
 
             let conditionId = await hashLockCondition.generateId(
                 nonce,
@@ -242,7 +234,7 @@ contract('HashLockCondition constructor', (accounts) => {
             try {
                 await hashLockCondition.methods['fulfill(bytes32,bytes32)'](
                     nonce,
-                    constants.condition.hashlock.bytes32.preimage,
+                    constants.condition.hashlock.bytes32.preimage
                 )
             } catch (e) {
                 assert.strictEqual(e.reason, 'Invalid UpdateRole')
@@ -252,7 +244,7 @@ contract('HashLockCondition constructor', (accounts) => {
         })
 
         it('right preimage should fail to fulfill if conditions already fulfilled for uint', async () => {
-            let nonce = constants.bytes32.one;
+            let nonce = constants.bytes32.one
 
             let conditionId = await hashLockCondition.generateId(
                 nonce,
@@ -265,13 +257,13 @@ contract('HashLockCondition constructor', (accounts) => {
             // fulfill once
             await hashLockCondition.fulfill(
                 nonce,
-                constants.condition.hashlock.uint.preimage,
+                constants.condition.hashlock.uint.preimage
             )
             // try to fulfill another time
             try {
                 await hashLockCondition.fulfill(
                     nonce,
-                    constants.condition.hashlock.uint.preimage,
+                    constants.condition.hashlock.uint.preimage
                 )
             } catch (e) {
                 assert.strictEqual(e.reason, 'Invalid state transition')
@@ -281,7 +273,7 @@ contract('HashLockCondition constructor', (accounts) => {
         })
 
         it('should fail to fulfill if conditions has different type ref', async () => {
-            let nonce = constants.bytes32.one;
+            let nonce = constants.bytes32.one
 
             let conditionId = await hashLockCondition.generateId(
                 nonce,
@@ -297,7 +289,7 @@ contract('HashLockCondition constructor', (accounts) => {
             try {
                 await hashLockCondition.fulfill(
                     nonce,
-                    constants.condition.hashlock.uint.preimage,
+                    constants.condition.hashlock.uint.preimage
                 )
             } catch (e) {
                 assert.strictEqual(e.reason, 'Invalid UpdateRole')

@@ -7,9 +7,7 @@ const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
 const constants = require('../../helpers/constants.js')
 
 contract('ConditionStore constructor', (accounts) => {
-
     describe('deploy and setup', () => {
-
         it('contract should deploy', async () => {
             // act-assert
             await ConditionStoreManager.new({ from: accounts[0] })
@@ -60,10 +58,9 @@ contract('ConditionStore constructor', (accounts) => {
     })
 
     describe('create conditions', () => {
-
         let conditionStoreManager
         let epochLibrary
-        let createRole
+        let createRole = accounts[0]
 
         beforeEach(async () => {
             epochLibrary = await EpochLibrary.new({ from: accounts[0] })
@@ -71,7 +68,6 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('createRole should create', async () => {
-            createRole = accounts[0]
             await conditionStoreManager.setup(createRole)
 
             let conditionId = constants.bytes32.one
@@ -85,7 +81,6 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('createRole should create with nonzero timeout and timelock', async () => {
-            createRole = accounts[0]
             await conditionStoreManager.setup(createRole)
 
             let conditionId = constants.bytes32.one
@@ -105,7 +100,6 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('createRole should create with nonzero timeout and timelock', async () => {
-            createRole = accounts[0]
             await conditionStoreManager.setup(createRole)
 
             let conditionId = constants.bytes32.one
@@ -137,7 +131,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('invalid createRole should not create', async () => {
-            createRole = accounts[1]
+            let createRole = accounts[1]
             await conditionStoreManager.setup(createRole)
 
             let conditionId = constants.bytes32.one
@@ -153,7 +147,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('invalid address should not create', async () => {
-            createRole = accounts[0]
+            let createRole = accounts[0]
             await conditionStoreManager.setup(createRole)
 
             let conditionId = constants.bytes32.one
@@ -172,11 +166,9 @@ contract('ConditionStore constructor', (accounts) => {
 
     describe('get conditions', () => {
         let conditionStoreManager
-        let createRole
-
         beforeEach(async () => {
             conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            createRole = accounts[0]
+            let createRole = accounts[0]
             await conditionStoreManager.setup(createRole)
         })
 
@@ -210,11 +202,10 @@ contract('ConditionStore constructor', (accounts) => {
 
     describe('exists', () => {
         let conditionStoreManager
-        let createRole
 
         beforeEach(async () => {
             conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            createRole = accounts[0]
+            let createRole = accounts[0]
             await conditionStoreManager.setup(createRole)
         })
 
@@ -235,11 +226,10 @@ contract('ConditionStore constructor', (accounts) => {
 
     describe('update condition state', () => {
         let conditionStoreManager
-        let createRole
 
         beforeEach(async () => {
             conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            createRole = accounts[0]
+            let createRole = accounts[0]
             await conditionStoreManager.setup(createRole)
         })
 
@@ -462,5 +452,4 @@ contract('ConditionStore constructor', (accounts) => {
             assert.strictEqual(false, await conditionStoreManager.exists(conditionId))
         })
     })
-
 })
