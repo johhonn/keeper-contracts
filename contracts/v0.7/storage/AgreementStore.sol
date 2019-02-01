@@ -1,10 +1,8 @@
 pragma solidity 0.5.3;
 
-import '../libraries/ConditionStoreLibrary.sol';
+import 'zos-lib/contracts/Initializable.sol';
 
-contract AgreementStore {
-
-    ConditionStoreLibrary internal _conditionStore;
+contract AgreementStore is Initializable {
 
     struct Agreement {
         bytes32 did;
@@ -21,12 +19,14 @@ contract AgreementStore {
     mapping(bytes32 => Template) _templates;
     mapping(bytes32 => Agreement) _agreements;
 
-    constructor(address conditionStoreAddress) public {
+    function Initialize(address conditionStoreAddress)
+        public
+        initializer()
+    {
         require(
             conditionStoreAddress != address(0),
             'invalid condition store address'
         );
-        _conditionStore = ConditionStoreLibrary(conditionStoreAddress);
     }
 
     function create(
@@ -36,18 +36,6 @@ contract AgreementStore {
         bytes32[] memory rewardIds,
         bytes32 did
     ) public returns (bool) {
-
-//        for(uint256 i = 0; i < _templates[templateId].conditionTypes.length; i++) {
-//            //TODO: replace msg.sender with condition owner
-//            _conditionStore.create(
-//                conditionIds[i], _templates[templateId].conditionTypes[i]);
-//        }
-//
-//        for(uint256 j = 0; j < _templates[templateId].rewardTypes.length; j++) {
-//            //TODO: replace msg.sender with condition owner
-//            _conditionStore.create(rewardIds[j], _templates[templateId].rewardTypes[j]);
-//        }
-
         _agreements[agreementId] = Agreement(templateId, did, conditionIds, rewardIds);
         return true;
     }

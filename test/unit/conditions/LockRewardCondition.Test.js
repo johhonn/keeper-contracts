@@ -5,7 +5,7 @@
 const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 const LockRewardCondition = artifacts.require('LockRewardCondition.sol')
-const constants = require('../../helpers/constants.js')
+const constants = require('../helpers/constants.js')
 const Web3 = require('web3')
 
 const nodeUrl = `http://localhost:${process.env.ETHEREUM_RPC_PORT || '8545'}`

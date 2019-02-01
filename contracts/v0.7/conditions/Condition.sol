@@ -1,8 +1,9 @@
 pragma solidity 0.5.3;
 
 import '../storage/ConditionStoreManager.sol';
+import 'zos-lib/contracts/Initializable.sol';
 
-contract Condition {
+contract Condition is Initializable {
     ConditionStoreManager internal conditionStoreManager;
 
     event ConditionFulfilled(bytes32 indexed agreementId, address indexed _type, bytes32 id);

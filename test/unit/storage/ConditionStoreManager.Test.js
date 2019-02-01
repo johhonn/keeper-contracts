@@ -8,7 +8,7 @@ const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 const EpochLibrary = artifacts.require('EpochLibrary.sol')
 const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
-const constants = require('../../helpers/constants.js')
+const constants = require('../helpers/constants.js')
 
 contract('ConditionStore constructor', (accounts) => {
     let conditionId

@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 import "truffle/Assert.sol";
-import { EpochLibrary } from "../../../contracts/libraries/EpochLibrary.sol";
+import { EpochLibrary } from "../../../contracts/v0.7/libraries/EpochLibrary.sol";
 
 contract TestEpochLibrary {
 

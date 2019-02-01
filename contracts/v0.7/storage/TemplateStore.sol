@@ -1,6 +1,8 @@
 pragma solidity 0.5.3;
 
-contract TemplateStore {
+import 'zos-lib/contracts/Initializable.sol';
+
+contract TemplateStore is Initializable {
 
     enum TemplateState { Uninitialized, Initialized, Created, Revoked }
 
