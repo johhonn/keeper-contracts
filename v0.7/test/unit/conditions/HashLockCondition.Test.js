@@ -90,7 +90,7 @@ contract('HashLockCondition constructor', (accounts) => {
             )
 
             let { state } = await conditionStoreManager.getCondition(conditionId)
-            assert.strictEqual(constants.condition.state.fulfilled, state.toNumber())
+            assert.strictEqual(state.toNumber(), constants.condition.state.fulfilled)
         })
 
         it('should fulfill if conditions exist for string preimage', async () => {
@@ -110,7 +110,7 @@ contract('HashLockCondition constructor', (accounts) => {
             )
 
             let { state } = await conditionStoreManager.getCondition(conditionId)
-            assert.strictEqual(constants.condition.state.fulfilled, state.toNumber())
+            assert.strictEqual(state.toNumber(), constants.condition.state.fulfilled)
         })
 
         it('should fulfill if conditions exist for bytes32 preimage', async () => {
@@ -130,7 +130,7 @@ contract('HashLockCondition constructor', (accounts) => {
             )
 
             let { state } = await conditionStoreManager.getCondition(conditionId)
-            assert.strictEqual(constants.condition.state.fulfilled, state.toNumber())
+            assert.strictEqual(state.toNumber(), constants.condition.state.fulfilled)
         })
     })
 

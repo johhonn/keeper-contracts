@@ -1,12 +1,32 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, assert, contract, describe, it, beforeEach */
+/* global artifacts, contract, describe, it, beforeEach */
+
+const chai = require('chai')
+const { assert } = chai
+const chaiAsPromised = require('chai-as-promised')
+chai.use(chaiAsPromised)
 
 const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
 const SignCondition = artifacts.require('SignCondition.sol')
 const constants = require('../../helpers/constants.js')
 
 contract('SignCondition constructor', (accounts) => {
+    async function setupTest({
+        conditionId = constants.bytes32.one,
+        conditionType = constants.address.dummy,
+        createRole = accounts[0],
+        setupConditionStoreManager = true
+    } = {}) {
+        const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
+        if (setupConditionStoreManager) {
+            await conditionStoreManager.setup(createRole)
+        }
+        const signCondition = await SignCondition.new(conditionStoreManager.address, { from: accounts[0] })
+
+        return { signCondition, conditionStoreManager, conditionId, conditionType, createRole }
+    }
+
     describe('deploy and setup', () => {
         it('contract should deploy', async () => {
             let conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
@@ -15,15 +35,9 @@ contract('SignCondition constructor', (accounts) => {
     })
 
     describe('fulfill non existing condition', () => {
-        let conditionStoreManager
-        let signCondition
-
-        beforeEach(async () => {
-            conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            signCondition = await SignCondition.new(conditionStoreManager.address, { from: accounts[0] })
-        })
-
         it('should not fulfill if conditions do not exist for bytes32 message', async () => {
+            const { signCondition } = await setupTest({ setupConditionStoreManager: false })
+
             let nonce = constants.bytes32.one
             let {
                 message,
@@ -31,29 +45,17 @@ contract('SignCondition constructor', (accounts) => {
                 signature
             } = constants.condition.sign.bytes32
 
-            try {
-                await signCondition.fulfill(nonce, message, publicKey, signature)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Condition needs to be Unfulfilled')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                signCondition.fulfill(nonce, message, publicKey, signature),
+                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+            )
         })
     })
 
     describe('fulfill existing condition', () => {
-        let conditionStoreManager
-        let signCondition
-        let createRole
-
-        beforeEach(async () => {
-            conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            createRole = accounts[0]
-            await conditionStoreManager.setup(createRole)
-            signCondition = await SignCondition.new(conditionStoreManager.address, { from: accounts[0] })
-        })
-
         it('should fulfill if conditions exist for bytes32 message', async () => {
+            const { signCondition, conditionStoreManager } = await setupTest()
+
             let nonce = constants.bytes32.one
             let {
                 message,
@@ -76,18 +78,9 @@ contract('SignCondition constructor', (accounts) => {
     })
 
     describe('fail to fulfill existing condition', () => {
-        let conditionStoreManager
-        let signCondition
-        let createRole
-
-        beforeEach(async () => {
-            conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            createRole = accounts[0]
-            await conditionStoreManager.setup(createRole)
-            signCondition = await SignCondition.new(conditionStoreManager.address, { from: accounts[0] })
-        })
-
         it('wrong signature should fail to fulfill if conditions exist for bytes32 message', async () => {
+            const { signCondition, conditionStoreManager } = await setupTest()
+
             let nonce = constants.bytes32.one
             let {
                 message,
@@ -101,19 +94,18 @@ contract('SignCondition constructor', (accounts) => {
                 conditionId,
                 signCondition.address)
 
-            try {
-                await signCondition.fulfill(
+            await assert.isRejected(
+                signCondition.fulfill(
                     nonce, message, publicKey,
                     constants.bytes32.one
-                )
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Could not recover signature')
-                return
-            }
-            assert.fail('Expected revert not received')
+                ),
+                constants.condition.sign.error.couldNotRecoverSignature
+            )
         })
 
         it('right signature should fail to fulfill if conditions already fulfilled for bytes32', async () => {
+            const { signCondition, conditionStoreManager } = await setupTest()
+
             let nonce = constants.bytes32.one
             let {
                 message,
@@ -131,16 +123,15 @@ contract('SignCondition constructor', (accounts) => {
             // fulfill once
             await signCondition.fulfill(nonce, message, publicKey, signature)
             // try to fulfill another time
-            try {
-                await signCondition.fulfill(nonce, message, publicKey, signature)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Condition needs to be Unfulfilled')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                signCondition.fulfill(nonce, message, publicKey, signature),
+                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+            )
         })
 
         it('should fail to fulfill if conditions has different type ref', async () => {
+            const { signCondition, conditionStoreManager } = await setupTest()
+
             let nonce = constants.bytes32.one
             let {
                 message,
@@ -157,13 +148,10 @@ contract('SignCondition constructor', (accounts) => {
                 accounts[0])
 
             // try to fulfill from sign condition
-            try {
-                await signCondition.fulfill(nonce, message, publicKey, signature)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid UpdateRole')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                signCondition.fulfill(nonce, message, publicKey, signature),
+                constants.acl.error.invalidUpdateRole
+            )
         })
     })
 })

@@ -1,6 +1,11 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, assert, contract, describe, it, beforeEach */
+/* global artifacts, contract, describe, it, beforeEach */
+
+const chai = require('chai')
+const { assert } = chai
+const chaiAsPromised = require('chai-as-promised')
+chai.use(chaiAsPromised)
 
 const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
@@ -10,6 +15,30 @@ const constants = require('../../../helpers/constants.js')
 const getBalance = require('../../../helpers/getBalance.js')
 
 contract('EscrowReward constructor', (accounts) => {
+    async function setupTest({
+        conditionId = constants.bytes32.one,
+        conditionType = constants.address.dummy,
+        createRole = accounts[0],
+        setupConditionStoreManager = true
+    } = {}) {
+        const conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
+        if (setupConditionStoreManager) {
+            await conditionStoreManager.setup(createRole)
+        }
+        const oceanToken = await OceanToken.new({ from: createRole })
+        const lockRewardCondition = await LockRewardCondition.new(
+            conditionStoreManager.address,
+            oceanToken.address,
+            { from: createRole }
+        )
+
+        const escrowReward = await EscrowReward.new(
+            conditionStoreManager.address,
+            oceanToken.address,
+            { from: createRole })
+        return { escrowReward, lockRewardCondition, oceanToken, conditionStoreManager, conditionId, conditionType, createRole }
+    }
+
     describe('deploy and setup', () => {
         it('contract should deploy', async () => {
             let conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
@@ -22,27 +51,9 @@ contract('EscrowReward constructor', (accounts) => {
     })
 
     describe('fulfill non existing condition', () => {
-        let conditionStoreManager
-        let oceanToken
-        let lockRewardCondition
-        let escrowReward
-        let createRole = accounts[0]
-
-        beforeEach(async () => {
-            conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
-            await conditionStoreManager.setup(createRole)
-            oceanToken = await OceanToken.new({ from: createRole })
-            lockRewardCondition = await LockRewardCondition.new(
-                conditionStoreManager.address,
-                oceanToken.address,
-                { from: createRole })
-            escrowReward = await EscrowReward.new(
-                conditionStoreManager.address,
-                oceanToken.address,
-                { from: createRole })
-        })
-
         it('should not fulfill if conditions do not exist', async () => {
+            const { escrowReward } = await setupTest()
+
             let nonce = constants.bytes32.one
             let lockConditionId = accounts[2]
             let releaseConditionId = accounts[3]
@@ -50,44 +61,23 @@ contract('EscrowReward constructor', (accounts) => {
             let receiver = accounts[1]
             let amount = 10
 
-            try {
-                await escrowReward.fulfill(
+            await assert.isRejected(
+                escrowReward.fulfill(
                     nonce,
                     amount,
                     receiver,
                     sender,
                     lockConditionId,
-                    releaseConditionId)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'LockCondition needs to be Fulfilled')
-                return
-            }
-            assert.fail('Expected revert not received')
-       })
+                    releaseConditionId),
+                constants.condition.reward.escrowReward.error.lockConditionNeedsToBeFulfilled
+            )
+        })
     })
 
     describe('fulfill existing condition', () => {
-        let conditionStoreManager
-        let oceanToken
-        let lockRewardCondition
-        let escrowReward
-        let createRole = accounts[0]
-
-        beforeEach(async () => {
-            conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
-            await conditionStoreManager.setup(createRole)
-            oceanToken = await OceanToken.new({ from: createRole })
-            lockRewardCondition = await LockRewardCondition.new(
-                conditionStoreManager.address,
-                oceanToken.address,
-                { from: createRole })
-            escrowReward = await EscrowReward.new(
-                conditionStoreManager.address,
-                oceanToken.address,
-                { from: createRole })
-        })
-
         it('should fulfill if conditions exist for account address', async () => {
+            const { escrowReward, lockRewardCondition, oceanToken, conditionStoreManager } = await setupTest()
+
             let nonce = constants.bytes32.one
             let sender = accounts[0]
             let receiver = accounts[1]
@@ -135,132 +125,24 @@ contract('EscrowReward constructor', (accounts) => {
                 lockConditionId,
                 releaseConditionId)
 
-            let state = await conditionStoreManager.getConditionState(conditionId)
-            assert.strictEqual(state.toNumber(), constants.condition.state.fulfilled)
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
+                constants.condition.state.fulfilled
+            )
         })
     })
 
     describe('fail to fulfill existing condition', () => {
-        let conditionStoreManager
-        let oceanToken
-        let lockRewardCondition
-        let createRole = accounts[0]
-
-        beforeEach(async () => {
-            conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
-            await conditionStoreManager.setup(createRole)
-            oceanToken = await OceanToken.new({ from: createRole })
-            lockRewardCondition = await LockRewardCondition.new(
-                conditionStoreManager.address,
-                oceanToken.address,
-                { from: createRole })
-        })
-
         it('out of balance should fail to fulfill if conditions exist', async () => {
-            let nonce = constants.bytes32.one
-            let rewardAddress = accounts[2]
-            let amount = 10
-
-            let hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
-            let conditionId = await lockRewardCondition.generateId(nonce, hashValues)
-
-            await conditionStoreManager.createCondition(
-                conditionId,
-                lockRewardCondition.address)
-
-            try {
-                await lockRewardCondition.fulfill(nonce, rewardAddress, amount)
-            } catch (e) {
-                assert.strictEqual(e.reason, undefined)
-                return
-            }
-            assert.fail('Expected revert not received')
         })
 
         it('not approved should fail to fulfill if conditions exist', async () => {
-            let nonce = constants.bytes32.one
-            let rewardAddress = accounts[2]
-            let amount = 10
-            let sender = accounts[0]
-
-            let hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
-            let conditionId = await lockRewardCondition.generateId(nonce, hashValues)
-
-            await conditionStoreManager.createCondition(
-                conditionId,
-                lockRewardCondition.address)
-
-            await oceanToken.mint(sender, amount)
-
-            try {
-                await lockRewardCondition.fulfill(nonce, rewardAddress, amount)
-            } catch (e) {
-                assert.strictEqual(e.reason, undefined)
-                return
-            }
-            assert.fail('Expected revert not received')
         })
 
         it('right transfer should fail to fulfill if conditions already fulfilled', async () => {
-            let nonce = constants.bytes32.one
-            let rewardAddress = accounts[2]
-            let amount = 10
-            let sender = accounts[0]
-
-            let hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
-            let conditionId = await lockRewardCondition.generateId(nonce, hashValues)
-
-            await conditionStoreManager.createCondition(
-                conditionId,
-                lockRewardCondition.address)
-
-            await oceanToken.mint(sender, amount)
-            await oceanToken.approve(
-                lockRewardCondition.address,
-                amount,
-                { from: sender })
-
-            await lockRewardCondition.fulfill(nonce, rewardAddress, amount)
-            let { state } = await conditionStoreManager.getCondition(conditionId)
-            assert.strictEqual(constants.condition.state.fulfilled, state.toNumber())
-
-            try {
-                await lockRewardCondition.fulfill(nonce, rewardAddress, amount)
-            } catch (e) {
-                assert.strictEqual(e.reason, undefined)
-                let { state } = await conditionStoreManager.getCondition(conditionId)
-                assert.strictEqual(constants.condition.state.fulfilled, state.toNumber())
-                return
-            }
-            assert.fail('Expected revert not received')
         })
 
         it('should fail to fulfill if conditions has different type ref', async () => {
-            let nonce = constants.bytes32.one
-            let rewardAddress = accounts[2]
-            let amount = 10
-            let sender = accounts[0]
-
-            let hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
-            let conditionId = await lockRewardCondition.generateId(nonce, hashValues)
-
-            await conditionStoreManager.createCondition(
-                conditionId,
-                accounts[0])
-
-            await oceanToken.mint(sender, amount)
-            await oceanToken.approve(
-                lockRewardCondition.address,
-                amount,
-                { from: sender })
-
-            try {
-                await lockRewardCondition.fulfill(nonce, rewardAddress, amount)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid UpdateRole')
-                return
-            }
-            assert.fail('Expected revert not received')
         })
     })
 })

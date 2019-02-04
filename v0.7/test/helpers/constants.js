@@ -44,6 +44,16 @@ let constants = {
                 signature: '0x89e0243d7bd929e499b18640565a532bebe490cbe7cfec432462e47e702852' +
                     '284e6cc334870e8be586388af53b524ca6773de977270940a0239f06524fcd25891b',
                 publicKey: '0x00Bd138aBD70e2F00903268F3Db08f2D25677C9e'
+            },
+            error: {
+                couldNotRecoverSignature: 'Could not recover signature'
+            }
+        },
+        reward: {
+            escrowReward: {
+                error: {
+                    lockConditionNeedsToBeFulfilled: 'LockCondition needs to be Fulfilled'
+                }
             }
         }
     },
