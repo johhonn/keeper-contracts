@@ -34,7 +34,8 @@ const contracts = [
     'AccessConditions',
     'FitchainConditions',
     'ComputeConditions',
-    'PaymentConditions'
+    'PaymentConditions',
+    'EpochLibrary'
 ]
 
 // prepare multisig wallet
@@ -95,6 +96,7 @@ async function deployContracts() {
     // Since each contract initialize function could be different we can not use a loop
     // NOTE: A dapp could now use the address of the proxy specified in zos.<network_name>.json
     // instance=MyContract.at(proxyAddress)
+    execSync(`npx zos create EpochLibrary`)
     execSync(`npx zos create DIDRegistry --init initialize --args ${OWNER} -v`)
     const tokenAddress = execSync(`npx zos create OceanToken --init --args ${OWNER} -v`).toString().trim()
     const dispenserAddress = execSync(`npx zos create Dispenser --init initialize --args ${tokenAddress},${OWNER} -v`).toString().trim()
