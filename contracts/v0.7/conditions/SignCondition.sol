@@ -5,7 +5,7 @@ import '../libraries/ConditionStoreLibrary.sol';
 import 'openzeppelin-eth/contracts/cryptography/ECDSA.sol';
 import 'zos-lib/contracts/Initializable.sol';
 
-contract SignCondition is Initializable, Condition {
+contract SignCondition is Condition {
 
     function initialize(address _conditionStoreManagerAddress)
         public

@@ -4,6 +4,7 @@ import '../storage/ConditionStoreManager.sol';
 import 'zos-lib/contracts/Initializable.sol';
 
 contract Condition is Initializable {
+
     ConditionStoreManager internal conditionStoreManager;
 
     event ConditionFulfilled(
