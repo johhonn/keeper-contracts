@@ -18,7 +18,11 @@ let constants = {
             uninitialized: 0,
             unfulfilled: 1,
             fulfilled: 2,
-            aborted: 3
+            aborted: 3,
+            error: {
+                invalidStateTransition: 'Invalid state transition',
+                conditionNeedsToBeUnfulfilled: 'Condition needs to be Unfulfilled'
+            }
         },
         hashlock: {
             string: {
@@ -41,6 +45,12 @@ let constants = {
                     '284e6cc334870e8be586388af53b524ca6773de977270940a0239f06524fcd25891b',
                 publicKey: '0x00Bd138aBD70e2F00903268F3Db08f2D25677C9e'
             }
+        }
+    },
+    acl: {
+        error: {
+            invalidCreateRole: 'Invalid CreateRole',
+            invalidUpdateRole: 'Invalid UpdateRole'
         }
     },
     did: '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
