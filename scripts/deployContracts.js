@@ -25,19 +25,21 @@ const NETWORK = process.env.NETWORK || 'development'
 // load current version from package
 const VERSION = `v${pkg.version}`
 
-// List of Libraries
-const libraries = [
-    'ConditionStoreLibrary',
-]
-
 // List of contracts
 const contracts = [
+    'ConditionStoreLibrary',
     'ConditionStoreManager',
     'SignCondition',
     'HashLockCondition',
     'OceanToken',
     'Dispenser',
-    'LockRewardCondition'
+    'LockRewardCondition',
+//    'ServiceExecutionAgreement',
+//    'LockRewardCondition'
+//    'AccessConditions',
+//    'FitchainConditions',
+//    'ComputeConditions',
+//    'PaymentConditions',
 ]
 
 // prepare multisig wallet
@@ -83,10 +85,6 @@ async function deployContracts() {
     // Initialize project zOS project
     // NOTE: Creates a zos.json file that keeps track of the project's details
     execSync(`npx zos init oceanprotocol ${VERSION} -v`)
-
-    // add and push libraries before contracts
-    //execSync(`npx zos add ${libraries[0]}  -v`)
-    //execSync(`npx zos push ${libraries[0]} -v`)
 
     // Register contracts in the project as an upgradeable contract.
     for (const contract of contracts) {
@@ -150,7 +148,7 @@ async function deployContracts() {
      * -----------------------------------------------------------------------
      */
     const { name } = require('../zos.json')
-    exportArtifacts(name)
+    exportArtifacts(name, 'Library')
 }
 
 module.exports = (cb) => {

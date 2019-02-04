@@ -16,10 +16,9 @@ library EpochLibrary {
         uint256 timeLock,
         uint256 timeOut)
     {
-        uint256 currentBlock = getCurrentBlockNumber();
         if(timeOut > 0 && timeLock > 0){
             require(
-                timeLock.add(currentBlock) < timeOut.add(currentBlock),
+                timeLock.add(block.number) < timeOut.add(block.number),
                 'Invalid time margin'
             );
         }
@@ -38,7 +37,7 @@ library EpochLibrary {
     {
         _self.timeLock = _timeLock;
         _self.timeOut = _timeOut;
-        _self.blockNumber = getCurrentBlockNumber();
+        _self.blockNumber = block.number;
     }
 
    /**
@@ -51,9 +50,8 @@ library EpochLibrary {
         view
         returns(bool)
     {
-        uint256 currentBlock = getCurrentBlockNumber();
         if((_self.timeOut == 0) ||
-           (_self.timeOut.add(_self.blockNumber) > currentBlock))
+           (_self.timeOut.add(_self.blockNumber) > block.number))
             return false;
         return true;
     }
@@ -68,23 +66,10 @@ library EpochLibrary {
         view
         returns(bool)
     {
-        uint256 currentBlock = getCurrentBlockNumber();
         if((_self.timeLock == 0) ||
-           (_self.timeLock.add(_self.blockNumber) > currentBlock))
+           (_self.timeLock.add(_self.blockNumber) > block.number))
             return false;
         return true;
-    }
-
-   /**
-    * @notice getCurrentBlockNumber get block number
-    * @return the current block number
-    */
-    function getCurrentBlockNumber()
-        public
-        view
-        returns (uint)
-    {
-        return block.number;
     }
 
    /**
@@ -110,5 +95,4 @@ library EpochLibrary {
     {
         return _self.timeLock.add(_self.blockNumber);
     }
-
 }
