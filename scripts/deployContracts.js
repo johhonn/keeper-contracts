@@ -27,14 +27,19 @@ const VERSION = `v${pkg.version}`
 
 // List of contracts
 const contracts = [
-    'DIDRegistry',
+    'ConditionStoreLibrary',
+    'ConditionStoreManager',
+    'SignCondition',
+    'HashLockCondition',
     'OceanToken',
     'Dispenser',
-    'ServiceExecutionAgreement',
-    'AccessConditions',
-    'FitchainConditions',
-    'ComputeConditions',
-    'PaymentConditions'
+    'LockRewardCondition',
+//    'ServiceExecutionAgreement',
+//    'LockRewardCondition'
+//    'AccessConditions',
+//    'FitchainConditions',
+//    'ComputeConditions',
+//    'PaymentConditions',
 ]
 
 // prepare multisig wallet
@@ -80,35 +85,48 @@ async function deployContracts() {
     // Initialize project zOS project
     // NOTE: Creates a zos.json file that keeps track of the project's details
     execSync(`npx zos init oceanprotocol ${VERSION} -v`)
+
     // Register contracts in the project as an upgradeable contract.
     for (const contract of contracts) {
-        execSync(`npx zos add ${contract} --skip-compile -v`)
+        execSync(`npx zos add ${contract}  -v`)
+        execSync(`npx zos push ${contract} -v`)
     }
 
     // Deploy all implementations in the specified network.
     // NOTE: Creates another zos.<network_name>.json file, specific to the network used,
     // which keeps track of deployed addresses, etc.
-    execSync('npx zos push --skip-compile -v')
+//    execSync('npx zos push  -v')
 
     // Request a proxy for the upgradeably contracts.
     // Here we run initialize which replace contract constructors
     // Since each contract initialize function could be different we can not use a loop
     // NOTE: A dapp could now use the address of the proxy specified in zos.<network_name>.json
     // instance=MyContract.at(proxyAddress)
-    execSync(`npx zos create DIDRegistry --init initialize --args ${OWNER} -v`)
+
+    // v0.7
+    const conditionStoreManagerAddress = execSync(`npx zos create ConditionStoreManager`).toString().trim()
     const tokenAddress = execSync(`npx zos create OceanToken --init --args ${OWNER} -v`).toString().trim()
     const dispenserAddress = execSync(`npx zos create Dispenser --init initialize --args ${tokenAddress},${OWNER} -v`).toString().trim()
-    const serviceExecutionAgreementAddress = execSync(`npx zos create ServiceExecutionAgreement -v`).toString().trim()
-    execSync(`npx zos create AccessConditions --init initialize --args ${serviceExecutionAgreementAddress} -v`)
-    execSync(`npx zos create PaymentConditions --init initialize --args ${serviceExecutionAgreementAddress},${tokenAddress} -v`)
-    execSync(`npx zos create FitchainConditions --init initialize --args ${serviceExecutionAgreementAddress},${stake},${maxSlots} -v`)
-    execSync(`npx zos create ComputeConditions --init initialize --args ${serviceExecutionAgreementAddress} -v`)
+    execSync(`npx zos create SignCondition --init initialize --args ${conditionStoreManagerAddress} -v`)
+    execSync(`npx zos create HashLockCondition --init initialize --args ${conditionStoreManagerAddress} -v`)
+    execSync(`npx zos create LockRewardCondition --init initialize --args ${conditionStoreManagerAddress},${tokenAddress} -v`)
+
+    // v0.6
+//    execSync(`npx zos create DIDRegistry --init initialize --args ${OWNER} -v`)
+//    const tokenAddress = execSync(`npx zos create OceanToken --init --args ${OWNER} -v`).toString().trim()
+//    const dispenserAddress = execSync(`npx zos create Dispenser --init initialize --args ${tokenAddress},${OWNER} -v`).toString().trim()
+//    const serviceExecutionAgreementAddress = execSync(`npx zos create ServiceExecutionAgreement -v`).toString().trim()
+//    execSync(`npx zos create AccessConditions --init initialize --args ${serviceExecutionAgreementAddress} -v`)
+//    execSync(`npx zos create PaymentConditions --init initialize --args ${serviceExecutionAgreementAddress},${tokenAddress} -v`)
+//    execSync(`npx zos create FitchainConditions --init initialize --args ${serviceExecutionAgreementAddress},${stake},${maxSlots} -v`)
+//    execSync(`npx zos create ComputeConditions --init initialize --args ${serviceExecutionAgreementAddress} -v`)
 
     /*
      * -----------------------------------------------------------------------
      * setup deployed contracts
      * -----------------------------------------------------------------------
      */
+    console.log(`adding minter ${dispenserAddress} from ${OWNER}`)
     const oceanToken = await OceanToken.at(tokenAddress)
     await oceanToken.addMinter(
         dispenserAddress,
@@ -130,7 +148,7 @@ async function deployContracts() {
      * -----------------------------------------------------------------------
      */
     const { name } = require('../zos.json')
-    exportArtifacts(name)
+    exportArtifacts(name, 'Library')
 }
 
 module.exports = (cb) => {

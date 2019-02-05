@@ -1,4 +1,4 @@
-pragma solidity 0.5.0;
+pragma solidity 0.5.3;
 
 import './Reward.sol';
 import '../../libraries/ConditionStoreLibrary.sol';

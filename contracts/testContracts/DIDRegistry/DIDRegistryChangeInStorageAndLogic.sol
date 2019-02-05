@@ -1,4 +1,4 @@
-pragma solidity 0.4.25;
+pragma solidity 0.5.3;
 
 import 'zos-lib/contracts/Initializable.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
@@ -28,7 +28,12 @@ contract DIDRegistryChangeInStorageAndLogic
 
     mapping(bytes32 => DIDRegister) private didRegister;
 
-    modifier onlyValidDIDArgs(bytes32 did, bytes32 checksum, string value){
+    modifier onlyValidDIDArgs(
+        bytes32 did,
+        bytes32 checksum,
+        string memory value
+    )
+    {
         address currentOwner = didRegister[did].owner;
         require(
             currentOwner == address(0x0) || currentOwner == msg.sender,
@@ -65,7 +70,7 @@ contract DIDRegistryChangeInStorageAndLogic
     function registerAttribute(
         bytes32 _did,
         bytes32 _checksum,
-        string _value
+        string memory _value
     )
         public
         onlyValidDIDArgs(_did, _checksum, _value)

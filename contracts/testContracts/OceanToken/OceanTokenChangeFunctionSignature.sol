@@ -1,4 +1,4 @@
-pragma solidity 0.4.25;
+pragma solidity 0.5.3;
 
 import 'openzeppelin-eth/contracts/token/ERC20/ERC20Capped.sol';
 import 'openzeppelin-eth/contracts/token/ERC20/ERC20Detailed.sol';

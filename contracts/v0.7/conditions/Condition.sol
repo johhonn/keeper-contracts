@@ -1,11 +1,17 @@
-pragma solidity 0.5.0;
+pragma solidity 0.5.3;
 
 import '../storage/ConditionStoreManager.sol';
+import 'zos-lib/contracts/Initializable.sol';
 
-contract Condition {
+contract Condition is Initializable {
+
     ConditionStoreManager internal conditionStoreManager;
 
-    event ConditionFulfilled(bytes32 indexed agreementId, address indexed _type, bytes32 id);
+    event ConditionFulfilled(
+        bytes32 indexed _agreementId,
+        address indexed _type,
+        bytes32 _id
+    );
 
     modifier onlyUnfulfilled(bytes32 _id) {
         require(
@@ -31,7 +37,13 @@ contract Condition {
         view
         returns (bytes32)
     {
-        return keccak256(abi.encodePacked(_agreementId, address(this), _valueHash));
+        return keccak256(
+            abi.encodePacked(
+                _agreementId,
+                address(this),
+                _valueHash
+            )
+        );
     }
 
     function fulfill(

@@ -1,10 +1,12 @@
-pragma solidity 0.5.0;
+pragma solidity 0.5.3;
 
+import '../Common.sol';
 import '../libraries/EpochLibrary.sol';
 import '../libraries/ConditionStoreLibrary.sol';
+import 'zos-lib/contracts/Initializable.sol';
 
-contract ConditionStoreManager {
-    using EpochLibrary for EpochLibrary.Epoch;
+contract ConditionStoreManager is Initializable, Common {
+
     using ConditionStoreLibrary for ConditionStoreLibrary.ConditionList;
 
     address private _createRole;
@@ -102,8 +104,15 @@ contract ConditionStoreManager {
         return conditionList.updateState(_id, _newState);
     }
 
-    function exists(bytes32 _id) public view returns (bool) {
-        return conditionList.conditions[_id].state != ConditionStoreLibrary.ConditionState.Uninitialized;
+    function exists(bytes32 _id)
+        public
+        view
+        returns (bool)
+    {
+        return (
+                conditionList.conditions[_id].state !=
+                ConditionStoreLibrary.ConditionState.Uninitialized
+        );
     }
 
     function getCondition(bytes32 _id)
