@@ -8,13 +8,15 @@ const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
 const constants = require('../helpers/constants.js')
+const testUtils = require('../../helpers/utils.js')
+
 
 contract('ConditionStore constructor', (accounts) => {
     let conditionId
     let conditionType
 
     async function setupTest({
-        conditionId = constants.bytes32.one,
+        conditionId = testUtils.generateId(),
         conditionType = constants.address.dummy,
         createRole = accounts[0],
         setupConditionStoreManager = true
@@ -39,7 +41,7 @@ contract('ConditionStore constructor', (accounts) => {
             assert.strictEqual(getCreateRole, constants.address.zero)
 
             // address should be set after correct setup
-            let createRole = accounts[1]
+            let createRole = accounts[0]
             await conditionStoreManager.setup(createRole)
             getCreateRole = await conditionStoreManager.getCreateRole()
             assert.strictEqual(getCreateRole, createRole)
@@ -82,8 +84,6 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('createRole should create', async () => {
-            await conditionStoreManager.setup(createRole)
-
             // conditionId should exist after create
             await conditionStoreManager.createCondition(conditionId, conditionType)
             assert.strictEqual(await conditionStoreManager.exists(conditionId), true)
@@ -110,7 +110,7 @@ contract('ConditionStore constructor', (accounts) => {
         it('createRole should create with nonzero timeout and timelock', async () => {
             await conditionStoreManager.setup(createRole)
 
-            let conditionId = constants.bytes32.one
+            let conditionId = testUtils.generateId()
             let conditionType = constants.address.dummy
             let conditionTimeLock = 1
             let conditionTimeOut = 10
@@ -142,7 +142,7 @@ contract('ConditionStore constructor', (accounts) => {
             const { conditionStoreManager, conditionId, conditionType } = await setupTest({ createRole: accounts[1] })
 
             await assert.isRejected(
-                conditionStoreManager.createCondition(conditionId, conditionType),
+                conditionStoreManager.createCondition(conditionId, conditionType, { from: accounts[1] }),
                 'Invalid CreateRole'
             )
         })
