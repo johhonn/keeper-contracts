@@ -61,16 +61,14 @@ contract('ConditionStore constructor', (accounts) => {
         it('anyone should not change createRole after setup', async () => {
             // setup correctly
             let conditionStoreManager = await ConditionStoreManager.deployed({ from: accounts[0] })
-            let createRole = accounts[1]
-            await conditionStoreManager.setup(createRole)
-
-            let getCreateRole = await conditionStoreManager.getCreateRole()
-            assert.strictEqual(getCreateRole, createRole)
+            // actual createRole
+            let createRole = accounts[0]
 
             // try to force with other account
-            let otherCreateRole = accounts[0]
+            let otherCreateRole = accounts[1]
             assert.notEqual(otherCreateRole, createRole)
             await conditionStoreManager.setup(otherCreateRole)
+            let getCreateRole = await conditionStoreManager.getCreateRole()
             assert.strictEqual(getCreateRole, createRole)
         })
     })
@@ -84,6 +82,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('createRole should create', async () => {
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest()
             // conditionId should exist after create
             await conditionStoreManager.createCondition(conditionId, conditionType)
             assert.strictEqual(await conditionStoreManager.exists(conditionId), true)
