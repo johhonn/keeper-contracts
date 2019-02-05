@@ -7,6 +7,7 @@ const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
+const EpochLibrary = artifacts.require('EpochLibrary.sol')
 const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 const LockRewardCondition = artifacts.require('LockRewardCondition.sol')
@@ -21,6 +22,9 @@ contract('EscrowReward constructor', (accounts) => {
         createRole = accounts[0],
         setupConditionStoreManager = true
     } = {}) {
+        const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+        await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
+
         const conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
         if (setupConditionStoreManager) {
             await conditionStoreManager.setup(createRole)
@@ -41,8 +45,11 @@ contract('EscrowReward constructor', (accounts) => {
 
     describe('deploy and setup', () => {
         it('contract should deploy', async () => {
-            let conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            let oceanToken = await OceanToken.new({ from: accounts[0] })
+            const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+            await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
+
+            const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
+            const oceanToken = await OceanToken.new({ from: accounts[0] })
             await EscrowReward.new(
                 conditionStoreManager.address,
                 oceanToken.address,
