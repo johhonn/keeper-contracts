@@ -8,14 +8,30 @@ contract Condition is Initializable {
     ConditionStoreManager internal conditionStoreManager;
 
     event ConditionFulfilled(
-        bytes32 indexed agreementId,
+        bytes32 indexed _agreementId,
         address indexed _type,
-        bytes32 id
+        bytes32 _id
     );
 
+    modifier onlyUnfulfilled(bytes32 _id) {
+        require(
+            isConditionUnfulfilled(_id),
+            'Condition needs to be Unfulfilled'
+        );
+        _;
+    }
+
+    modifier onlyValidFulfillState(ConditionStoreLibrary.ConditionState _state) {
+        require(
+            _state > ConditionStoreLibrary.ConditionState.Unfulfilled,
+            'New state needs to be higher than Unfulfilled'
+        );
+        _;
+    }
+
     function generateId(
-        bytes32 agreementId,
-        bytes32 valueHash
+        bytes32 _agreementId,
+        bytes32 _valueHash
     )
         public
         view
@@ -23,9 +39,9 @@ contract Condition is Initializable {
     {
         return keccak256(
             abi.encodePacked(
-                agreementId,
+                _agreementId,
                 address(this),
-                valueHash
+                _valueHash
             )
         );
     }
@@ -35,8 +51,31 @@ contract Condition is Initializable {
         ConditionStoreLibrary.ConditionState _newState
     )
         internal
+        onlyUnfulfilled(_id)
+        onlyValidFulfillState(_newState)
         returns (ConditionStoreLibrary.ConditionState)
     {
+        // _newState can be Fulfilled or Aborted
         return conditionStoreManager.updateConditionState(_id, _newState);
+    }
+
+    function isConditionUninitialized(bytes32 _condition) public view returns (bool) {
+        return ( conditionStoreManager.getConditionState(_condition) ==
+            ConditionStoreLibrary.ConditionState.Uninitialized );
+    }
+
+    function isConditionUnfulfilled(bytes32 _condition) public view returns (bool) {
+        return ( conditionStoreManager.getConditionState(_condition) ==
+            ConditionStoreLibrary.ConditionState.Unfulfilled );
+    }
+
+    function isConditionFulfilled(bytes32 _condition) public view returns (bool) {
+        return ( conditionStoreManager.getConditionState(_condition) ==
+            ConditionStoreLibrary.ConditionState.Fulfilled );
+    }
+
+    function isConditionAborted(bytes32 _condition) public view returns (bool) {
+        return ( conditionStoreManager.getConditionState(_condition) ==
+            ConditionStoreLibrary.ConditionState.Aborted);
     }
 }

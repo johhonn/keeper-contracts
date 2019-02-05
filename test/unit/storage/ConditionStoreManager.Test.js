@@ -6,6 +6,7 @@ const chai = require('chai')
 const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
+
 const EpochLibrary = artifacts.require('EpochLibrary.sol')
 const ConditionStoreLibrary = artifacts.require('ConditionStoreLibrary.sol')
 const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
@@ -119,7 +120,7 @@ contract('ConditionStore constructor', (accounts) => {
             let conditionTimeLock = 1
             let conditionTimeOut = 10
 
-            let currentBlockNumber = await conditionStoreManager.getCurrentBlockNumber()
+            let currentBlockNumber = await epochLibrary.getCurrentBlockNumber()
 
             await conditionStoreManager.createCondition(
                 conditionId,
@@ -164,7 +165,7 @@ contract('ConditionStore constructor', (accounts) => {
 
             await assert.isRejected(
                 conditionStoreManager.createCondition(conditionId, conditionType),
-                'Invalid address: 0x0'
+                constants.address.error.invalidAddress0x0
             )
         })
     })
@@ -218,7 +219,7 @@ contract('ConditionStore constructor', (accounts) => {
             let newState = constants.condition.state.unfulfilled
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, newState),
-                'Invalid UpdateRole'
+                constants.acl.error.invalidUpdateRole
             )
         })
 
@@ -249,7 +250,7 @@ contract('ConditionStore constructor', (accounts) => {
             let newState = constants.condition.state.uninitialized
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, newState),
-                'Invalid state transition'
+                constants.condition.state.error.invalidStateTransition
             )
         })
 
@@ -260,7 +261,7 @@ contract('ConditionStore constructor', (accounts) => {
             let newState = constants.condition.state.unfulfilled
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, newState),
-                'Invalid state transition'
+                constants.condition.state.error.invalidStateTransition
             )
         })
 
@@ -271,7 +272,7 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, constants.condition.state.unfulfilled),
-                'Invalid state transition'
+                constants.condition.state.error.invalidStateTransition
             )
         })
 
@@ -282,7 +283,7 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, constants.condition.state.unfulfilled),
-                'Invalid state transition'
+                constants.condition.state.error.invalidStateTransition
             )
         })
 
@@ -293,7 +294,7 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, constants.condition.state.unfulfilled),
-                'Invalid state transition'
+                constants.condition.state.error.invalidStateTransition
             )
         })
 
@@ -304,7 +305,7 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, constants.condition.state.uninitialized),
-                'Invalid state transition'
+                constants.condition.state.error.invalidStateTransition
             )
         })
 
@@ -315,7 +316,7 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, constants.condition.state.uninitialized),
-                'Invalid state transition'
+                constants.condition.state.error.invalidStateTransition
             )
         })
 
@@ -326,7 +327,7 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted),
-                'Invalid state transition'
+                constants.condition.state.error.invalidStateTransition
             )
         })
 
@@ -337,7 +338,7 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled),
-                'Invalid state transition'
+                constants.condition.state.error.invalidStateTransition
             )
         })
 
@@ -348,7 +349,7 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled),
-                'Invalid state transition'
+                constants.condition.state.error.invalidStateTransition
             )
         })
 
@@ -359,7 +360,7 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted),
-                'Invalid state transition'
+                constants.condition.state.error.invalidStateTransition
             )
         })
 
@@ -370,7 +371,7 @@ contract('ConditionStore constructor', (accounts) => {
             let newState = constants.condition.state.unfulfilled
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, newState),
-                'Invalid UpdateRole'
+                constants.acl.error.invalidUpdateRole
             )
         })
 

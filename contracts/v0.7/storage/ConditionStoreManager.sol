@@ -136,4 +136,11 @@ contract ConditionStoreManager is Initializable, Common {
     function getConditionListSize() public view returns (uint size) {
         return conditionList.conditionIds.length;
     }
+
+    function getConditionState(bytes32 _id)
+        public
+        view
+        returns (ConditionStoreLibrary.ConditionState) {
+        return conditionList.conditions[_id].state;
+    }
 }

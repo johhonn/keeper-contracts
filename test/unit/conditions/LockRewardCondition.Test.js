@@ -1,26 +1,51 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, assert, contract, describe, it, beforeEach */
+/* global artifacts, contract, describe, it, beforeEach */
 
+const chai = require('chai')
+const { assert } = chai
+const chaiAsPromised = require('chai-as-promised')
+chai.use(chaiAsPromised)
+
+const EpochLibrary = artifacts.require('EpochLibrary.sol')
 const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
 const OceanToken = artifacts.require('OceanToken.sol')
 const LockRewardCondition = artifacts.require('LockRewardCondition.sol')
-const constants = require('../helpers/constants.js')
-const Web3 = require('web3')
-
-const nodeUrl = `http://localhost:${process.env.ETHEREUM_RPC_PORT || '8545'}`
-let web3 = new Web3(new Web3.providers.HttpProvider(nodeUrl))
-let getBalance = async (token, address) => {
-    return web3.utils.toDecimal(
-        await token.balanceOf.call(address)
-    )
-}
+const constants = require('../../helpers/constants.js')
+const getBalance = require('../../helpers/getBalance.js')
 
 contract('LockRewardCondition constructor', (accounts) => {
+    async function setupTest({
+        conditionId = constants.bytes32.one,
+        conditionType = constants.address.dummy,
+        createRole = accounts[0],
+        setupConditionStoreManager = true
+    } = {}) {
+        const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+        await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
+
+        const conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
+        if (setupConditionStoreManager) {
+            await conditionStoreManager.setup(createRole)
+        }
+        const oceanToken = await OceanToken.new({ from: createRole })
+        await oceanToken.initialize(createRole)
+
+        const lockRewardCondition = await LockRewardCondition.new(
+            conditionStoreManager.address,
+            oceanToken.address,
+            { from: createRole }
+        )
+        return { lockRewardCondition, oceanToken, conditionStoreManager, conditionId, conditionType, createRole }
+    }
+
     describe('deploy and setup', () => {
         it('contract should deploy', async () => {
-            let conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            let oceanToken = await OceanToken.new({ from: accounts[0] })
+            const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+            await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
+
+            const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
+            const oceanToken = await OceanToken.new({ from: accounts[0] })
             await LockRewardCondition.new(
                 conditionStoreManager.address,
                 oceanToken.address,
@@ -29,22 +54,9 @@ contract('LockRewardCondition constructor', (accounts) => {
     })
 
     describe('fulfill non existing condition', () => {
-        let conditionStoreManager
-        let oceanToken
-        let lockRewardCondition
-        let createRole = accounts[0]
-
-        beforeEach(async () => {
-            conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
-            await conditionStoreManager.setup(createRole)
-            oceanToken = await OceanToken.new({ from: createRole })
-            lockRewardCondition = await LockRewardCondition.new(
-                conditionStoreManager.address,
-                oceanToken.address,
-                { from: createRole })
-        })
-
         it('should not fulfill if conditions do not exist', async () => {
+            const { lockRewardCondition, oceanToken } = await setupTest()
+
             let nonce = constants.bytes32.one
             let rewardAddress = accounts[2]
             let sender = accounts[0]
@@ -56,33 +68,17 @@ contract('LockRewardCondition constructor', (accounts) => {
                 amount,
                 { from: sender })
 
-            try {
-                await lockRewardCondition.fulfill(nonce, rewardAddress, amount)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid UpdateRole')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                lockRewardCondition.fulfill(nonce, rewardAddress, amount),
+                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+            )
         })
     })
 
     describe('fulfill existing condition', () => {
-        let conditionStoreManager
-        let oceanToken
-        let lockRewardCondition
-        let createRole = accounts[0]
-
-        beforeEach(async () => {
-            conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
-            await conditionStoreManager.setup(createRole)
-            oceanToken = await OceanToken.new({ from: createRole })
-            lockRewardCondition = await LockRewardCondition.new(
-                conditionStoreManager.address,
-                oceanToken.address,
-                { from: createRole })
-        })
-
         it('should fulfill if conditions exist for account address', async () => {
+            const { lockRewardCondition, oceanToken, conditionStoreManager } = await setupTest()
+
             let nonce = constants.bytes32.one
             let rewardAddress = accounts[2]
             let sender = accounts[0]
@@ -103,29 +99,16 @@ contract('LockRewardCondition constructor', (accounts) => {
 
             await lockRewardCondition.fulfill(nonce, rewardAddress, amount)
             let { state } = await conditionStoreManager.getCondition(conditionId)
-            assert.strictEqual(constants.condition.state.fulfilled, state.toNumber())
+            assert.strictEqual(state.toNumber(), constants.condition.state.fulfilled)
             let rewardBalance = await getBalance(oceanToken, rewardAddress)
             assert.strictEqual(rewardBalance, amount)
         })
     })
 
     describe('fail to fulfill existing condition', () => {
-        let conditionStoreManager
-        let oceanToken
-        let lockRewardCondition
-        let createRole = accounts[0]
-
-        beforeEach(async () => {
-            conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
-            await conditionStoreManager.setup(createRole)
-            oceanToken = await OceanToken.new({ from: createRole })
-            lockRewardCondition = await LockRewardCondition.new(
-                conditionStoreManager.address,
-                oceanToken.address,
-                { from: createRole })
-        })
-
         it('out of balance should fail to fulfill if conditions exist', async () => {
+            const { lockRewardCondition, conditionStoreManager } = await setupTest()
+
             let nonce = constants.bytes32.one
             let rewardAddress = accounts[2]
             let amount = 10
@@ -137,16 +120,15 @@ contract('LockRewardCondition constructor', (accounts) => {
                 conditionId,
                 lockRewardCondition.address)
 
-            try {
-                await lockRewardCondition.fulfill(nonce, rewardAddress, amount)
-            } catch (e) {
-                assert.strictEqual(e.reason, undefined)
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                lockRewardCondition.fulfill(nonce, rewardAddress, amount),
+                undefined
+            )
         })
 
         it('not approved should fail to fulfill if conditions exist', async () => {
+            const { lockRewardCondition, oceanToken, conditionStoreManager } = await setupTest()
+
             let nonce = constants.bytes32.one
             let rewardAddress = accounts[2]
             let amount = 10
@@ -161,16 +143,15 @@ contract('LockRewardCondition constructor', (accounts) => {
 
             await oceanToken.mint(sender, amount)
 
-            try {
-                await lockRewardCondition.fulfill(nonce, rewardAddress, amount)
-            } catch (e) {
-                assert.strictEqual(e.reason, undefined)
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                lockRewardCondition.fulfill(nonce, rewardAddress, amount),
+                undefined
+            )
         })
 
         it('right transfer should fail to fulfill if conditions already fulfilled', async () => {
+            const { lockRewardCondition, oceanToken, conditionStoreManager } = await setupTest()
+
             let nonce = constants.bytes32.one
             let rewardAddress = accounts[2]
             let amount = 10
@@ -190,21 +171,24 @@ contract('LockRewardCondition constructor', (accounts) => {
                 { from: sender })
 
             await lockRewardCondition.fulfill(nonce, rewardAddress, amount)
-            let { state } = await conditionStoreManager.getCondition(conditionId)
-            assert.strictEqual(constants.condition.state.fulfilled, state.toNumber())
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
+                constants.condition.state.fulfilled
+            )
 
-            try {
-                await lockRewardCondition.fulfill(nonce, rewardAddress, amount)
-            } catch (e) {
-                assert.strictEqual(e.reason, undefined)
-                let { state } = await conditionStoreManager.getCondition(conditionId)
-                assert.strictEqual(constants.condition.state.fulfilled, state.toNumber())
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                lockRewardCondition.fulfill(nonce, rewardAddress, amount),
+                undefined
+            )
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
+                constants.condition.state.fulfilled
+            )
         })
 
         it('should fail to fulfill if conditions has different type ref', async () => {
+            const { lockRewardCondition, oceanToken, conditionStoreManager } = await setupTest()
+
             let nonce = constants.bytes32.one
             let rewardAddress = accounts[2]
             let amount = 10
@@ -223,13 +207,10 @@ contract('LockRewardCondition constructor', (accounts) => {
                 amount,
                 { from: sender })
 
-            try {
-                await lockRewardCondition.fulfill(nonce, rewardAddress, amount)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid UpdateRole')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                lockRewardCondition.fulfill(nonce, rewardAddress, amount),
+                constants.acl.error.invalidUpdateRole
+            )
         })
     })
 })

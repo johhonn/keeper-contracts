@@ -1,4 +1,7 @@
 let constants = {
+    keeper: {
+        nodeUrl: `http://localhost:${process.env.ETHEREUM_RPC_PORT || '8545'}`
+    },
     address: {
         zero: '0x0000000000000000000000000000000000000000',
         dummy: '0xeE9300b7961e0a01d9f0adb863C7A227A07AaD75',
@@ -15,7 +18,11 @@ let constants = {
             uninitialized: 0,
             unfulfilled: 1,
             fulfilled: 2,
-            aborted: 3
+            aborted: 3,
+            error: {
+                invalidStateTransition: 'Invalid state transition',
+                conditionNeedsToBeUnfulfilled: 'Condition needs to be Unfulfilled'
+            }
         },
         hashlock: {
             string: {
@@ -35,9 +42,25 @@ let constants = {
             bytes32: {
                 message: '0x225cded94ed000b85624acb3090384c7676fe920939ba66d994b7fd54459b85a',
                 signature: '0x89e0243d7bd929e499b18640565a532bebe490cbe7cfec432462e47e702852' +
-                           '284e6cc334870e8be586388af53b524ca6773de977270940a0239f06524fcd25891b',
+                    '284e6cc334870e8be586388af53b524ca6773de977270940a0239f06524fcd25891b',
                 publicKey: '0x00Bd138aBD70e2F00903268F3Db08f2D25677C9e'
+            },
+            error: {
+                couldNotRecoverSignature: 'Could not recover signature'
             }
+        },
+        reward: {
+            escrowReward: {
+                error: {
+                    lockConditionNeedsToBeFulfilled: 'LockCondition needs to be Fulfilled'
+                }
+            }
+        }
+    },
+    acl: {
+        error: {
+            invalidCreateRole: 'Invalid CreateRole',
+            invalidUpdateRole: 'Invalid UpdateRole'
         }
     },
     did: '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
