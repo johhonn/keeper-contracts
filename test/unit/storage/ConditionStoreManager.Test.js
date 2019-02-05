@@ -6,49 +6,58 @@ const chai = require('chai')
 const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
+const EpochLibrary = artifacts.require('EpochLibrary.sol')
+const ConditionStoreLibrary = artifacts.require('ConditionStoreLibrary.sol')
 const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
 const constants = require('../helpers/constants.js')
-const testUtils = require('../../helpers/utils.js')
-
+const Common = artifacts.require('Common.sol')
 
 contract('ConditionStore constructor', (accounts) => {
-    let conditionId
-    let conditionType
-
     async function setupTest({
-        conditionId = testUtils.generateId(),
+        conditionId = constants.bytes32.one,
         conditionType = constants.address.dummy,
         createRole = accounts[0],
         setupConditionStoreManager = true
     } = {}) {
-        const conditionStoreManager = await ConditionStoreManager.deployed({ from: accounts[0] })
+        const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+        await ConditionStoreLibrary.link('EpochLibrary', epochLibrary.address)
+        const conditionStoreLibrary = await ConditionStoreLibrary.new({ from: accounts[0] })
+        await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
+        await ConditionStoreManager.link('ConditionStoreLibrary', conditionStoreLibrary.address)
+        const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
+
         if (setupConditionStoreManager) {
             await conditionStoreManager.setup(createRole)
         }
-        return { conditionStoreManager, conditionId, conditionType, createRole }
+        return { epochLibrary, conditionStoreManager, conditionId, conditionType, createRole }
     }
 
     describe('deploy and setup', () => {
         it('contract should deploy', async () => {
             // act-assert
-            await ConditionStoreManager.deployed({ from: accounts[0] })
+            const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+            await ConditionStoreLibrary.link('EpochLibrary', epochLibrary.address)
+            const conditionStoreLibrary = await ConditionStoreLibrary.new({ from: accounts[0] })
+            await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
+            await ConditionStoreManager.link('ConditionStoreLibrary', conditionStoreLibrary.address)
+            const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
         })
 
         it('contract should setup', async () => {
-            let conditionStoreManager = await ConditionStoreManager.deployed({ from: accounts[0] })
+            let conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
             let getCreateRole = await conditionStoreManager.getCreateRole()
             // address should be 0x0 before setup
             assert.strictEqual(getCreateRole, constants.address.zero)
 
             // address should be set after correct setup
-            let createRole = accounts[0]
+            let createRole = accounts[1]
             await conditionStoreManager.setup(createRole)
             getCreateRole = await conditionStoreManager.getCreateRole()
             assert.strictEqual(getCreateRole, createRole)
         })
 
         it('contract should not setup with zero', async () => {
-            let conditionStoreManager = await ConditionStoreManager.deployed({ from: accounts[0] })
+            let conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
 
             // setup with zero fails
             let createRole = constants.address.zero
@@ -60,29 +69,28 @@ contract('ConditionStore constructor', (accounts) => {
 
         it('anyone should not change createRole after setup', async () => {
             // setup correctly
-            let conditionStoreManager = await ConditionStoreManager.deployed({ from: accounts[0] })
-            // actual createRole
-            let createRole = accounts[0]
+            let conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
+            let createRole = accounts[1]
+            await conditionStoreManager.setup(createRole)
+
+            let getCreateRole = await conditionStoreManager.getCreateRole()
+            assert.strictEqual(getCreateRole, createRole)
 
             // try to force with other account
-            let otherCreateRole = accounts[1]
+            let otherCreateRole = accounts[0]
             assert.notEqual(otherCreateRole, createRole)
             await conditionStoreManager.setup(otherCreateRole)
-            let getCreateRole = await conditionStoreManager.getCreateRole()
             assert.strictEqual(getCreateRole, createRole)
         })
     })
 
     describe('create conditions', () => {
-        let conditionStoreManager
-        let createRole = accounts[0]
-
-        beforeEach(async () => {
-            conditionStoreManager = await ConditionStoreManager.deployed({ from: accounts[0] })
-        })
-
         it('createRole should create', async () => {
             const { conditionStoreManager, conditionId, conditionType } = await setupTest()
+
+            assert.strictEqual(await conditionStoreManager.exists(conditionId), false)
+            assert.strictEqual((await conditionStoreManager.getConditionListSize()).toNumber(), 0)
+
             // conditionId should exist after create
             await conditionStoreManager.createCondition(conditionId, conditionType)
             assert.strictEqual(await conditionStoreManager.exists(conditionId), true)
@@ -107,10 +115,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('createRole should create with nonzero timeout and timelock', async () => {
-            await conditionStoreManager.setup(createRole)
-
-            let conditionId = testUtils.generateId()
-            let conditionType = constants.address.dummy
+            const { conditionStoreManager, epochLibrary, conditionId, conditionType } = await setupTest()
             let conditionTimeLock = 1
             let conditionTimeOut = 10
 
@@ -138,16 +143,24 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('invalid createRole should not create', async () => {
-            const { conditionStoreManager, conditionId, conditionType } = await setupTest({ createRole: accounts[1] })
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType
+            } = await setupTest({ createRole: accounts[1] })
 
             await assert.isRejected(
-                conditionStoreManager.createCondition(conditionId, conditionType, { from: accounts[1] }),
+                conditionStoreManager.createCondition(conditionId, conditionType),
                 'Invalid CreateRole'
             )
         })
 
         it('invalid address should not create', async () => {
-            const { conditionStoreManager, conditionId, conditionType } = await setupTest({ conditionType: constants.address.zero })
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType
+            } = await setupTest({ conditionType: constants.address.zero })
 
             await assert.isRejected(
                 conditionStoreManager.createCondition(conditionId, conditionType),
