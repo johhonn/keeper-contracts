@@ -12,37 +12,37 @@ contract HashLockCondition is Condition {
         conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
     }
 
-    function hashValues(uint256 preimage)
+    function hashValues(uint256 _preimage)
         public
         pure
         returns (bytes32)
     {
-        return hashValues(abi.encodePacked(preimage));
+        return hashValues(abi.encodePacked (_preimage));
     }
 
-    function hashValues(string memory preimage)
+    function hashValues(string memory _preimage)
         public
         pure
         returns (bytes32)
     {
-        return hashValues(abi.encodePacked(preimage));
+        return hashValues(abi.encodePacked (_preimage));
     }
 
-    function hashValues(bytes32 preimage)
+    function hashValues(bytes32 _preimage)
         public
         pure
         returns
         (bytes32)
     {
-        return hashValues(abi.encodePacked(preimage));
+        return hashValues(abi.encodePacked (_preimage));
     }
 
-    function hashValues(bytes memory preimage)
+    function hashValues(bytes memory _preimage)
         public
         pure
         returns (bytes32)
     {
-        return keccak256(preimage);
+        return keccak256 (_preimage);
     }
 
     function fulfill(

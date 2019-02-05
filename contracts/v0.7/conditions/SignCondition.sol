@@ -14,28 +14,28 @@ contract SignCondition is Condition {
         conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
     }
 
-    function hashValues(bytes32 message, address publicKey)
+    function hashValues(bytes32 message, address _publicKey)
         public
         pure
         returns (bytes32)
     {
-        return keccak256(abi.encodePacked(message, publicKey));
+        return keccak256(abi.encodePacked (_message, _publicKey));
     }
 
-    function hashValues(string memory message, address publicKey)
+    function hashValues(string memory message, address _publicKey)
         public
         pure
         returns (bytes32)
     {
-        return keccak256(abi.encodePacked(message, publicKey));
+        return keccak256(abi.encodePacked (_message, _publicKey));
     }
 
-    function hashValues(bytes memory message, address publicKey)
+    function hashValues(bytes memory message, address _publicKey)
         public
         pure
         returns (bytes32)
     {
-        return keccak256(abi.encodePacked(message, publicKey));
+        return keccak256(abi.encodePacked (_message, _publicKey));
     }
 
     function fulfill(

@@ -152,7 +152,7 @@ contract('ConditionStore constructor', (accounts) => {
 
             await assert.isRejected(
                 conditionStoreManager.createCondition(conditionId, conditionType),
-                'Invalid CreateRole'
+                constants.acl.error.invalidCreateRole
             )
         })
 
