@@ -3,18 +3,17 @@ pragma solidity 0.5.3;
 import './Condition.sol';
 import '../libraries/ConditionStoreLibrary.sol';
 import 'openzeppelin-eth/contracts/cryptography/ECDSA.sol';
-import 'zos-lib/contracts/Initializable.sol';
+//import 'zos-lib/contracts/Initializable.sol';
 
 contract SignCondition is Condition {
 
-    function initialize(address _conditionStoreManagerAddress)
+    constructor(address _conditionStoreManagerAddress)
         public
-        initializer()
     {
         conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
     }
 
-    function hashValues(bytes32 message, address _publicKey)
+    function hashValues(bytes32 _message, address _publicKey)
         public
         pure
         returns (bytes32)
@@ -22,7 +21,7 @@ contract SignCondition is Condition {
         return keccak256(abi.encodePacked (_message, _publicKey));
     }
 
-    function hashValues(string memory message, address _publicKey)
+    function hashValues(string memory _message, address _publicKey)
         public
         pure
         returns (bytes32)
@@ -30,7 +29,7 @@ contract SignCondition is Condition {
         return keccak256(abi.encodePacked (_message, _publicKey));
     }
 
-    function hashValues(bytes memory message, address _publicKey)
+    function hashValues(bytes memory _message, address _publicKey)
         public
         pure
         returns (bytes32)

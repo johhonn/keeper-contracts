@@ -1,6 +1,7 @@
 pragma solidity 0.5.3;
 
 import './ConditionStoreManager.sol';
+import './TemplateStoreManager.sol';
 import '../libraries/AgreementStoreLibrary.sol';
 import 'zos-lib/contracts/Initializable.sol';
 
@@ -9,6 +10,7 @@ contract AgreementStoreManager is Initializable {
     using AgreementStoreLibrary for AgreementStoreLibrary.AgreementList;
 
     ConditionStoreManager private conditionStoreManager;
+    TemplateStoreManager private templateStoreManager;
     AgreementStoreLibrary.AgreementList private agreementList;
 
     modifier uniqueId(bytes32 _id) {
@@ -19,8 +21,22 @@ contract AgreementStoreManager is Initializable {
         _;
     }
 
-    constructor(address _conditionStoreManagerAddress) public {
+    modifier nonZero(bytes32 _value) {
+        require(
+            _value != 0x0,
+            'Value cannot be 0x0'
+        );
+        _;
+    }
+
+    constructor(
+        address _conditionStoreManagerAddress,
+        address _templateStoreManagerAddress
+    )
+        public
+    {
         conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
+        templateStoreManager = TemplateStoreManager(_templateStoreManagerAddress);
     }
 
     function createAgreement(
@@ -31,8 +47,27 @@ contract AgreementStoreManager is Initializable {
     )
         public
         uniqueId(_id)
+        nonZero(_did)
         returns (uint size)
     {
+        require(
+            templateStoreManager.exists(_templateId) == true,
+            'Template must exist'
+        );
+
+        address[] memory conditionTypes = templateStoreManager.getConditionTypes(_templateId);
+        require(
+            conditionTypes.length == _conditionIds.length,
+            'conditionIds has wrong length'
+        );
+
+
+        for (uint256 i = 0; i < conditionTypes.length; i++) {
+            conditionStoreManager.createCondition(
+                _conditionIds[i],
+                conditionTypes[i]
+            );
+        }
         return agreementList.create(
             _id,
             _did,
@@ -47,7 +82,7 @@ contract AgreementStoreManager is Initializable {
         returns (bool)
     {
         return (
-            agreementList.agreements[_id].templateId != 0x0
+            agreementList.agreements[_id].did != 0x0
         );
     }
 
