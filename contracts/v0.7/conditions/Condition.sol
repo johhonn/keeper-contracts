@@ -21,7 +21,10 @@ contract Condition is Initializable {
         _;
     }
 
-    modifier onlyValidFulfillState(ConditionStoreLibrary.ConditionState _state) {
+    modifier onlyValidFulfillState(
+        ConditionStoreLibrary.ConditionState _state
+    )
+    {
         require(
             _state > ConditionStoreLibrary.ConditionState.Unfulfilled,
             'New state needs to be higher than Unfulfilled'
@@ -59,22 +62,34 @@ contract Condition is Initializable {
         return conditionStoreManager.updateConditionState(_id, _newState);
     }
 
-    function isConditionUninitialized(bytes32 _condition) public view returns (bool) {
+    function isConditionUninitialized(bytes32 _condition)
+        public view
+        returns (bool)
+    {
         return ( conditionStoreManager.getConditionState(_condition) ==
             ConditionStoreLibrary.ConditionState.Uninitialized );
     }
 
-    function isConditionUnfulfilled(bytes32 _condition) public view returns (bool) {
+    function isConditionUnfulfilled(bytes32 _condition)
+        public view
+        returns (bool)
+    {
         return ( conditionStoreManager.getConditionState(_condition) ==
             ConditionStoreLibrary.ConditionState.Unfulfilled );
     }
 
-    function isConditionFulfilled(bytes32 _condition) public view returns (bool) {
+    function isConditionFulfilled(bytes32 _condition)
+        public view
+        returns (bool)
+    {
         return ( conditionStoreManager.getConditionState(_condition) ==
             ConditionStoreLibrary.ConditionState.Fulfilled );
     }
 
-    function isConditionAborted(bytes32 _condition) public view returns (bool) {
+    function isConditionAborted(bytes32 _condition)
+        public view
+        returns (bool)
+    {
         return ( conditionStoreManager.getConditionState(_condition) ==
             ConditionStoreLibrary.ConditionState.Aborted);
     }

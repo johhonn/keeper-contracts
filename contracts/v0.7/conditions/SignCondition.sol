@@ -11,7 +11,8 @@ contract SignCondition is Condition {
         public
         initializer()
     {
-        conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
+        conditionStoreManager =
+            ConditionStoreManager(_conditionStoreManagerAddress);
     }
 
     function hashValues(bytes32 message, address publicKey)
