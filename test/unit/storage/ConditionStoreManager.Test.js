@@ -11,7 +11,6 @@ const EpochLibrary = artifacts.require('EpochLibrary.sol')
 const ConditionStoreLibrary = artifacts.require('ConditionStoreLibrary.sol')
 const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
 const constants = require('../../helpers/constants.js')
-const Common = artifacts.require('Common.sol')
 
 contract('ConditionStore constructor', (accounts) => {
     async function setupTest({
@@ -41,7 +40,7 @@ contract('ConditionStore constructor', (accounts) => {
             const conditionStoreLibrary = await ConditionStoreLibrary.new({ from: accounts[0] })
             await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
             await ConditionStoreManager.link('ConditionStoreLibrary', conditionStoreLibrary.address)
-            const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
+            await ConditionStoreManager.new({ from: accounts[0] })
         })
 
         it('contract should setup', async () => {

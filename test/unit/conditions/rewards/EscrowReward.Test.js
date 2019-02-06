@@ -13,7 +13,6 @@ const OceanToken = artifacts.require('OceanToken.sol')
 const LockRewardCondition = artifacts.require('LockRewardCondition.sol')
 const EscrowReward = artifacts.require('EscrowReward.sol')
 const constants = require('../../../helpers/constants.js')
-const getBalance = require('../../../helpers/getBalance.js')
 
 contract('EscrowReward constructor', (accounts) => {
     async function setupTest({
@@ -98,10 +97,10 @@ contract('EscrowReward constructor', (accounts) => {
             await conditionStoreManager.createCondition(
                 conditionLockId,
                 lockRewardCondition.address)
-            
+
             let lockConditionId = conditionLockId
             let releaseConditionId = conditionLockId
-            
+
             let hashValues = await escrowReward.hashValues(
                 amount,
                 receiver,
