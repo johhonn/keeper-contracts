@@ -115,7 +115,7 @@ contract('ConditionStore constructor', (accounts) => {
         })
 
         it('createRole should create with nonzero timeout and timelock', async () => {
-            const { conditionStoreManager, epochLibrary, conditionId, conditionType } = await setupTest()
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest()
             let conditionTimeLock = 1
             let conditionTimeOut = 10
 

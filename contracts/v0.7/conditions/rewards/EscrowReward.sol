@@ -12,6 +12,11 @@ contract EscrowReward is Reward {
     )
         public
     {
+        require(
+            _tokenAddress != address(0) &&
+            _conditionStoreManagerAddress != address(0),
+            'Invalid address'
+        );
         conditionStoreManager =
             ConditionStoreManager(_conditionStoreManagerAddress);
         token = OceanToken(_tokenAddress);
@@ -89,7 +94,7 @@ contract EscrowReward is Reward {
             token.transfer(_receiver, _amount),
             'Could not transfer token'
         );
-        return __fulfill(
+        return fulfill(
             _id,
             ConditionStoreLibrary.ConditionState.Fulfilled
         );

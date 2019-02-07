@@ -9,6 +9,10 @@ contract HashLockCondition is Condition {
         public
         initializer()
     {
+        require(
+            _conditionStoreManagerAddress != address(0),
+            'Invalid address'
+        );
         conditionStoreManager =
             ConditionStoreManager(_conditionStoreManagerAddress);
     }
@@ -82,7 +86,7 @@ contract HashLockCondition is Condition {
         private
         returns (ConditionStoreLibrary.ConditionState)
     {
-        return __fulfill(
+        return fulfill(
             _generatedId,
             ConditionStoreLibrary.ConditionState.Fulfilled
         );

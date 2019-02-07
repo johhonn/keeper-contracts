@@ -15,6 +15,11 @@ contract LockRewardCondition is Condition {
         public
         initializer()
     {
+        require(
+            _tokenAddress != address(0) &&
+            _conditionStoreManagerAddress != address(0),
+            'Invalid address'
+        );
         conditionStoreManager =
             ConditionStoreManager(_conditionStoreManagerAddress);
         token = OceanToken(_tokenAddress);
@@ -44,7 +49,7 @@ contract LockRewardCondition is Condition {
             token.transfer(rewardContractAddress, amount),
             'Could not transfer token'
         );
-        return __fulfill(
+        return fulfill(
             generateId(agreementId, hashValues(rewardContractAddress, amount)),
             ConditionStoreLibrary.ConditionState.Fulfilled
         );
