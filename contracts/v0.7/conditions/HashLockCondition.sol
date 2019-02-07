@@ -4,45 +4,24 @@ import './Condition.sol';
 
 contract HashLockCondition is Condition {
 
-    constructor(address _conditionStoreManagerAddress)
-        public
-    {
-        conditionStoreManager = ConditionStoreManager(
-            _conditionStoreManagerAddress
-            );
+    constructor(address _conditionStoreManagerAddress) public {
+        conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
     }
 
-    function hashValues(uint256 preimage)
-        public
-        pure
-        returns (bytes32)
-    {
-        return hashValues(abi.encodePacked(preimage));
+    function hashValues(uint256 _preimage) public pure returns (bytes32) {
+        return hashValues(abi.encodePacked(_preimage));
     }
 
-    function hashValues(string memory preimage)
-        public
-        pure
-        returns (bytes32)
-    {
-        return hashValues(abi.encodePacked(preimage));
+    function hashValues(string memory _preimage) public pure returns (bytes32) {
+        return hashValues(abi.encodePacked(_preimage));
     }
 
-    function hashValues(bytes32 preimage)
-        public
-        pure
-        returns
-        (bytes32)
-    {
-        return hashValues(abi.encodePacked(preimage));
+    function hashValues(bytes32 _preimage) public pure returns (bytes32) {
+        return hashValues(abi.encodePacked(_preimage));
     }
 
-    function hashValues(bytes memory preimage)
-        public
-        pure
-        returns (bytes32)
-    {
-        return keccak256(preimage);
+    function hashValues(bytes memory _preimage) public pure returns (bytes32) {
+        return keccak256(_preimage);
     }
 
     function fulfill(

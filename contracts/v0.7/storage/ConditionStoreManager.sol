@@ -1,10 +1,12 @@
 pragma solidity 0.5.3;
 
+import '../Common.sol';
 import '../libraries/EpochLibrary.sol';
 import '../libraries/ConditionStoreLibrary.sol';
+import 'zos-lib/contracts/Initializable.sol';
 
-contract ConditionStoreManager {
-    using EpochLibrary for EpochLibrary.Epoch;
+contract ConditionStoreManager is Initializable, Common {
+
     using ConditionStoreLibrary for ConditionStoreLibrary.ConditionList;
 
     address private _createRole;
@@ -133,5 +135,12 @@ contract ConditionStoreManager {
 
     function getConditionListSize() public view returns (uint size) {
         return conditionList.conditionIds.length;
+    }
+
+    function getConditionState(bytes32 _id)
+        public
+        view
+        returns (ConditionStoreLibrary.ConditionState) {
+        return conditionList.conditions[_id].state;
     }
 }

@@ -68,10 +68,4 @@ library ConditionStoreLibrary {
         _self.conditions[_id].state = _newState;
         return _newState;
     }
-
-
-//    function isTimeout(bytes32 id) public view returns (bool) {
-//        return ( (ConditionList._conditions[id].timeout > 0)
-//                  && (block.number > ConditionList._conditions[id].timeout) );
-//    }
 }
