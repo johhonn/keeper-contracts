@@ -15,6 +15,11 @@ contract LockRewardCondition is Condition {
         public
         initializer()
     {
+        require(
+            _tokenAddress != address(0) &&
+            _conditionStoreManagerAddress != address(0),
+            'Invalid address'
+        );
         conditionStoreManager =
             ConditionStoreManager(_conditionStoreManagerAddress);
         token = OceanToken(_tokenAddress);
