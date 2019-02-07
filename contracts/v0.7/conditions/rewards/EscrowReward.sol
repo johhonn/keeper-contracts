@@ -94,7 +94,7 @@ contract EscrowReward is Reward {
             token.transfer(_receiver, _amount),
             'Could not transfer token'
         );
-        return __fulfill(
+        return fulfill(
             _id,
             ConditionStoreLibrary.ConditionState.Fulfilled
         );

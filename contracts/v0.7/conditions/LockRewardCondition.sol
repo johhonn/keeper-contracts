@@ -49,7 +49,7 @@ contract LockRewardCondition is Condition {
             token.transfer(rewardContractAddress, amount),
             'Could not transfer token'
         );
-        return __fulfill(
+        return fulfill(
             generateId(agreementId, hashValues(rewardContractAddress, amount)),
             ConditionStoreLibrary.ConditionState.Fulfilled
         );

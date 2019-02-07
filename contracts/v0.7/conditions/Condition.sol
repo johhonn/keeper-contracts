@@ -49,7 +49,7 @@ contract Condition is Initializable {
         );
     }
 
-    function __fulfill(
+    function fulfill(
         bytes32 _id,
         ConditionStoreLibrary.ConditionState _newState
     )
