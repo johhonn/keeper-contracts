@@ -71,14 +71,19 @@ contract('AgreementStoreManager', (accounts) => {
             const templateId = constants.bytes32.one
             await templateStoreManager.createTemplate(
                 templateId,
-                [constants.address.dummy, accounts[0]]
+                [
+                    constants.address.dummy,
+                    accounts[0]
+                ]
             )
             const storedTemplate = await templateStoreManager.getTemplate(templateId)
 
             const agreement = {
                 did: constants.did,
                 templateId: constants.bytes32.one,
-                conditionIds: [constants.bytes32.zero]
+                conditionIds: [constants.bytes32.zero, constants.bytes32.one],
+                timeLocks: [0, 1],
+                timeOuts: [2, 3]
             }
             const agreementId = constants.bytes32.one
 
@@ -94,12 +99,14 @@ contract('AgreementStoreManager', (accounts) => {
                 storedCondition = await conditionStoreManager.getCondition(conditionId)
                 expect(storedCondition.typeRef).to.equal(storedTemplate.conditionTypes[i])
                 expect(storedCondition.state.toNumber()).to.equal(constants.condition.state.unfulfilled)
+                expect(storedCondition.timeLock.toNumber()).to.equal(agreement.timeLocks[i])
+                expect(storedCondition.timeOut.toNumber()).to.equal(agreement.timeOuts[i])
             })
         })
     })
 
     describe('get agreement', () => {
-        it('successful create should get unfulfilled condition', async () => {
+        it('successful create should get agreement', async () => {
             const { agreementStoreManager, templateStoreManager } = await setupTest()
 
             const templateId = constants.bytes32.one
@@ -111,7 +118,9 @@ contract('AgreementStoreManager', (accounts) => {
             const agreement = {
                 did: constants.did,
                 templateId: constants.bytes32.one,
-                conditionIds: [constants.bytes32.one, constants.bytes32.zero]
+                conditionIds: [constants.bytes32.one, constants.bytes32.zero],
+                timeLocks: [0, 1],
+                timeOuts: [2, 3]
             }
             const agreementId = constants.bytes32.one
 

@@ -24,6 +24,11 @@ let constants = {
                 conditionNeedsToBeUnfulfilled: 'Condition needs to be Unfulfilled'
             }
         },
+        epoch: {
+            error: {
+                isTimeLocked: 'TimeLock is not over yet'
+            }
+        },
         hashlock: {
             string: {
                 preimage: 'oceanprotocol',
@@ -59,7 +64,7 @@ let constants = {
     },
     acl: {
         error: {
-            invalidCreateRole: 'Invalid CreateRole',
+            invalidCreateConditionRole: 'Invalid CreateConditionRole',
             invalidUpdateRole: 'Invalid UpdateRole'
         }
     },

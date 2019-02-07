@@ -43,7 +43,9 @@ contract AgreementStoreManager is Initializable {
         bytes32 _id,
         bytes32 _did,
         bytes32 _templateId,
-        bytes32[] memory _conditionIds
+        bytes32[] memory _conditionIds,
+        uint[] memory _timeLocks,
+        uint[] memory _timeOuts
     )
         public
         uniqueId(_id)
@@ -65,7 +67,9 @@ contract AgreementStoreManager is Initializable {
         for (uint256 i = 0; i < conditionTypes.length; i++) {
             conditionStoreManager.createCondition(
                 _conditionIds[i],
-                conditionTypes[i]
+                conditionTypes[i],
+                _timeLocks[i],
+                _timeOuts[i]
             );
         }
         return agreementList.create(

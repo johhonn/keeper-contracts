@@ -143,7 +143,9 @@ contract('AgreementStoreManager', (accounts) => {
                     conditionIdLock,
                     conditionIdSign,
                     conditionIdEscrow
-                ]
+                ],
+                timeLocks: [0, 0, 0],
+                timeOuts: [0, 0, 0]
             }
 
             await agreementStoreManager.createAgreement(
@@ -193,6 +195,106 @@ contract('AgreementStoreManager', (accounts) => {
             )
 
             assert.strictEqual(await getBalance(oceanToken, receiver), amount)
+        })
+
+        it('should create escrow agreement and abort after timeout', async () => {
+            const {
+                oceanToken,
+                agreementStoreManager,
+                templateStoreManager,
+                conditionStoreManager,
+                signCondition,
+                lockRewardCondition,
+                escrowReward
+            } = await setupTest()
+
+            // deploy template
+            const templateId = constants.bytes32.one
+            await templateStoreManager.createTemplate(
+                templateId,
+                [
+                    lockRewardCondition.address,
+                    signCondition.address,
+                    escrowReward.address
+                ]
+            )
+
+            const agreementId = constants.bytes32.one
+
+            let sender = accounts[0]
+            let receiver = accounts[1]
+            let amount = 10
+
+            let {
+                message,
+                publicKey,
+                signature
+            } = constants.condition.sign.bytes32
+
+            let hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
+            let conditionIdLock = await lockRewardCondition.generateId(agreementId, hashValuesLock)
+
+            let hashValuesSign = await signCondition.hashValues(message, publicKey)
+            let conditionIdSign = await signCondition.generateId(agreementId, hashValuesSign)
+
+            let hashValuesEscrow = await escrowReward.hashValues(
+                amount,
+                receiver,
+                sender,
+                conditionIdLock,
+                conditionIdSign)
+            let conditionIdEscrow = await escrowReward.generateId(agreementId, hashValuesEscrow)
+
+            const agreement = {
+                did: constants.did,
+                templateId: templateId,
+                conditionIds: [
+                    conditionIdLock,
+                    conditionIdSign,
+                    conditionIdEscrow
+                ],
+                timeLocks: [0, 0, 0],
+                timeOuts: [0, 1, 0]
+            }
+
+            await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement)
+            )
+
+            await oceanToken.mint(sender, amount)
+
+            await oceanToken.approve(
+                lockRewardCondition.address,
+                amount,
+                { from: sender })
+
+            await lockRewardCondition.fulfill(agreementId, escrowReward.address, amount)
+
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(conditionIdLock)).toNumber(),
+                constants.condition.state.fulfilled)
+
+            await signCondition.fulfill(agreementId, message, publicKey, signature)
+
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(conditionIdSign)).toNumber(),
+                constants.condition.state.aborted)
+
+            await escrowReward.fulfill(
+                agreementId,
+                amount,
+                receiver,
+                sender,
+                conditionIdLock,
+                conditionIdSign)
+
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(conditionIdEscrow)).toNumber(),
+                constants.condition.state.fulfilled
+            )
+
+            assert.strictEqual(await getBalance(oceanToken, sender), amount)
         })
     })
 })

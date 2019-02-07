@@ -1,17 +1,26 @@
 pragma solidity 0.5.3;
 
-import { EpochLibrary } from './EpochLibrary.sol';
 
 library ConditionStoreLibrary {
 
-    using EpochLibrary for EpochLibrary.Epoch;
-
     enum ConditionState { Uninitialized, Unfulfilled, Fulfilled, Aborted }
+
+    event ConditionCreated(
+        bytes32 indexed _id,
+        address indexed _typeRef,
+        address indexed _who
+    );
+
+    event ConditionUpdated(
+        bytes32 indexed _id,
+        address indexed _typeRef,
+        address indexed _who,
+        ConditionStoreLibrary.ConditionState _state
+    );
 
     struct Condition {
         address typeRef;
         ConditionState state;
-        EpochLibrary.Epoch epoch;
     }
 
     struct ConditionList {
@@ -42,17 +51,23 @@ library ConditionStoreLibrary {
     function create(
         ConditionList storage _self,
         bytes32 _id,
-        address _typeRef,
-        uint256 _timeLock,
-        uint256 _timeOut
+        address _typeRef
     )
         internal
         returns (uint size)
     {
-        _self.conditions[_id].typeRef = _typeRef;
-        _self.conditions[_id].state = ConditionState.Unfulfilled;
-        _self.conditions[_id].epoch.create(_timeLock, _timeOut);
+        _self.conditions[_id] = Condition({
+            typeRef: _typeRef,
+            state: ConditionState.Unfulfilled
+        });
         _self.conditionIds.push(_id);
+
+        emit ConditionCreated(
+            _id,
+            _typeRef,
+            msg.sender
+        );
+
         return _self.conditionIds.length;
     }
 
@@ -66,6 +81,14 @@ library ConditionStoreLibrary {
         returns (ConditionState)
     {
         _self.conditions[_id].state = _newState;
+
+        emit ConditionUpdated(
+            _id,
+            _self.conditions[_id].typeRef,
+            msg.sender,
+            _newState
+        );
+
         return _newState;
     }
 }
