@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, assert, contract, describe, it , before, beforeEach */
+/* global artifacts, assert, contract, describe, it, beforeEach */
 const PaymentConditions = artifacts.require('PaymentConditions.sol')
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
 const OceanToken = artifacts.require('OceanToken.sol')

@@ -1,5 +1,5 @@
 /* eslint-env mocha */
-/* global artifacts, assert, contract, describe, it, before */
+/* global artifacts, assert, contract, describe, it */
 /* eslint-disable no-console, max-len */
 
 const ServiceExecutionAgreement = artifacts.require('ServiceExecutionAgreement.sol')
