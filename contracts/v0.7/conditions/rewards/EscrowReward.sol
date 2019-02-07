@@ -6,11 +6,12 @@ import '../../libraries/ConditionStoreLibrary.sol';
 
 contract EscrowReward is Reward {
 
-    constructor(
+    function initialize(
         address _conditionStoreManagerAddress,
         address _tokenAddress
     )
         public
+        initializer()
     {
         require(
             _tokenAddress != address(0) &&
