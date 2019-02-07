@@ -119,7 +119,7 @@ contract('ConditionStore constructor', (accounts) => {
             let conditionTimeLock = 1
             let conditionTimeOut = 10
 
-            let currentBlockNumber = await epochLibrary.getCurrentBlockNumber()
+            let currentBlockNumber = await conditionStoreManager.getCurrentBlockNumber()
 
             await conditionStoreManager.createCondition(
                 conditionId,

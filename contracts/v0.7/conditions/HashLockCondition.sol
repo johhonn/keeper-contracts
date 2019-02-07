@@ -82,7 +82,7 @@ contract HashLockCondition is Condition {
         private
         returns (ConditionStoreLibrary.ConditionState)
     {
-        return super.fulfill(
+        return __fulfill(
             _generatedId,
             ConditionStoreLibrary.ConditionState.Fulfilled
         );

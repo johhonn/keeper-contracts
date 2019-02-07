@@ -52,7 +52,7 @@ contract SignCondition is Condition {
             ECDSA.recover(_message, _signature) == _publicKey,
             'Could not recover signature'
         );
-        return super.fulfill(
+        return __fulfill(
             generateId(_agreementId, hashValues(_message, _publicKey)),
             ConditionStoreLibrary.ConditionState.Fulfilled
         );

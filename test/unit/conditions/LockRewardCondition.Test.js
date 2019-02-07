@@ -31,7 +31,9 @@ contract('LockRewardCondition constructor', (accounts) => {
         const oceanToken = await OceanToken.new({ from: createRole })
         await oceanToken.initialize(createRole)
 
-        const lockRewardCondition = await LockRewardCondition.new(
+        const lockRewardCondition = await LockRewardCondition.new()
+
+        await lockRewardCondition.initialize(
             conditionStoreManager.address,
             oceanToken.address,
             { from: createRole }
@@ -46,7 +48,9 @@ contract('LockRewardCondition constructor', (accounts) => {
 
             const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
             const oceanToken = await OceanToken.new({ from: accounts[0] })
-            await LockRewardCondition.new(
+            const lockRewardCondition = await LockRewardCondition.new()
+
+            await lockRewardCondition.initialize(
                 conditionStoreManager.address,
                 oceanToken.address,
                 { from: accounts[0] })

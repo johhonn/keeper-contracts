@@ -31,16 +31,21 @@ contract('EscrowReward constructor', (accounts) => {
 
         const oceanToken = await OceanToken.new({ from: createRole })
         await oceanToken.initialize(createRole)
-        const lockRewardCondition = await LockRewardCondition.new(
+
+        const lockRewardCondition = await LockRewardCondition.new()
+
+        await lockRewardCondition.initialize(
             conditionStoreManager.address,
             oceanToken.address,
             { from: createRole }
         )
 
-        const escrowReward = await EscrowReward.new(
+        const escrowReward = await EscrowReward.new()
+        await escrowReward.initialize(
             conditionStoreManager.address,
             oceanToken.address,
             { from: createRole })
+
         return { escrowReward, lockRewardCondition, oceanToken, conditionStoreManager, conditionId, conditionType, createRole }
     }
 
