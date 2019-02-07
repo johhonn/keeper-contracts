@@ -167,6 +167,21 @@ contract('ConditionStore constructor', (accounts) => {
                 constants.address.error.invalidAddress0x0
             )
         })
+
+        it('existing ID should not create', async () => {
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType
+            } = await setupTest({ conditionType: accounts[0] })
+
+            await conditionStoreManager.createCondition(conditionId, conditionType)
+
+            await assert.isRejected(
+                conditionStoreManager.createCondition(conditionId, conditionType),
+                constants.condition.id.error.idAlreadyExists
+            )
+        })
     })
 
     describe('get conditions', () => {

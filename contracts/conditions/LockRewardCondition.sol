@@ -1,7 +1,7 @@
 pragma solidity 0.5.3;
 
 import './Condition.sol';
-import '../../OceanToken.sol';
+import '../OceanToken.sol';
 //import 'zos-lib/contracts/Initializable.sol';
 
 contract LockRewardCondition is Condition {

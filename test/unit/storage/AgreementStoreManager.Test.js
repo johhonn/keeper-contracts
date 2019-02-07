@@ -79,7 +79,7 @@ contract('AgreementStoreManager', (accounts) => {
             const storedTemplate = await templateStoreManager.getTemplate(templateId)
 
             const agreement = {
-                did: constants.did,
+                did: constants.did[0],
                 templateId: constants.bytes32.one,
                 conditionIds: [constants.bytes32.zero, constants.bytes32.one],
                 timeLocks: [0, 1],
@@ -103,6 +103,68 @@ contract('AgreementStoreManager', (accounts) => {
                 expect(storedCondition.timeOut.toNumber()).to.equal(agreement.timeOuts[i])
             })
         })
+
+        it('should not create agreement with existing conditions', async () => {
+            const { agreementStoreManager, templateStoreManager } = await setupTest()
+
+            const templateId = constants.bytes32.one
+            await templateStoreManager.createTemplate(
+                templateId,
+                [constants.address.dummy]
+            )
+
+            const agreement = {
+                did: constants.did[0],
+                templateId: constants.bytes32.one,
+                conditionIds: [constants.bytes32.zero],
+                timeLocks: [0],
+                timeOuts: [2]
+            }
+            const agreementId = constants.bytes32.zero
+
+            await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement)
+            )
+
+            const otherAgreement = {
+                did: constants.did[0],
+                templateId: constants.bytes32.one,
+                conditionIds: [constants.bytes32.zero],
+                timeLocks: [0],
+                timeOuts: [2]
+            }
+            const otherAgreementId = constants.bytes32.one
+
+            await assert.isRejected(
+                agreementStoreManager.createAgreement(
+                    otherAgreementId,
+                    ...Object.values(otherAgreement)
+                ),
+                constants.condition.id.error.idAlreadyExists
+            )
+        })
+
+        it('should not create agreement with non existing template', async () => {
+            const { agreementStoreManager } = await setupTest()
+
+            const agreement = {
+                did: constants.did[0],
+                templateId: constants.bytes32.one,
+                conditionIds: [constants.bytes32.zero],
+                timeLocks: [0],
+                timeOuts: [2]
+            }
+            const agreementId = constants.bytes32.zero
+
+            await assert.isRejected(
+                agreementStoreManager.createAgreement(
+                    agreementId,
+                    ...Object.values(agreement)
+                ),
+                constants.template.error.templateMustExist
+            )
+        })
     })
 
     describe('get agreement', () => {
@@ -116,7 +178,7 @@ contract('AgreementStoreManager', (accounts) => {
             )
 
             const agreement = {
-                did: constants.did,
+                did: constants.did[0],
                 templateId: constants.bytes32.one,
                 conditionIds: [constants.bytes32.one, constants.bytes32.zero],
                 timeLocks: [0, 1],

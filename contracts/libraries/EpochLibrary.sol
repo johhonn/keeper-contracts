@@ -124,8 +124,4 @@ library EpochLibrary {
     {
         return _self.timeLock.add(_self.blockNumber);
     }
-
-    function getCurrentBlockNumber() public view returns (uint256) {
-        return block.number;
-    }
 }

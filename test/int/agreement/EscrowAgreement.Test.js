@@ -137,7 +137,7 @@ contract('AgreementStoreManager', (accounts) => {
             let conditionIdEscrow = await escrowReward.generateId(agreementId, hashValuesEscrow)
 
             const agreement = {
-                did: constants.did,
+                did: constants.did[0],
                 templateId: templateId,
                 conditionIds: [
                     conditionIdLock,
@@ -246,7 +246,7 @@ contract('AgreementStoreManager', (accounts) => {
             let conditionIdEscrow = await escrowReward.generateId(agreementId, hashValuesEscrow)
 
             const agreement = {
-                did: constants.did,
+                did: constants.did[0],
                 templateId: templateId,
                 conditionIds: [
                     conditionIdLock,

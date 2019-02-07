@@ -14,6 +14,11 @@ let constants = {
         one: '0x0000000000000000000000000000000000000000000000000000000000000001'
     },
     condition: {
+        id: {
+            error: {
+                idAlreadyExists: 'Id already exists'
+            }
+        },
         state: {
             uninitialized: 0,
             unfulfilled: 1,
@@ -62,13 +67,21 @@ let constants = {
             }
         }
     },
+    template: {
+        error: {
+            templateMustExist: 'Template must exist'
+        }
+    },
     acl: {
         error: {
             invalidCreateConditionRole: 'Invalid CreateConditionRole',
             invalidUpdateRole: 'Invalid UpdateRole'
         }
     },
-    did: '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
+    did: [
+        '0x0000000000000000000000000000000000000000000000000000000001111111',
+        '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
+    ]
 }
 
 module.exports = constants
