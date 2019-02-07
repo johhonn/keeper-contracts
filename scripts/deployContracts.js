@@ -33,7 +33,8 @@ const contracts = [
     'HashLockCondition',
     'OceanToken',
     'Dispenser',
-    'LockRewardCondition'
+    'LockRewardCondition',
+    'DIDRegistry'
 //    'ServiceExecutionAgreement',
 //    'LockRewardCondition'
 //    'AccessConditions',
@@ -104,6 +105,7 @@ async function deployContracts() {
     // instance=MyContract.at(proxyAddress)
 
     // v0.7
+    execSync(`npx zos create DIDRegistry`)
     const conditionStoreManagerAddress = execSync(`npx zos create ConditionStoreManager`).toString().trim()
     const tokenAddress = execSync(`npx zos create OceanToken --init --args ${OWNER} -v`).toString().trim()
     const dispenserAddress = execSync(`npx zos create Dispenser --init initialize --args ${tokenAddress},${OWNER} -v`).toString().trim()
