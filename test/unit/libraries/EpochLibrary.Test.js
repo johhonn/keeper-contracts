@@ -1,9 +1,8 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, contract, describe, it, beforeEach, expect */
+/* global artifacts, contract, describe, it, beforeEach */
 
 const chai = require('chai')
-const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
@@ -28,13 +27,13 @@ contract('EpochLibrary', (accounts) => {
 
     describe('create epoch', () => {
         it('should create and epoch exist', async () => {
-            const { epochLibrary } = await setupTest()
+            await setupTest()
         })
     })
 
     describe('get epoch', () => {
         it('successful create should get unfulfilled condition', async () => {
-            const { epochLibrary } = await setupTest()
+            await setupTest()
         })
     })
 
