@@ -1,13 +1,29 @@
 /* eslint-disable no-console */
 const fs = require('fs')
+const contract = require('truffle-contract')
 
+// MultiSig Configuration
 const accountAmount = 4
 const threshold = 2
+const dailiyLimitInEther = 5
 
-async function setupWallet(web3, artifacts) {
+async function setupWallet(web3) {
     console.log('Setting up MultiSigWallet')
 
-    const MultiSigWallet = artifacts.require('MultiSigWallet')
+    const MultiSigWalletWithDailyLimit =
+        contract(require('@oceanprotocol/multisigwallet/build/contracts/MultiSigWalletWithDailyLimit.json'))
+
+    await MultiSigWalletWithDailyLimit.setProvider(web3.currentProvider)
+
+    // Workaround for a compatibility issue between web3@1.0.0-beta.29 and truffle-contract@3.0.3
+    // https://github.com/trufflesuite/truffle-contract/issues/57#issuecomment-331300494
+    if (typeof MultiSigWalletWithDailyLimit.currentProvider.sendAsync !== 'function') {
+        MultiSigWalletWithDailyLimit.currentProvider.sendAsync = function() {
+            return MultiSigWalletWithDailyLimit.currentProvider.send.apply(
+                MultiSigWalletWithDailyLimit.currentProvider, arguments
+            )
+        }
+    }
 
     // get accounts from web3
     const accounts = await web3.eth.getAccounts()
@@ -28,10 +44,13 @@ async function setupWallet(web3, artifacts) {
         'threshold', threshold)
 
     // deploy wallet to the blockchain
-    const wallet = await MultiSigWallet.new(
+    const wallet = await MultiSigWalletWithDailyLimit.new(
         multiSigAccounts,
         threshold,
-        { from: accounts[0] })
+        web3.utils.toWei(dailiyLimitInEther.toString(10), 'Ether'), {
+            gas: gasLimit,
+            from: accounts[0]
+        })
 
     let walletAddresses = {
         wallet: wallet.address,

@@ -1,5 +1,5 @@
 /* eslint-env mocha */
-/* global artifacts, assert, contract, describe, it, beforeEach, before */
+/* global artifacts, assert, contract, describe, it, beforeEach */
 
 const DIDRegistry = artifacts.require('DIDRegistry.sol')
 const testUtils = require('../../helpers/utils.js')

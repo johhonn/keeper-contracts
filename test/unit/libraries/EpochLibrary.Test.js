@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, contract, describe, it, beforeEach */
+/* global artifacts, contract, describe, it */
 
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
