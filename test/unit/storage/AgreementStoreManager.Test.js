@@ -27,11 +27,14 @@ contract('AgreementStoreManager', (accounts) => {
         const templateStoreManager = await TemplateStoreManager.new({ from: createRole })
         const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: createRole })
         await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-        const agreementStoreManager = await AgreementStoreManager.new(
+        const agreementStoreManager = await AgreementStoreManager.new()
+
+        await agreementStoreManager.initialize(
             conditionStoreManager.address,
             templateStoreManager.address,
             { from: createRole }
         )
+
         if (setupConditionStoreManager) {
             await conditionStoreManager.setup(agreementStoreManager.address)
         }
