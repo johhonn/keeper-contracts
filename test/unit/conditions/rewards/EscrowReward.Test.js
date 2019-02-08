@@ -28,7 +28,6 @@ contract('EscrowReward constructor', (accounts) => {
         if (setupConditionStoreManager) {
             await conditionStoreManager.setup(createRole)
         }
-
         const oceanToken = await OceanToken.new({ from: createRole })
         await oceanToken.initialize(createRole)
 
@@ -44,7 +43,8 @@ contract('EscrowReward constructor', (accounts) => {
         await escrowReward.initialize(
             conditionStoreManager.address,
             oceanToken.address,
-            { from: createRole })
+            { from: createRole }
+        )
 
         return { escrowReward, lockRewardCondition, oceanToken, conditionStoreManager, conditionId, conditionType, createRole }
     }
@@ -56,15 +56,19 @@ contract('EscrowReward constructor', (accounts) => {
 
             const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
             const oceanToken = await OceanToken.new({ from: accounts[0] })
-            await EscrowReward.new(
+
+            const escrowReward = await EscrowReward.new()
+            await escrowReward.initialize(
                 conditionStoreManager.address,
                 oceanToken.address,
-                { from: accounts[0] })
+                { from: accounts[0] }
+            )
         })
     })
 
     describe('fulfill non existing condition', () => {
         it('should not fulfill if conditions do not exist', async () => {
+            await setupTest()
             const { escrowReward } = await setupTest()
 
             let nonce = constants.bytes32.one
