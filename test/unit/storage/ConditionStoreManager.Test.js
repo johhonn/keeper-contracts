@@ -14,7 +14,7 @@ const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
 const constants = require('../../helpers/constants.js')
 const increaseTime = require('../../helpers/increaseTime.js')
 
-contract('ConditionStore constructor', (accounts) => {
+contract('ConditionStoreManager', (accounts) => {
     async function setupTest({
         conditionId = constants.bytes32.one,
         conditionType = constants.address.dummy,
@@ -90,12 +90,16 @@ contract('ConditionStore constructor', (accounts) => {
         it('createConditionRole should create', async () => {
             const { conditionStoreManager, conditionId, conditionType } = await setupTest()
 
-            assert.strictEqual(await conditionStoreManager.exists(conditionId), false)
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
+                constants.condition.state.uninitialized)
             assert.strictEqual((await conditionStoreManager.getConditionListSize()).toNumber(), 0)
 
             // conditionId should exist after create
             await conditionStoreManager.createCondition(conditionId, conditionType)
-            assert.strictEqual(await conditionStoreManager.exists(conditionId), true)
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
+                constants.condition.state.unfulfilled)
             assert.strictEqual((await conditionStoreManager.getConditionListSize()).toNumber(), 1)
         })
 
@@ -179,7 +183,7 @@ contract('ConditionStore constructor', (accounts) => {
 
             await assert.isRejected(
                 conditionStoreManager.createCondition(conditionId, conditionType),
-                constants.condition.id.error.idAlreadyExists
+                constants.condition.state.error.conditionAlreadyCreated
             )
         })
     })
@@ -212,28 +216,13 @@ contract('ConditionStore constructor', (accounts) => {
         })
     })
 
-    describe('exists', () => {
-        it('successful create should exist', async () => {
-            const { conditionStoreManager, conditionId, conditionType } = await setupTest()
-
-            // returns true on create
-            await conditionStoreManager.createCondition(conditionId, conditionType)
-            assert.strictEqual(await conditionStoreManager.exists(conditionId), true)
-        })
-
-        it('no create should not exist', async () => {
-            const { conditionStoreManager, conditionId } = await setupTest()
-            assert.strictEqual(await conditionStoreManager.exists(conditionId), false)
-        })
-    })
-
     describe('update condition state', () => {
         it('should not transition from uninitialized', async () => {
             const { conditionStoreManager, conditionId } = await setupTest()
             let newState = constants.condition.state.unfulfilled
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, newState),
-                constants.condition.state.error.invalidStateTransition
+                constants.acl.error.invalidUpdateRole
             )
         })
 
@@ -343,7 +332,7 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted),
-                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+                constants.condition.state.error.invalidStateTransition
             )
         })
 
@@ -354,7 +343,7 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled),
-                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+                constants.condition.state.error.invalidStateTransition
             )
         })
 
@@ -365,7 +354,7 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled),
-                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+                constants.condition.state.error.invalidStateTransition
             )
         })
 
@@ -376,7 +365,7 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted),
-                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+                constants.condition.state.error.invalidStateTransition
             )
         })
 
@@ -389,11 +378,6 @@ contract('ConditionStore constructor', (accounts) => {
                 conditionStoreManager.updateConditionState(conditionId, newState),
                 constants.acl.error.invalidUpdateRole
             )
-        })
-
-        it('no create should not exist', async () => {
-            const { conditionStoreManager, conditionId } = await setupTest({ conditionType: accounts[0] })
-            assert.strictEqual(await conditionStoreManager.exists(conditionId), false)
         })
     })
 

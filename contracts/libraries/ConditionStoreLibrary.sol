@@ -28,26 +28,6 @@ library ConditionStoreLibrary {
         bytes32[] conditionIds;
     }
 
-
-    modifier onlyValidStateTransition(
-        ConditionList storage _self,
-        bytes32 _id,
-        ConditionState _newState
-    )
-    {
-        // once Fulfilled or Aborted no more transitions
-        require(
-            _self.conditions[_id].state < ConditionState.Fulfilled,
-            'Invalid state transition'
-        );
-        // Uninitialized -> Unfulfilled -> {Fulfilled || Aborted}
-        require(
-            _self.conditions[_id].state < _newState,
-            'Invalid state transition'
-        );
-        _;
-    }
-
     function create(
         ConditionList storage _self,
         bytes32 _id,
@@ -56,6 +36,10 @@ library ConditionStoreLibrary {
         internal
         returns (uint size)
     {
+        require(
+            _self.conditions[_id].state == ConditionState.Uninitialized,
+            "Condition already created"
+        );
         _self.conditions[_id] = Condition({
             typeRef: _typeRef,
             state: ConditionState.Unfulfilled
@@ -77,7 +61,6 @@ library ConditionStoreLibrary {
         ConditionState _newState
     )
         internal
-        onlyValidStateTransition(_self, _id, _newState)
         returns (ConditionState)
     {
         _self.conditions[_id].state = _newState;

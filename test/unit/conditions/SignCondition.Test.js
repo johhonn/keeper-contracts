@@ -54,7 +54,7 @@ contract('SignCondition constructor', (accounts) => {
 
             await assert.isRejected(
                 signCondition.fulfill(nonce, message, publicKey, signature),
-                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+                constants.acl.error.invalidUpdateRole
             )
         })
     })
@@ -132,7 +132,7 @@ contract('SignCondition constructor', (accounts) => {
             // try to fulfill another time
             await assert.isRejected(
                 signCondition.fulfill(nonce, message, publicKey, signature),
-                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+                constants.condition.state.error.invalidStateTransition
             )
         })
 

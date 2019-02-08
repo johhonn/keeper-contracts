@@ -1,6 +1,7 @@
 pragma solidity 0.5.3;
 
 import './Condition.sol';
+import '../storage/AgreementStoreManager.sol';
 import '../ISecretStore.sol';
 //import 'zos-lib/contracts/Initializable.sol';
 
@@ -8,12 +9,28 @@ contract AccessSecretStoreCondition is Condition {
 
     mapping(bytes32 => mapping(address => bool)) private documentPermissions;
 
-    constructor(address _conditionStoreManagerAddress)
+    AgreementStoreManager private agreementStoreManager;
+
+    constructor(
+        address _conditionStoreManagerAddress,
+        address _agreementStoreManagerAddress
+    )
         public
 //        initializer()
     {
         conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
+        agreementStoreManager = AgreementStoreManager(_agreementStoreManagerAddress);
     }
+
+
+//    modifier onlyAgreementOwner(bytes32 _agreementId)
+//    {
+//        require(
+//            agreementStorage.getAgreementPublisher(agreementId) == msg.sender,
+//            'Restricted access - only SLA publisher'
+//        );
+//        _;
+//    }
 
     function hashValues(
         bytes32 _documentId,
@@ -23,7 +40,7 @@ contract AccessSecretStoreCondition is Condition {
         pure
         returns (bytes32)
     {
-        return hashValues(abi.encodePacked(_documentId, _grantee));
+        return keccak256(abi.encodePacked(_documentId, _grantee));
     }
 
     function fulfill(
@@ -34,6 +51,10 @@ contract AccessSecretStoreCondition is Condition {
         public
         returns (ConditionStoreLibrary.ConditionState)
     {
+        require(
+            msg.sender == agreementStoreManager.getAgreementCreator(_agreementId),
+            'Invalid UpdateRole'
+        );
         documentPermissions[_documentId][_grantee] = true;
         return super.fulfill(
             generateId(_agreementId, hashValues(_documentId, _grantee)),
@@ -48,8 +69,8 @@ contract AccessSecretStoreCondition is Condition {
     * @return true if the access was granted
     */
     function checkPermissions(
-        bytes32 _documentId,
-        address _grantee
+        address _grantee,
+        bytes32 _documentId
     )
         public view
         returns(bool permissionGranted)

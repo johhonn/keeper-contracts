@@ -42,6 +42,7 @@ contract AgreementStoreManager is Initializable {
     function createAgreement(
         bytes32 _id,
         bytes32 _did,
+        address _didOwner,
         bytes32 _templateId,
         bytes32[] memory _conditionIds,
         uint[] memory _timeLocks,
@@ -59,10 +60,11 @@ contract AgreementStoreManager is Initializable {
 
         address[] memory conditionTypes = templateStoreManager.getConditionTypes(_templateId);
         require(
-            conditionTypes.length == _conditionIds.length,
-            'conditionIds has wrong length'
+            _conditionIds.length == conditionTypes.length &&
+            _timeLocks.length == conditionTypes.length &&
+            _timeOuts.length == conditionTypes.length,
+            'Arguments have wrong length'
         );
-
 
         for (uint256 i = 0; i < conditionTypes.length; i++) {
             conditionStoreManager.createCondition(
@@ -75,6 +77,7 @@ contract AgreementStoreManager is Initializable {
         return agreementList.create(
             _id,
             _did,
+            _didOwner,
             _templateId,
             _conditionIds
         );
@@ -95,16 +98,34 @@ contract AgreementStoreManager is Initializable {
         view
         returns (
             bytes32 did,
+            address didOwner,
             bytes32 templateId,
-            bytes32[] memory conditionIds
+            bytes32[] memory conditionIds,
+            address creator,
+            uint256 blockNumberCreated
         )
     {
         did = agreementList.agreements[_id].did;
+        didOwner = agreementList.agreements[_id].didOwner;
         templateId = agreementList.agreements[_id].templateId;
         conditionIds = agreementList.agreements[_id].conditionIds;
+        creator = agreementList.agreements[_id].creator;
+        blockNumberCreated = agreementList.agreements[_id].blockNumberCreated;
     }
 
-    function getAgreementListSize() public view returns (uint size) {
+    function getAgreementCreator(bytes32 _id)
+        external
+        view
+        returns (address creator)
+    {
+        return agreementList.agreements[_id].creator;
+    }
+
+    function getAgreementListSize()
+        public
+        view
+        returns (uint size)
+    {
         return agreementList.agreementIds.length;
     }
 }

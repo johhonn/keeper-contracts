@@ -53,7 +53,8 @@ contract EscrowReward is Reward {
             hashValues(_amount, _receiver, _sender, _lockCondition, _releaseCondition)
         );
         require(
-            conditionStoreManager.isConditionFulfilled(_lockCondition),
+            conditionStoreManager.getConditionState(_lockCondition) ==
+            ConditionStoreLibrary.ConditionState.Fulfilled,
             'LockCondition needs to be Fulfilled'
         );
         require(
@@ -61,9 +62,15 @@ contract EscrowReward is Reward {
             'Not enough balance'
         );
 
-        if (conditionStoreManager.isConditionFulfilled(_releaseCondition)) {
+        if (
+            conditionStoreManager.getConditionState(_releaseCondition) ==
+            ConditionStoreLibrary.ConditionState.Fulfilled)
+        {
             return _transferAndFulfill(id, _receiver, _amount);
-        } else if (conditionStoreManager.isConditionAborted(_releaseCondition)) {
+        } else if (
+            conditionStoreManager.getConditionState(_releaseCondition) ==
+            ConditionStoreLibrary.ConditionState.Aborted)
+        {
             return _transferAndFulfill(id, _sender, _amount);
         }
     }

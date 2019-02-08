@@ -14,7 +14,7 @@ const LockRewardCondition = artifacts.require('LockRewardCondition.sol')
 const constants = require('../../helpers/constants.js')
 const getBalance = require('../../helpers/getBalance.js')
 
-contract('LockRewardCondition constructor', (accounts) => {
+contract('LockRewardCondition', (accounts) => {
     async function setupTest({
         conditionId = constants.bytes32.one,
         conditionType = constants.address.dummy,
@@ -70,7 +70,7 @@ contract('LockRewardCondition constructor', (accounts) => {
 
             await assert.isRejected(
                 lockRewardCondition.fulfill(nonce, rewardAddress, amount),
-                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+                constants.acl.error.invalidUpdateRole
             )
         })
     })
