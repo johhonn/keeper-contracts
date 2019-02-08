@@ -37,11 +37,13 @@ contract('AgreementStoreManager', (accounts) => {
 
         const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: createRole })
         await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-        const agreementStoreManager = await AgreementStoreManager.new(
+        const agreementStoreManager = await AgreementStoreManager.new({ from: createRole })
+        await agreementStoreManager.initialize(
             conditionStoreManager.address,
             templateStoreManager.address,
             { from: createRole }
         )
+
         if (setupConditionStoreManager) {
             await conditionStoreManager.setup(agreementStoreManager.address)
         }
@@ -49,26 +51,31 @@ contract('AgreementStoreManager', (accounts) => {
         const oceanToken = await OceanToken.new({ from: createRole })
         await oceanToken.initialize(createRole)
 
-        const hashLockCondition = await HashLockCondition.new(
+        const hashLockCondition = await HashLockCondition.new({ from: createRole })
+        await hashLockCondition.initialize(
             conditionStoreManager.address,
             { from: createRole }
         )
 
-        const signCondition = await SignCondition.new(
+        const signCondition = await SignCondition.new({ from: createRole })
+        await signCondition.initialize(
             conditionStoreManager.address,
             { from: createRole }
         )
 
-        const lockRewardCondition = await LockRewardCondition.new(
+        const lockRewardCondition = await LockRewardCondition.new({ from: createRole })
+        await lockRewardCondition.initialize(
             conditionStoreManager.address,
             oceanToken.address,
             { from: createRole }
         )
 
-        const escrowReward = await EscrowReward.new(
+        const escrowReward = await EscrowReward.new()
+        await escrowReward.initialize(
             conditionStoreManager.address,
             oceanToken.address,
-            { from: createRole })
+            { from: createRole }
+        )
 
         return {
             oceanToken,

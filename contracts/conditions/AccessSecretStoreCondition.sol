@@ -2,15 +2,15 @@ pragma solidity 0.5.3;
 
 import './Condition.sol';
 import '../ISecretStore.sol';
-//import 'zos-lib/contracts/Initializable.sol';
+import 'zos-lib/contracts/Initializable.sol';
 
 contract AccessSecretStoreCondition is Condition {
 
     mapping(bytes32 => mapping(address => bool)) private documentPermissions;
 
-    constructor(address _conditionStoreManagerAddress)
+    function initialize(address _conditionStoreManagerAddress)
         public
-//        initializer()
+        initializer()
     {
         conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
     }
@@ -23,7 +23,7 @@ contract AccessSecretStoreCondition is Condition {
         pure
         returns (bytes32)
     {
-        return hashValues(abi.encodePacked(_documentId, _grantee));
+        return keccak256(abi.encodePacked(_documentId, _grantee));
     }
 
     function fulfill(

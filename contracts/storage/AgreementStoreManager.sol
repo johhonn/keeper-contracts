@@ -29,11 +29,12 @@ contract AgreementStoreManager is Initializable {
         _;
     }
 
-    constructor(
+    function initialize(
         address _conditionStoreManagerAddress,
         address _templateStoreManagerAddress
     )
         public
+        initializer()
     {
         conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
         templateStoreManager = TemplateStoreManager(_templateStoreManagerAddress);

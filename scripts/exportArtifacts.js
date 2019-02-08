@@ -20,11 +20,10 @@ function exportArtifacts(name, substrFilter) {
     console.log(version, network)
 
     contractNames.forEach((contractName) => {
-        if(contractName.indexOf(substrFilter) > -1) {
+        if (contractName.indexOf(substrFilter) > -1) {
+            /* eslint-disable-next-line no-console */
             console.log('Skip library file: ', contractName)
-        }
-        else
-        {
+        } else {
             /* eslint-disable-next-line security/detect-non-literal-fs-filename */
             const contract = JSON.parse(fs.readFileSync(`${buildDir}${contractName}.json`, 'utf-8').toString())
 

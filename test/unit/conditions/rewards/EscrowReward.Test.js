@@ -13,7 +13,6 @@ const OceanToken = artifacts.require('OceanToken.sol')
 const LockRewardCondition = artifacts.require('LockRewardCondition.sol')
 const EscrowReward = artifacts.require('EscrowReward.sol')
 const constants = require('../../../helpers/constants.js')
-const getBalance = require('../../../helpers/getBalance.js')
 
 contract('EscrowReward constructor', (accounts) => {
     async function setupTest({
@@ -29,19 +28,24 @@ contract('EscrowReward constructor', (accounts) => {
         if (setupConditionStoreManager) {
             await conditionStoreManager.setup(createRole)
         }
-
         const oceanToken = await OceanToken.new({ from: createRole })
         await oceanToken.initialize(createRole)
-        const lockRewardCondition = await LockRewardCondition.new(
+
+        const lockRewardCondition = await LockRewardCondition.new()
+
+        await lockRewardCondition.initialize(
             conditionStoreManager.address,
             oceanToken.address,
             { from: createRole }
         )
 
-        const escrowReward = await EscrowReward.new(
+        const escrowReward = await EscrowReward.new()
+        await escrowReward.initialize(
             conditionStoreManager.address,
             oceanToken.address,
-            { from: createRole })
+            { from: createRole }
+        )
+
         return { escrowReward, lockRewardCondition, oceanToken, conditionStoreManager, conditionId, conditionType, createRole }
     }
 
@@ -52,15 +56,19 @@ contract('EscrowReward constructor', (accounts) => {
 
             const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
             const oceanToken = await OceanToken.new({ from: accounts[0] })
-            await EscrowReward.new(
+
+            const escrowReward = await EscrowReward.new()
+            await escrowReward.initialize(
                 conditionStoreManager.address,
                 oceanToken.address,
-                { from: accounts[0] })
+                { from: accounts[0] }
+            )
         })
     })
 
     describe('fulfill non existing condition', () => {
         it('should not fulfill if conditions do not exist', async () => {
+            await setupTest()
             const { escrowReward } = await setupTest()
 
             let nonce = constants.bytes32.one
@@ -98,10 +106,10 @@ contract('EscrowReward constructor', (accounts) => {
             await conditionStoreManager.createCondition(
                 conditionLockId,
                 lockRewardCondition.address)
-            
+
             let lockConditionId = conditionLockId
             let releaseConditionId = conditionLockId
-            
+
             let hashValues = await escrowReward.hashValues(
                 amount,
                 receiver,

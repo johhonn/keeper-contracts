@@ -6,13 +6,20 @@ import '../../libraries/ConditionStoreLibrary.sol';
 
 contract EscrowReward is Reward {
 
-    constructor(
+    function initialize(
         address _conditionStoreManagerAddress,
         address _tokenAddress
     )
         public
+        initializer()
     {
-        conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
+        require(
+            _tokenAddress != address(0) &&
+            _conditionStoreManagerAddress != address(0),
+            'Invalid address'
+        );
+        conditionStoreManager =
+            ConditionStoreManager(_conditionStoreManagerAddress);
         token = OceanToken(_tokenAddress);
     }
 
@@ -25,16 +32,18 @@ contract EscrowReward is Reward {
         bytes32 _lockCondition,
         bytes32 _releaseCondition
     )
-        public
-        pure
+        public pure
         returns (bytes32)
     {
-        return keccak256(abi.encodePacked(
+        return keccak256(
+            abi.encodePacked(
                 _amount,
                 _receiver,
                 _sender,
                 _lockCondition,
-                _releaseCondition));
+                _releaseCondition
+            )
+        );
     }
 
     function fulfill(
@@ -50,7 +59,13 @@ contract EscrowReward is Reward {
     {
         bytes32 id = generateId(
             _agreementId,
-            hashValues(_amount, _receiver, _sender, _lockCondition, _releaseCondition)
+            hashValues(
+                _amount,
+                _receiver,
+                _sender,
+                _lockCondition,
+                _releaseCondition
+            )
         );
         require(
             conditionStoreManager.isConditionFulfilled(_lockCondition),
@@ -80,7 +95,10 @@ contract EscrowReward is Reward {
             token.transfer(_receiver, _amount),
             'Could not transfer token'
         );
-        return super.fulfill(_id, ConditionStoreLibrary.ConditionState.Fulfilled);
+        return fulfill(
+            _id,
+            ConditionStoreLibrary.ConditionState.Fulfilled
+        );
     }
 }
 
