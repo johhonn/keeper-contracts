@@ -12,6 +12,10 @@ contract AccessSecretStoreCondition is Condition {
         public
         initializer()
     {
+        require(
+            _conditionStoreManagerAddress != address(0),
+            'Invalid address'
+        );
         conditionStoreManager = ConditionStoreManager(
             _conditionStoreManagerAddress
         );
