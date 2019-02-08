@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, contract, describe, it, beforeEach */
+/* global artifacts, contract, describe, it */
 
 const chai = require('chai')
 const { assert } = chai
@@ -10,14 +10,15 @@ chai.use(chaiAsPromised)
 const EpochLibrary = artifacts.require('EpochLibrary.sol')
 const ConditionStoreLibrary = artifacts.require('ConditionStoreLibrary.sol')
 const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
-const constants = require('../helpers/constants.js')
-const Common = artifacts.require('Common.sol')
+
+const constants = require('../../helpers/constants.js')
+const increaseTime = require('../../helpers/increaseTime.js')
 
 contract('ConditionStore constructor', (accounts) => {
     async function setupTest({
         conditionId = constants.bytes32.one,
         conditionType = constants.address.dummy,
-        createRole = accounts[0],
+        createConditionRole = accounts[0],
         setupConditionStoreManager = true
     } = {}) {
         const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
@@ -28,9 +29,9 @@ contract('ConditionStore constructor', (accounts) => {
         const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
 
         if (setupConditionStoreManager) {
-            await conditionStoreManager.setup(createRole)
+            await conditionStoreManager.setup(createConditionRole)
         }
-        return { epochLibrary, conditionStoreManager, conditionId, conditionType, createRole }
+        return { epochLibrary, conditionStoreManager, conditionId, conditionType, createConditionRole }
     }
 
     describe('deploy and setup', () => {
@@ -41,52 +42,52 @@ contract('ConditionStore constructor', (accounts) => {
             const conditionStoreLibrary = await ConditionStoreLibrary.new({ from: accounts[0] })
             await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
             await ConditionStoreManager.link('ConditionStoreLibrary', conditionStoreLibrary.address)
-            const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
+            await ConditionStoreManager.new({ from: accounts[0] })
         })
 
         it('contract should setup', async () => {
             let conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            let getCreateRole = await conditionStoreManager.getCreateRole()
+            let getCreateConditionRole = await conditionStoreManager.getCreateConditionRole()
             // address should be 0x0 before setup
-            assert.strictEqual(getCreateRole, constants.address.zero)
+            assert.strictEqual(getCreateConditionRole, constants.address.zero)
 
             // address should be set after correct setup
-            let createRole = accounts[1]
-            await conditionStoreManager.setup(createRole)
-            getCreateRole = await conditionStoreManager.getCreateRole()
-            assert.strictEqual(getCreateRole, createRole)
+            let createConditionRole = accounts[1]
+            await conditionStoreManager.setup(createConditionRole)
+            getCreateConditionRole = await conditionStoreManager.getCreateConditionRole()
+            assert.strictEqual(getCreateConditionRole, createConditionRole)
         })
 
         it('contract should not setup with zero', async () => {
             let conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
 
             // setup with zero fails
-            let createRole = constants.address.zero
+            let createConditionRole = constants.address.zero
             await assert.isRejected(
-                conditionStoreManager.setup(createRole),
+                conditionStoreManager.setup(createConditionRole),
                 constants.address.error.invalidAddress0x0
             )
         })
 
-        it('anyone should not change createRole after setup', async () => {
+        it('anyone should not change createConditionRole after setup', async () => {
             // setup correctly
             let conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            let createRole = accounts[1]
-            await conditionStoreManager.setup(createRole)
+            let createConditionRole = accounts[1]
+            await conditionStoreManager.setup(createConditionRole)
 
-            let getCreateRole = await conditionStoreManager.getCreateRole()
-            assert.strictEqual(getCreateRole, createRole)
+            let getCreateConditionRole = await conditionStoreManager.getCreateConditionRole()
+            assert.strictEqual(getCreateConditionRole, createConditionRole)
 
             // try to force with other account
-            let otherCreateRole = accounts[0]
-            assert.notEqual(otherCreateRole, createRole)
-            await conditionStoreManager.setup(otherCreateRole)
-            assert.strictEqual(getCreateRole, createRole)
+            let otherCreateConditionRole = accounts[0]
+            assert.notEqual(otherCreateConditionRole, createConditionRole)
+            await conditionStoreManager.setup(otherCreateConditionRole)
+            assert.strictEqual(getCreateConditionRole, createConditionRole)
         })
     })
 
     describe('create conditions', () => {
-        it('createRole should create', async () => {
+        it('createConditionRole should create', async () => {
             const { conditionStoreManager, conditionId, conditionType } = await setupTest()
 
             assert.strictEqual(await conditionStoreManager.exists(conditionId), false)
@@ -98,7 +99,7 @@ contract('ConditionStore constructor', (accounts) => {
             assert.strictEqual((await conditionStoreManager.getConditionListSize()).toNumber(), 1)
         })
 
-        it('createRole should create with nonzero timeout and timelock', async () => {
+        it('createConditionRole should create with zero timeout and timelock', async () => {
             const { conditionStoreManager, conditionId, conditionType } = await setupTest()
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
@@ -115,12 +116,10 @@ contract('ConditionStore constructor', (accounts) => {
             assert.strictEqual(timeOut.toNumber(), 0)
         })
 
-        it('createRole should create with nonzero timeout and timelock', async () => {
-            const { conditionStoreManager, epochLibrary, conditionId, conditionType } = await setupTest()
+        it('createConditionRole should create with nonzero timeout and timelock', async () => {
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest()
             let conditionTimeLock = 1
             let conditionTimeOut = 10
-
-            let currentBlockNumber = await epochLibrary.getCurrentBlockNumber()
 
             await conditionStoreManager.createCondition(
                 conditionId,
@@ -140,19 +139,19 @@ contract('ConditionStore constructor', (accounts) => {
             assert.strictEqual(state.toNumber(), constants.condition.state.unfulfilled)
             assert.strictEqual(timeLock.toNumber(), conditionTimeLock)
             assert.strictEqual(timeOut.toNumber(), conditionTimeOut)
-            assert.strictEqual(blockNumber.toNumber(), currentBlockNumber.toNumber())
+            assert.isAbove(blockNumber.toNumber(), 0)
         })
 
-        it('invalid createRole should not create', async () => {
+        it('invalid createConditionRole should not create', async () => {
             const {
                 conditionStoreManager,
                 conditionId,
                 conditionType
-            } = await setupTest({ createRole: accounts[1] })
+            } = await setupTest({ createConditionRole: accounts[1] })
 
             await assert.isRejected(
                 conditionStoreManager.createCondition(conditionId, conditionType),
-                'Invalid CreateRole'
+                constants.acl.error.invalidCreateConditionRole
             )
         })
 
@@ -166,6 +165,21 @@ contract('ConditionStore constructor', (accounts) => {
             await assert.isRejected(
                 conditionStoreManager.createCondition(conditionId, conditionType),
                 constants.address.error.invalidAddress0x0
+            )
+        })
+
+        it('existing ID should not create', async () => {
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType
+            } = await setupTest({ conditionType: accounts[0] })
+
+            await conditionStoreManager.createCondition(conditionId, conditionType)
+
+            await assert.isRejected(
+                conditionStoreManager.createCondition(conditionId, conditionType),
+                constants.condition.id.error.idAlreadyExists
             )
         })
     })
@@ -219,7 +233,7 @@ contract('ConditionStore constructor', (accounts) => {
             let newState = constants.condition.state.unfulfilled
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, newState),
-                constants.acl.error.invalidUpdateRole
+                constants.condition.state.error.invalidStateTransition
             )
         })
 
@@ -229,8 +243,9 @@ contract('ConditionStore constructor', (accounts) => {
 
             let newState = constants.condition.state.fulfilled
             await conditionStoreManager.updateConditionState(conditionId, newState)
-            let { state } = await conditionStoreManager.getCondition(conditionId)
-            assert.strictEqual(state.toNumber(), constants.condition.state.fulfilled)
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
+                constants.condition.state.fulfilled)
         })
 
         it('correct role should transition from unfulfilled to aborted', async () => {
@@ -239,8 +254,9 @@ contract('ConditionStore constructor', (accounts) => {
 
             let newState = constants.condition.state.aborted
             await conditionStoreManager.updateConditionState(conditionId, newState)
-            let { state } = await conditionStoreManager.getCondition(conditionId)
-            assert.strictEqual(state.toNumber(), constants.condition.state.aborted)
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
+                constants.condition.state.aborted)
         })
 
         it('correct role should not transition from unfulfilled to uninitialized', async () => {
@@ -327,7 +343,7 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted),
-                constants.condition.state.error.invalidStateTransition
+                constants.condition.state.error.conditionNeedsToBeUnfulfilled
             )
         })
 
@@ -338,7 +354,7 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled),
-                constants.condition.state.error.invalidStateTransition
+                constants.condition.state.error.conditionNeedsToBeUnfulfilled
             )
         })
 
@@ -349,7 +365,7 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled),
-                constants.condition.state.error.invalidStateTransition
+                constants.condition.state.error.conditionNeedsToBeUnfulfilled
             )
         })
 
@@ -360,7 +376,7 @@ contract('ConditionStore constructor', (accounts) => {
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted),
-                constants.condition.state.error.invalidStateTransition
+                constants.condition.state.error.conditionNeedsToBeUnfulfilled
             )
         })
 
@@ -368,7 +384,7 @@ contract('ConditionStore constructor', (accounts) => {
             const { conditionStoreManager, conditionId, conditionType } = await setupTest()
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
-            let newState = constants.condition.state.unfulfilled
+            let newState = constants.condition.state.fulfilled
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, newState),
                 constants.acl.error.invalidUpdateRole
@@ -378,6 +394,162 @@ contract('ConditionStore constructor', (accounts) => {
         it('no create should not exist', async () => {
             const { conditionStoreManager, conditionId } = await setupTest({ conditionType: accounts[0] })
             assert.strictEqual(await conditionStoreManager.exists(conditionId), false)
+        })
+    })
+
+    describe('time locked conditions', () => {
+        it('zero time lock should not time lock', async () => {
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({ conditionType: accounts[0] })
+            let conditionTimeLock = 0
+            let conditionTimeOut = 0
+
+            await conditionStoreManager.createCondition(
+                conditionId,
+                conditionType,
+                conditionTimeLock,
+                conditionTimeOut)
+            assert.strictEqual(
+                await conditionStoreManager.isConditionTimeLocked(conditionId),
+                false
+            )
+        })
+
+        it('nonzero time lock should time lock', async () => {
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({ conditionType: accounts[0] })
+            let conditionTimeLock = 10
+            let conditionTimeOut = 0
+
+            await conditionStoreManager.createCondition(
+                conditionId,
+                conditionType,
+                conditionTimeLock,
+                conditionTimeOut)
+            assert.strictEqual(
+                await conditionStoreManager.isConditionTimeLocked(conditionId),
+                true
+            )
+        })
+
+        it('nonzero time lock should not update', async () => {
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({ conditionType: accounts[0] })
+            let conditionTimeLock = 10
+            let conditionTimeOut = 0
+
+            await conditionStoreManager.createCondition(
+                conditionId,
+                conditionType,
+                conditionTimeLock,
+                conditionTimeOut)
+            let newState = constants.condition.state.fulfilled
+            await assert.isRejected(
+                conditionStoreManager.updateConditionState(conditionId, newState),
+                constants.condition.epoch.error.isTimeLocked
+            )
+        })
+
+        it('nonzero time lock should update after timeLock expires', async () => {
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({ conditionType: accounts[0] })
+            let conditionTimeLock = 3
+            let conditionTimeOut = 0
+
+            await conditionStoreManager.createCondition(
+                conditionId,
+                conditionType,
+                conditionTimeLock,
+                conditionTimeOut)
+            let newState = constants.condition.state.fulfilled
+            await assert.isRejected(
+                conditionStoreManager.updateConditionState(conditionId, newState),
+                constants.condition.epoch.error.isTimeLocked
+            )
+            // waited for a block
+            await increaseTime(1)
+
+            await conditionStoreManager.updateConditionState(conditionId, newState)
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
+                constants.condition.state.fulfilled)
+        })
+    })
+
+    describe('timeout conditions', () => {
+        it('zero time out should not time out', async () => {
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({ conditionType: accounts[0] })
+            let conditionTimeLock = 0
+            let conditionTimeOut = 0
+
+            await conditionStoreManager.createCondition(
+                conditionId,
+                conditionType,
+                conditionTimeLock,
+                conditionTimeOut)
+            assert.strictEqual(
+                await conditionStoreManager.isConditionTimedOut(conditionId),
+                false
+            )
+        })
+
+        it('nonzero time out should time out', async () => {
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({ conditionType: accounts[0] })
+            let conditionTimeLock = 0
+            let conditionTimeOut = 1
+
+            await conditionStoreManager.createCondition(
+                conditionId,
+                conditionType,
+                conditionTimeLock,
+                conditionTimeOut)
+
+            assert.strictEqual(
+                await conditionStoreManager.isConditionTimedOut(conditionId),
+                false
+            )
+            // wait for a block
+            await increaseTime(1)
+
+            assert.strictEqual(
+                await conditionStoreManager.isConditionTimedOut(conditionId),
+                true
+            )
+        })
+
+        it('nonzero time out should not abort after time out', async () => {
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({ conditionType: accounts[0] })
+            let conditionTimeLock = 0
+            let conditionTimeOut = 1
+
+            await conditionStoreManager.createCondition(
+                conditionId,
+                conditionType,
+                conditionTimeLock,
+                conditionTimeOut)
+
+            // wait for a block
+            await increaseTime(1)
+
+            let newState = constants.condition.state.fulfilled
+            await conditionStoreManager.updateConditionState(conditionId, newState)
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
+                constants.condition.state.aborted)
+        })
+
+        it('nonzero time lock should update before time out', async () => {
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({ conditionType: accounts[0] })
+            let conditionTimeLock = 0
+            let conditionTimeOut = 1
+
+            await conditionStoreManager.createCondition(
+                conditionId,
+                conditionType,
+                conditionTimeLock,
+                conditionTimeOut)
+
+            let newState = constants.condition.state.fulfilled
+            await conditionStoreManager.updateConditionState(conditionId, newState)
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
+                constants.condition.state.fulfilled)
         })
     })
 })
