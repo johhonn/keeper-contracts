@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, contract, describe, it, beforeEach */
+/* global artifacts, contract, describe, it, beforeEach, expect */
 
 const chai = require('chai')
 const { assert } = chai
@@ -26,8 +26,8 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
         const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-        const templateStoreManager = await TemplateStoreManager.new({ from: createRole })
-        const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: createRole })
+        const templateStoreManager = await TemplateStoreManager.new({ from: accounts[0] })
+        const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: accounts[0] })
         await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
         const agreementStoreManager = await AgreementStoreManager.new(
             conditionStoreManager.address,
@@ -36,7 +36,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
         )
 
         if (setupConditionStoreManager) {
-            await conditionStoreManager.setup(a)
+            await conditionStoreManager.setup(agreementStoreManager.address)
         }
 
         const accessSecretStoreCondition = await AccessSecretStoreCondition.new(
@@ -94,7 +94,12 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
 
     describe('fulfill existing condition', () => {
         it('should fulfill if condition exist', async () => {
-            const { accessSecretStoreCondition, agreementStoreManager, templateStoreManager, conditionStoreManager } = await setupTest()
+            const {
+                accessSecretStoreCondition,
+                agreementStoreManager,
+                templateStoreManager,
+                conditionStoreManager
+            } = await setupTest()
 
             const nonce = constants.bytes32.one
             const documentId = constants.bytes32.one
@@ -106,11 +111,14 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
                 [accessSecretStoreCondition.address]
             )
 
+            let hashValues = await accessSecretStoreCondition.hashValues(documentId, grantee)
+            let conditionId = await accessSecretStoreCondition.generateId(nonce, hashValues)
+
             const agreement = {
                 did: constants.did[0],
-                didOwner: constants.address.dummy,
+                didOwner: accounts[0],
                 templateId: templateId,
-                conditionIds: [nonce],
+                conditionIds: [conditionId],
                 timeLocks: [0],
                 timeOuts: [2]
             }
@@ -121,9 +129,6 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
                 ...Object.values(agreement)
             )
 
-            let hashValues = await accessSecretStoreCondition.hashValues(documentId, grantee)
-            let conditionId = await accessSecretStoreCondition.generateId(nonce, hashValues)
-
             await accessSecretStoreCondition.fulfill(nonce, documentId, grantee)
 
             assert.strictEqual(
@@ -133,81 +138,188 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
     })
 
     describe('fail to fulfill existing condition', () => {
-        it('wrong accessSecretStoreature should fail to fulfill if conditions exist for bytes32 message', async () => {
-            const { accessSecretStoreCondition, conditionStoreManager } = await setupTest()
+        it('wrong did owner should fail to fulfill if conditions exist', async () => {
+            const {
+                accessSecretStoreCondition,
+                agreementStoreManager,
+                templateStoreManager,
+            } = await setupTest()
 
             const nonce = constants.bytes32.one
             const documentId = constants.bytes32.one
             const grantee = accounts[1]
 
+            const templateId = constants.bytes32.one
+            await templateStoreManager.createTemplate(
+                templateId,
+                [accessSecretStoreCondition.address]
+            )
+
             let hashValues = await accessSecretStoreCondition.hashValues(documentId, grantee)
             let conditionId = await accessSecretStoreCondition.generateId(nonce, hashValues)
 
-            await conditionStoreManager.createCondition(
-                conditionId,
-                accessSecretStoreCondition.address)
+            const agreement = {
+                did: constants.did[0],
+                didOwner: accounts[1],
+                templateId: templateId,
+                conditionIds: [conditionId],
+                timeLocks: [0],
+                timeOuts: [2]
+            }
+            const agreementId = constants.bytes32.one
+
+            await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement)
+            )
+
+            await assert.isRejected(
+                accessSecretStoreCondition.fulfill(nonce, documentId, grantee),
+                constants.acl.error.invalidUpdateRole
+            )
+        })
+
+        it('right didOwner should fail to fulfill if conditions already fulfilled', async () => {
+            const {
+                accessSecretStoreCondition,
+                agreementStoreManager,
+                templateStoreManager,
+            } = await setupTest()
+
+            const nonce = constants.bytes32.one
+            const documentId = constants.bytes32.one
+            const grantee = accounts[1]
+
+            const templateId = constants.bytes32.one
+            await templateStoreManager.createTemplate(
+                templateId,
+                [accessSecretStoreCondition.address]
+            )
+
+            let hashValues = await accessSecretStoreCondition.hashValues(documentId, grantee)
+            let conditionId = await accessSecretStoreCondition.generateId(nonce, hashValues)
+
+            const agreement = {
+                did: constants.did[0],
+                didOwner: accounts[0],
+                templateId: templateId,
+                conditionIds: [conditionId],
+                timeLocks: [0],
+                timeOuts: [2]
+            }
+            const agreementId = constants.bytes32.one
+
+            await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement)
+            )
+
+            accessSecretStoreCondition.fulfill(nonce, documentId, grantee)
+
+            await assert.isRejected(
+                accessSecretStoreCondition.fulfill(nonce, documentId, grantee),
+                constants.condition.state.error.invalidStateTransition
+            )
+        })
+    })
+
+    describe('get access secret store condition', () => {
+        it('successful create should get condition and permissions', async () => {
+            const {
+                accessSecretStoreCondition,
+                agreementStoreManager,
+                templateStoreManager,
+                conditionStoreManager
+            } = await setupTest()
+
+            const nonce = constants.bytes32.one
+            const documentId = constants.bytes32.one
+            const grantee = accounts[1]
+            const timeLock = 10000210
+            const timeOut = 234898098
+
+            const templateId = constants.bytes32.one
+            await templateStoreManager.createTemplate(
+                templateId,
+                [accessSecretStoreCondition.address]
+            )
+
+            let hashValues = await accessSecretStoreCondition.hashValues(documentId, grantee)
+            let conditionId = await accessSecretStoreCondition.generateId(nonce, hashValues)
+
+            const agreement = {
+                did: constants.did[0],
+                didOwner: accounts[0],
+                templateId: templateId,
+                conditionIds: [conditionId],
+                timeLocks: [timeLock],
+                timeOuts: [timeOut]
+            }
+            const agreementId = constants.bytes32.one
+
+            await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement)
+            )
+
+            const storedCondition = await conditionStoreManager.getCondition(conditionId)
+            // TODO - containSubset
+            expect(storedCondition.typeRef)
+                .to.equal(accessSecretStoreCondition.address)
+            expect(storedCondition.timeLock.toNumber())
+                .to.equal(timeLock)
+            expect(storedCondition.timeOut.toNumber())
+                .to.equal(timeOut)
+        })
+    })
+    describe('check permissions', () => {
+        it('successful create should get condition and permissions', async () => {
+            const {
+                accessSecretStoreCondition,
+                agreementStoreManager,
+                templateStoreManager,
+            } = await setupTest()
+
+            const nonce = constants.bytes32.one
+            const documentId = constants.bytes32.one
+            const grantee = accounts[1]
+            const timeLock = 0
+            const timeOut = 234898098
+
+            const templateId = constants.bytes32.one
+            await templateStoreManager.createTemplate(
+                templateId,
+                [accessSecretStoreCondition.address]
+            )
+
+            let hashValues = await accessSecretStoreCondition.hashValues(documentId, grantee)
+            let conditionId = await accessSecretStoreCondition.generateId(nonce, hashValues)
+
+            const agreement = {
+                did: constants.did[0],
+                didOwner: accounts[0],
+                templateId: templateId,
+                conditionIds: [conditionId],
+                timeLocks: [timeLock],
+                timeOuts: [timeOut]
+            }
+            const agreementId = constants.bytes32.one
+
+            expect(await accessSecretStoreCondition.checkPermissions(grantee, documentId))
+                .to.equal(false)
+
+            await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement)
+            )
+
+            expect(await accessSecretStoreCondition.checkPermissions(grantee, documentId))
+                .to.equal(false)
 
             await accessSecretStoreCondition.fulfill(nonce, documentId, grantee)
 
-
-            await assert.isRejected(
-                accessSecretStoreCondition.fulfill(
-                    nonce, message, publicKey,
-                    constants.bytes32.one
-                ),
-                constants.condition.accessSecretStore.error.couldNotRecoverAccessSecretStoreature
-            )
-        })
-
-        it('right accessSecretStoreature should fail to fulfill if conditions already fulfilled for bytes32', async () => {
-            const { accessSecretStoreCondition, conditionStoreManager } = await setupTest()
-
-            let nonce = constants.bytes32.one
-            let {
-                message,
-                publicKey,
-                accessSecretStoreature
-            } = constants.condition.accessSecretStore.bytes32
-
-            let hashValues = await accessSecretStoreCondition.hashValues(message, publicKey)
-            let conditionId = await accessSecretStoreCondition.generateId(nonce, hashValues)
-
-            await conditionStoreManager.createCondition(
-                conditionId,
-                accessSecretStoreCondition.address)
-
-            // fulfill once
-            await accessSecretStoreCondition.fulfill(nonce, message, publicKey, accessSecretStoreature)
-            // try to fulfill another time
-            await assert.isRejected(
-                accessSecretStoreCondition.fulfill(nonce, message, publicKey, accessSecretStoreature),
-                constants.condition.state.error.conditionNeedsToBeUnfulfilled
-            )
-        })
-
-        it('should fail to fulfill if conditions has different type ref', async () => {
-            const { accessSecretStoreCondition, conditionStoreManager } = await setupTest()
-
-            let nonce = constants.bytes32.one
-            let {
-                message,
-                publicKey,
-                accessSecretStoreature
-            } = constants.condition.accessSecretStore.bytes32
-
-            let hashValues = await accessSecretStoreCondition.hashValues(message, publicKey)
-            let conditionId = await accessSecretStoreCondition.generateId(nonce, hashValues)
-
-            // create a condition of a type different than accessSecretStore condition
-            await conditionStoreManager.createCondition(
-                conditionId,
-                accounts[0])
-
-            // try to fulfill from accessSecretStore condition
-            await assert.isRejected(
-                accessSecretStoreCondition.fulfill(nonce, message, publicKey, accessSecretStoreature),
-                constants.acl.error.invalidUpdateRole
-            )
+            expect(await accessSecretStoreCondition.checkPermissions(grantee, documentId))
+                .to.equal(true)
         })
     })
 })

@@ -113,12 +113,12 @@ contract AgreementStoreManager is Initializable {
         blockNumberCreated = agreementList.agreements[_id].blockNumberCreated;
     }
 
-    function getAgreementCreator(bytes32 _id)
+    function getAgreementDidOwner(bytes32 _id)
         external
         view
-        returns (address creator)
+        returns (address didOwner)
     {
-        return agreementList.agreements[_id].creator;
+        return agreementList.agreements[_id].didOwner;
     }
 
     function getAgreementListSize()
