@@ -26,7 +26,7 @@ contract('AgreementStoreManager', (accounts) => {
         agreementId = constants.bytes32.one,
         conditionIds = [constants.address.dummy],
         createRole = accounts[0],
-        setupConditionStoreManager = true,
+        setupConditionStoreManager = true
     } = {}) {
         const epochLibrary = await EpochLibrary.new({ from: createRole })
 

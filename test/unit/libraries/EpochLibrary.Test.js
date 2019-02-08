@@ -22,20 +22,19 @@ contract('EpochLibrary', (accounts) => {
     describe('deploy and setup', () => {
         it('contract should deploy', async () => {
             // act-assert
-            await EpochLibrary.new({ from: accounts[0] })})
+            await EpochLibrary.new({ from: accounts[0] })
+        })
     })
 
     describe('create epoch', () => {
         it('should create and epoch exist', async () => {
             const { epochLibrary } = await setupTest()
-
         })
     })
 
     describe('get epoch', () => {
         it('successful create should get unfulfilled condition', async () => {
             const { epochLibrary } = await setupTest()
-
         })
     })
 

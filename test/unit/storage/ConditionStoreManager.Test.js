@@ -14,7 +14,6 @@ const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
 const constants = require('../../helpers/constants.js')
 const increaseTime = require('../../helpers/increaseTime.js')
 
-
 contract('ConditionStore constructor', (accounts) => {
     async function setupTest({
         conditionId = constants.bytes32.one,
