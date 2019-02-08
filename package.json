@@ -50,7 +50,7 @@
   "author": "Ocean Protocol",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@oceanprotocol/multisigwallet": "git+ssh://git@github.com/oceanprotocol/MultiSigWallet.git#v0.2.0",
+    "@oceanprotocol/multisigwallet": "git+https://github.com/oceanprotocol/MultiSigWallet.git#v0.2.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "chai-subset": "^1.6.0",
