@@ -65,7 +65,11 @@ contract TemplateStoreManager is Initializable {
         conditionTypes = templateList.templates[_id].conditionTypes;
     }
 
-    function getConditionTypes(bytes32 _id) public view returns (address[] memory) {
+    function getConditionTypes(bytes32 _id)
+        public
+        view
+        returns (address[] memory)
+    {
         return templateList.templates[_id].conditionTypes;
     }
 

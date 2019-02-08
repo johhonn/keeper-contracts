@@ -36,8 +36,12 @@ contract AgreementStoreManager is Initializable {
         public
         initializer()
     {
-        conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
-        templateStoreManager = TemplateStoreManager(_templateStoreManagerAddress);
+        conditionStoreManager = ConditionStoreManager(
+            _conditionStoreManagerAddress
+        );
+        templateStoreManager = TemplateStoreManager(
+            _templateStoreManagerAddress
+        );
     }
 
     function createAgreement(
@@ -58,7 +62,9 @@ contract AgreementStoreManager is Initializable {
             'Template must exist'
         );
 
-        address[] memory conditionTypes = templateStoreManager.getConditionTypes(_templateId);
+        address[] memory conditionTypes =
+            templateStoreManager.getConditionTypes(_templateId);
+
         require(
             conditionTypes.length == _conditionIds.length,
             'conditionIds has wrong length'

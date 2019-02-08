@@ -140,7 +140,10 @@ contract ConditionStoreManager is Initializable, Common {
         );
         // auto abort on time out
         if (isConditionTimedOut(_id))
-            _newState = ConditionStoreLibrary.ConditionState.Aborted;
+            return conditionList.updateState(
+                _id,
+                ConditionStoreLibrary.ConditionState.Aborted
+            );
         return conditionList.updateState(_id, _newState);
     }
 
@@ -190,7 +193,10 @@ contract ConditionStoreManager is Initializable, Common {
         view
         returns (bool)
     {
-        return ( getConditionState(_id) == ConditionStoreLibrary.ConditionState.Uninitialized );
+        return (
+            getConditionState(_id) ==
+            ConditionStoreLibrary.ConditionState.Uninitialized
+        );
     }
 
     function isConditionUnfulfilled(bytes32 _id)
@@ -198,7 +204,10 @@ contract ConditionStoreManager is Initializable, Common {
         view
         returns (bool)
     {
-        return ( getConditionState(_id) == ConditionStoreLibrary.ConditionState.Unfulfilled );
+        return (
+            getConditionState(_id) ==
+            ConditionStoreLibrary.ConditionState.Unfulfilled
+        );
     }
 
     function isConditionFulfilled(bytes32 _id)
@@ -206,7 +215,10 @@ contract ConditionStoreManager is Initializable, Common {
         view
         returns (bool)
     {
-        return ( getConditionState(_id) == ConditionStoreLibrary.ConditionState.Fulfilled );
+        return (
+            getConditionState(_id) ==
+            ConditionStoreLibrary.ConditionState.Fulfilled
+        );
     }
 
     function isConditionAborted(bytes32 _id)
@@ -214,7 +226,10 @@ contract ConditionStoreManager is Initializable, Common {
         view
         returns (bool)
     {
-        return ( getConditionState(_id) == ConditionStoreLibrary.ConditionState.Aborted);
+        return (
+            getConditionState(_id) ==
+            ConditionStoreLibrary.ConditionState.Aborted
+        );
     }
 
     function isConditionTimeLocked(bytes32 _id)

@@ -12,7 +12,9 @@ contract AccessSecretStoreCondition is Condition {
         public
         initializer()
     {
-        conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
+        conditionStoreManager = ConditionStoreManager(
+            _conditionStoreManagerAddress
+        );
     }
 
     function hashValues(
