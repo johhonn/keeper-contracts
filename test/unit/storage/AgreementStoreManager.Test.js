@@ -149,7 +149,7 @@ contract('AgreementStoreManager', (accounts) => {
                     otherAgreementId,
                     ...Object.values(otherAgreement)
                 ),
-                constants.condition.state.error.conditionAlreadyCreated
+                constants.condition.id.error.idAlreadyExists
             )
         })
 
@@ -222,7 +222,6 @@ contract('AgreementStoreManager', (accounts) => {
         it('successful create should get agreement', async () => {
             const { common, agreementStoreManager, templateStoreManager } = await setupTest()
 
-            const blockNumber = await common.getCurrentBlockNumber()
             const templateId = constants.bytes32.one
             await templateStoreManager.createTemplate(
                 templateId,
@@ -238,6 +237,7 @@ contract('AgreementStoreManager', (accounts) => {
                 timeOuts: [2, 3]
             }
             const agreementId = constants.bytes32.one
+            const blockNumber = await common.getCurrentBlockNumber()
 
             await agreementStoreManager.createAgreement(
                 agreementId,
@@ -254,10 +254,10 @@ contract('AgreementStoreManager', (accounts) => {
                 .to.equal(agreement.templateId)
             expect(storedAgreement.conditionIds)
                 .to.deep.equal(agreement.conditionIds)
-            expect(storedAgreement.creator)
+            expect(storedAgreement.lastUpdatedBy)
                 .to.equal(accounts[0])
-            expect(storedAgreement.blockNumberCreated.toNumber())
-                .to.equal(blockNumber.toNumber() + 1)
+            expect(storedAgreement.blockNumberUpdated.toNumber())
+                .to.equal(blockNumber.toNumber())
         })
     })
 })

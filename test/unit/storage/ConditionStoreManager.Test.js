@@ -1,12 +1,13 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, contract, describe, it, beforeEach */
+/* global artifacts, contract, describe, it, beforeEach, expect */
 
 const chai = require('chai')
 const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
+const Common = artifacts.require('Common.sol')
 const EpochLibrary = artifacts.require('EpochLibrary.sol')
 const ConditionStoreLibrary = artifacts.require('ConditionStoreLibrary.sol')
 const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
@@ -21,6 +22,7 @@ contract('ConditionStoreManager', (accounts) => {
         createConditionRole = accounts[0],
         setupConditionStoreManager = true
     } = {}) {
+        const common = await Common.new({ from: accounts[0] })
         const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
         await ConditionStoreLibrary.link('EpochLibrary', epochLibrary.address)
         const conditionStoreLibrary = await ConditionStoreLibrary.new({ from: accounts[0] })
@@ -31,7 +33,14 @@ contract('ConditionStoreManager', (accounts) => {
         if (setupConditionStoreManager) {
             await conditionStoreManager.setup(createConditionRole)
         }
-        return { epochLibrary, conditionStoreManager, conditionId, conditionType, createConditionRole }
+        return {
+            common,
+            epochLibrary,
+            conditionStoreManager,
+            conditionId,
+            conditionType,
+            createConditionRole
+        }
     }
 
     describe('deploy and setup', () => {
@@ -183,15 +192,16 @@ contract('ConditionStoreManager', (accounts) => {
 
             await assert.isRejected(
                 conditionStoreManager.createCondition(conditionId, conditionType),
-                constants.condition.state.error.conditionAlreadyCreated
+                constants.condition.id.error.idAlreadyExists
             )
         })
     })
 
     describe('get conditions', () => {
         it('successful create should get unfulfilled condition', async () => {
-            const { conditionStoreManager, conditionId, conditionType } = await setupTest()
+            const { common, conditionStoreManager, conditionId, conditionType } = await setupTest()
 
+            const blockNumber = await common.getCurrentBlockNumber()
             // returns true on create
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
@@ -199,12 +209,19 @@ contract('ConditionStoreManager', (accounts) => {
                 typeRef,
                 state,
                 timeLock,
-                timeOut
+                timeOut,
+                lastUpdatedBy,
+                blockNumberUpdated
             } = await conditionStoreManager.getCondition(conditionId)
+
             assert.strictEqual(typeRef, conditionType)
             assert.strictEqual(state.toNumber(), constants.condition.state.unfulfilled)
             assert.strictEqual(timeLock.toNumber(), 0)
             assert.strictEqual(timeOut.toNumber(), 0)
+            expect(lastUpdatedBy)
+                .to.equal(accounts[0])
+            expect(blockNumberUpdated.toNumber())
+                .to.equal(blockNumber.toNumber())
         })
 
         it('no create should get uninitialized Condition', async () => {

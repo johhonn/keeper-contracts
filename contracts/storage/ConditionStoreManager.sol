@@ -96,11 +96,6 @@ contract ConditionStoreManager is Initializable, Common {
         onlyCondition(_id)
         returns (ConditionStoreLibrary.ConditionState)
     {
-        require(
-            (conditionList.conditions[_id].state == ConditionStoreLibrary.ConditionState.Unfulfilled) &&
-            (_newState > conditionList.conditions[_id].state),
-            'Invalid state transition'
-        );
         // no update before time lock
         require(
             !isConditionTimeLocked(_id),
@@ -124,7 +119,9 @@ contract ConditionStoreManager is Initializable, Common {
             ConditionStoreLibrary.ConditionState state,
             uint timeLock,
             uint timeOut,
-            uint blockNumber
+            uint blockNumber,
+            address lastUpdatedBy,
+            uint blockNumberUpdated
         )
     {
         typeRef = conditionList.conditions[_id].typeRef;
@@ -132,6 +129,8 @@ contract ConditionStoreManager is Initializable, Common {
         timeLock = epochList.epochs[_id].timeLock;
         timeOut = epochList.epochs[_id].timeOut;
         blockNumber = epochList.epochs[_id].blockNumber;
+        lastUpdatedBy = conditionList.conditions[_id].lastUpdatedBy;
+        blockNumberUpdated = conditionList.conditions[_id].blockNumberUpdated;
     }
 
     function getConditionState(bytes32 _id)

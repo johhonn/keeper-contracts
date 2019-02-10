@@ -54,7 +54,7 @@ contract AgreementStoreManager is Initializable {
         returns (uint size)
     {
         require(
-            templateStoreManager.exists(_templateId) == true,
+            templateStoreManager.isTemplateActive(_templateId) == true,
             'Template must exist'
         );
 
@@ -101,16 +101,16 @@ contract AgreementStoreManager is Initializable {
             address didOwner,
             bytes32 templateId,
             bytes32[] memory conditionIds,
-            address creator,
-            uint256 blockNumberCreated
+            address lastUpdatedBy,
+            uint256 blockNumberUpdated
         )
     {
         did = agreementList.agreements[_id].did;
         didOwner = agreementList.agreements[_id].didOwner;
         templateId = agreementList.agreements[_id].templateId;
         conditionIds = agreementList.agreements[_id].conditionIds;
-        creator = agreementList.agreements[_id].creator;
-        blockNumberCreated = agreementList.agreements[_id].blockNumberCreated;
+        lastUpdatedBy = agreementList.agreements[_id].lastUpdatedBy;
+        blockNumberUpdated = agreementList.agreements[_id].blockNumberUpdated;
     }
 
     function getAgreementDidOwner(bytes32 _id)

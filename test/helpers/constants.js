@@ -25,8 +25,7 @@ let constants = {
             fulfilled: 2,
             aborted: 3,
             error: {
-                invalidStateTransition: 'Invalid state transition',
-                conditionAlreadyCreated: 'Condition already created'
+                invalidStateTransition: 'Invalid state transition'
             }
         },
         epoch: {

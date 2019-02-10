@@ -8,8 +8,8 @@ library AgreementStoreLibrary {
         address didOwner;
         bytes32 templateId;
         bytes32[] conditionIds;
-        address creator;
-        uint256 blockNumberCreated;
+        address lastUpdatedBy;
+        uint256 blockNumberUpdated;
     }
 
     struct AgreementList {
@@ -29,7 +29,7 @@ library AgreementStoreLibrary {
         returns (uint size)
     {
         require(
-            _self.agreements[_id].blockNumberCreated == 0,
+            _self.agreements[_id].blockNumberUpdated == 0,
             'Id already exists'
         );
         _self.agreements[_id] = Agreement({
@@ -37,8 +37,8 @@ library AgreementStoreLibrary {
             didOwner: _didOwner,
             templateId: _templateId,
             conditionIds: _conditionIds,
-            creator: msg.sender,
-            blockNumberCreated: block.number
+            lastUpdatedBy: msg.sender,
+            blockNumberUpdated: block.number
         });
         _self.agreementIds.push(_id);
         return _self.agreementIds.length;
