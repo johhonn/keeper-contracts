@@ -12,7 +12,7 @@ contract TemplateStoreManager is Initializable {
     modifier onlyTemplateOwner(bytes32 _id){
         require(
             templateList.templates[_id].lastUpdatedBy == msg.sender,
-            'invalid template owner'
+            'Invalid UpdateRole'
         );
         _;
     }
@@ -60,6 +60,13 @@ contract TemplateStoreManager is Initializable {
         return templateList.templates[_id].state == TemplateStoreLibrary.TemplateState.Active;
     }
 
+    function revoke(bytes32 _id)
+        public
+        onlyTemplateOwner(_id)
+    {
+        return templateList.revoke(_id);
+    }
+
 //    function addConditionType(
 //        bytes32 templateId,
 //        address conditionType
@@ -75,10 +82,5 @@ contract TemplateStoreManager is Initializable {
 //        return true;
 //    }
 //
-//    function revoke(bytes32 templateId)
-//    public
-//    onlyTemplateOwner(templateId){
-//        templates[templateId].state = TemplateState.Revoked;
-//    }
 
 }

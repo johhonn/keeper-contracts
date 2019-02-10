@@ -40,4 +40,19 @@ library TemplateStoreLibrary {
         _self.templateIds.push(_id);
         return _self.templateIds.length;
     }
+
+    function revoke(
+        TemplateList storage _self,
+        bytes32 _id
+    )
+        internal
+    {
+        require(
+            _self.templates[_id].state == TemplateState.Active,
+            "Template not active"
+        );
+
+        _self.templates[_id].state = TemplateState.Revoked;
+        _self.templates[_id].blockNumberUpdated = block.number;
+    }
 }

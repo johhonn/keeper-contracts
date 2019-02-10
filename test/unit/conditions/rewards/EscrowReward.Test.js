@@ -142,16 +142,5 @@ contract('EscrowReward constructor', (accounts) => {
     })
 
     describe('fail to fulfill existing condition', () => {
-        it('out of balance should fail to fulfill if conditions exist', async () => {
-        })
-
-        it('not approved should fail to fulfill if conditions exist', async () => {
-        })
-
-        it('right transfer should fail to fulfill if conditions already fulfilled', async () => {
-        })
-
-        it('should fail to fulfill if conditions has different type ref', async () => {
-        })
     })
 })

@@ -171,7 +171,7 @@ contract('AgreementStoreManager', (accounts) => {
                     agreementId,
                     ...Object.values(agreement)
                 ),
-                constants.template.error.templateMustExist
+                constants.template.error.templateNotActive
             )
         })
 

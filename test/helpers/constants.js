@@ -67,8 +67,13 @@ let constants = {
         }
     },
     template: {
+        state: {
+            uninitialized: 0,
+            active: 1,
+            revoked: 2
+        },
         error: {
-            templateMustExist: 'Template must exist'
+            templateNotActive: 'Template not active'
         }
     },
     acl: {

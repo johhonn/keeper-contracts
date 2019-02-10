@@ -55,7 +55,7 @@ contract AgreementStoreManager is Initializable {
     {
         require(
             templateStoreManager.isTemplateActive(_templateId) == true,
-            'Template must exist'
+            'Template not active'
         );
 
         address[] memory conditionTypes = templateStoreManager.getConditionTypes(_templateId);

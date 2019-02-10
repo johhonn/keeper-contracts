@@ -83,6 +83,8 @@ contract('TemplateStoreManager', (accounts) => {
             const storedTemplate = await templateStoreManager.getTemplate(templateId)
             expect(storedTemplate.conditionTypes)
                 .to.deep.equal(template.conditionTypes)
+            expect(storedTemplate.state.toNumber())
+                .to.equal(constants.template.state.active)
             expect(storedTemplate.lastUpdatedBy)
                 .to.equal(accounts[0])
             expect(storedTemplate.blockNumberUpdated.toNumber())
@@ -90,11 +92,80 @@ contract('TemplateStoreManager', (accounts) => {
         })
     })
 
-    describe('exists', () => {
-        it('successful create should exist', async () => {
+    describe('revoke', () => {
+        it('successful create should revoke if owner', async () => {
+            const { common, templateStoreManager } = await setupTest()
+
+            const template = {
+                conditionTypes: [constants.address.dummy]
+            }
+            const templateId = constants.bytes32.one
+
+            await templateStoreManager.createTemplate(
+                templateId,
+                ...Object.values(template)
+            )
+
+            const blockNumber = await common.getCurrentBlockNumber()
+
+            await templateStoreManager.revoke(templateId)
+
+            const storedTemplate = await templateStoreManager.getTemplate(templateId)
+            expect(storedTemplate.state.toNumber())
+                .to.equal(constants.template.state.revoked)
+            expect(storedTemplate.blockNumberUpdated.toNumber())
+                .to.equal(blockNumber.toNumber())
         })
 
-        it('no create should not exist', async () => {
+        it('successful create should not revoke if not owner', async () => {
+            const { templateStoreManager } = await setupTest()
+
+            const template = {
+                conditionTypes: [constants.address.dummy]
+            }
+            const templateId = constants.bytes32.one
+
+            await templateStoreManager.createTemplate(
+                templateId,
+                ...Object.values(template)
+            )
+
+            await assert.isRejected(
+                templateStoreManager.revoke(templateId, { from: accounts[1] }),
+                constants.acl.error.invalidUpdateRole
+            )
+        })
+
+        it('should not revoke if not active', async () => {
+            const { templateStoreManager } = await setupTest()
+
+            const templateId = constants.bytes32.one
+
+            await assert.isRejected(
+                templateStoreManager.revoke(templateId),
+                constants.acl.error.invalidUpdateRole
+            )
+        })
+
+        it('should not revoke if already revoked', async () => {
+            const { templateStoreManager } = await setupTest()
+
+            const template = {
+                conditionTypes: [constants.address.dummy]
+            }
+            const templateId = constants.bytes32.one
+
+            await templateStoreManager.createTemplate(
+                templateId,
+                ...Object.values(template)
+            )
+
+            await templateStoreManager.revoke(templateId)
+
+            await assert.isRejected(
+                templateStoreManager.revoke(templateId),
+                constants.template.error.templateNotActive
+            )
         })
     })
 })
