@@ -19,28 +19,28 @@ contract SignCondition is Condition {
             ConditionStoreManager(_conditionStoreManagerAddress);
     }
 
-    function hashValues(bytes32 message, address publicKey)
+    function hashValues(bytes32 _message, address _publicKey)
         public
         pure
         returns (bytes32)
     {
-        return keccak256(abi.encodePacked(message, publicKey));
+        return keccak256(abi.encodePacked(_message, _publicKey));
     }
 
-    function hashValues(string memory message, address publicKey)
+    function hashValues(string memory _message, address _publicKey)
         public
         pure
         returns (bytes32)
     {
-        return keccak256(abi.encodePacked(message, publicKey));
+        return keccak256(abi.encodePacked(_message, _publicKey));
     }
 
-    function hashValues(bytes memory message, address publicKey)
+    function hashValues(bytes memory _message, address _publicKey)
         public
         pure
         returns (bytes32)
     {
-        return keccak256(abi.encodePacked(message, publicKey));
+        return keccak256(abi.encodePacked(_message, _publicKey));
     }
 
     function fulfill(
@@ -56,7 +56,7 @@ contract SignCondition is Condition {
             ECDSA.recover(_message, _signature) == _publicKey,
             'Could not recover signature'
         );
-        return fulfill(
+        return super.fulfill(
             generateId(_agreementId, hashValues(_message, _publicKey)),
             ConditionStoreLibrary.ConditionState.Fulfilled
         );

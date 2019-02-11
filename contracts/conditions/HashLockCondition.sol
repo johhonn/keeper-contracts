@@ -13,41 +13,40 @@ contract HashLockCondition is Condition {
             _conditionStoreManagerAddress != address(0),
             'Invalid address'
         );
-        conditionStoreManager =
-            ConditionStoreManager(_conditionStoreManagerAddress);
+        conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
     }
 
-    function hashValues(uint256 preimage)
+    function hashValues(uint256 _preimage)
         public
         pure
         returns (bytes32)
     {
-        return hashValues(abi.encodePacked(preimage));
+        return hashValues(abi.encodePacked(_preimage));
     }
 
-    function hashValues(string memory preimage)
+    function hashValues(string memory _preimage)
         public
         pure
         returns (bytes32)
     {
-        return hashValues(abi.encodePacked(preimage));
+        return hashValues(abi.encodePacked(_preimage));
     }
 
-    function hashValues(bytes32 preimage)
+    function hashValues(bytes32 _preimage)
         public
         pure
         returns
         (bytes32)
     {
-        return hashValues(abi.encodePacked(preimage));
+        return hashValues(abi.encodePacked(_preimage));
     }
 
-    function hashValues(bytes memory preimage)
+    function hashValues(bytes memory _preimage)
         public
         pure
         returns (bytes32)
     {
-        return keccak256(preimage);
+        return keccak256(_preimage);
     }
 
     function fulfill(
@@ -86,7 +85,7 @@ contract HashLockCondition is Condition {
         private
         returns (ConditionStoreLibrary.ConditionState)
     {
-        return fulfill(
+        return super.fulfill(
             _generatedId,
             ConditionStoreLibrary.ConditionState.Fulfilled
         );
