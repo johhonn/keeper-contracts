@@ -170,7 +170,7 @@ async function deploy(contracts, roles) {
 
     // v0.7
     if (contracts.indexOf('DIDRegistry') > -1) {
-        execSync(`npx zos create DIDRegistry`)
+        execSync(`npx zos create DIDRegistry --init initialize --args ${roles.owner}`)
     }
 
     if (contracts.indexOf('OceanToken') > -1) {
