@@ -106,7 +106,10 @@ contract ConditionStoreManager is Initializable, Common {
         );
         // auto abort after time out
         if (isConditionTimedOut(_id))
-            _newState = ConditionStoreLibrary.ConditionState.Aborted;
+            conditionList.updateState(
+                _id,
+                ConditionStoreLibrary.ConditionState.Aborted
+            );
         return conditionList.updateState(_id, _newState);
     }
 

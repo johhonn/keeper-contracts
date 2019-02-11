@@ -27,7 +27,7 @@ library TemplateStoreLibrary {
     {
         require(
             _self.templates[_id].blockNumberUpdated == 0,
-            "Id already exists"
+            'Id already exists'
         );
 
         _self.templates[_id] = Template({
@@ -49,7 +49,7 @@ library TemplateStoreLibrary {
     {
         require(
             _self.templates[_id].state == TemplateState.Active,
-            "Template not active"
+            'Template not active'
         );
 
         _self.templates[_id].state = TemplateState.Revoked;

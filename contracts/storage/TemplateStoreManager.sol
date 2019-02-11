@@ -61,7 +61,8 @@ contract TemplateStoreManager is Initializable {
     }
 
     function isTemplateActive(bytes32 _id) public view returns (bool) {
-        return templateList.templates[_id].state == TemplateStoreLibrary.TemplateState.Active;
+        return templateList.templates[_id].state ==
+            TemplateStoreLibrary.TemplateState.Active;
     }
 
     function revoke(bytes32 _id)
@@ -70,21 +71,4 @@ contract TemplateStoreManager is Initializable {
     {
         return templateList.revoke(_id);
     }
-
-//    function addConditionType(
-//        bytes32 templateId,
-//        address conditionType
-//    )
-//    public
-//    onlyTemplateOwner(templateId)
-//    returns(bool){
-//        require(
-//            templates[templateId].conditions[conditionType].length == 0,
-//            'condition already exists'
-//        );
-//        templates[templateId].conditions[conditionType] = new address[](0);
-//        return true;
-//    }
-//
-
 }

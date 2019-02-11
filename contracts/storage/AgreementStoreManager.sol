@@ -21,13 +21,17 @@ contract AgreementStoreManager is Initializable {
         initializer()
     {
         require(
-            _conditionStoreManagerAddress!= address(0) &&
-            _templateStoreManagerAddress!= address(0),
+            _conditionStoreManagerAddress != address(0) &&
+            _templateStoreManagerAddress != address(0),
             'Invalid address'
         );
 
-        conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
-        templateStoreManager = TemplateStoreManager(_templateStoreManagerAddress);
+        conditionStoreManager = ConditionStoreManager(
+            _conditionStoreManagerAddress
+        );
+        templateStoreManager = TemplateStoreManager(
+            _templateStoreManagerAddress
+        );
     }
 
     function createAgreement(
@@ -47,8 +51,8 @@ contract AgreementStoreManager is Initializable {
             'Template not active'
         );
 
-        address[] memory conditionTypes =
-            templateStoreManager.getConditionTypes(_templateId);
+        address[] memory conditionTypes = templateStoreManager
+            .getConditionTypes(_templateId);
 
         require(
             _conditionIds.length == conditionTypes.length &&

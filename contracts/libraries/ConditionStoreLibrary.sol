@@ -40,7 +40,7 @@ library ConditionStoreLibrary {
     {
         require(
             _self.conditions[_id].blockNumberUpdated == 0,
-            "Id already exists"
+            'Id already exists'
         );
         _self.conditions[_id] = Condition({
             typeRef: _typeRef,

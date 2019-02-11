@@ -14,7 +14,9 @@ contract SignCondition is Condition {
             _conditionStoreManagerAddress != address(0),
             'Invalid address'
         );
-        conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
+        conditionStoreManager = ConditionStoreManager(
+            _conditionStoreManagerAddress
+        );
     }
 
     function hashValues(bytes32 _message, address _publicKey)

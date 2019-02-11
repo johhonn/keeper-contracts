@@ -29,7 +29,6 @@ contract('SignCondition constructor', (accounts) => {
                 { from: accounts[0] }
             )
         }
-        
         const signCondition = await SignCondition.new()
         await signCondition.initialize(conditionStoreManager.address, { from: accounts[0] })
 
