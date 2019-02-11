@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, contract, describe, it, beforeEach, expect */
+/* global artifacts, contract, describe, it, expect */
 
 const chai = require('chai')
 const { assert } = chai
@@ -450,7 +450,7 @@ contract('ConditionStoreManager', (accounts) => {
 
         it('nonzero time lock should update after timeLock expires', async () => {
             const { conditionStoreManager, conditionId, conditionType } = await setupTest({ conditionType: accounts[0] })
-            let conditionTimeLock = 2
+            let conditionTimeLock = 3
             let conditionTimeOut = 0
 
             await conditionStoreManager.createCondition(
@@ -464,6 +464,8 @@ contract('ConditionStoreManager', (accounts) => {
                 constants.condition.epoch.error.isTimeLocked
             )
             // waited for a block
+            await increaseTime(1)
+
             await conditionStoreManager.updateConditionState(conditionId, newState)
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
@@ -505,6 +507,7 @@ contract('ConditionStoreManager', (accounts) => {
             )
             // wait for a block
             await increaseTime(1)
+
             assert.strictEqual(
                 await conditionStoreManager.isConditionTimedOut(conditionId),
                 true

@@ -18,8 +18,8 @@ process.chdir('../')
  */
 const walletPath = './wallet.json'
 // FitchainConditions config
-const stake = '10'
-const maxSlots = '1'
+// const stake = '10'
+// const maxSlots = '1'
 // load NETWORK from environment
 const NETWORK = process.env.NETWORK || 'development'
 // load current version from package
@@ -34,6 +34,7 @@ const contracts = [
     'OceanToken',
     'Dispenser',
     'LockRewardCondition',
+    'DIDRegistry'
 //    'ServiceExecutionAgreement',
 //    'LockRewardCondition'
 //    'AccessConditions',
@@ -95,7 +96,7 @@ async function deployContracts() {
     // Deploy all implementations in the specified network.
     // NOTE: Creates another zos.<network_name>.json file, specific to the network used,
     // which keeps track of deployed addresses, etc.
-//    execSync('npx zos push  -v')
+    //    execSync('npx zos push  -v')
 
     // Request a proxy for the upgradeably contracts.
     // Here we run initialize which replace contract constructors
@@ -104,6 +105,7 @@ async function deployContracts() {
     // instance=MyContract.at(proxyAddress)
 
     // v0.7
+    execSync(`npx zos create DIDRegistry`)
     const conditionStoreManagerAddress = execSync(`npx zos create ConditionStoreManager`).toString().trim()
     const tokenAddress = execSync(`npx zos create OceanToken --init --args ${OWNER} -v`).toString().trim()
     const dispenserAddress = execSync(`npx zos create Dispenser --init initialize --args ${tokenAddress},${OWNER} -v`).toString().trim()
@@ -112,14 +114,14 @@ async function deployContracts() {
     execSync(`npx zos create LockRewardCondition --init initialize --args ${conditionStoreManagerAddress},${tokenAddress} -v`)
 
     // v0.6
-//    execSync(`npx zos create DIDRegistry --init initialize --args ${OWNER} -v`)
-//    const tokenAddress = execSync(`npx zos create OceanToken --init --args ${OWNER} -v`).toString().trim()
-//    const dispenserAddress = execSync(`npx zos create Dispenser --init initialize --args ${tokenAddress},${OWNER} -v`).toString().trim()
-//    const serviceExecutionAgreementAddress = execSync(`npx zos create ServiceExecutionAgreement -v`).toString().trim()
-//    execSync(`npx zos create AccessConditions --init initialize --args ${serviceExecutionAgreementAddress} -v`)
-//    execSync(`npx zos create PaymentConditions --init initialize --args ${serviceExecutionAgreementAddress},${tokenAddress} -v`)
-//    execSync(`npx zos create FitchainConditions --init initialize --args ${serviceExecutionAgreementAddress},${stake},${maxSlots} -v`)
-//    execSync(`npx zos create ComputeConditions --init initialize --args ${serviceExecutionAgreementAddress} -v`)
+    //    execSync(`npx zos create DIDRegistry --init initialize --args ${OWNER} -v`)
+    //    const tokenAddress = execSync(`npx zos create OceanToken --init --args ${OWNER} -v`).toString().trim()
+    //    const dispenserAddress = execSync(`npx zos create Dispenser --init initialize --args ${tokenAddress},${OWNER} -v`).toString().trim()
+    //    const serviceExecutionAgreementAddress = execSync(`npx zos create ServiceExecutionAgreement -v`).toString().trim()
+    //    execSync(`npx zos create AccessConditions --init initialize --args ${serviceExecutionAgreementAddress} -v`)
+    //    execSync(`npx zos create PaymentConditions --init initialize --args ${serviceExecutionAgreementAddress},${tokenAddress} -v`)
+    //    execSync(`npx zos create FitchainConditions --init initialize --args ${serviceExecutionAgreementAddress},${stake},${maxSlots} -v`)
+    //    execSync(`npx zos create ComputeConditions --init initialize --args ${serviceExecutionAgreementAddress} -v`)
 
     /*
      * -----------------------------------------------------------------------

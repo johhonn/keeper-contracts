@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, contract, describe, it, beforeEach */
+/* global artifacts, contract, describe, it */
 
 const chai = require('chai')
 const { assert } = chai
@@ -23,10 +23,12 @@ contract('SignCondition constructor', (accounts) => {
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
         const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
+
         if (setupConditionStoreManager) {
             await conditionStoreManager.setup(createRole)
         }
-        const signCondition = await SignCondition.new(conditionStoreManager.address, { from: accounts[0] })
+        const signCondition = await SignCondition.new()
+        await signCondition.initialize(conditionStoreManager.address, { from: accounts[0] })
 
         return { signCondition, conditionStoreManager, conditionId, conditionType, createRole }
     }
@@ -37,7 +39,8 @@ contract('SignCondition constructor', (accounts) => {
             await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
             const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            await SignCondition.new(conditionStoreManager.address, { from: accounts[0] })
+            const signCondition = await SignCondition.new()
+            await signCondition.initialize(conditionStoreManager.address, { from: accounts[0] })
         })
     })
 
@@ -53,8 +56,8 @@ contract('SignCondition constructor', (accounts) => {
             } = constants.condition.sign.bytes32
 
             await assert.isRejected(
-                signCondition.fulfill(nonce, message, publicKey, signature),
-                constants.acl.error.invalidUpdateRole
+                signCondition.fulfill(nonce, message, publicKey, signature, { from: accounts[2] }),
+                constants.condition.state.error.conditionNeedsToBeUnfulfilled
             )
         })
     })

@@ -13,7 +13,7 @@ contract AgreementStoreManager is Initializable {
     TemplateStoreManager private templateStoreManager;
     AgreementStoreLibrary.AgreementList private agreementList;
 
-    modifier uniqueId(bytes32 _id) {
+    modifier onlyUniqueId(bytes32 _id) {
         require(
             !exists(_id),
             'Id already exists'
@@ -21,7 +21,7 @@ contract AgreementStoreManager is Initializable {
         _;
     }
 
-    modifier nonZero(bytes32 _value) {
+    modifier onlyNonZero(bytes32 _value) {
         require(
             _value != 0x0,
             'Value cannot be 0x0'
@@ -29,14 +29,28 @@ contract AgreementStoreManager is Initializable {
         _;
     }
 
-    constructor(
+    function initialize(
         address _conditionStoreManagerAddress,
         address _templateStoreManagerAddress
     )
         public
+        initializer()
     {
-        conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
-        templateStoreManager = TemplateStoreManager(_templateStoreManagerAddress);
+        require(
+            _conditionStoreManagerAddress!= address(0),
+            'Invalid condition store manager address'
+        );
+        require(
+            _templateStoreManagerAddress!= address(0),
+            'Invalid template store manager address'
+        );
+
+        conditionStoreManager = ConditionStoreManager(
+            _conditionStoreManagerAddress
+        );
+        templateStoreManager = TemplateStoreManager(
+            _templateStoreManagerAddress
+        );
     }
 
     function createAgreement(
@@ -49,8 +63,8 @@ contract AgreementStoreManager is Initializable {
         uint[] memory _timeOuts
     )
         public
-        uniqueId(_id)
-        nonZero(_did)
+        onlyUniqueId(_id)
+        onlyNonZero(_did)
         returns (uint size)
     {
         require(
@@ -58,7 +72,9 @@ contract AgreementStoreManager is Initializable {
             'Template not active'
         );
 
-        address[] memory conditionTypes = templateStoreManager.getConditionTypes(_templateId);
+        address[] memory conditionTypes =
+            templateStoreManager.getConditionTypes(_templateId);
+
         require(
             _conditionIds.length == conditionTypes.length &&
             _timeLocks.length == conditionTypes.length &&

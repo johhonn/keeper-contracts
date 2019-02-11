@@ -3,7 +3,7 @@ pragma solidity 0.5.3;
 import './Condition.sol';
 import '../storage/AgreementStoreManager.sol';
 import '../ISecretStore.sol';
-//import 'zos-lib/contracts/Initializable.sol';
+import 'zos-lib/contracts/Initializable.sol';
 
 contract AccessSecretStoreCondition is Condition {
 
@@ -11,12 +11,12 @@ contract AccessSecretStoreCondition is Condition {
 
     AgreementStoreManager private agreementStoreManager;
 
-    constructor(
+    function initialize(
         address _conditionStoreManagerAddress,
         address _agreementStoreManagerAddress
     )
         public
-//        initializer()
+        initializer()
     {
         conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
         agreementStoreManager = AgreementStoreManager(_agreementStoreManagerAddress);

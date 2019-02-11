@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, contract, describe, it, beforeEach, expect */
+/* global artifacts, contract, describe, it, expect */
 
 const chai = require('chai')
 const { assert } = chai
@@ -20,7 +20,7 @@ contract('AgreementStoreManager', (accounts) => {
         agreementId = constants.bytes32.one,
         conditionIds = [constants.address.dummy],
         createRole = accounts[0],
-        setupConditionStoreManager = true,
+        setupConditionStoreManager = true
     } = {}) {
         const common = await Common.new({ from: createRole })
         const epochLibrary = await EpochLibrary.new({ from: createRole })
@@ -29,11 +29,14 @@ contract('AgreementStoreManager', (accounts) => {
         const templateStoreManager = await TemplateStoreManager.new({ from: createRole })
         const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: createRole })
         await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-        const agreementStoreManager = await AgreementStoreManager.new(
+        const agreementStoreManager = await AgreementStoreManager.new()
+
+        await agreementStoreManager.initialize(
             conditionStoreManager.address,
             templateStoreManager.address,
             { from: createRole }
         )
+
         if (setupConditionStoreManager) {
             await conditionStoreManager.setup(agreementStoreManager.address)
         }
