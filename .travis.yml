@@ -74,7 +74,7 @@ script:
             # mkdir -p $HOME/.mythril && curl -L -o $HOME/.mythril/signatures.db https://github.com/ConsenSys/mythril-classic/blob/develop/mythril/support/assets/signatures.db?raw=true
             mkdir -p $HOME/.mythril && cp -rp assets/* $HOME/.mythril/
             npm run security:mythril
-            #travis_wait 30 npm run security:securify
+            travis_wait 30 npm run security:securify
         #fi
 
 after_script:
