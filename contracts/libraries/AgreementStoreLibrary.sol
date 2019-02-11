@@ -25,7 +25,7 @@ library AgreementStoreLibrary {
         bytes32 _templateId,
         bytes32[] memory _conditionIds
     )
-        public
+        internal
         returns (uint size)
     {
         require(

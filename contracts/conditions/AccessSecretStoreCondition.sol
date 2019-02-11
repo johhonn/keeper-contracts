@@ -22,16 +22,6 @@ contract AccessSecretStoreCondition is Condition {
         agreementStoreManager = AgreementStoreManager(_agreementStoreManagerAddress);
     }
 
-
-//    modifier onlyAgreementOwner(bytes32 _agreementId)
-//    {
-//        require(
-//            agreementStorage.getAgreementPublisher(agreementId) == msg.sender,
-//            'Restricted access - only SLA publisher'
-//        );
-//        _;
-//    }
-
     function hashValues(
         bytes32 _documentId,
         address _grantee
