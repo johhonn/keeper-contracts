@@ -53,7 +53,7 @@ contract('ConditionStoreManager', (accounts) => {
         }
     }
 
-    describe('deploy and setup', () => {
+    describe('deploy and initialize', () => {
         it('contract should deploy', async () => {
             // act-assert
             const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
@@ -64,12 +64,16 @@ contract('ConditionStoreManager', (accounts) => {
             await ConditionStoreManager.new({ from: accounts[0] })
         })
 
-        it('contract should setup', async () => {
+        it('contract should initialize', async () => {
             const createRole = accounts[0]
             const owner = accounts[1]
 
             const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
             // address should be 0x0 before setup
+            assert.strictEqual(
+                await conditionStoreManager.owner(),
+                constants.address.zero
+            )
             assert.strictEqual(
                 await conditionStoreManager.getCreateRole(),
                 constants.address.zero
@@ -82,9 +86,26 @@ contract('ConditionStoreManager', (accounts) => {
                 await conditionStoreManager.getCreateRole(),
                 createRole
             )
+            assert.strictEqual(
+                await conditionStoreManager.owner(),
+                owner
+            )
         })
 
-        it('contract should not setup with zero', async () => {
+        it('contract should not initialize with zero owner', async () => {
+            const createRole = accounts[0]
+            const owner = constants.address.zero
+
+            const conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
+
+            // setup with zero fails
+            await assert.isRejected(
+                conditionStoreManager.initialize(owner, createRole),
+                constants.address.error.invalidAddress0x0
+            )
+        })
+
+        it('contract should not initialize with zero createRole', async () => {
             const createRole = constants.address.zero
             const owner = accounts[1]
 
@@ -97,7 +118,31 @@ contract('ConditionStoreManager', (accounts) => {
             )
         })
 
-        it('anyone should not change createRole after setup', async () => {
+        it('contract should not initialize without arguments', async () => {
+            const owner = accounts[0]
+
+            const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
+
+            // setup with zero fails
+            await assert.isRejected(
+                conditionStoreManager.initialize(),
+                constants.initialize.error.invalidNumberParamsGot0Expected2
+            )
+        })
+
+        it('contract should not initialize with one argument', async () => {
+            const owner = accounts[0]
+
+            const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
+
+            // setup with zero fails
+            await assert.isRejected(
+                conditionStoreManager.initialize(owner),
+                constants.initialize.error.invalidNumberParamsGot1Expected2
+            )
+        })
+
+        it('anyone should not change createRole after initialize', async () => {
             const createRole = accounts[0]
             const owner = accounts[1]
             // setup correctly
@@ -111,10 +156,10 @@ contract('ConditionStoreManager', (accounts) => {
             )
 
             // try to force with other account
-            const otherCreateConditionRole = accounts[2]
-            assert.notEqual(otherCreateConditionRole, createRole)
+            const otherCreateRole = accounts[2]
+            assert.notEqual(otherCreateRole, createRole)
             await assert.isRejected(
-                conditionStoreManager.initialize(otherCreateConditionRole),
+                conditionStoreManager.initialize(otherCreateRole),
                 'Contract instance has already been initialized'
             )
             assert.strictEqual(
@@ -193,7 +238,7 @@ contract('ConditionStoreManager', (accounts) => {
 
             await assert.isRejected(
                 conditionStoreManager.createCondition(conditionId, conditionType),
-                constants.acl.error.invalidCreateConditionRole
+                constants.acl.error.invalidCreateRole
             )
         })
 

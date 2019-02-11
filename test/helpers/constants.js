@@ -79,8 +79,14 @@ let constants = {
     },
     acl: {
         error: {
-            invalidCreateConditionRole: 'Invalid CreateConditionRole',
+            invalidCreateRole: 'Invalid CreateRole',
             invalidUpdateRole: 'Invalid UpdateRole'
+        }
+    },
+    initialize: {
+        error: {
+            invalidNumberParamsGot0Expected2: 'Invalid number of parameters for "initialize". Got 0 expected 2!',
+            invalidNumberParamsGot1Expected2: 'Invalid number of parameters for "initialize". Got 1 expected 2!'
         }
     },
     did: [

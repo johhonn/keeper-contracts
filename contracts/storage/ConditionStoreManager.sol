@@ -4,10 +4,9 @@ import '../Common.sol';
 import '../libraries/EpochLibrary.sol';
 import '../libraries/ConditionStoreLibrary.sol';
 
-import 'zos-lib/contracts/Initializable.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
-contract ConditionStoreManager is Initializable, Common, Ownable {
+contract ConditionStoreManager is Ownable, Common {
 
     using ConditionStoreLibrary for ConditionStoreLibrary.ConditionList;
     using EpochLibrary for EpochLibrary.EpochList;
@@ -19,7 +18,7 @@ contract ConditionStoreManager is Initializable, Common, Ownable {
     modifier onlyCreateRole(){
         require(
             createRole == msg.sender,
-            'Invalid CreateConditionRole'
+            'Invalid CreateRole'
         );
         _;
     }
@@ -34,11 +33,23 @@ contract ConditionStoreManager is Initializable, Common, Ownable {
     }
 
     function initialize(
+        address _sender
+    )
+        public
+        initializer
+    {
+        require(
+            true == false,
+            'Invalid number of parameters for "initialize". Got 1 expected 2!'
+        );
+    }
+
+    function initialize(
         address _owner,
         address _createRole
     )
         public
-        initializer()
+        initializer
     {
         require(
             _owner != address(0) &&
@@ -46,7 +57,7 @@ contract ConditionStoreManager is Initializable, Common, Ownable {
             'Invalid address'
         );
         require(
-            createRole == address (0),
+            createRole == address(0),
             'Role already assigned'
         );
         Ownable.initialize(_owner);
