@@ -1,6 +1,7 @@
 pragma solidity 0.5.3;
 
 import '../storage/ConditionStoreManager.sol';
+import 'zos-lib/contracts/Initializable.sol';
 
 contract Condition is Initializable {
 
@@ -38,7 +39,7 @@ contract Condition is Initializable {
     function abortByTimeOut(
         bytes32 _id
     )
-        internal
+        external
         returns (ConditionStoreLibrary.ConditionState)
     {
         require(

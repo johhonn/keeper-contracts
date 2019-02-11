@@ -110,6 +110,8 @@ contract('AgreementStoreManager', (accounts) => {
                 expect(storedCondition.timeLock.toNumber()).to.equal(agreement.timeLocks[i])
                 expect(storedCondition.timeOut.toNumber()).to.equal(agreement.timeOuts[i])
             })
+
+            expect((await agreementStoreManager.getAgreementListSize()).toNumber()).to.equal(1)
         })
 
         it('should not create agreement with existing conditions', async () => {

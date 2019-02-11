@@ -30,7 +30,8 @@ let constants = {
         },
         epoch: {
             error: {
-                isTimeLocked: 'TimeLock is not over yet'
+                isTimeLocked: 'TimeLock is not over yet',
+                conditionNeedsToBeTimedOut: 'Condition needs to be timed out'
             }
         },
         hashlock: {

@@ -60,6 +60,7 @@ contract('TemplateStoreManager', (accounts) => {
 
             expect(await templateStoreManager.isTemplateActive(templateId))
                 .to.equal(true)
+            expect((await templateStoreManager.getTemplateListSize()).toNumber()).to.equal(1)
         })
     })
 

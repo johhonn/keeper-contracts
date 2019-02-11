@@ -8,6 +8,7 @@ const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
 const Common = artifacts.require('Common.sol')
+const HashLockCondition = artifacts.require('HashLockCondition.sol')
 const EpochLibrary = artifacts.require('EpochLibrary.sol')
 const ConditionStoreLibrary = artifacts.require('ConditionStoreLibrary.sol')
 const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
@@ -36,9 +37,12 @@ contract('ConditionStoreManager', (accounts) => {
                 { from: accounts[0] }
             )
         }
+        const hashLockCondition = await HashLockCondition.new()
+        await hashLockCondition.initialize(conditionStoreManager.address, { from: accounts[0] })
 
         return {
             common,
+            hashLockCondition,
             epochLibrary,
             conditionStoreManager,
             conditionId,
@@ -558,6 +562,55 @@ contract('ConditionStoreManager', (accounts) => {
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
                 constants.condition.state.fulfilled)
+        })
+
+        it('timed out condition should abort by timeout', async () => {
+            const {
+                conditionStoreManager,
+                hashLockCondition,
+                conditionId
+            } = await setupTest()
+
+            let conditionTimeLock = 0
+            let conditionTimeOut = 1
+
+            await conditionStoreManager.createCondition(
+                conditionId,
+                hashLockCondition.address,
+                conditionTimeLock,
+                conditionTimeOut)
+
+            // wait for a block
+            await increaseTime(1)
+
+            await hashLockCondition.abortByTimeOut(conditionId)
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
+                constants.condition.state.aborted)
+        })
+
+        it('timed out condition should not abort before timeout', async () => {
+            const {
+                conditionStoreManager,
+                hashLockCondition,
+                conditionId
+            } = await setupTest()
+
+            let conditionTimeLock = 0
+            let conditionTimeOut = 10
+
+            await conditionStoreManager.createCondition(
+                conditionId,
+                hashLockCondition.address,
+                conditionTimeLock,
+                conditionTimeOut)
+
+            // wait for a block
+            await increaseTime(1)
+
+            await assert.isRejected(
+                hashLockCondition.abortByTimeOut(conditionId),
+                constants.condition.epoch.error.conditionNeedsToBeTimedOut)
         })
     })
 })
