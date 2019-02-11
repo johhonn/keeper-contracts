@@ -22,7 +22,7 @@ const EscrowReward = artifacts.require('EscrowReward.sol')
 const constants = require('../../helpers/constants.js')
 const getBalance = require('../../helpers/getBalance.js')
 
-contract('AgreementStoreManager', (accounts) => {
+contract('Escrow Agreement integration test', (accounts) => {
     async function setupTest({
         agreementId = constants.bytes32.one,
         conditionIds = [constants.address.dummy],
@@ -174,7 +174,8 @@ contract('AgreementStoreManager', (accounts) => {
                 ...Object.values(agreement)
             )
 
-            expect(await agreementStoreManager.exists(agreementId)).to.equal(true)
+            expect((await agreementStoreManager.getAgreement(agreementId)).did)
+                .to.equal(constants.did[0])
 
             let storedCondition
             agreement.conditionIds.forEach(async (conditionId, i) => {

@@ -104,13 +104,12 @@ contract ConditionStoreManager is Initializable, Common {
             !isConditionTimeLocked(_id),
             'TimeLock is not over yet'
         );
+
+        ConditionStoreLibrary.ConditionState updateState = _newState;
         // auto abort after time out
         if (isConditionTimedOut(_id))
-            conditionList.updateState(
-                _id,
-                ConditionStoreLibrary.ConditionState.Aborted
-            );
-        return conditionList.updateState(_id, _newState);
+            updateState = ConditionStoreLibrary.ConditionState.Aborted;
+        return conditionList.updateState(_id, updateState);
     }
 
     function getConditionListSize() public view returns (uint size) {

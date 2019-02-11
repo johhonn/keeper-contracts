@@ -26,22 +26,8 @@ contract('EpochLibrary', (accounts) => {
     })
 
     describe('create epoch', () => {
-        it('should create and epoch exist', async () => {
-            await setupTest()
-        })
     })
 
     describe('get epoch', () => {
-        it('successful create should get unfulfilled condition', async () => {
-            await setupTest()
-        })
-    })
-
-    describe('exists', () => {
-        it('successful create should exist', async () => {
-        })
-
-        it('no create should not exist', async () => {
-        })
     })
 })
