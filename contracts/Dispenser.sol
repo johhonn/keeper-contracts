@@ -95,7 +95,7 @@ contract Dispenser is Initializable, Ownable {
 
         require(
             amountWithDigits + totalMintAmount < maxMintAmount,
-            "Exceeded maxMintAmount"
+            'Exceeded maxMintAmount'
         );
 
         /* solium-disable-next-line security/no-block-members */
