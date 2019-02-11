@@ -3,7 +3,6 @@ pragma solidity 0.5.3;
 import './Condition.sol';
 import '../libraries/ConditionStoreLibrary.sol';
 import 'openzeppelin-eth/contracts/cryptography/ECDSA.sol';
-import 'zos-lib/contracts/Initializable.sol';
 
 contract SignCondition is Condition {
 
