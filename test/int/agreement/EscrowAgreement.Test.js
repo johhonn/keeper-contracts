@@ -16,12 +16,13 @@ const OceanToken = artifacts.require('OceanToken.sol')
 const HashLockCondition = artifacts.require('HashLockCondition.sol')
 const SignCondition = artifacts.require('SignCondition.sol')
 const LockRewardCondition = artifacts.require('LockRewardCondition.sol')
+const AccessSecretStoreCondition = artifacts.require('AccessSecretStoreCondition.sol')
 const EscrowReward = artifacts.require('EscrowReward.sol')
 
 const constants = require('../../helpers/constants.js')
 const getBalance = require('../../helpers/getBalance.js')
 
-contract('AgreementStoreManager', (accounts) => {
+contract('Escrow Agreement integration test', (accounts) => {
     async function setupTest({
         agreementId = constants.bytes32.one,
         conditionIds = [constants.address.dummy],
@@ -45,7 +46,10 @@ contract('AgreementStoreManager', (accounts) => {
         )
 
         if (setupConditionStoreManager) {
-            await conditionStoreManager.setup(agreementStoreManager.address)
+            await conditionStoreManager.initialize(
+                agreementStoreManager.address,
+                { from: accounts[0] }
+            )
         }
 
         const oceanToken = await OceanToken.new({ from: createRole })
@@ -70,7 +74,15 @@ contract('AgreementStoreManager', (accounts) => {
             { from: createRole }
         )
 
-        const escrowReward = await EscrowReward.new()
+        const accessSecretStoreCondition = await AccessSecretStoreCondition.new({ from: createRole })
+
+        await accessSecretStoreCondition.initialize(
+            conditionStoreManager.address,
+            agreementStoreManager.address,
+            { from: createRole }
+        )
+
+        const escrowReward = await EscrowReward.new({ from: createRole })
         await escrowReward.initialize(
             conditionStoreManager.address,
             oceanToken.address,
@@ -85,6 +97,7 @@ contract('AgreementStoreManager', (accounts) => {
             hashLockCondition,
             signCondition,
             lockRewardCondition,
+            accessSecretStoreCondition,
             escrowReward,
             agreementId,
             conditionIds,
@@ -92,7 +105,7 @@ contract('AgreementStoreManager', (accounts) => {
         }
     }
 
-    describe('create and fulfill escrow agreement', () => {
+    describe('create and fulfill escrow agreement with sign', () => {
         it('should create escrow agreement and fulfill', async () => {
             const {
                 oceanToken,
@@ -145,6 +158,7 @@ contract('AgreementStoreManager', (accounts) => {
 
             const agreement = {
                 did: constants.did[0],
+                didOwner: accounts[0],
                 templateId: templateId,
                 conditionIds: [
                     conditionIdLock,
@@ -160,7 +174,8 @@ contract('AgreementStoreManager', (accounts) => {
                 ...Object.values(agreement)
             )
 
-            expect(await agreementStoreManager.exists(agreementId)).to.equal(true)
+            expect((await agreementStoreManager.getAgreement(agreementId)).did)
+                .to.equal(constants.did[0])
 
             let storedCondition
             agreement.conditionIds.forEach(async (conditionId, i) => {
@@ -254,6 +269,7 @@ contract('AgreementStoreManager', (accounts) => {
 
             const agreement = {
                 did: constants.did[0],
+                didOwner: accounts[0],
                 templateId: templateId,
                 conditionIds: [
                     conditionIdLock,
@@ -302,6 +318,124 @@ contract('AgreementStoreManager', (accounts) => {
             )
 
             assert.strictEqual(await getBalance(oceanToken, sender), amount)
+        })
+    })
+
+    describe('create and fulfill escrow agreement with access secret store and timeLock', () => {
+        it('should create escrow agreement and fulfill', async () => {
+            const {
+                oceanToken,
+                agreementStoreManager,
+                templateStoreManager,
+                conditionStoreManager,
+                accessSecretStoreCondition,
+                lockRewardCondition,
+                escrowReward
+            } = await setupTest()
+
+            // deploy template
+            const templateId = constants.bytes32.one
+            await templateStoreManager.createTemplate(
+                templateId,
+                [
+                    lockRewardCondition.address,
+                    accessSecretStoreCondition.address,
+                    escrowReward.address
+                ]
+            )
+            await templateStoreManager.getTemplate(templateId)
+
+            const agreementId = constants.bytes32.one
+
+            const sender = accounts[0]
+            const receiver = accounts[1]
+            const amount = 10
+
+            const hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
+            const conditionIdLock = await lockRewardCondition.generateId(agreementId, hashValuesLock)
+
+            const documentId = constants.did[0]
+            const grantee = accounts[1]
+
+            const hashValuesAccess = await accessSecretStoreCondition.hashValues(documentId, grantee)
+            const conditionIdAccess = await accessSecretStoreCondition.generateId(agreementId, hashValuesAccess)
+
+            const hashValuesEscrow = await escrowReward.hashValues(
+                amount,
+                receiver,
+                sender,
+                conditionIdLock,
+                conditionIdAccess)
+            const conditionIdEscrow = await escrowReward.generateId(agreementId, hashValuesEscrow)
+
+            const agreement = {
+                did: constants.did[0],
+                didOwner: accounts[0],
+                templateId: templateId,
+                conditionIds: [
+                    conditionIdLock,
+                    conditionIdAccess,
+                    conditionIdEscrow
+                ],
+                timeLocks: [0, 6, 0],
+                timeOuts: [0, 0, 0]
+            }
+
+            await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement)
+            )
+
+            await oceanToken.mint(sender, amount)
+
+            await oceanToken.approve(
+                lockRewardCondition.address,
+                amount,
+                { from: sender })
+
+            await lockRewardCondition.fulfill(agreementId, escrowReward.address, amount)
+
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(conditionIdLock)).toNumber(),
+                constants.condition.state.fulfilled)
+
+            await assert.isRejected(
+                accessSecretStoreCondition.fulfill(agreementId, documentId, grantee),
+                constants.condition.epoch.error.isTimeLocked
+            )
+
+            await assert.isRejected(
+                accessSecretStoreCondition.fulfill(agreementId, documentId, grantee,
+                    { from: accounts[1] }),
+                constants.acl.error.invalidUpdateRole
+            )
+
+            expect(await accessSecretStoreCondition.checkPermissions(grantee, documentId))
+                .to.equal(false)
+
+            await accessSecretStoreCondition.fulfill(agreementId, documentId, grantee)
+
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(conditionIdAccess)).toNumber(),
+                constants.condition.state.fulfilled)
+
+            await escrowReward.fulfill(
+                agreementId,
+                amount,
+                receiver,
+                sender,
+                conditionIdLock,
+                conditionIdAccess)
+
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(conditionIdEscrow)).toNumber(),
+                constants.condition.state.fulfilled
+            )
+
+            expect(await accessSecretStoreCondition.checkPermissions(grantee, documentId))
+                .to.equal(true)
+
+            assert.strictEqual(await getBalance(oceanToken, receiver), amount)
         })
     })
 })

@@ -14,7 +14,7 @@ const LockRewardCondition = artifacts.require('LockRewardCondition.sol')
 const constants = require('../../helpers/constants.js')
 const getBalance = require('../../helpers/getBalance.js')
 
-contract('LockRewardCondition constructor', (accounts) => {
+contract('LockRewardCondition', (accounts) => {
     async function setupTest({
         conditionId = constants.bytes32.one,
         conditionType = constants.address.dummy,
@@ -26,8 +26,12 @@ contract('LockRewardCondition constructor', (accounts) => {
 
         const conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
         if (setupConditionStoreManager) {
-            await conditionStoreManager.setup(createRole)
+            await conditionStoreManager.initialize(
+                createRole,
+                { from: accounts[0] }
+            )
         }
+
         const oceanToken = await OceanToken.new({ from: createRole })
         await oceanToken.initialize(createRole)
 
@@ -74,7 +78,7 @@ contract('LockRewardCondition constructor', (accounts) => {
 
             await assert.isRejected(
                 lockRewardCondition.fulfill(nonce, rewardAddress, amount),
-                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+                constants.acl.error.invalidUpdateRole
             )
         })
     })

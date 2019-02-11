@@ -24,7 +24,10 @@ contract('HashLockCondition constructor', (accounts) => {
 
         const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
         if (setupConditionStoreManager) {
-            await conditionStoreManager.setup(createRole)
+            await conditionStoreManager.initialize(
+                createRole,
+                { from: accounts[0] }
+            )
         }
         const hashLockCondition = await HashLockCondition.new()
         await hashLockCondition.initialize(conditionStoreManager.address, { from: accounts[0] })
@@ -51,7 +54,7 @@ contract('HashLockCondition constructor', (accounts) => {
                     conditionId,
                     constants.condition.hashlock.uint.preimage
                 ),
-                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+                constants.acl.error.invalidUpdateRole
             )
         })
 
@@ -63,7 +66,7 @@ contract('HashLockCondition constructor', (accounts) => {
                     conditionId,
                     constants.condition.hashlock.string.preimage
                 ),
-                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+                constants.acl.error.invalidUpdateRole
             )
         })
 
@@ -75,7 +78,7 @@ contract('HashLockCondition constructor', (accounts) => {
                     conditionId,
                     constants.condition.hashlock.bytes32.preimage
                 ),
-                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+                constants.acl.error.invalidUpdateRole
             )
         })
     })
@@ -159,7 +162,7 @@ contract('HashLockCondition constructor', (accounts) => {
                     constants.bytes32.one,
                     constants.condition.hashlock.uint.preimage + 333
                 ),
-                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+                constants.acl.error.invalidUpdateRole
             )
         })
 
@@ -179,7 +182,7 @@ contract('HashLockCondition constructor', (accounts) => {
                     constants.bytes32.one,
                     constants.condition.hashlock.uint.preimage + 'some bogus'
                 ),
-                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+                constants.acl.error.invalidUpdateRoled
             )
         })
 
@@ -199,7 +202,7 @@ contract('HashLockCondition constructor', (accounts) => {
                     constants.bytes32.one,
                     constants.condition.hashlock.uint.preimage
                 ),
-                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+                constants.acl.error.invalidUpdateRole
             )
         })
 
@@ -219,7 +222,7 @@ contract('HashLockCondition constructor', (accounts) => {
                     constants.bytes32.one,
                     constants.condition.hashlock.bytes32.preimage
                 ),
-                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+                constants.acl.error.invalidUpdateRole
             )
         })
 
@@ -245,7 +248,7 @@ contract('HashLockCondition constructor', (accounts) => {
                     constants.bytes32.one,
                     constants.condition.hashlock.uint.preimage
                 ),
-                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+                constants.condition.state.error.invalidStateTransition
             )
         })
 

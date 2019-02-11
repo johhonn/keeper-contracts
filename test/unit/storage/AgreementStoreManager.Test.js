@@ -7,6 +7,7 @@ const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
+const Common = artifacts.require('Common.sol')
 const EpochLibrary = artifacts.require('EpochLibrary.sol')
 const AgreementStoreLibrary = artifacts.require('AgreementStoreLibrary.sol')
 const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
@@ -21,6 +22,7 @@ contract('AgreementStoreManager', (accounts) => {
         createRole = accounts[0],
         setupConditionStoreManager = true
     } = {}) {
+        const common = await Common.new({ from: createRole })
         const epochLibrary = await EpochLibrary.new({ from: createRole })
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
         const conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
@@ -36,7 +38,10 @@ contract('AgreementStoreManager', (accounts) => {
         )
 
         if (setupConditionStoreManager) {
-            await conditionStoreManager.setup(agreementStoreManager.address)
+            await conditionStoreManager.initialize(
+                agreementStoreManager.address,
+                { from: accounts[0] }
+            )
         }
 
         return {
@@ -45,7 +50,8 @@ contract('AgreementStoreManager', (accounts) => {
             templateStoreManager,
             agreementId,
             conditionIds,
-            createRole
+            createRole,
+            common
         }
     }
 
@@ -68,7 +74,7 @@ contract('AgreementStoreManager', (accounts) => {
     })
 
     describe('create agreement', () => {
-        it('should create and agreement and conditions exist', async () => {
+        it('create agreement should have existing agreement and conditions created', async () => {
             const { agreementStoreManager, templateStoreManager, conditionStoreManager } = await setupTest()
 
             const templateId = constants.bytes32.one
@@ -83,7 +89,8 @@ contract('AgreementStoreManager', (accounts) => {
 
             const agreement = {
                 did: constants.did[0],
-                templateId: constants.bytes32.one,
+                didOwner: constants.address.dummy,
+                templateId: templateId,
                 conditionIds: [constants.bytes32.zero, constants.bytes32.one],
                 timeLocks: [0, 1],
                 timeOuts: [2, 3]
@@ -95,8 +102,6 @@ contract('AgreementStoreManager', (accounts) => {
                 ...Object.values(agreement)
             )
 
-            expect(await agreementStoreManager.exists(agreementId)).to.equal(true)
-
             let storedCondition
             agreement.conditionIds.forEach(async (conditionId, i) => {
                 storedCondition = await conditionStoreManager.getCondition(conditionId)
@@ -105,6 +110,8 @@ contract('AgreementStoreManager', (accounts) => {
                 expect(storedCondition.timeLock.toNumber()).to.equal(agreement.timeLocks[i])
                 expect(storedCondition.timeOut.toNumber()).to.equal(agreement.timeOuts[i])
             })
+
+            expect((await agreementStoreManager.getAgreementListSize()).toNumber()).to.equal(1)
         })
 
         it('should not create agreement with existing conditions', async () => {
@@ -116,10 +123,13 @@ contract('AgreementStoreManager', (accounts) => {
                 [constants.address.dummy]
             )
 
+            const conditionIds = [constants.bytes32.zero]
+
             const agreement = {
                 did: constants.did[0],
-                templateId: constants.bytes32.one,
-                conditionIds: [constants.bytes32.zero],
+                didOwner: constants.address.dummy,
+                templateId: templateId,
+                conditionIds: conditionIds,
                 timeLocks: [0],
                 timeOuts: [2]
             }
@@ -131,11 +141,12 @@ contract('AgreementStoreManager', (accounts) => {
             )
 
             const otherAgreement = {
-                did: constants.did[0],
-                templateId: constants.bytes32.one,
-                conditionIds: [constants.bytes32.zero],
-                timeLocks: [0],
-                timeOuts: [2]
+                did: constants.did[1],
+                didOwner: accounts[1],
+                templateId: templateId,
+                conditionIds: conditionIds,
+                timeLocks: [3],
+                timeOuts: [100]
             }
             const otherAgreementId = constants.bytes32.one
 
@@ -153,6 +164,7 @@ contract('AgreementStoreManager', (accounts) => {
 
             const agreement = {
                 did: constants.did[0],
+                didOwner: constants.address.dummy,
                 templateId: constants.bytes32.one,
                 conditionIds: [constants.bytes32.zero],
                 timeLocks: [0],
@@ -165,14 +177,56 @@ contract('AgreementStoreManager', (accounts) => {
                     agreementId,
                     ...Object.values(agreement)
                 ),
-                constants.template.error.templateMustExist
+                constants.template.error.templateNotActive
+            )
+        })
+
+        it('should not create agreement with existing ID', async () => {
+            const { agreementStoreManager, templateStoreManager } = await setupTest()
+
+            const templateId = constants.bytes32.one
+            await templateStoreManager.createTemplate(
+                templateId,
+                [constants.address.dummy]
+            )
+
+            const agreement = {
+                did: constants.did[0],
+                didOwner: constants.address.dummy,
+                templateId: templateId,
+                conditionIds: [constants.bytes32.zero],
+                timeLocks: [0],
+                timeOuts: [2]
+            }
+            const agreementId = constants.bytes32.zero
+
+            await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement)
+            )
+            const otherAgreement = {
+                did: constants.did[1],
+                didOwner: accounts[1],
+                templateId: templateId,
+                conditionIds: [constants.bytes32.one],
+                timeLocks: [2],
+                timeOuts: [3]
+            }
+            const otherAgreementId = constants.bytes32.zero
+
+            await assert.isRejected(
+                agreementStoreManager.createAgreement(
+                    otherAgreementId,
+                    ...Object.values(otherAgreement)
+                ),
+                constants.condition.id.error.idAlreadyExists
             )
         })
     })
 
     describe('get agreement', () => {
         it('successful create should get agreement', async () => {
-            const { agreementStoreManager, templateStoreManager } = await setupTest()
+            const { common, agreementStoreManager, templateStoreManager } = await setupTest()
 
             const templateId = constants.bytes32.one
             await templateStoreManager.createTemplate(
@@ -182,12 +236,14 @@ contract('AgreementStoreManager', (accounts) => {
 
             const agreement = {
                 did: constants.did[0],
-                templateId: constants.bytes32.one,
+                didOwner: constants.address.dummy,
+                templateId: templateId,
                 conditionIds: [constants.bytes32.one, constants.bytes32.zero],
                 timeLocks: [0, 1],
                 timeOuts: [2, 3]
             }
             const agreementId = constants.bytes32.one
+            const blockNumber = await common.getCurrentBlockNumber()
 
             await agreementStoreManager.createAgreement(
                 agreementId,
@@ -196,17 +252,18 @@ contract('AgreementStoreManager', (accounts) => {
 
             // TODO - containSubset
             const storedAgreement = await agreementStoreManager.getAgreement(agreementId)
-            expect(storedAgreement.did).to.equal(agreement.did)
-            expect(storedAgreement.templateId).to.equal(agreement.templateId)
-            expect(storedAgreement.conditionIds).to.deep.equal(agreement.conditionIds)
-        })
-    })
-
-    describe('exists', () => {
-        it('successful create should exist', async () => {
-        })
-
-        it('no create should not exist', async () => {
+            expect(storedAgreement.did)
+                .to.equal(agreement.did)
+            expect(storedAgreement.didOwner)
+                .to.equal(agreement.didOwner)
+            expect(storedAgreement.templateId)
+                .to.equal(agreement.templateId)
+            expect(storedAgreement.conditionIds)
+                .to.deep.equal(agreement.conditionIds)
+            expect(storedAgreement.lastUpdatedBy)
+                .to.equal(accounts[0])
+            expect(storedAgreement.blockNumberUpdated.toNumber())
+                .to.equal(blockNumber.toNumber())
         })
     })
 })

@@ -10,19 +10,19 @@ contract ConditionStoreManager is Initializable, Common {
     using ConditionStoreLibrary for ConditionStoreLibrary.ConditionList;
     using EpochLibrary for EpochLibrary.EpochList;
 
-    address private _createConditionRole;
+    address private createRole;
     ConditionStoreLibrary.ConditionList private conditionList;
     EpochLibrary.EpochList private epochList;
 
-    modifier onlyCreateConditionRole(){
+    modifier onlyCreateRole(){
         require(
-            _createConditionRole == msg.sender,
+            createRole == msg.sender,
             'Invalid CreateConditionRole'
         );
         _;
     }
 
-    modifier onlyTypeRef(bytes32 _id)
+    modifier onlyUpdateRole(bytes32 _id)
     {
         require(
             conditionList.conditions[_id].typeRef == address(msg.sender),
@@ -31,57 +31,29 @@ contract ConditionStoreManager is Initializable, Common {
         _;
     }
 
-    modifier isUniqueId(bytes32 _id) {
-        require(
-            !exists(_id),
-            'Id already exists'
-        );
-        _;
-    }
-
-    modifier isValidAddress(address _address){
-        require(
-            _address != address(0),
-            'Invalid address: 0x0'
-        );
-        _;
-    }
-
-    modifier isUnfulfilled(bytes32 _id) {
-        require(
-            isConditionUnfulfilled(_id),
-            'Condition needs to be Unfulfilled'
-        );
-        _;
-    }
-
-    modifier isValidFulfillState(
-        ConditionStoreLibrary.ConditionState _state
+    function initialize(
+        address _createRole
     )
+        public
+        initializer()
     {
         require(
-            _state > ConditionStoreLibrary.ConditionState.Unfulfilled,
-            'Invalid state transition'
+            _createRole != address(0),
+            'Invalid address'
         );
-        _;
+        require(
+            createRole == address (0),
+            'Role already assigned'
+        );
+        createRole = _createRole;
     }
 
-
-    function setup(address createConditionRole)
-        public
-        isValidAddress(createConditionRole)
-    {
-        if(_createConditionRole == address(0)){
-            _createConditionRole = createConditionRole;
-        }
-    }
-
-    function getCreateConditionRole()
+    function getCreateRole()
         public
         view
         returns (address)
     {
-        return _createConditionRole;
+        return createRole;
     }
 
     function createCondition(
@@ -99,6 +71,7 @@ contract ConditionStoreManager is Initializable, Common {
         );
     }
 
+    // create: Uninitialized --> Unfulfilled
     function createCondition(
         bytes32 _id,
         address _typeRef,
@@ -106,56 +79,37 @@ contract ConditionStoreManager is Initializable, Common {
         uint _timeOut
     )
         public
-        onlyCreateConditionRole
-        isUniqueId(_id)
-        isValidAddress(_typeRef)
+        onlyCreateRole
         returns (uint size)
     {
-        if (_timeLock > 0 || _timeOut > 0) {
-            epochList.create(
-                _id,
-                _timeLock,
-                _timeOut
-            );
-        }
-        return conditionList.create(
-            _id,
-            _typeRef
+        require(
+            _typeRef != address(0),
+            'Invalid address'
         );
+        epochList.create(_id, _timeLock, _timeOut);
+        return conditionList.create(_id, _typeRef);
     }
 
+    // update: Unfulfilled --> Fulfilled | Aborted | ...
     function updateConditionState(
         bytes32 _id,
         ConditionStoreLibrary.ConditionState _newState
     )
         public
-        isValidFulfillState(_newState)
-        isUnfulfilled(_id)
-        onlyTypeRef(_id)
+        onlyUpdateRole(_id)
         returns (ConditionStoreLibrary.ConditionState)
     {
+        // no update before time lock
         require(
             !isConditionTimeLocked(_id),
             'TimeLock is not over yet'
         );
-        // auto abort on time out
-        if (isConditionTimedOut(_id))
-            return conditionList.updateState(
-                _id,
-                ConditionStoreLibrary.ConditionState.Aborted
-            );
-        return conditionList.updateState(_id, _newState);
-    }
 
-    function exists(bytes32 _id)
-        public
-        view
-        returns (bool)
-    {
-        return (
-            conditionList.conditions[_id].state !=
-            ConditionStoreLibrary.ConditionState.Uninitialized
-        );
+        ConditionStoreLibrary.ConditionState updateState = _newState;
+        // auto abort after time out
+        if (isConditionTimedOut(_id))
+            updateState = ConditionStoreLibrary.ConditionState.Aborted;
+        return conditionList.updateState(_id, updateState);
     }
 
     function getConditionListSize() public view returns (uint size) {
@@ -170,7 +124,9 @@ contract ConditionStoreManager is Initializable, Common {
             ConditionStoreLibrary.ConditionState state,
             uint timeLock,
             uint timeOut,
-            uint blockNumber
+            uint blockNumber,
+            address lastUpdatedBy,
+            uint blockNumberUpdated
         )
     {
         typeRef = conditionList.conditions[_id].typeRef;
@@ -178,6 +134,8 @@ contract ConditionStoreManager is Initializable, Common {
         timeLock = epochList.epochs[_id].timeLock;
         timeOut = epochList.epochs[_id].timeOut;
         blockNumber = epochList.epochs[_id].blockNumber;
+        lastUpdatedBy = conditionList.conditions[_id].lastUpdatedBy;
+        blockNumberUpdated = conditionList.conditions[_id].blockNumberUpdated;
     }
 
     function getConditionState(bytes32 _id)
@@ -186,50 +144,6 @@ contract ConditionStoreManager is Initializable, Common {
         returns (ConditionStoreLibrary.ConditionState)
     {
         return conditionList.conditions[_id].state;
-    }
-
-    function isConditionUninitialized(bytes32 _id)
-        public
-        view
-        returns (bool)
-    {
-        return (
-            getConditionState(_id) ==
-            ConditionStoreLibrary.ConditionState.Uninitialized
-        );
-    }
-
-    function isConditionUnfulfilled(bytes32 _id)
-        public
-        view
-        returns (bool)
-    {
-        return (
-            getConditionState(_id) ==
-            ConditionStoreLibrary.ConditionState.Unfulfilled
-        );
-    }
-
-    function isConditionFulfilled(bytes32 _id)
-        public
-        view
-        returns (bool)
-    {
-        return (
-            getConditionState(_id) ==
-            ConditionStoreLibrary.ConditionState.Fulfilled
-        );
-    }
-
-    function isConditionAborted(bytes32 _id)
-        public
-        view
-        returns (bool)
-    {
-        return (
-            getConditionState(_id) ==
-            ConditionStoreLibrary.ConditionState.Aborted
-        );
     }
 
     function isConditionTimeLocked(bytes32 _id)

@@ -6,7 +6,7 @@ let constants = {
         zero: '0x0000000000000000000000000000000000000000',
         dummy: '0xeE9300b7961e0a01d9f0adb863C7A227A07AaD75',
         error: {
-            invalidAddress0x0: 'Invalid address: 0x0'
+            invalidAddress0x0: 'Invalid address'
         }
     },
     bytes32: {
@@ -25,13 +25,13 @@ let constants = {
             fulfilled: 2,
             aborted: 3,
             error: {
-                invalidStateTransition: 'Invalid state transition',
-                conditionNeedsToBeUnfulfilled: 'Condition needs to be Unfulfilled'
+                invalidStateTransition: 'Invalid state transition'
             }
         },
         epoch: {
             error: {
-                isTimeLocked: 'TimeLock is not over yet'
+                isTimeLocked: 'TimeLock is not over yet',
+                conditionNeedsToBeTimedOut: 'Condition needs to be timed out'
             }
         },
         hashlock: {
@@ -68,8 +68,13 @@ let constants = {
         }
     },
     template: {
+        state: {
+            uninitialized: 0,
+            active: 1,
+            revoked: 2
+        },
         error: {
-            templateMustExist: 'Template must exist'
+            templateNotActive: 'Template not active'
         }
     },
     acl: {

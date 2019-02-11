@@ -2,12 +2,14 @@ pragma solidity 0.5.3;
 
 library TemplateStoreLibrary {
 
-    enum TemplateState { Uninitialized, Created, Revoked }
+    enum TemplateState { Uninitialized, Active, Revoked }
 
     struct Template {
         TemplateState state;
         address owner;
         address[] conditionTypes;
+        address lastUpdatedBy;
+        uint256 blockNumberUpdated;
     }
 
     struct TemplateList {
@@ -23,12 +25,34 @@ library TemplateStoreLibrary {
         internal
         returns (uint size)
     {
+        require(
+            _self.templates[_id].blockNumberUpdated == 0,
+            'Id already exists'
+        );
+
         _self.templates[_id] = Template({
-            state: TemplateState.Created,
+            state: TemplateState.Active,
             owner: msg.sender,
-            conditionTypes: _conditionTypes
+            conditionTypes: _conditionTypes,
+            lastUpdatedBy: msg.sender,
+            blockNumberUpdated: block.number
         });
         _self.templateIds.push(_id);
         return _self.templateIds.length;
+    }
+
+    function revoke(
+        TemplateList storage _self,
+        bytes32 _id
+    )
+        internal
+    {
+        require(
+            _self.templates[_id].state == TemplateState.Active,
+            'Template not active'
+        );
+
+        _self.templates[_id].state = TemplateState.Revoked;
+        _self.templates[_id].blockNumberUpdated = block.number;
     }
 }
