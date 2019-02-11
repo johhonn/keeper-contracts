@@ -26,67 +26,68 @@ contract('Escrow Agreement integration test', (accounts) => {
     async function setupTest({
         agreementId = constants.bytes32.one,
         conditionIds = [constants.address.dummy],
-        createRole = accounts[0],
+        owner = accounts[0],
         setupConditionStoreManager = true
     } = {}) {
-        const epochLibrary = await EpochLibrary.new({ from: createRole })
+        const epochLibrary = await EpochLibrary.new({ from: owner })
 
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
-        const conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
+        const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
 
-        const templateStoreManager = await TemplateStoreManager.new({ from: createRole })
+        const templateStoreManager = await TemplateStoreManager.new({ from: owner })
 
-        const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: createRole })
+        const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: owner })
         await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-        const agreementStoreManager = await AgreementStoreManager.new({ from: createRole })
+        const agreementStoreManager = await AgreementStoreManager.new({ from: owner })
         await agreementStoreManager.initialize(
             conditionStoreManager.address,
             templateStoreManager.address,
-            { from: createRole }
+            { from: owner }
         )
 
         if (setupConditionStoreManager) {
             await conditionStoreManager.initialize(
+                owner,
                 agreementStoreManager.address,
                 { from: accounts[0] }
             )
         }
 
-        const oceanToken = await OceanToken.new({ from: createRole })
-        await oceanToken.initialize(createRole)
+        const oceanToken = await OceanToken.new({ from: owner })
+        await oceanToken.initialize(owner)
 
-        const hashLockCondition = await HashLockCondition.new({ from: createRole })
+        const hashLockCondition = await HashLockCondition.new({ from: owner })
         await hashLockCondition.initialize(
             conditionStoreManager.address,
-            { from: createRole }
+            { from: owner }
         )
 
-        const signCondition = await SignCondition.new({ from: createRole })
+        const signCondition = await SignCondition.new({ from: owner })
         await signCondition.initialize(
             conditionStoreManager.address,
-            { from: createRole }
+            { from: owner }
         )
 
-        const lockRewardCondition = await LockRewardCondition.new({ from: createRole })
+        const lockRewardCondition = await LockRewardCondition.new({ from: owner })
         await lockRewardCondition.initialize(
             conditionStoreManager.address,
             oceanToken.address,
-            { from: createRole }
+            { from: owner }
         )
 
-        const accessSecretStoreCondition = await AccessSecretStoreCondition.new({ from: createRole })
+        const accessSecretStoreCondition = await AccessSecretStoreCondition.new({ from: owner })
 
         await accessSecretStoreCondition.initialize(
             conditionStoreManager.address,
             agreementStoreManager.address,
-            { from: createRole }
+            { from: owner }
         )
 
-        const escrowReward = await EscrowReward.new({ from: createRole })
+        const escrowReward = await EscrowReward.new({ from: owner })
         await escrowReward.initialize(
             conditionStoreManager.address,
             oceanToken.address,
-            { from: createRole }
+            { from: owner }
         )
 
         return {
@@ -101,7 +102,7 @@ contract('Escrow Agreement integration test', (accounts) => {
             escrowReward,
             agreementId,
             conditionIds,
-            createRole
+            owner
         }
     }
 

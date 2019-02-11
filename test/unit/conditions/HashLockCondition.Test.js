@@ -16,22 +16,22 @@ contract('HashLockCondition constructor', (accounts) => {
     async function setupTest({
         conditionId = constants.bytes32.one,
         conditionType = constants.address.dummy,
-        createRole = accounts[0],
-        setupConditionStoreManager = true
+        owner = accounts[1],
+        createRole = accounts[0]
     } = {}) {
-        const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+        const epochLibrary = await EpochLibrary.new({ from: owner })
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
-        const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-        if (setupConditionStoreManager) {
-            await conditionStoreManager.initialize(
-                createRole,
-                { from: accounts[0] }
-            )
-        }
-        const hashLockCondition = await HashLockCondition.new()
-        await hashLockCondition.initialize(conditionStoreManager.address, { from: accounts[0] })
-        return { hashLockCondition, conditionStoreManager, conditionId, conditionType, createRole }
+        const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
+        await conditionStoreManager.initialize(
+            owner,
+            createRole,
+            { from: owner }
+        )
+
+        const hashLockCondition = await HashLockCondition.new({ from: owner })
+        await hashLockCondition.initialize(conditionStoreManager.address, { from: owner })
+        return { hashLockCondition, conditionStoreManager, conditionId, conditionType, owner, createRole }
     }
 
     describe('deploy and setup', () => {
@@ -47,7 +47,7 @@ contract('HashLockCondition constructor', (accounts) => {
 
     describe('fulfill non existing condition', () => {
         it('should not fulfill if conditions do not exist for uint preimage', async () => {
-            const { hashLockCondition, conditionId } = await setupTest({ setupConditionStoreManager: false })
+            const { hashLockCondition, conditionId } = await setupTest()
 
             await assert.isRejected(
                 hashLockCondition.fulfill(
@@ -59,7 +59,7 @@ contract('HashLockCondition constructor', (accounts) => {
         })
 
         it('should not fulfill if conditions do not exist for string preimage', async () => {
-            const { hashLockCondition, conditionId } = await setupTest({ setupConditionStoreManager: false })
+            const { hashLockCondition, conditionId } = await setupTest()
 
             await assert.isRejected(
                 hashLockCondition.methods['fulfill(bytes32,string)'](
@@ -71,7 +71,7 @@ contract('HashLockCondition constructor', (accounts) => {
         })
 
         it('should not fulfill if conditions do not exist for bytes32 preimage', async () => {
-            const { hashLockCondition, conditionId } = await setupTest({ setupConditionStoreManager: false })
+            const { hashLockCondition, conditionId } = await setupTest()
 
             await assert.isRejected(
                 hashLockCondition.methods['fulfill(bytes32,bytes32)'](

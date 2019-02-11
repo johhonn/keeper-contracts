@@ -20,38 +20,38 @@ contract('AgreementStoreManager', (accounts) => {
         agreementId = constants.bytes32.one,
         conditionIds = [constants.address.dummy],
         createRole = accounts[0],
-        setupConditionStoreManager = true
+        owner = accounts[1]
     } = {}) {
-        const common = await Common.new({ from: createRole })
-        const epochLibrary = await EpochLibrary.new({ from: createRole })
+        const common = await Common.new({ from: owner })
+        const epochLibrary = await EpochLibrary.new({ from: owner })
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
-        const conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
-        const templateStoreManager = await TemplateStoreManager.new({ from: createRole })
-        const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: createRole })
+        const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
+        const templateStoreManager = await TemplateStoreManager.new({ from: owner })
+        const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: owner })
         await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-        const agreementStoreManager = await AgreementStoreManager.new()
+        const agreementStoreManager = await AgreementStoreManager.new({ from: owner })
 
         await agreementStoreManager.initialize(
             conditionStoreManager.address,
             templateStoreManager.address,
-            { from: createRole }
+            { from: owner }
         )
 
-        if (setupConditionStoreManager) {
-            await conditionStoreManager.initialize(
-                agreementStoreManager.address,
-                { from: accounts[0] }
-            )
-        }
+        await conditionStoreManager.initialize(
+            owner,
+            agreementStoreManager.address,
+            { from: owner }
+        )
 
         return {
+            common,
             agreementStoreManager,
             conditionStoreManager,
             templateStoreManager,
             agreementId,
             conditionIds,
             createRole,
-            common
+            owner
         }
     }
 

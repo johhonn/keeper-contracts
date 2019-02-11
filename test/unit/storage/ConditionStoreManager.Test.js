@@ -21,24 +21,25 @@ contract('ConditionStoreManager', (accounts) => {
         conditionId = constants.bytes32.one,
         conditionType = constants.address.dummy,
         createRole = accounts[0],
-        setupConditionStoreManager = true
+        owner = accounts[1]
     } = {}) {
-        const common = await Common.new({ from: accounts[0] })
-        const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+        const common = await Common.new({ from: owner })
+        const epochLibrary = await EpochLibrary.new({ from: owner })
+
         await ConditionStoreLibrary.link('EpochLibrary', epochLibrary.address)
-        const conditionStoreLibrary = await ConditionStoreLibrary.new({ from: accounts[0] })
+        const conditionStoreLibrary = await ConditionStoreLibrary.new({ from: owner })
+
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
         await ConditionStoreManager.link('ConditionStoreLibrary', conditionStoreLibrary.address)
-        const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
+        const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
+        await conditionStoreManager.initialize(
+            owner,
+            createRole,
+            { from: owner }
+        )
 
-        if (setupConditionStoreManager) {
-            await conditionStoreManager.initialize(
-                createRole,
-                { from: accounts[0] }
-            )
-        }
-        const hashLockCondition = await HashLockCondition.new()
-        await hashLockCondition.initialize(conditionStoreManager.address, { from: accounts[0] })
+        const hashLockCondition = await HashLockCondition.new({ from: owner })
+        await hashLockCondition.initialize(conditionStoreManager.address, { from: owner })
 
         return {
             common,
@@ -47,7 +48,8 @@ contract('ConditionStoreManager', (accounts) => {
             conditionStoreManager,
             conditionId,
             conditionType,
-            createRole
+            createRole,
+            owner
         }
     }
 
@@ -63,46 +65,62 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('contract should setup', async () => {
-            let conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            let getCreateRole = await conditionStoreManager.getCreateRole()
+            const createRole = accounts[0]
+            const owner = accounts[1]
+
+            const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
             // address should be 0x0 before setup
-            assert.strictEqual(getCreateRole, constants.address.zero)
+            assert.strictEqual(
+                await conditionStoreManager.getCreateRole(),
+                constants.address.zero
+            )
 
             // address should be set after correct setup
-            let createRole = accounts[1]
-            await conditionStoreManager.initialize(createRole)
-            getCreateRole = await conditionStoreManager.getCreateRole()
-            assert.strictEqual(getCreateRole, createRole)
+            await conditionStoreManager.initialize(owner, createRole)
+
+            assert.strictEqual(
+                await conditionStoreManager.getCreateRole(),
+                createRole
+            )
         })
 
         it('contract should not setup with zero', async () => {
-            let conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
+            const createRole = constants.address.zero
+            const owner = accounts[1]
+
+            const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
 
             // setup with zero fails
-            let createRole = constants.address.zero
             await assert.isRejected(
-                conditionStoreManager.initialize(createRole),
+                conditionStoreManager.initialize(owner, createRole),
                 constants.address.error.invalidAddress0x0
             )
         })
 
         it('anyone should not change createRole after setup', async () => {
+            const createRole = accounts[0]
+            const owner = accounts[1]
             // setup correctly
-            let conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            let createRole = accounts[1]
-            await conditionStoreManager.initialize(createRole)
+            const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
 
-            let getCreateRole = await conditionStoreManager.getCreateRole()
-            assert.strictEqual(getCreateRole, createRole)
+            await conditionStoreManager.initialize(owner, createRole)
+
+            assert.strictEqual(
+                await conditionStoreManager.getCreateRole(),
+                createRole
+            )
 
             // try to force with other account
-            let otherCreateConditionRole = accounts[0]
+            const otherCreateConditionRole = accounts[2]
             assert.notEqual(otherCreateConditionRole, createRole)
             await assert.isRejected(
                 conditionStoreManager.initialize(otherCreateConditionRole),
                 'Contract instance has already been initialized'
             )
-            assert.strictEqual(getCreateRole, createRole)
+            assert.strictEqual(
+                await conditionStoreManager.getCreateRole(),
+                createRole
+            )
         })
     })
 

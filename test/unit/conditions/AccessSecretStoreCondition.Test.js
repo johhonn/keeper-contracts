@@ -19,37 +19,35 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
     async function setupTest({
         conditionId = constants.bytes32.one,
         conditionType = constants.address.dummy,
-        createRole = accounts[0],
-        setupConditionStoreManager = true
+        owner = accounts[0]
     } = {}) {
-        const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+        const epochLibrary = await EpochLibrary.new({ from: owner })
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
-        const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-        const templateStoreManager = await TemplateStoreManager.new({ from: accounts[0] })
+        const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
+        const templateStoreManager = await TemplateStoreManager.new({ from: owner })
 
-        const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: createRole })
+        const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: owner })
         await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
         const agreementStoreManager = await AgreementStoreManager.new()
 
         await agreementStoreManager.initialize(
             conditionStoreManager.address,
             templateStoreManager.address,
-            { from: accounts[0] }
+            { from: owner }
         )
 
-        if (setupConditionStoreManager) {
-            await conditionStoreManager.initialize(
-                agreementStoreManager.address,
-                { from: accounts[0] }
-            )
-        }
-        const accessSecretStoreCondition = await AccessSecretStoreCondition.new({ from: accounts[0] })
+        await conditionStoreManager.initialize(
+            owner,
+            agreementStoreManager.address,
+            { from: owner }
+        )
 
+        const accessSecretStoreCondition = await AccessSecretStoreCondition.new({ from: owner })
         await accessSecretStoreCondition.initialize(
             conditionStoreManager.address,
             agreementStoreManager.address,
-            { from: accounts[0] }
+            { from: owner }
         )
 
         return {
@@ -59,7 +57,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             templateStoreManager,
             conditionId,
             conditionType,
-            createRole
+            owner
         }
     }
 
@@ -89,7 +87,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
 
     describe('fulfill non existing condition', () => {
         it('should not fulfill if condition does not exist', async () => {
-            const { accessSecretStoreCondition } = await setupTest({ setupConditionStoreManager: false })
+            const { accessSecretStoreCondition } = await setupTest()
 
             const nonce = constants.bytes32.one
             const documentId = constants.bytes32.one

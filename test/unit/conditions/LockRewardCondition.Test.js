@@ -18,31 +18,38 @@ contract('LockRewardCondition', (accounts) => {
     async function setupTest({
         conditionId = constants.bytes32.one,
         conditionType = constants.address.dummy,
-        createRole = accounts[0],
-        setupConditionStoreManager = true
+        owner = accounts[1],
+        createRole = accounts[0]
     } = {}) {
-        const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+        const epochLibrary = await EpochLibrary.new({ from: owner })
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
-        const conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
-        if (setupConditionStoreManager) {
-            await conditionStoreManager.initialize(
-                createRole,
-                { from: accounts[0] }
-            )
-        }
+        const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
+        await conditionStoreManager.initialize(
+            owner,
+            createRole,
+            { from: owner }
+        )
 
-        const oceanToken = await OceanToken.new({ from: createRole })
-        await oceanToken.initialize(createRole)
+        const oceanToken = await OceanToken.new({ from: owner })
+        await oceanToken.initialize(owner)
 
-        const lockRewardCondition = await LockRewardCondition.new()
+        const lockRewardCondition = await LockRewardCondition.new({ from: owner })
 
         await lockRewardCondition.initialize(
             conditionStoreManager.address,
             oceanToken.address,
             { from: createRole }
         )
-        return { lockRewardCondition, oceanToken, conditionStoreManager, conditionId, conditionType, createRole }
+        return {
+            lockRewardCondition,
+            oceanToken,
+            conditionStoreManager,
+            conditionId,
+            conditionType,
+            createRole,
+            owner
+        }
     }
 
     describe('deploy and setup', () => {
@@ -63,14 +70,14 @@ contract('LockRewardCondition', (accounts) => {
 
     describe('fulfill non existing condition', () => {
         it('should not fulfill if conditions do not exist', async () => {
-            const { lockRewardCondition, oceanToken } = await setupTest()
+            const { lockRewardCondition, oceanToken, owner } = await setupTest()
 
             let nonce = constants.bytes32.one
             let rewardAddress = accounts[2]
             let sender = accounts[0]
             let amount = 10
 
-            await oceanToken.mint(sender, amount)
+            await oceanToken.mint(sender, amount, { from: owner })
             await oceanToken.approve(
                 lockRewardCondition.address,
                 amount,
@@ -85,7 +92,12 @@ contract('LockRewardCondition', (accounts) => {
 
     describe('fulfill existing condition', () => {
         it('should fulfill if conditions exist for account address', async () => {
-            const { lockRewardCondition, oceanToken, conditionStoreManager } = await setupTest()
+            const {
+                lockRewardCondition,
+                oceanToken,
+                conditionStoreManager,
+                owner
+            } = await setupTest()
 
             let nonce = constants.bytes32.one
             let rewardAddress = accounts[2]
@@ -99,7 +111,7 @@ contract('LockRewardCondition', (accounts) => {
                 conditionId,
                 lockRewardCondition.address)
 
-            await oceanToken.mint(sender, amount)
+            await oceanToken.mint(sender, amount, { from: owner })
             await oceanToken.approve(
                 lockRewardCondition.address,
                 amount,
@@ -135,7 +147,12 @@ contract('LockRewardCondition', (accounts) => {
         })
 
         it('not approved should fail to fulfill if conditions exist', async () => {
-            const { lockRewardCondition, oceanToken, conditionStoreManager } = await setupTest()
+            const {
+                lockRewardCondition,
+                oceanToken,
+                conditionStoreManager,
+                owner
+            } = await setupTest()
 
             let nonce = constants.bytes32.one
             let rewardAddress = accounts[2]
@@ -149,7 +166,7 @@ contract('LockRewardCondition', (accounts) => {
                 conditionId,
                 lockRewardCondition.address)
 
-            await oceanToken.mint(sender, amount)
+            await oceanToken.mint(sender, amount, { from: owner })
 
             await assert.isRejected(
                 lockRewardCondition.fulfill(nonce, rewardAddress, amount),
@@ -158,7 +175,12 @@ contract('LockRewardCondition', (accounts) => {
         })
 
         it('right transfer should fail to fulfill if conditions already fulfilled', async () => {
-            const { lockRewardCondition, oceanToken, conditionStoreManager } = await setupTest()
+            const {
+                lockRewardCondition,
+                oceanToken,
+                conditionStoreManager,
+                owner
+            } = await setupTest()
 
             let nonce = constants.bytes32.one
             let rewardAddress = accounts[2]
@@ -172,7 +194,7 @@ contract('LockRewardCondition', (accounts) => {
                 conditionId,
                 lockRewardCondition.address)
 
-            await oceanToken.mint(sender, amount)
+            await oceanToken.mint(sender, amount, { from: owner })
             await oceanToken.approve(
                 lockRewardCondition.address,
                 amount,
@@ -195,7 +217,12 @@ contract('LockRewardCondition', (accounts) => {
         })
 
         it('should fail to fulfill if conditions has different type ref', async () => {
-            const { lockRewardCondition, oceanToken, conditionStoreManager } = await setupTest()
+            const {
+                lockRewardCondition,
+                oceanToken,
+                conditionStoreManager,
+                owner
+            } = await setupTest()
 
             let nonce = constants.bytes32.one
             let rewardAddress = accounts[2]
@@ -209,7 +236,7 @@ contract('LockRewardCondition', (accounts) => {
                 conditionId,
                 accounts[0])
 
-            await oceanToken.mint(sender, amount)
+            await oceanToken.mint(sender, amount, { from: owner })
             await oceanToken.approve(
                 lockRewardCondition.address,
                 amount,

@@ -3,9 +3,11 @@ pragma solidity 0.5.3;
 import '../Common.sol';
 import '../libraries/EpochLibrary.sol';
 import '../libraries/ConditionStoreLibrary.sol';
-import 'zos-lib/contracts/Initializable.sol';
 
-contract ConditionStoreManager is Initializable, Common {
+import 'zos-lib/contracts/Initializable.sol';
+import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
+
+contract ConditionStoreManager is Initializable, Common, Ownable {
 
     using ConditionStoreLibrary for ConditionStoreLibrary.ConditionList;
     using EpochLibrary for EpochLibrary.EpochList;
@@ -32,12 +34,14 @@ contract ConditionStoreManager is Initializable, Common {
     }
 
     function initialize(
+        address _owner,
         address _createRole
     )
         public
         initializer()
     {
         require(
+            _owner != address(0) &&
             _createRole != address(0),
             'Invalid address'
         );
@@ -45,6 +49,7 @@ contract ConditionStoreManager is Initializable, Common {
             createRole == address (0),
             'Role already assigned'
         );
+        Ownable.initialize(_owner);
         createRole = _createRole;
     }
 
