@@ -2,8 +2,9 @@
 /* eslint-disable no-console */
 /* global artifacts, assert, contract, describe, it, beforeEach */
 const testUtils = require('../../helpers/utils.js')
-const Dispenser = artifacts.require('Dispenser.sol')
-const OceanToken = artifacts.require('OceanToken.sol')
+
+const Dispenser = artifacts.require('Dispenser')
+const OceanToken = artifacts.require('OceanToken')
 
 contract('Dispenser', (accounts) => {
     let dispenser
@@ -54,6 +55,17 @@ contract('Dispenser', (accounts) => {
             const balance = await oceanToken.balanceOf(accounts[1])
             assert.strictEqual(balance.toNumber(), 0)
             testUtils.assertEmitted(result, 1, 'RequestLimitExceeded')
+        })
+
+        it('Should not mint more than max amount', async () => {
+            // act
+            try {
+                await dispenser.requestTokens(1000 * 10 ** 10, { from: accounts[1] })
+            } catch (err) {
+                assert.equal(err.reason, 'Exceeded maxMintAmount')
+                return
+            }
+            assert.fail('Expected revert not received')
         })
     })
 })
