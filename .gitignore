@@ -16,7 +16,7 @@ zos.dev-*
 .zos.session
 .zos.lock
 zos.json
-wallet.json
+wallets.json
 mythrilReport.md
 securifyReport.txt
 KeeperContracts.png

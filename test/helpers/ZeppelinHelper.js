@@ -149,7 +149,7 @@ module.exports = class ZeppelinHelper extends ZeppelinHelperBase {
     }
 
     async loadWallet() {
-        let files = glob.sync('./wallet.json')
+        let files = glob.sync('./wallets.json')
         if (files === undefined || files.length === 0) {
             // array empty or does not exist
             throw Error(`wallet config file not found`)

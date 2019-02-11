@@ -7,14 +7,14 @@ const OceanToken = artifacts.require('OceanToken.sol')
 
 contract('Dispenser', (accounts) => {
     let dispenser
-    let token
+    let oceanToken
 
     beforeEach(async () => {
-        token = await OceanToken.new()
-        await token.initialize(accounts[0])
+        oceanToken = await OceanToken.new()
+        await oceanToken.initialize(accounts[0], accounts[0])
         dispenser = await Dispenser.new()
-        await dispenser.initialize(token.address, accounts[0])
-        await token.addMinter(dispenser.address)
+        await dispenser.initialize(oceanToken.address, accounts[0])
+        await oceanToken.addMinter(dispenser.address)
     })
 
     describe('requestTokens', () => {
@@ -23,7 +23,7 @@ contract('Dispenser', (accounts) => {
             await dispenser.requestTokens(200, { from: accounts[1] })
 
             // assert
-            const balance = await token.balanceOf(accounts[1])
+            const balance = await oceanToken.balanceOf(accounts[1])
             assert.strictEqual(balance.toNumber(), 200)
         })
 
@@ -37,7 +37,7 @@ contract('Dispenser', (accounts) => {
             const result = await dispenser.requestTokens(10, { from: accounts[1] })
 
             // assert
-            const balance = await token.balanceOf(accounts[1])
+            const balance = await oceanToken.balanceOf(accounts[1])
             assert.strictEqual(balance.toNumber(), 10)
             testUtils.assertEmitted(result, 1, 'RequestFrequencyExceeded')
         })
@@ -51,7 +51,7 @@ contract('Dispenser', (accounts) => {
             const result = await dispenser.requestTokens(11, { from: accounts[1] })
 
             // assert
-            const balance = await token.balanceOf(accounts[1])
+            const balance = await oceanToken.balanceOf(accounts[1])
             assert.strictEqual(balance.toNumber(), 0)
             testUtils.assertEmitted(result, 1, 'RequestLimitExceeded')
         })
