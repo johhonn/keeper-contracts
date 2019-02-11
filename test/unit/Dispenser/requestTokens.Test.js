@@ -1,7 +1,11 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, assert, contract, describe, it, beforeEach */
+/* global artifacts, contract, describe, it, beforeEach */
 const testUtils = require('../../helpers/utils.js')
+const chai = require('chai')
+const { assert } = chai
+const chaiAsPromised = require('chai-as-promised')
+chai.use(chaiAsPromised)
 
 const Dispenser = artifacts.require('Dispenser')
 const OceanToken = artifacts.require('OceanToken')
@@ -59,13 +63,10 @@ contract('Dispenser', (accounts) => {
 
         it('Should not mint more than max amount', async () => {
             // act
-            try {
-                await dispenser.requestTokens(1000 * 10 ** 10, { from: accounts[1] })
-            } catch (err) {
-                assert.equal(err.reason, 'Exceeded maxMintAmount')
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                dispenser.requestTokens(1000 * 10 ** 10, { from: accounts[1] }),
+                'Exceeded maxMintAmount'
+            )
         })
     })
 })

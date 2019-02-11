@@ -1,6 +1,11 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, assert, contract, describe, it, beforeEach */
+/* global artifacts, contract, describe, it, beforeEach */
+const chai = require('chai')
+const { assert } = chai
+const chaiAsPromised = require('chai-as-promised')
+chai.use(chaiAsPromised)
+
 const Dispenser = artifacts.require('Dispenser')
 const OceanToken = artifacts.require('OceanToken')
 
@@ -23,13 +28,11 @@ contract('Dispenser', (accounts) => {
 
         it('Should fail on setting the max amount from someone', async () => {
             // act
-            try {
-                await dispenser.setMaxAmount(10, { from: someone })
-            } catch (err) {
-                assert.equal(false, await dispenser.isOwner({ from: someone }))
-                return
-            }
-            assert.fail('Expected revert not received')
+            await assert.isRejected(
+                dispenser.setMaxAmount(10, { from: someone }),
+                'revert'
+            )
+            assert.equal(false, await dispenser.isOwner({ from: someone }))
         })
     })
 })
