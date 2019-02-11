@@ -25,7 +25,10 @@ contract('SignCondition constructor', (accounts) => {
         const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
 
         if (setupConditionStoreManager) {
-            await conditionStoreManager.setup(createRole)
+            await conditionStoreManager.initialize(
+                createRole,
+                { from: accounts[0] }
+            )
         }
         const signCondition = await SignCondition.new()
         await signCondition.initialize(conditionStoreManager.address, { from: accounts[0] })
@@ -135,7 +138,7 @@ contract('SignCondition constructor', (accounts) => {
             // try to fulfill another time
             await assert.isRejected(
                 signCondition.fulfill(nonce, message, publicKey, signature),
-                constants.condition.state.error.conditionNeedsToBeUnfulfilled
+                constants.condition.state.error.invalidStateTransition
             )
         })
 

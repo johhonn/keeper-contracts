@@ -26,13 +26,16 @@ contract('EscrowReward constructor', (accounts) => {
 
         const conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
         if (setupConditionStoreManager) {
-            await conditionStoreManager.setup(createRole)
+            await conditionStoreManager.initialize(
+                createRole,
+                { from: accounts[0] }
+            )
         }
+
         const oceanToken = await OceanToken.new({ from: createRole })
         await oceanToken.initialize(createRole, createRole)
 
         const lockRewardCondition = await LockRewardCondition.new()
-
         await lockRewardCondition.initialize(
             conditionStoreManager.address,
             oceanToken.address,
@@ -150,16 +153,5 @@ contract('EscrowReward constructor', (accounts) => {
     })
 
     describe('fail to fulfill existing condition', () => {
-        it('out of balance should fail to fulfill if conditions exist', async () => {
-        })
-
-        it('not approved should fail to fulfill if conditions exist', async () => {
-        })
-
-        it('right transfer should fail to fulfill if conditions already fulfilled', async () => {
-        })
-
-        it('should fail to fulfill if conditions has different type ref', async () => {
-        })
     })
 })

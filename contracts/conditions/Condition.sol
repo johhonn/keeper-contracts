@@ -39,7 +39,7 @@ contract Condition is Initializable {
     function abortByTimeOut(
         bytes32 _id
     )
-        internal
+        external
         returns (ConditionStoreLibrary.ConditionState)
     {
         require(

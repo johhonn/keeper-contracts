@@ -3,7 +3,6 @@ pragma solidity 0.5.3;
 import './Reward.sol';
 import '../../libraries/ConditionStoreLibrary.sol';
 
-
 contract EscrowReward is Reward {
 
     function initialize(
@@ -18,8 +17,9 @@ contract EscrowReward is Reward {
             _conditionStoreManagerAddress != address(0),
             'Invalid address'
         );
-        conditionStoreManager =
-            ConditionStoreManager(_conditionStoreManagerAddress);
+        conditionStoreManager = ConditionStoreManager(
+            _conditionStoreManagerAddress
+        );
         token = OceanToken(_tokenAddress);
     }
 
@@ -68,7 +68,8 @@ contract EscrowReward is Reward {
             )
         );
         require(
-            conditionStoreManager.isConditionFulfilled(_lockCondition),
+            conditionStoreManager.getConditionState(_lockCondition) ==
+            ConditionStoreLibrary.ConditionState.Fulfilled,
             'LockCondition needs to be Fulfilled'
         );
         require(
@@ -76,9 +77,15 @@ contract EscrowReward is Reward {
             'Not enough balance'
         );
 
-        if (conditionStoreManager.isConditionFulfilled(_releaseCondition)) {
+        if (
+            conditionStoreManager.getConditionState(_releaseCondition) ==
+            ConditionStoreLibrary.ConditionState.Fulfilled)
+        {
             return _transferAndFulfill(id, _receiver, _amount);
-        } else if (conditionStoreManager.isConditionAborted(_releaseCondition)) {
+        } else if (
+            conditionStoreManager.getConditionState(_releaseCondition) ==
+            ConditionStoreLibrary.ConditionState.Aborted)
+        {
             return _transferAndFulfill(id, _sender, _amount);
         }
     }
@@ -95,7 +102,7 @@ contract EscrowReward is Reward {
             token.transfer(_receiver, _amount),
             'Could not transfer token'
         );
-        return fulfill(
+        return super.fulfill(
             _id,
             ConditionStoreLibrary.ConditionState.Fulfilled
         );
