@@ -25,7 +25,10 @@ contract LockRewardCondition is Condition {
         token = OceanToken(_tokenAddress);
     }
 
-    function hashValues(address _rewardAddress, uint256 _amount)
+    function hashValues(
+        address _rewardAddress,
+        uint256 _amount
+    )
         public
         pure
         returns (bytes32)

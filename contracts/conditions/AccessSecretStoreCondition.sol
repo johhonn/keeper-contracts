@@ -3,7 +3,6 @@ pragma solidity 0.5.3;
 import './Condition.sol';
 import '../storage/AgreementStoreManager.sol';
 import '../ISecretStore.sol';
-import 'zos-lib/contracts/Initializable.sol';
 
 contract AccessSecretStoreCondition is Condition {
 

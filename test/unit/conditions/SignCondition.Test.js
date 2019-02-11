@@ -23,6 +23,7 @@ contract('SignCondition constructor', (accounts) => {
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
         const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
+
         if (setupConditionStoreManager) {
             await conditionStoreManager.initialize(
                 createRole,
