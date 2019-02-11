@@ -38,7 +38,10 @@ contract('AgreementStoreManager', (accounts) => {
         )
 
         if (setupConditionStoreManager) {
-            await conditionStoreManager.setup(agreementStoreManager.address)
+            await conditionStoreManager.initialize(
+                agreementStoreManager.address,
+                { from: accounts[0] }
+            )
         }
 
         return {
@@ -98,8 +101,6 @@ contract('AgreementStoreManager', (accounts) => {
                 agreementId,
                 ...Object.values(agreement)
             )
-
-            expect(await agreementStoreManager.exists(agreementId)).to.equal(true)
 
             let storedCondition
             agreement.conditionIds.forEach(async (conditionId, i) => {
@@ -207,7 +208,7 @@ contract('AgreementStoreManager', (accounts) => {
                 templateId: templateId,
                 conditionIds: [constants.bytes32.one],
                 timeLocks: [2],
-                timeOuts: [1]
+                timeOuts: [3]
             }
             const otherAgreementId = constants.bytes32.zero
 

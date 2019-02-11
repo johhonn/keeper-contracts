@@ -13,22 +13,6 @@ contract AgreementStoreManager is Initializable {
     TemplateStoreManager private templateStoreManager;
     AgreementStoreLibrary.AgreementList private agreementList;
 
-    modifier onlyUniqueId(bytes32 _id) {
-        require(
-            !exists(_id),
-            'Id already exists'
-        );
-        _;
-    }
-
-    modifier onlyNonZero(bytes32 _value) {
-        require(
-            _value != 0x0,
-            'Value cannot be 0x0'
-        );
-        _;
-    }
-
     function initialize(
         address _conditionStoreManagerAddress,
         address _templateStoreManagerAddress
@@ -37,20 +21,13 @@ contract AgreementStoreManager is Initializable {
         initializer()
     {
         require(
-            _conditionStoreManagerAddress!= address(0),
-            'Invalid condition store manager address'
-        );
-        require(
+            _conditionStoreManagerAddress!= address(0) &&
             _templateStoreManagerAddress!= address(0),
-            'Invalid template store manager address'
+            'Invalid address'
         );
 
-        conditionStoreManager = ConditionStoreManager(
-            _conditionStoreManagerAddress
-        );
-        templateStoreManager = TemplateStoreManager(
-            _templateStoreManagerAddress
-        );
+        conditionStoreManager = ConditionStoreManager(_conditionStoreManagerAddress);
+        templateStoreManager = TemplateStoreManager(_templateStoreManagerAddress);
     }
 
     function createAgreement(
@@ -63,8 +40,6 @@ contract AgreementStoreManager is Initializable {
         uint[] memory _timeOuts
     )
         public
-        onlyUniqueId(_id)
-        onlyNonZero(_did)
         returns (uint size)
     {
         require(
@@ -96,16 +71,6 @@ contract AgreementStoreManager is Initializable {
             _didOwner,
             _templateId,
             _conditionIds
-        );
-    }
-
-    function exists(bytes32 _id)
-        public
-        view
-        returns (bool)
-    {
-        return (
-            agreementList.agreements[_id].did != 0x0
         );
     }
 

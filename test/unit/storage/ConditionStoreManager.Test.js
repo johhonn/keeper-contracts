@@ -19,7 +19,7 @@ contract('ConditionStoreManager', (accounts) => {
     async function setupTest({
         conditionId = constants.bytes32.one,
         conditionType = constants.address.dummy,
-        createConditionRole = accounts[0],
+        createRole = accounts[0],
         setupConditionStoreManager = true
     } = {}) {
         const common = await Common.new({ from: accounts[0] })
@@ -31,15 +31,19 @@ contract('ConditionStoreManager', (accounts) => {
         const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
 
         if (setupConditionStoreManager) {
-            await conditionStoreManager.setup(createConditionRole)
+            await conditionStoreManager.initialize(
+                createRole,
+                { from: accounts[0] }
+            )
         }
+
         return {
             common,
             epochLibrary,
             conditionStoreManager,
             conditionId,
             conditionType,
-            createConditionRole
+            createRole
         }
     }
 
@@ -56,47 +60,50 @@ contract('ConditionStoreManager', (accounts) => {
 
         it('contract should setup', async () => {
             let conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            let getCreateConditionRole = await conditionStoreManager.getCreateConditionRole()
+            let getCreateRole = await conditionStoreManager.getCreateRole()
             // address should be 0x0 before setup
-            assert.strictEqual(getCreateConditionRole, constants.address.zero)
+            assert.strictEqual(getCreateRole, constants.address.zero)
 
             // address should be set after correct setup
-            let createConditionRole = accounts[1]
-            await conditionStoreManager.setup(createConditionRole)
-            getCreateConditionRole = await conditionStoreManager.getCreateConditionRole()
-            assert.strictEqual(getCreateConditionRole, createConditionRole)
+            let createRole = accounts[1]
+            await conditionStoreManager.initialize(createRole)
+            getCreateRole = await conditionStoreManager.getCreateRole()
+            assert.strictEqual(getCreateRole, createRole)
         })
 
         it('contract should not setup with zero', async () => {
             let conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
 
             // setup with zero fails
-            let createConditionRole = constants.address.zero
+            let createRole = constants.address.zero
             await assert.isRejected(
-                conditionStoreManager.setup(createConditionRole),
+                conditionStoreManager.initialize(createRole),
                 constants.address.error.invalidAddress0x0
             )
         })
 
-        it('anyone should not change createConditionRole after setup', async () => {
+        it('anyone should not change createRole after setup', async () => {
             // setup correctly
             let conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            let createConditionRole = accounts[1]
-            await conditionStoreManager.setup(createConditionRole)
+            let createRole = accounts[1]
+            await conditionStoreManager.initialize(createRole)
 
-            let getCreateConditionRole = await conditionStoreManager.getCreateConditionRole()
-            assert.strictEqual(getCreateConditionRole, createConditionRole)
+            let getCreateRole = await conditionStoreManager.getCreateRole()
+            assert.strictEqual(getCreateRole, createRole)
 
             // try to force with other account
             let otherCreateConditionRole = accounts[0]
-            assert.notEqual(otherCreateConditionRole, createConditionRole)
-            await conditionStoreManager.setup(otherCreateConditionRole)
-            assert.strictEqual(getCreateConditionRole, createConditionRole)
+            assert.notEqual(otherCreateConditionRole, createRole)
+            await assert.isRejected(
+                conditionStoreManager.initialize(otherCreateConditionRole),
+                'Contract instance has already been initialized'
+            )
+            assert.strictEqual(getCreateRole, createRole)
         })
     })
 
     describe('create conditions', () => {
-        it('createConditionRole should create', async () => {
+        it('createRole should create', async () => {
             const { conditionStoreManager, conditionId, conditionType } = await setupTest()
 
             assert.strictEqual(
@@ -112,7 +119,7 @@ contract('ConditionStoreManager', (accounts) => {
             assert.strictEqual((await conditionStoreManager.getConditionListSize()).toNumber(), 1)
         })
 
-        it('createConditionRole should create with zero timeout and timelock', async () => {
+        it('createRole should create with zero timeout and timelock', async () => {
             const { conditionStoreManager, conditionId, conditionType } = await setupTest()
             await conditionStoreManager.createCondition(conditionId, conditionType)
 
@@ -129,7 +136,7 @@ contract('ConditionStoreManager', (accounts) => {
             assert.strictEqual(timeOut.toNumber(), 0)
         })
 
-        it('createConditionRole should create with nonzero timeout and timelock', async () => {
+        it('createRole should create with nonzero timeout and timelock', async () => {
             const { conditionStoreManager, conditionId, conditionType } = await setupTest()
             let conditionTimeLock = 1
             let conditionTimeOut = 10
@@ -155,12 +162,12 @@ contract('ConditionStoreManager', (accounts) => {
             assert.isAbove(blockNumber.toNumber(), 0)
         })
 
-        it('invalid createConditionRole should not create', async () => {
+        it('invalid createRole should not create', async () => {
             const {
                 conditionStoreManager,
                 conditionId,
                 conditionType
-            } = await setupTest({ createConditionRole: accounts[1] })
+            } = await setupTest({ createRole: accounts[1] })
 
             await assert.isRejected(
                 conditionStoreManager.createCondition(conditionId, conditionType),

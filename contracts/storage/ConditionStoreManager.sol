@@ -10,19 +10,19 @@ contract ConditionStoreManager is Initializable, Common {
     using ConditionStoreLibrary for ConditionStoreLibrary.ConditionList;
     using EpochLibrary for EpochLibrary.EpochList;
 
-    address private _createConditionRole;
+    address private createRole;
     ConditionStoreLibrary.ConditionList private conditionList;
     EpochLibrary.EpochList private epochList;
 
-    modifier onlyParent(){
+    modifier onlyCreateRole(){
         require(
-            _createConditionRole == msg.sender,
+            createRole == msg.sender,
             'Invalid CreateConditionRole'
         );
         _;
     }
 
-    modifier onlyCondition(bytes32 _id)
+    modifier onlyUpdateRole(bytes32 _id)
     {
         require(
             conditionList.conditions[_id].typeRef == address(msg.sender),
@@ -31,29 +31,29 @@ contract ConditionStoreManager is Initializable, Common {
         _;
     }
 
-    modifier isValidAddress(address _address){
-        require(
-            _address != address(0),
-            'Invalid address: 0x0'
-        );
-        _;
-    }
-
-    function setup(address createConditionRole)
+    function initialize(
+        address _createRole
+    )
         public
-        isValidAddress(createConditionRole)
+        initializer()
     {
-        if(_createConditionRole == address(0)){
-            _createConditionRole = createConditionRole;
-        }
+        require(
+            _createRole != address(0),
+            'Invalid address'
+        );
+        require(
+            createRole == address (0),
+            'Role already assigned'
+        );
+        createRole = _createRole;
     }
 
-    function getCreateConditionRole()
+    function getCreateRole()
         public
         view
         returns (address)
     {
-        return _createConditionRole;
+        return createRole;
     }
 
     function createCondition(
@@ -79,10 +79,13 @@ contract ConditionStoreManager is Initializable, Common {
         uint _timeOut
     )
         public
-        onlyParent
-        isValidAddress(_typeRef)
+        onlyCreateRole
         returns (uint size)
     {
+        require(
+            _typeRef != address(0),
+            'Invalid address'
+        );
         epochList.create(_id, _timeLock, _timeOut);
         return conditionList.create(_id, _typeRef);
     }
@@ -93,7 +96,7 @@ contract ConditionStoreManager is Initializable, Common {
         ConditionStoreLibrary.ConditionState _newState
     )
         public
-        onlyCondition(_id)
+        onlyUpdateRole(_id)
         returns (ConditionStoreLibrary.ConditionState)
     {
         // no update before time lock

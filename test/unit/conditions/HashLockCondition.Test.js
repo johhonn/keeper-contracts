@@ -24,7 +24,10 @@ contract('HashLockCondition constructor', (accounts) => {
 
         const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
         if (setupConditionStoreManager) {
-            await conditionStoreManager.setup(createRole)
+            await conditionStoreManager.initialize(
+                createRole,
+                { from: accounts[0] }
+            )
         }
         const hashLockCondition = await HashLockCondition.new()
         await hashLockCondition.initialize(conditionStoreManager.address, { from: accounts[0] })

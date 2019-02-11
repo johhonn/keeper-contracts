@@ -26,8 +26,12 @@ contract('EscrowReward constructor', (accounts) => {
 
         const conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
         if (setupConditionStoreManager) {
-            await conditionStoreManager.setup(createRole)
+            await conditionStoreManager.initialize(
+                createRole,
+                { from: accounts[0] }
+            )
         }
+
         const oceanToken = await OceanToken.new({ from: createRole })
         await oceanToken.initialize(createRole)
 

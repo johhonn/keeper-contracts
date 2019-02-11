@@ -46,7 +46,10 @@ contract('AgreementStoreManager', (accounts) => {
         )
 
         if (setupConditionStoreManager) {
-            await conditionStoreManager.setup(agreementStoreManager.address)
+            await conditionStoreManager.initialize(
+                agreementStoreManager.address,
+                { from: accounts[0] }
+            )
         }
 
         const oceanToken = await OceanToken.new({ from: createRole })

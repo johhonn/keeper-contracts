@@ -6,7 +6,7 @@ let constants = {
         zero: '0x0000000000000000000000000000000000000000',
         dummy: '0xeE9300b7961e0a01d9f0adb863C7A227A07AaD75',
         error: {
-            invalidAddress0x0: 'Invalid address: 0x0'
+            invalidAddress0x0: 'Invalid address'
         }
     },
     bytes32: {

@@ -39,7 +39,10 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
         )
 
         if (setupConditionStoreManager) {
-            await conditionStoreManager.setup(agreementStoreManager.address)
+            await conditionStoreManager.initialize(
+                agreementStoreManager.address,
+                { from: accounts[0] }
+            )
         }
         const accessSecretStoreCondition = await AccessSecretStoreCondition.new({ from: accounts[0] })
 
