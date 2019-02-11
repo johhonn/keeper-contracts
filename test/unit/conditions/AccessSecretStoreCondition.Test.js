@@ -27,22 +27,27 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
 
         const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
         const templateStoreManager = await TemplateStoreManager.new({ from: accounts[0] })
-        const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: accounts[0] })
+
+        const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: createRole })
         await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-        const agreementStoreManager = await AgreementStoreManager.new(
+        const agreementStoreManager = await AgreementStoreManager.new()
+
+        await agreementStoreManager.initialize(
             conditionStoreManager.address,
             templateStoreManager.address,
-            { from: createRole }
+            { from: accounts[0] }
         )
 
         if (setupConditionStoreManager) {
             await conditionStoreManager.setup(agreementStoreManager.address)
         }
+        const accessSecretStoreCondition = await AccessSecretStoreCondition.new({ from: accounts[0] })
 
-        const accessSecretStoreCondition = await AccessSecretStoreCondition.new(
+        await accessSecretStoreCondition.initialize(
             conditionStoreManager.address,
             agreementStoreManager.address,
-            { from: accounts[0] })
+            { from: accounts[0] }
+        )
 
         return {
             accessSecretStoreCondition,
@@ -69,7 +74,9 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
                 { from: accounts[0] }
             )
 
-            await AccessSecretStoreCondition.new(
+            const accessSecretStoreCondition = await AccessSecretStoreCondition.new({ from: accounts[0] })
+
+            await accessSecretStoreCondition.initialize(
                 conditionStoreManager.address,
                 agreementStoreManager.address,
                 { from: accounts[0] }
@@ -142,7 +149,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             const {
                 accessSecretStoreCondition,
                 agreementStoreManager,
-                templateStoreManager,
+                templateStoreManager
             } = await setupTest()
 
             const nonce = constants.bytes32.one
@@ -183,7 +190,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             const {
                 accessSecretStoreCondition,
                 agreementStoreManager,
-                templateStoreManager,
+                templateStoreManager
             } = await setupTest()
 
             const nonce = constants.bytes32.one
@@ -277,7 +284,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             const {
                 accessSecretStoreCondition,
                 agreementStoreManager,
-                templateStoreManager,
+                templateStoreManager
             } = await setupTest()
 
             const nonce = constants.bytes32.one

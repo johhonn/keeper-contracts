@@ -32,7 +32,6 @@ contract('EscrowReward constructor', (accounts) => {
         await oceanToken.initialize(createRole)
 
         const lockRewardCondition = await LockRewardCondition.new()
-
         await lockRewardCondition.initialize(
             conditionStoreManager.address,
             oceanToken.address,

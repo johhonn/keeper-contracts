@@ -71,12 +71,15 @@ contract('AgreementStoreManager', (accounts) => {
             { from: createRole }
         )
 
-        const accessSecretStoreCondition = await AccessSecretStoreCondition.new(
+        const accessSecretStoreCondition = await AccessSecretStoreCondition.new({ from: createRole })
+
+        await accessSecretStoreCondition.initialize(
             conditionStoreManager.address,
             agreementStoreManager.address,
-            { from: accounts[0] })
+            { from: createRole }
+        )
 
-        const escrowReward = await EscrowReward.new()
+        const escrowReward = await EscrowReward.new({ from: createRole })
         await escrowReward.initialize(
             conditionStoreManager.address,
             oceanToken.address,
