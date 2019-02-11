@@ -34,6 +34,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
         await agreementStoreManager.initialize(
             conditionStoreManager.address,
             templateStoreManager.address,
+            owner,
             { from: owner }
         )
 

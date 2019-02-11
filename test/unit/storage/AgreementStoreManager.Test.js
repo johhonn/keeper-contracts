@@ -34,6 +34,7 @@ contract('AgreementStoreManager', (accounts) => {
         await agreementStoreManager.initialize(
             conditionStoreManager.address,
             templateStoreManager.address,
+            owner,
             { from: owner }
         )
 
@@ -56,19 +57,116 @@ contract('AgreementStoreManager', (accounts) => {
     }
 
     describe('deploy and setup', () => {
-        it('contract should deploy', async () => {
-            // act-assert
+        it('contract should deploy and initialize', async () => {
             const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
             await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
             const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
             const templateStoreManager = await TemplateStoreManager.new({ from: accounts[0] })
-
             const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: accounts[0] })
             await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-            await AgreementStoreManager.new(
+            const agreementStoreManager = await AgreementStoreManager.new({ from: accounts[0] })
+
+            await agreementStoreManager.initialize(
                 conditionStoreManager.address,
                 templateStoreManager.address,
+                accounts[0],
                 { from: accounts[0] }
+            )
+        })
+
+        it('contract should not initialize with zero owner', async () => {
+            const createRole = accounts[0]
+            const owner = constants.address.zero
+
+            const epochLibrary = await EpochLibrary.new({ from: createRole })
+            await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
+            const conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
+            const templateStoreManager = await TemplateStoreManager.new({ from: createRole })
+            const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: createRole })
+            await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
+            const agreementStoreManager = await AgreementStoreManager.new({ from: createRole })
+
+            // setup with zero fails
+            await assert.isRejected(
+                agreementStoreManager.initialize(
+                    conditionStoreManager.address,
+                    templateStoreManager.address,
+                    owner,
+                    { from: createRole }
+                ),
+                constants.address.error.invalidAddress0x0
+            )
+        })
+
+        it('contract should not initialize with zero conditionStoreManager address', async () => {
+            const createRole = accounts[0]
+            const owner = constants.address.zero
+
+            const templateStoreManager = await TemplateStoreManager.new({ from: createRole })
+            const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: createRole })
+            await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
+            const agreementStoreManager = await AgreementStoreManager.new({ from: createRole })
+
+            // setup with zero fails
+            await assert.isRejected(
+                agreementStoreManager.initialize(
+                    owner,
+                    templateStoreManager.address,
+                    createRole,
+                    { from: createRole }
+                ),
+                constants.address.error.invalidAddress0x0
+            )
+        })
+
+        it('contract should not initialize with zero templateStoreManager address', async () => {
+            const createRole = accounts[0]
+            const owner = constants.address.zero
+
+            const epochLibrary = await EpochLibrary.new({ from: createRole })
+            await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
+            const conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
+            const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: createRole })
+            await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
+            const agreementStoreManager = await AgreementStoreManager.new({ from: createRole })
+
+            // setup with zero fails
+            await assert.isRejected(
+                agreementStoreManager.initialize(
+                    conditionStoreManager.address,
+                    owner,
+                    createRole,
+                    { from: createRole }
+                ),
+                constants.address.error.invalidAddress0x0
+            )
+        })
+
+        it('contract should not initialize without arguments', async () => {
+            const owner = accounts[0]
+
+            const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: owner })
+            await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
+            const agreementStoreManager = await AgreementStoreManager.new({ from: owner })
+
+            // setup with zero fails
+            await assert.isRejected(
+                agreementStoreManager.initialize(),
+                constants.initialize.error.invalidNumberParamsGot0Expected3
+            )
+        })
+
+        it('contract should not initialize with one argument', async () => {
+            const owner = accounts[0]
+
+            const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: owner })
+            await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
+            const agreementStoreManager = await AgreementStoreManager.new({ from: owner })
+
+            // setup with zero fails
+            await assert.isRejected(
+                agreementStoreManager.initialize(owner),
+                constants.initialize.error.invalidNumberParamsGot1Expected3
             )
         })
     })

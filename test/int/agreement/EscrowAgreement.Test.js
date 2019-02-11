@@ -26,8 +26,7 @@ contract('Escrow Agreement integration test', (accounts) => {
     async function setupTest({
         agreementId = constants.bytes32.one,
         conditionIds = [constants.address.dummy],
-        owner = accounts[0],
-        setupConditionStoreManager = true
+        owner = accounts[0]
     } = {}) {
         const epochLibrary = await EpochLibrary.new({ from: owner })
 
@@ -39,19 +38,19 @@ contract('Escrow Agreement integration test', (accounts) => {
         const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: owner })
         await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
         const agreementStoreManager = await AgreementStoreManager.new({ from: owner })
+
         await agreementStoreManager.initialize(
             conditionStoreManager.address,
             templateStoreManager.address,
+            owner,
             { from: owner }
         )
 
-        if (setupConditionStoreManager) {
-            await conditionStoreManager.initialize(
-                owner,
-                agreementStoreManager.address,
-                { from: accounts[0] }
-            )
-        }
+        await conditionStoreManager.initialize(
+            owner,
+            agreementStoreManager.address,
+            { from: accounts[0] }
+        )
 
         const oceanToken = await OceanToken.new({ from: owner })
         await oceanToken.initialize(owner)

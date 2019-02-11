@@ -86,7 +86,9 @@ let constants = {
     initialize: {
         error: {
             invalidNumberParamsGot0Expected2: 'Invalid number of parameters for "initialize". Got 0 expected 2!',
-            invalidNumberParamsGot1Expected2: 'Invalid number of parameters for "initialize". Got 1 expected 2!'
+            invalidNumberParamsGot0Expected3: 'Invalid number of parameters for "initialize". Got 0 expected 3!',
+            invalidNumberParamsGot1Expected2: 'Invalid number of parameters for "initialize". Got 1 expected 2!',
+            invalidNumberParamsGot1Expected3: 'Invalid number of parameters for "initialize". Got 1 expected 3!'
         }
     },
     did: [
