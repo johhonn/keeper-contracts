@@ -73,6 +73,7 @@ script:
             npm run security:surya
             # mkdir -p $HOME/.mythril && curl -L -o $HOME/.mythril/signatures.db https://github.com/ConsenSys/mythril-classic/blob/develop/mythril/support/assets/signatures.db?raw=true
             mkdir -p $HOME/.mythril && cp -rp assets/* $HOME/.mythril/
+            sed -i 's/pragma solidity >=0.4.24 <0.6.0;/pragma solidity 0.5.3;/g' node_modules/zos-lib/contracts/Initializable.sol
             npm run security:mythril
             travis_wait 30 npm run security:securify
         #fi
