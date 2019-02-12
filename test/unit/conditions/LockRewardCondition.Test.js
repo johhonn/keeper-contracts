@@ -34,7 +34,7 @@ contract('LockRewardCondition', (accounts) => {
         const oceanToken = await OceanToken.new()
         await oceanToken.initialize(owner, owner)
 
-        const lockRewardCondition = await LockRewardCondition.new({ from: owner })
+        const lockRewardCondition = await LockRewardCondition.new()
 
         await lockRewardCondition.initialize(
             conditionStoreManager.address,

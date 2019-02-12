@@ -34,14 +34,14 @@ contract('EscrowReward constructor', (accounts) => {
         const oceanToken = await OceanToken.new()
         await oceanToken.initialize(owner, owner)
 
-        const lockRewardCondition = await LockRewardCondition.new({ from: owner })
+        const lockRewardCondition = await LockRewardCondition.new()
         await lockRewardCondition.initialize(
             conditionStoreManager.address,
             oceanToken.address,
             { from: owner }
         )
 
-        const escrowReward = await EscrowReward.new({ from: owner })
+        const escrowReward = await EscrowReward.new()
         await escrowReward.initialize(
             conditionStoreManager.address,
             oceanToken.address,
@@ -68,7 +68,7 @@ contract('EscrowReward constructor', (accounts) => {
             const conditionStoreManager = await ConditionStoreManager.new()
             const oceanToken = await OceanToken.new()
 
-            const escrowReward = await EscrowReward.new({ from: accounts[0] })
+            const escrowReward = await EscrowReward.new()
             await escrowReward.initialize(
                 conditionStoreManager.address,
                 oceanToken.address,

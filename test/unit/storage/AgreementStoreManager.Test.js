@@ -29,7 +29,7 @@ contract('AgreementStoreManager', (accounts) => {
         const templateStoreManager = await TemplateStoreManager.new()
         const agreementStoreLibrary = await AgreementStoreLibrary.new()
         await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-        const agreementStoreManager = await AgreementStoreManager.new({ from: owner })
+        const agreementStoreManager = await AgreementStoreManager.new()
 
         await agreementStoreManager.initialize(
             conditionStoreManager.address,
@@ -58,7 +58,7 @@ contract('AgreementStoreManager', (accounts) => {
 
     describe('deploy and setup', () => {
         it('contract should deploy and initialize', async () => {
-            const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+            const epochLibrary = await EpochLibrary.new()
             await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
             const agreementStoreLibrary = await AgreementStoreLibrary.new()
@@ -70,13 +70,13 @@ contract('AgreementStoreManager', (accounts) => {
             const createRole = accounts[0]
             const owner = constants.address.zero
 
-            const epochLibrary = await EpochLibrary.new({ from: createRole })
+            const epochLibrary = await EpochLibrary.new()
             await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
-            const conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
-            const templateStoreManager = await TemplateStoreManager.new({ from: createRole })
-            const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: createRole })
+            const conditionStoreManager = await ConditionStoreManager.new()
+            const templateStoreManager = await TemplateStoreManager.new()
+            const agreementStoreLibrary = await AgreementStoreLibrary.new()
             await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-            const agreementStoreManager = await AgreementStoreManager.new({ from: createRole })
+            const agreementStoreManager = await AgreementStoreManager.new()
 
             // setup with zero fails
             await assert.isRejected(
@@ -94,10 +94,10 @@ contract('AgreementStoreManager', (accounts) => {
             const createRole = accounts[0]
             const owner = constants.address.zero
 
-            const templateStoreManager = await TemplateStoreManager.new({ from: createRole })
-            const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: createRole })
+            const templateStoreManager = await TemplateStoreManager.new()
+            const agreementStoreLibrary = await AgreementStoreLibrary.new()
             await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-            const agreementStoreManager = await AgreementStoreManager.new({ from: createRole })
+            const agreementStoreManager = await AgreementStoreManager.new()
 
             // setup with zero fails
             await assert.isRejected(
@@ -115,12 +115,12 @@ contract('AgreementStoreManager', (accounts) => {
             const createRole = accounts[0]
             const owner = constants.address.zero
 
-            const epochLibrary = await EpochLibrary.new({ from: createRole })
+            const epochLibrary = await EpochLibrary.new()
             await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
-            const conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
-            const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: createRole })
+            const conditionStoreManager = await ConditionStoreManager.new()
+            const agreementStoreLibrary = await AgreementStoreLibrary.new()
             await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-            const agreementStoreManager = await AgreementStoreManager.new({ from: createRole })
+            const agreementStoreManager = await AgreementStoreManager.new()
 
             // setup with zero fails
             await assert.isRejected(
@@ -137,9 +137,9 @@ contract('AgreementStoreManager', (accounts) => {
         it('contract should not initialize without arguments', async () => {
             const owner = accounts[0]
 
-            const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: owner })
+            const agreementStoreLibrary = await AgreementStoreLibrary.new()
             await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-            const agreementStoreManager = await AgreementStoreManager.new({ from: owner })
+            const agreementStoreManager = await AgreementStoreManager.new()
 
             // setup with zero fails
             await assert.isRejected(
@@ -151,9 +151,9 @@ contract('AgreementStoreManager', (accounts) => {
         it('contract should not initialize with one argument', async () => {
             const owner = accounts[0]
 
-            const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: owner })
+            const agreementStoreLibrary = await AgreementStoreLibrary.new()
             await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-            const agreementStoreManager = await AgreementStoreManager.new({ from: owner })
+            const agreementStoreManager = await AgreementStoreManager.new()
 
             // setup with zero fails
             await assert.isRejected(

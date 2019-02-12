@@ -94,7 +94,7 @@ contract('ConditionStoreManager', (accounts) => {
             const createRole = accounts[0]
             const owner = constants.address.zero
 
-            const conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
+            const conditionStoreManager = await ConditionStoreManager.new()
 
             // setup with zero fails
             await assert.isRejected(
@@ -119,7 +119,7 @@ contract('ConditionStoreManager', (accounts) => {
         it('contract should not initialize without arguments', async () => {
             const owner = accounts[0]
 
-            const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
+            const conditionStoreManager = await ConditionStoreManager.new()
 
             // setup with zero fails
             await assert.isRejected(
@@ -131,7 +131,7 @@ contract('ConditionStoreManager', (accounts) => {
         it('contract should not initialize with one argument', async () => {
             const owner = accounts[0]
 
-            const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
+            const conditionStoreManager = await ConditionStoreManager.new()
 
             // setup with zero fails
             await assert.isRejected(
