@@ -21,10 +21,10 @@ contract('EscrowReward constructor', (accounts) => {
         createRole = accounts[0],
         setupConditionStoreManager = true
     } = {}) {
-        const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+        const epochLibrary = await EpochLibrary.new()
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
-        const conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
+        const conditionStoreManager = await ConditionStoreManager.new()
         if (setupConditionStoreManager) {
             await conditionStoreManager.initialize(
                 createRole,
@@ -32,7 +32,7 @@ contract('EscrowReward constructor', (accounts) => {
             )
         }
 
-        const oceanToken = await OceanToken.new({ from: createRole })
+        const oceanToken = await OceanToken.new()
         await oceanToken.initialize(createRole, createRole)
 
         const lockRewardCondition = await LockRewardCondition.new()
@@ -54,11 +54,11 @@ contract('EscrowReward constructor', (accounts) => {
 
     describe('deploy and setup', () => {
         it('contract should deploy', async () => {
-            const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+            const epochLibrary = await EpochLibrary.new()
             await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
-            const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            const oceanToken = await OceanToken.new({ from: accounts[0] })
+            const conditionStoreManager = await ConditionStoreManager.new()
+            const oceanToken = await OceanToken.new()
 
             const escrowReward = await EscrowReward.new()
             await escrowReward.initialize(

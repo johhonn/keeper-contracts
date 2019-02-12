@@ -12,7 +12,7 @@ contract('EpochLibrary', (accounts) => {
     describe('deploy and setup', () => {
         it('contract should deploy', async () => {
             // act-assert
-            await EpochLibrary.new({ from: accounts[0] })
+            await EpochLibrary.new()
         })
     })
 

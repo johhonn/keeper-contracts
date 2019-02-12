@@ -19,10 +19,10 @@ contract('SignCondition constructor', (accounts) => {
         createRole = accounts[0],
         setupConditionStoreManager = true
     } = {}) {
-        const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+        const epochLibrary = await EpochLibrary.new()
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
-        const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
+        const conditionStoreManager = await ConditionStoreManager.new()
 
         if (setupConditionStoreManager) {
             await conditionStoreManager.initialize(
@@ -38,10 +38,10 @@ contract('SignCondition constructor', (accounts) => {
 
     describe('deploy and setup', () => {
         it('contract should deploy', async () => {
-            const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+            const epochLibrary = await EpochLibrary.new()
             await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
-            const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
+            const conditionStoreManager = await ConditionStoreManager.new()
             const signCondition = await SignCondition.new()
             await signCondition.initialize(conditionStoreManager.address, { from: accounts[0] })
         })

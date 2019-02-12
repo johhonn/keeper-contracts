@@ -18,12 +18,10 @@ contract('TemplateStoreManager', (accounts) => {
         conditionType = constants.address.dummy,
         createRole = accounts[0]
     } = {}) {
-        const common = await Common.new({ from: accounts[0] })
-        const templateStoreLibrary = await TemplateStoreLibrary.new({ from: createRole })
+        const common = await Common.new()
+        const templateStoreLibrary = await TemplateStoreLibrary.new()
         await TemplateStoreManager.link('TemplateStoreLibrary', templateStoreLibrary.address)
-        const templateStoreManager = await TemplateStoreManager.new(
-            { from: createRole }
-        )
+        const templateStoreManager = await TemplateStoreManager.new()
         return {
             common,
             templateStoreManager,
@@ -36,11 +34,9 @@ contract('TemplateStoreManager', (accounts) => {
     describe('deploy and setup', () => {
         it('contract should deploy', async () => {
             // act-assert
-            const templateStoreLibrary = await TemplateStoreLibrary.new({ from: accounts[0] })
+            const templateStoreLibrary = await TemplateStoreLibrary.new()
             await TemplateStoreManager.link('TemplateStoreLibrary', templateStoreLibrary.address)
-            await TemplateStoreManager.new(
-                { from: accounts[0] }
-            )
+            await TemplateStoreManager.new()
         })
     })
 
