@@ -22,12 +22,12 @@ contract('AgreementStoreManager', (accounts) => {
         createRole = accounts[0],
         setupConditionStoreManager = true
     } = {}) {
-        const common = await Common.new({ from: createRole })
-        const epochLibrary = await EpochLibrary.new({ from: createRole })
+        const common = await Common.new()
+        const epochLibrary = await EpochLibrary.new()
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
-        const conditionStoreManager = await ConditionStoreManager.new({ from: createRole })
-        const templateStoreManager = await TemplateStoreManager.new({ from: createRole })
-        const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: createRole })
+        const conditionStoreManager = await ConditionStoreManager.new()
+        const templateStoreManager = await TemplateStoreManager.new()
+        const agreementStoreLibrary = await AgreementStoreLibrary.new()
         await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
         const agreementStoreManager = await AgreementStoreManager.new()
 
@@ -58,18 +58,12 @@ contract('AgreementStoreManager', (accounts) => {
     describe('deploy and setup', () => {
         it('contract should deploy', async () => {
             // act-assert
-            const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+            const epochLibrary = await EpochLibrary.new()
             await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
-            const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            const templateStoreManager = await TemplateStoreManager.new({ from: accounts[0] })
 
-            const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: accounts[0] })
+            const agreementStoreLibrary = await AgreementStoreLibrary.new()
             await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-            await AgreementStoreManager.new(
-                conditionStoreManager.address,
-                templateStoreManager.address,
-                { from: accounts[0] }
-            )
+            await AgreementStoreManager.new()
         })
     })
 
