@@ -1,100 +1,127 @@
 pragma solidity 0.5.3;
 
-import 'zos-lib/contracts/Initializable.sol';
-import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
+import 'openzeppelin-eth/contracts/math/SafeMath.sol';
 
+library EpochLibrary {
 
-/**
- * @title DID Registry
- * @author Ocean Protocol Team
- * @dev All function calls are currently implemented without side effects
- */
-contract DIDRegistryWithBug is Initializable, Ownable {
+    using SafeMath for uint256;
 
-    struct DIDRegister {
-        address owner;
-        uint updateAt;
+    struct Epoch {
+        uint256 timeLock;
+        uint256 timeOut;
+        uint256 blockNumber;
     }
 
-    event DIDAttributeRegistered(
-        bytes32 indexed did,
-        address indexed owner,
-        bytes32 indexed checksum,
-        string value,
-        uint updatedAt
-    );
+    struct EpochList {
+        mapping(bytes32 => Epoch) epochs;
+        bytes32[] epochIds;
+    }
 
-    mapping(bytes32 => DIDRegister) private didRegister;
-
-    modifier onlyValidDIDArgs(bytes32 did, bytes32 checksum, string memory value){
-        address currentOwner = didRegister[did].owner;
+    modifier onlyValidTimeMargin(
+        uint256 timeLock,
+        uint256 timeOut)
+    {
         require(
-            currentOwner == address(0x0) || currentOwner == msg.sender,
-            'Attributes must be registered by the DID owners.'
+            timeLock >= 0,
+            'Invalid time margin'
         );
         require(
-            //TODO: 2048 should be changed in the future
-            bytes(value).length <= 2048,
-            'Invalid url size'
+            timeOut >= 0,
+            'Invalid time margin'
         );
+        if(timeOut > 0 && timeLock > 0){
+            require(
+                timeLock < timeOut,
+                'Invalid time margin'
+            );
+        }
         _;
     }
 
-    function initialize(
-        address _owner
+   /**
+    * @notice create creates new Epoch
+    * @param _self is the Epoch storage pointer
+    * @param _timeLock value in block count (can not fulfill before)
+    * @param _timeOut value in block count (can not fulfill after)
+    */
+    function create(
+        EpochList storage _self,
+        bytes32 _id,
+        uint256 _timeLock,
+        uint256 _timeOut
     )
-        public initializer()
+        internal
+        onlyValidTimeMargin(_timeLock, _timeOut)
+        returns (uint size)
     {
-        Ownable.initialize(_owner);
+        _self.epochs[_id] = Epoch({
+            timeLock: _timeLock,
+            timeOut: _timeOut,
+            blockNumber: block.number
+        });
+        _self.epochIds.push(_id);
+        return _self.epochIds.length;
     }
 
    /**
-    * @notice registerAttribute is called only by DID owner.
-    * @dev this function registers DID attributes
-    * @param _did refers to decentralized identifier (a byte32 length ID)
-    * @param _checksum includes a one-way HASH calculated using the DDO content
-    * @param _value refers to the attribute value
+    * @notice isTimedOut means you cannot fulfill after
+    * @param _self is the Epoch storage pointer
+    * @return true if the current block number is gt timeOut
     */
-    function registerAttribute(
-        bytes32 _did,
-        bytes32 _checksum,
-        string memory _value
+    function isTimedOut(
+        EpochList storage _self,
+        bytes32 _id
     )
         public
-        onlyValidDIDArgs(_did, _checksum, _value)
+        view
+        returns(bool)
     {
-        // add bug here
-        didRegister[_did] = DIDRegister(msg.sender, 42);
-        emit DIDAttributeRegistered(
-            _did,
-            msg.sender,
-            _checksum,
-            _value,
-            block.number
-        );
+        if (_self.epochs[_id].timeOut == 0)
+            return false;
+        return (block.number > getEpochTimeOut(_self.epochs[_id]));
     }
 
    /**
-    * @notice getUpdateAt is called by anyone.
-    * @param did refers to decentralized identifier (a byte32 length ID)
-    * @return last modified (update) time of a DID
+    * @notice isTimeLocked means you cannot fulfill before
+    * @param _self is the Epoch storage pointer
+    * @return true if the current block number is gt timeLock
     */
-    function getUpdateAt(bytes32 did)
-        public view
-        returns(uint)
+    function isTimeLocked(
+        EpochList storage _self,
+        bytes32 _id
+    )
+        public
+        view
+        returns(bool)
     {
-        return didRegister[did].updateAt;
+        return (block.number < getEpochTimeLock(_self.epochs[_id]));
     }
 
    /**
-    * @notice getOwner is called by anyone.
-    * @param did refers to decentralized identifier (a byte32 length ID)
-    * @return the address of the owner
+    * @notice getEpochTimeOut
+    * @param _self is the Epoch storage pointer
     */
-    function getOwner(bytes32 did)
-        public view
-        returns(address)
+    function getEpochTimeOut(
+        Epoch storage _self
+    )
+        public
+        view
+        returns(uint256)
     {
-        return didRegister[did].owner;
+        return _self.timeOut.add(_self.blockNumber);
+    }
+
+    /**
+    * @notice getEpochTimeLock
+    * @param _self is the Epoch storage pointer
+    */
+    function getEpochTimeLock(
+        Epoch storage _self
+    )
+        public
+        view
+        returns(uint256)
+    {
+        return _self.timeLock.add(_self.blockNumber);
     }
 }

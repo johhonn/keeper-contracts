@@ -12,7 +12,7 @@ const createWallet = require('./createWallet')
 const verbose = process.env.VERBOSE || false
 const flags = verbose ? ' -v' : ' -s'
 const stdio = 'inherit'
-const network = process.env.NETWORK
+const network = process.env.NETWORK || 'development'
 
 class ZeppelinHelperBase {
     async restoreState(admin) {
@@ -38,7 +38,7 @@ class ZeppelinHelperBase {
         execSync(`npx zos add ${contracts.join(' ')} --skip-compile -v`)
         // push contracts
         console.log('pushing contracts')
-        execSync(`npx zos push --skip-compile ${flags}`)
+        execSync(`npx zos push --skip-compile -v`)
         return adminWallet
     }
 }
