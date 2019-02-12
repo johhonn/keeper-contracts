@@ -1,23 +1,27 @@
 pragma solidity 0.5.3;
 
 import './Condition.sol';
+import '../storage/AgreementStoreManager.sol';
 import '../ISecretStore.sol';
-import 'zos-lib/contracts/Initializable.sol';
 
 contract AccessSecretStoreCondition is Condition {
 
     mapping(bytes32 => mapping(address => bool)) private documentPermissions;
 
-    function initialize(address _conditionStoreManagerAddress)
+    AgreementStoreManager private agreementStoreManager;
+
+    function initialize(
+        address _conditionStoreManagerAddress,
+        address _agreementStoreManagerAddress
+    )
         public
         initializer()
     {
-        require(
-            _conditionStoreManagerAddress != address(0),
-            'Invalid address'
-        );
         conditionStoreManager = ConditionStoreManager(
             _conditionStoreManagerAddress
+        );
+        agreementStoreManager = AgreementStoreManager(
+            _agreementStoreManagerAddress
         );
     }
 
@@ -40,6 +44,10 @@ contract AccessSecretStoreCondition is Condition {
         public
         returns (ConditionStoreLibrary.ConditionState)
     {
+        require(
+            msg.sender == agreementStoreManager.getAgreementDidOwner(_agreementId),
+            'Invalid UpdateRole'
+        );
         documentPermissions[_documentId][_grantee] = true;
         return super.fulfill(
             generateId(_agreementId, hashValues(_documentId, _grantee)),
@@ -54,8 +62,8 @@ contract AccessSecretStoreCondition is Condition {
     * @return true if the access was granted
     */
     function checkPermissions(
-        bytes32 _documentId,
-        address _grantee
+        address _grantee,
+        bytes32 _documentId
     )
         public view
         returns(bool permissionGranted)

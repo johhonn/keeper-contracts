@@ -21,31 +21,13 @@ library ConditionStoreLibrary {
     struct Condition {
         address typeRef;
         ConditionState state;
+        address lastUpdatedBy;
+        uint256 blockNumberUpdated;
     }
 
     struct ConditionList {
         mapping(bytes32 => Condition) conditions;
         bytes32[] conditionIds;
-    }
-
-
-    modifier onlyValidStateTransition(
-        ConditionList storage _self,
-        bytes32 _id,
-        ConditionState _newState
-    )
-    {
-        // once Fulfilled or Aborted no more transitions
-        require(
-            _self.conditions[_id].state < ConditionState.Fulfilled,
-            'Invalid state transition'
-        );
-        // Uninitialized -> Unfulfilled -> {Fulfilled || Aborted}
-        require(
-            _self.conditions[_id].state < _newState,
-            'Invalid state transition'
-        );
-        _;
     }
 
     function create(
@@ -56,9 +38,15 @@ library ConditionStoreLibrary {
         internal
         returns (uint size)
     {
+        require(
+            _self.conditions[_id].blockNumberUpdated == 0,
+            'Id already exists'
+        );
         _self.conditions[_id] = Condition({
             typeRef: _typeRef,
-            state: ConditionState.Unfulfilled
+            state: ConditionState.Unfulfilled,
+            lastUpdatedBy: msg.sender,
+            blockNumberUpdated: block.number
         });
         _self.conditionIds.push(_id);
 
@@ -77,10 +65,17 @@ library ConditionStoreLibrary {
         ConditionState _newState
     )
         internal
-        onlyValidStateTransition(_self, _id, _newState)
         returns (ConditionState)
     {
+        require(
+            (_self.conditions[_id].state == ConditionState.Unfulfilled) &&
+            (_newState > _self.conditions[_id].state),
+            'Invalid state transition'
+        );
+
         _self.conditions[_id].state = _newState;
+        _self.conditions[_id].lastUpdatedBy = msg.sender;
+        _self.conditions[_id].blockNumberUpdated = block.number;
 
         emit ConditionUpdated(
             _id,
