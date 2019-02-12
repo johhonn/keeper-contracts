@@ -17,12 +17,12 @@ function exportArtifacts(name, substrFilter) {
     const contractNames = Object.keys(contracts)
 
     /* eslint-disable-next-line no-console */
-    console.log(version, network)
+    console.log(name, version, network)
 
     contractNames.forEach((contractName) => {
         if (contractName.indexOf(substrFilter) > -1) {
             /* eslint-disable-next-line no-console */
-            console.log('Skip library file: ', contractName)
+            console.log('Skipping library file: ', contractName)
         } else {
             /* eslint-disable-next-line security/detect-non-literal-fs-filename */
             const contract = JSON.parse(fs.readFileSync(`${buildDir}${contractName}.json`, 'utf-8').toString())

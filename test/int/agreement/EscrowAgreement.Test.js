@@ -52,8 +52,8 @@ contract('Escrow Agreement integration test', (accounts) => {
             { from: accounts[0] }
         )
 
-        const oceanToken = await OceanToken.new({ from: owner })
-        await oceanToken.initialize(owner)
+        const oceanToken = await OceanToken.new()
+        await oceanToken.initialize(owner, owner)
 
         const hashLockCondition = await HashLockCondition.new({ from: owner })
         await hashLockCondition.initialize(

@@ -47,7 +47,8 @@ contract DIDRegistry is Initializable, Ownable {
     function initialize(
         address _owner
     )
-        public initializer()
+        public
+        initializer
     {
         Ownable.initialize(_owner);
     }
@@ -84,19 +85,19 @@ contract DIDRegistry is Initializable, Ownable {
     */
     function getUpdateAt(bytes32 did)
         public view
-        returns(uint)
+        returns(uint updateAt)
     {
         return didRegister[did].updateAt;
     }
 
    /**
-    * @notice getOwner is called by anyone.
+    * @notice getDidOwner is called by anyone.
     * @param did refers to decentralized identifier (a byte32 length ID)
     * @return the address of the owner
     */
-    function getOwner(bytes32 did)
+    function getDidOwner(bytes32 did)
         public view
-        returns(address)
+        returns(address didOwner)
     {
         return didRegister[did].owner;
     }

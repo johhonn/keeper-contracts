@@ -63,7 +63,7 @@ script:
     - npm run test:cover
     - npm run report-coverage
     - npm run compile
-    - npm run migrate
+    - npm run deploy
     - git status
     - git add package-lock.json
     - git diff-index --quiet HEAD || git commit -m "Travis update"
