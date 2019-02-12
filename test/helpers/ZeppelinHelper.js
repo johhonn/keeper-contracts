@@ -1,15 +1,15 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts */
 const pkg = require('../../package')
 const { encodeCall } = require('zos-lib')
 /* eslint-disable-next-line security/detect-child-process */
 const { execSync } = require('child_process')
 const glob = require('glob')
 const fs = require('fs')
+const contract = require('truffle-contract')
 
 const verbose = process.env.VERBOSE || false
-const MultiSigWallet = artifacts.require('MultiSigWallet')
+const MultiSigWallet = contract(require('@oceanprotocol/multisigwallet/build/contracts/MultiSigWalletWithDailyLimit'))
 const flags = verbose ? ' -v' : ' -s'
 const stdio = 'inherit'
 
