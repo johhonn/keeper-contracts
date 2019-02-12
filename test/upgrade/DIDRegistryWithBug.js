@@ -42,9 +42,9 @@ contract('DIDRegistry', (accounts) => {
             assert.strictEqual(value, payload.value)
 
             // Upgrade to insert bug
-            await zos.upgradeToNewContract('DIDRegistryWithBug')
+            await zos.upgradeToNewContract('DIDRegistryWithBug', accounts[0])
             let p = await DIDRegistryWithBug.at(dIDRegistryAddress)
-            await zos.approveLatestTransaction()
+            await zos.approveLatestTransaction(accounts[1])
 
             // check functionality works
             did = web3.utils.sha3('did:ocn:test-attrN')
