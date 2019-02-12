@@ -23,22 +23,20 @@ contract('ConditionStoreManager', (accounts) => {
         createRole = accounts[0],
         owner = accounts[1]
     } = {}) {
-        const common = await Common.new({ from: owner })
-        const epochLibrary = await EpochLibrary.new({ from: owner })
-
+        const common = await Common.new()
+        const epochLibrary = await EpochLibrary.new()
         await ConditionStoreLibrary.link('EpochLibrary', epochLibrary.address)
-        const conditionStoreLibrary = await ConditionStoreLibrary.new({ from: owner })
-
+        const conditionStoreLibrary = await ConditionStoreLibrary.new()
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
         await ConditionStoreManager.link('ConditionStoreLibrary', conditionStoreLibrary.address)
-        const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
+        const conditionStoreManager = await ConditionStoreManager.new()
         await conditionStoreManager.initialize(
             owner,
             createRole,
             { from: owner }
         )
 
-        const hashLockCondition = await HashLockCondition.new({ from: owner })
+        const hashLockCondition = await HashLockCondition.new()
         await hashLockCondition.initialize(conditionStoreManager.address, { from: owner })
 
         return {
@@ -56,19 +54,19 @@ contract('ConditionStoreManager', (accounts) => {
     describe('deploy and initialize', () => {
         it('contract should deploy', async () => {
             // act-assert
-            const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+            const epochLibrary = await EpochLibrary.new()
             await ConditionStoreLibrary.link('EpochLibrary', epochLibrary.address)
-            const conditionStoreLibrary = await ConditionStoreLibrary.new({ from: accounts[0] })
+            const conditionStoreLibrary = await ConditionStoreLibrary.new()
             await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
             await ConditionStoreManager.link('ConditionStoreLibrary', conditionStoreLibrary.address)
-            await ConditionStoreManager.new({ from: accounts[0] })
+            await ConditionStoreManager.new()
         })
 
         it('contract should initialize', async () => {
             const createRole = accounts[0]
             const owner = accounts[1]
 
-            const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
+            const conditionStoreManager = await ConditionStoreManager.new()
             // address should be 0x0 before setup
             assert.strictEqual(
                 await conditionStoreManager.owner(),
@@ -109,7 +107,7 @@ contract('ConditionStoreManager', (accounts) => {
             const createRole = constants.address.zero
             const owner = accounts[1]
 
-            const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
+            const conditionStoreManager = await ConditionStoreManager.new()
 
             // setup with zero fails
             await assert.isRejected(
@@ -146,7 +144,7 @@ contract('ConditionStoreManager', (accounts) => {
             const createRole = accounts[0]
             const owner = accounts[1]
             // setup correctly
-            const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
+            const conditionStoreManager = await ConditionStoreManager.new()
 
             await conditionStoreManager.initialize(owner, createRole)
 

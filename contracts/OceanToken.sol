@@ -35,45 +35,4 @@ contract OceanToken is Initializable, Ownable, ERC20Detailed, ERC20Capped {
         // set initial minter, this has to be renounced after the setup!
         _addMinter(_initialMinter);
     }
-
-    /**
-    * @dev Transfer token for a specified address when not paused
-    * @param to The address to transfer to.
-    * @param value The amount to be transferred.
-    */
-    function transfer(
-        address to,
-        uint256 value
-    )
-        public
-        returns (bool tokenTransferred)
-    {
-        require(
-            to != address(0),
-            'To address is 0x0.'
-        );
-        return super.transfer(to, value);
-    }
-
-    /**
-    * @dev Transfer tokens from one address to another when not paused
-    * @param from address The address which you want to send tokens from
-    * @param to address The address which you want to transfer to
-    * @param value uint256 the amount of tokens to be transferred
-    */
-    function transferFrom(
-        address from,
-        address to,
-        uint256 value
-    )
-        public
-        returns (bool tokenTransferred)
-    {
-        require(
-            to != address(0),
-            'To address is 0x0.'
-        );
-        return super.transferFrom(from, to, value);
-    }
-
 }

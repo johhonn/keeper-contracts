@@ -22,12 +22,12 @@ contract('AgreementStoreManager', (accounts) => {
         createRole = accounts[0],
         owner = accounts[1]
     } = {}) {
-        const common = await Common.new({ from: owner })
-        const epochLibrary = await EpochLibrary.new({ from: owner })
+        const common = await Common.new()
+        const epochLibrary = await EpochLibrary.new()
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
-        const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
-        const templateStoreManager = await TemplateStoreManager.new({ from: owner })
-        const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: owner })
+        const conditionStoreManager = await ConditionStoreManager.new()
+        const templateStoreManager = await TemplateStoreManager.new()
+        const agreementStoreLibrary = await AgreementStoreLibrary.new()
         await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
         const agreementStoreManager = await AgreementStoreManager.new({ from: owner })
 
@@ -60,18 +60,10 @@ contract('AgreementStoreManager', (accounts) => {
         it('contract should deploy and initialize', async () => {
             const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
             await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
-            const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            const templateStoreManager = await TemplateStoreManager.new({ from: accounts[0] })
-            const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: accounts[0] })
-            await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-            const agreementStoreManager = await AgreementStoreManager.new({ from: accounts[0] })
 
-            await agreementStoreManager.initialize(
-                conditionStoreManager.address,
-                templateStoreManager.address,
-                accounts[0],
-                { from: accounts[0] }
-            )
+            const agreementStoreLibrary = await AgreementStoreLibrary.new()
+            await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
+            await AgreementStoreManager.new()
         })
 
         it('contract should not initialize with zero owner', async () => {

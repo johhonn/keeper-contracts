@@ -21,13 +21,13 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
         conditionType = constants.address.dummy,
         owner = accounts[0]
     } = {}) {
-        const epochLibrary = await EpochLibrary.new({ from: owner })
+        const epochLibrary = await EpochLibrary.new()
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
-        const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
-        const templateStoreManager = await TemplateStoreManager.new({ from: owner })
+        const conditionStoreManager = await ConditionStoreManager.new()
+        const templateStoreManager = await TemplateStoreManager.new()
 
-        const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: owner })
+        const agreementStoreLibrary = await AgreementStoreLibrary.new()
         await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
         const agreementStoreManager = await AgreementStoreManager.new()
 
@@ -44,7 +44,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             { from: owner }
         )
 
-        const accessSecretStoreCondition = await AccessSecretStoreCondition.new({ from: owner })
+        const accessSecretStoreCondition = await AccessSecretStoreCondition.new()
         await accessSecretStoreCondition.initialize(
             conditionStoreManager.address,
             agreementStoreManager.address,
@@ -64,19 +64,14 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
 
     describe('deploy and setup', () => {
         it('contract should deploy', async () => {
-            const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+            const epochLibrary = await EpochLibrary.new()
             await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
-            const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            const templateStoreManager = await TemplateStoreManager.new({ from: accounts[0] })
-            const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: accounts[0] })
+            const conditionStoreManager = await ConditionStoreManager.new()
+            const agreementStoreLibrary = await AgreementStoreLibrary.new()
             await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-            const agreementStoreManager = await AgreementStoreManager.new(
-                conditionStoreManager.address,
-                templateStoreManager.address,
-                { from: accounts[0] }
-            )
+            const agreementStoreManager = await AgreementStoreManager.new()
 
-            const accessSecretStoreCondition = await AccessSecretStoreCondition.new({ from: accounts[0] })
+            const accessSecretStoreCondition = await AccessSecretStoreCondition.new()
 
             await accessSecretStoreCondition.initialize(
                 conditionStoreManager.address,

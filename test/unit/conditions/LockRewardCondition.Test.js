@@ -21,10 +21,10 @@ contract('LockRewardCondition', (accounts) => {
         owner = accounts[1],
         createRole = accounts[0]
     } = {}) {
-        const epochLibrary = await EpochLibrary.new({ from: owner })
+        const epochLibrary = await EpochLibrary.new()
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
-        const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
+        const conditionStoreManager = await ConditionStoreManager.new()
         await conditionStoreManager.initialize(
             owner,
             createRole,
@@ -54,11 +54,11 @@ contract('LockRewardCondition', (accounts) => {
 
     describe('deploy and setup', () => {
         it('contract should deploy', async () => {
-            const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+            const epochLibrary = await EpochLibrary.new()
             await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
-            const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
-            const oceanToken = await OceanToken.new({ from: accounts[0] })
+            const conditionStoreManager = await ConditionStoreManager.new()
+            const oceanToken = await OceanToken.new()
             const lockRewardCondition = await LockRewardCondition.new()
 
             await lockRewardCondition.initialize(

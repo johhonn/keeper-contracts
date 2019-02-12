@@ -19,27 +19,27 @@ contract('HashLockCondition constructor', (accounts) => {
         owner = accounts[1],
         createRole = accounts[0]
     } = {}) {
-        const epochLibrary = await EpochLibrary.new({ from: owner })
+        const epochLibrary = await EpochLibrary.new()
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
-        const conditionStoreManager = await ConditionStoreManager.new({ from: owner })
+        const conditionStoreManager = await ConditionStoreManager.new()
         await conditionStoreManager.initialize(
             owner,
             createRole,
             { from: owner }
         )
 
-        const hashLockCondition = await HashLockCondition.new({ from: owner })
+        const hashLockCondition = await HashLockCondition.new()
         await hashLockCondition.initialize(conditionStoreManager.address, { from: owner })
         return { hashLockCondition, conditionStoreManager, conditionId, conditionType, owner, createRole }
     }
 
     describe('deploy and setup', () => {
         it('contract should deploy', async () => {
-            const epochLibrary = await EpochLibrary.new({ from: accounts[0] })
+            const epochLibrary = await EpochLibrary.new()
             await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
-            const conditionStoreManager = await ConditionStoreManager.new({ from: accounts[0] })
+            const conditionStoreManager = await ConditionStoreManager.new()
             const hashLockCondition = await HashLockCondition.new()
             await hashLockCondition.initialize(conditionStoreManager.address, { from: accounts[0] })
         })
