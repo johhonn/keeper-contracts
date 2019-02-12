@@ -189,7 +189,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             )
         })
 
-        it('right didOwner should fail to fulfill if conditions already fulfilled', async () => {
+        it('right did owner should fail to fulfill if conditions already fulfilled', async () => {
             const {
                 accessSecretStoreCondition,
                 agreementStoreManager,
@@ -224,7 +224,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
                 ...Object.values(agreement)
             )
 
-            accessSecretStoreCondition.fulfill(nonce, documentId, grantee)
+            await accessSecretStoreCondition.fulfill(nonce, documentId, grantee)
 
             await assert.isRejected(
                 accessSecretStoreCondition.fulfill(nonce, documentId, grantee),

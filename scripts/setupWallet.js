@@ -8,22 +8,12 @@ const threshold = 2
 const dailiyLimitInEther = 5
 
 async function setupWallet(web3) {
-    console.log('Setting up MultiSigWallet')
+    console.log('Setting up MultiSigWallets')
 
     const MultiSigWalletWithDailyLimit =
         contract(require('@oceanprotocol/multisigwallet/build/contracts/MultiSigWalletWithDailyLimit.json'))
 
     await MultiSigWalletWithDailyLimit.setProvider(web3.currentProvider)
-
-    // Workaround for a compatibility issue between web3@1.0.0-beta.29 and truffle-contract@3.0.3
-    // https://github.com/trufflesuite/truffle-contract/issues/57#issuecomment-331300494
-    if (typeof MultiSigWalletWithDailyLimit.currentProvider.sendAsync !== 'function') {
-        MultiSigWalletWithDailyLimit.currentProvider.sendAsync = function() {
-            return MultiSigWalletWithDailyLimit.currentProvider.send.apply(
-                MultiSigWalletWithDailyLimit.currentProvider, arguments
-            )
-        }
-    }
 
     // get accounts from web3
     const accounts = await web3.eth.getAccounts()
@@ -37,39 +27,50 @@ async function setupWallet(web3) {
 
     const block = await web3.eth.getBlock('latest')
     const { gasLimit } = block
+    const deployerRole = accounts[0]
 
-    console.log(
-        'gasLimit', gasLimit,
-        'multiSigAccounts', JSON.stringify(multiSigAccounts, null, 2),
-        'threshold', threshold)
-
-    // deploy wallet to the blockchain
-    const wallet = await MultiSigWalletWithDailyLimit.new(
+    const walletParameters = [
         multiSigAccounts,
         threshold,
-        web3.utils.toWei(dailiyLimitInEther.toString(10), 'Ether'), {
+        web3.utils.toWei(dailiyLimitInEther.toString(10), 'Ether')
+    ]
+
+    // deploy wallet to the blockchain
+    const upgraderWallet = await MultiSigWalletWithDailyLimit.new(
+        ...walletParameters, {
             gas: gasLimit,
-            from: accounts[0]
+            from: deployerRole
         })
 
-    let walletAddresses = {
-        wallet: wallet.address,
-        owners: multiSigAccounts
-    }
+    const ownerWallet = await MultiSigWalletWithDailyLimit.new(
+        ...walletParameters, {
+            gas: gasLimit,
+            from: deployerRole
+        })
 
-    const walletString = JSON.stringify(walletAddresses, null, 4)
-    console.log('Wallet addresses:', walletString)
+    let wallets = [{
+        name: 'upgrader',
+        address: upgraderWallet.address,
+        owners: multiSigAccounts
+    }, {
+        name: 'owner',
+        address: ownerWallet.address,
+        owners: multiSigAccounts
+    }]
+
+    const walletsString = JSON.stringify(wallets, null, 4)
+    console.log('Wallets created:\n', walletsString)
 
     // write to file
     await fs.writeFileSync(
-        './wallet.json',
-        walletString,
+        './wallets.json',
+        walletsString,
         'utf8', (err) => {
             if (err) {
                 console.error('Error writing file:', err)
                 return
             }
-            console.log('Wallet file has been created')
+            console.log('Wallets file has been created')
         })
 }
 

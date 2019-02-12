@@ -1,20 +1,25 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, assert, contract, describe, it, beforeEach */
+/* global artifacts, contract, describe, it, beforeEach */
 const testUtils = require('../../helpers/utils.js')
-const Dispenser = artifacts.require('Dispenser.sol')
-const OceanToken = artifacts.require('OceanToken.sol')
+const chai = require('chai')
+const { assert } = chai
+const chaiAsPromised = require('chai-as-promised')
+chai.use(chaiAsPromised)
+
+const Dispenser = artifacts.require('Dispenser')
+const OceanToken = artifacts.require('OceanToken')
 
 contract('Dispenser', (accounts) => {
     let dispenser
-    let token
+    let oceanToken
 
     beforeEach(async () => {
-        token = await OceanToken.new()
-        await token.initialize(accounts[0])
+        oceanToken = await OceanToken.new()
+        await oceanToken.initialize(accounts[0], accounts[0])
         dispenser = await Dispenser.new()
-        await dispenser.initialize(token.address, accounts[0])
-        await token.addMinter(dispenser.address)
+        await dispenser.initialize(oceanToken.address, accounts[0])
+        await oceanToken.addMinter(dispenser.address)
     })
 
     describe('requestTokens', () => {
@@ -23,7 +28,7 @@ contract('Dispenser', (accounts) => {
             await dispenser.requestTokens(200, { from: accounts[1] })
 
             // assert
-            const balance = await token.balanceOf(accounts[1])
+            const balance = await oceanToken.balanceOf(accounts[1])
             assert.strictEqual(balance.toNumber(), 200)
         })
 
@@ -37,7 +42,7 @@ contract('Dispenser', (accounts) => {
             const result = await dispenser.requestTokens(10, { from: accounts[1] })
 
             // assert
-            const balance = await token.balanceOf(accounts[1])
+            const balance = await oceanToken.balanceOf(accounts[1])
             assert.strictEqual(balance.toNumber(), 10)
             testUtils.assertEmitted(result, 1, 'RequestFrequencyExceeded')
         })
@@ -51,9 +56,17 @@ contract('Dispenser', (accounts) => {
             const result = await dispenser.requestTokens(11, { from: accounts[1] })
 
             // assert
-            const balance = await token.balanceOf(accounts[1])
+            const balance = await oceanToken.balanceOf(accounts[1])
             assert.strictEqual(balance.toNumber(), 0)
             testUtils.assertEmitted(result, 1, 'RequestLimitExceeded')
+        })
+
+        it('Should not mint more than max amount', async () => {
+            // act
+            await assert.isRejected(
+                dispenser.requestTokens(1000 * 10 ** 10, { from: accounts[1] }),
+                'Exceeded maxMintAmount'
+            )
         })
     })
 })
