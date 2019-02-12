@@ -69,7 +69,7 @@ async function getAddressForImplementation(contractName) {
 }
 
 async function loadWallet(name) {
-    console.log(`Loading wallet ${name}`)
+    console.log(`Loading ${name} wallet`)
     /* eslint-disable-next-line security/detect-non-literal-fs-filename */
     const wallets = JSON.parse(fs.readFileSync(walletPath))
     const walletAddress = wallets.find((wallet) => wallet.name === name).address
@@ -77,13 +77,13 @@ async function loadWallet(name) {
         contract(require('@oceanprotocol/multisigwallet/build/contracts/MultiSigWalletWithDailyLimit.json'))
     MultiSigWalletWithDailyLimit.setProvider(web3.currentProvider)
     const wallet = await MultiSigWalletWithDailyLimit.at(walletAddress)
-    console.log(`Loaded wallet ${name} ${wallet.address}`)
+    console.log(`Loaded ${name} wallet at ${wallet.address}`)
     return wallet
 }
 
 async function requestContractUpgrade(contractName, deployerRole, adminWallet) {
-    console.log(`Upgrading contract: ${contractName}`)
     const p = contractName.split(':')
+    console.log(`Upgrading contract: ${p[1]} with ${p[0]}`)
     const implementationAddress = await getAddressForImplementation(p[1])
     const upgradeCallData = encodeCall('upgradeTo', ['address'], [implementationAddress])
     const args = [
@@ -91,9 +91,8 @@ async function requestContractUpgrade(contractName, deployerRole, adminWallet) {
         0,
         upgradeCallData
     ]
-    console.log(args)
     const tx = await adminWallet.submitTransaction(...args, { from: deployerRole })
-    console.log(`Upgraded contract ${contractName}`)
+    console.log(`Upgraded contract: ${p[1]}`)
     return tx.logs[0].args.transactionId.toNumber()
 }
 
