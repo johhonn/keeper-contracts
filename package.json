@@ -20,7 +20,7 @@
     "test:unit": "truffle test $(find ./test/unit/ -name '*.js')",
     "test:integration": "truffle test $(find ./test/int/ -name '*.js')",
     "test:fast": "truffle test $(find ./test/unit/ -name '*.js') $(find ./test/int/ -name '*.js')",
-    "test:upgrade": "truffle test $(find ./test/upgrade/ -name '*.js')",
+    "test:upgrade": "npm run clean && npm run compile && truffle test $(find ./test/upgrade/ -name '*.js')",
     "test": "npm run test:ensurewallet&& truffle test",
     "test:cover": "export NETWORK='coverage' && solidity-coverage",
     "report-coverage": "cat ./coverage/lcov.info | codacy-coverage --token b95545c0da4b45848cc5eef363c2711e  --prefix ./",
