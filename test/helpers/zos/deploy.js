@@ -3,7 +3,7 @@
 const { execSync } = require('child_process')
 const fs = require('fs')
 const glob = require('glob')
-const { exportArtifacts } = require('./exportArtifacts')
+// const { exportArtifacts } = require('./exportArtifacts')
 const createWallet = require('../wallet/createWallet')
 const loadWallet = require('../wallet/loadWallet')
 const pkg = require('../../../package.json')

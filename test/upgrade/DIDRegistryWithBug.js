@@ -1,5 +1,5 @@
 /* eslint-env mocha */
-/* global web3, artifacts, assert, contract, describe, it, before, beforeEach */
+/* global web3, artifacts, assert, contract, describe, it, beforeEach */
 
 const testUtils = require('../helpers/utils.js')
 const deploy = require('../helpers/zos/deploy')

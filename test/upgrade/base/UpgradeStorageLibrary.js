@@ -1,5 +1,5 @@
 /* eslint-env mocha */
-/* global artifacts, assert, contract, describe, it, before, beforeEach */
+/* global artifacts, assert, contract, describe, it, beforeEach */
 
 const constants = require('../../helpers/constants.js')
 const deploy = require('../../helpers/zos/deploy')
