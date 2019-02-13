@@ -1,6 +1,6 @@
 pragma solidity 0.5.3;
 
-import './EpochLibrary.sol';
+import './sol';
 import 'openzeppelin-eth/contracts/math/SafeMath.sol';
 
 library EpochLibrary {
@@ -25,7 +25,7 @@ library EpochLibrary {
     * @param _timeOut value in block count (can not fulfill after)
     */
     function create(
-        EpochLibrary.EpochList storage _self,
+        EpochList storage _self,
         bytes32 _id,
         uint256 _timeLock,
         uint256 _timeOut
@@ -47,7 +47,7 @@ library EpochLibrary {
                 'Invalid time margin'
             );
         }
-        _self.epochs[_id] = EpochLibrary.Epoch({
+        _self.epochs[_id] = Epoch({
             timeLock: _timeLock,
             timeOut: _timeOut,
             blockNumber: block.number
@@ -62,7 +62,7 @@ library EpochLibrary {
     * @return true if the current block number is gt timeOut
     */
     function isTimedOut(
-        EpochLibrary.EpochList storage _self,
+        EpochList storage _self,
         bytes32 _id
     )
         public
@@ -80,7 +80,7 @@ library EpochLibrary {
     * @return true if the current block number is gt timeLock
     */
     function isTimeLocked(
-        EpochLibrary.EpochList storage _self,
+        EpochList storage _self,
         bytes32 _id
     )
         public
@@ -95,7 +95,7 @@ library EpochLibrary {
     * @param _self is the Epoch storage pointer
     */
     function getEpochTimeOut(
-        EpochLibrary.Epoch storage _self
+        Epoch storage _self
     )
         public
         view
@@ -109,7 +109,7 @@ library EpochLibrary {
     * @param _self is the Epoch storage pointer
     */
     function getEpochTimeLock(
-        EpochLibrary.Epoch storage _self
+        Epoch storage _self
     )
         public
         view
