@@ -10,7 +10,6 @@ const loadWallet = require('./loadWallet')
 const createWallet = require('./createWallet')
 
 const verbose = process.env.VERBOSE || false
-const flags = verbose ? ' -v' : ' -s'
 const stdio = 'inherit'
 const network = process.env.NETWORK || 'development'
 
@@ -30,11 +29,11 @@ class ZeppelinHelperBase {
         // Set zos session (network, admin, timeout)
         // execSync(`npx zos session --network ${network} --from ${admin} --expires ${timeout}`)
         console.log(`Creating session with network: ${network} and admin: ${admin}`)
-        execSync(`npx zos session --network ${network} --from ${admin} ${flags}`)
-        execSync(`npx zos init oceanprotocol v${pkg.version} --force ${flags}`)
+        execSync(`npx zos session --network ${network} --from ${admin} -v`)
+        execSync(`npx zos init oceanprotocol v${pkg.version} --force -v`)
         // add all contracts again
         console.log('adding contracts')
-        const contracts = ['DIDRegistry', 'OceanToken', 'Dispenser']
+        const contracts = ['DIDRegistry', 'OceanToken', 'Dispenser', 'EpochLibrary']
         execSync(`npx zos add ${contracts.join(' ')} --skip-compile -v`)
         // push contracts
         console.log('pushing contracts')
@@ -50,6 +49,7 @@ module.exports = class ZeppelinHelper extends ZeppelinHelperBase {
         this.dependencies = {
             DIDRegistry: [],
             OceanToken: [],
+            EpochLibrary: [],
             Dispenser: ['OceanToken']
         }
     }
@@ -84,6 +84,9 @@ module.exports = class ZeppelinHelper extends ZeppelinHelperBase {
             }
             let cmd
             switch (contract) {
+                case 'EpochLibrary':
+                    cmd = `EpochLibrary --init`
+                    break
                 case 'DIDRegistry':
                     cmd = `DIDRegistry --init --args ${this.owner}`
                     break
@@ -99,10 +102,10 @@ module.exports = class ZeppelinHelper extends ZeppelinHelperBase {
             if (verbose) {
                 console.log('cmd:', cmd)
             }
-            let address = execSync(`npx zos create ${cmd} ${flags}`).toString().trim()
+            let address = execSync(`npx zos create ${cmd} -v`).toString().trim()
             // no need for wallet when upgrade is not to be tested
             if (this.upgrade) {
-                execSync(`npx zos set-admin ${contract} ${this.wallet.address} --yes ${flags}`)
+                execSync(`npx zos set-admin ${contract} ${this.wallet.address} --yes -v`)
             }
             this.addresses[contract] = address
         } else {
@@ -128,8 +131,8 @@ module.exports = class ZeppelinHelper extends ZeppelinHelperBase {
     }
 
     async upgradeToNewContract(newContractName, account) {
-        execSync(`npx zos add ${newContractName}:${this.contractName} --skip-compile ${flags}`, { stdio: stdio })
-        execSync(`npx zos push --skip-compile --force ${flags}`, { stdio: stdio })
+        execSync(`npx zos add ${newContractName}:${this.contractName} --skip-compile -v`, { stdio: stdio })
+        execSync(`npx zos push --skip-compile --force -v`, { stdio: stdio })
         await this.readImplementationFromJson()
         const upgradeCallData = encodeCall('upgradeTo', ['address'], [this.implementationAddress])
         let tx = await this.wallet.submitTransaction(

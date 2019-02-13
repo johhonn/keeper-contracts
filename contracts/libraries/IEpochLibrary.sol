@@ -2,9 +2,7 @@ pragma solidity 0.5.3;
 
 import 'openzeppelin-eth/contracts/math/SafeMath.sol';
 
-library EpochLibrary {
-
-    using SafeMath for uint256;
+library IEpochLibrary {
 
     struct Epoch {
         uint256 timeLock;
@@ -17,28 +15,9 @@ library EpochLibrary {
         bytes32[] epochIds;
     }
 
-    modifier onlyValidTimeMargin(
-        uint256 timeLock,
-        uint256 timeOut)
-    {
-        require(
-            timeLock >= 0,
-            'Invalid time margin'
-        );
-        require(
-            timeOut >= 0,
-            'Invalid time margin'
-        );
-        if(timeOut > 0 && timeLock > 0){
-            require(
-                timeLock < timeOut,
-                'Invalid time margin'
-            );
-        }
-        _;
-    }
+    function initialize() public;
 
-   /**
+    /**
     * @notice create creates new Epoch
     * @param _self is the Epoch storage pointer
     * @param _timeLock value in block count (can not fulfill before)
@@ -50,20 +29,10 @@ library EpochLibrary {
         uint256 _timeLock,
         uint256 _timeOut
     )
-        internal
-        onlyValidTimeMargin(_timeLock, _timeOut)
-        returns (uint size)
-    {
-        _self.epochs[_id] = Epoch({
-            timeLock: _timeLock,
-            timeOut: _timeOut,
-            blockNumber: block.number
-        });
-        _self.epochIds.push(_id);
-        return _self.epochIds.length;
-    }
+        public
+        returns (uint size);
 
-   /**
+       /**
     * @notice isTimedOut means you cannot fulfill after
     * @param _self is the Epoch storage pointer
     * @return true if the current block number is gt timeOut
@@ -74,12 +43,7 @@ library EpochLibrary {
     )
         public
         view
-        returns(bool)
-    {
-        if (_self.epochs[_id].timeOut == 0)
-            return false;
-        return (block.number > getEpochTimeOut(_self.epochs[_id]));
-    }
+        returns(bool);
 
    /**
     * @notice isTimeLocked means you cannot fulfill before
@@ -92,10 +56,7 @@ library EpochLibrary {
     )
         public
         view
-        returns(bool)
-    {
-        return (block.number < getEpochTimeLock(_self.epochs[_id]));
-    }
+        returns(bool);
 
    /**
     * @notice getEpochTimeOut
@@ -106,10 +67,7 @@ library EpochLibrary {
     )
         public
         view
-        returns(uint256)
-    {
-        return _self.timeOut.add(_self.blockNumber);
-    }
+        returns(uint256);
 
     /**
     * @notice getEpochTimeLock
@@ -120,8 +78,5 @@ library EpochLibrary {
     )
         public
         view
-        returns(uint256)
-    {
-        return _self.timeLock.add(_self.blockNumber);
-    }
+        returns(uint256);
 }

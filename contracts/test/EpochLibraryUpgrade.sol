@@ -1,9 +1,9 @@
 pragma solidity 0.5.3;
 
-import './IEpochLibrary.sol';
+import '../libraries/IEpochLibrary.sol';
 import 'openzeppelin-eth/contracts/math/SafeMath.sol';
 
-library EpochLibrary {
+library EpochLibraryUpgrade {
 
     using SafeMath for uint256;
 
@@ -42,7 +42,7 @@ library EpochLibrary {
         _self.epochs[_id] = IEpochLibrary.Epoch({
             timeLock: _timeLock,
             timeOut: _timeOut,
-            blockNumber: block.number
+            blockNumber: 1984
         });
         _self.epochIds.push(_id);
         return _self.epochIds.length;

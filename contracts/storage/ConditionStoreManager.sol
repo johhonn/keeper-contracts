@@ -1,18 +1,18 @@
 pragma solidity 0.5.3;
 
 import '../Common.sol';
-import '../libraries/EpochLibrary.sol';
+import '../libraries/IEpochLibrary.sol';
 import '../libraries/ConditionStoreLibrary.sol';
 import 'zos-lib/contracts/Initializable.sol';
 
 contract ConditionStoreManager is Initializable, Common {
 
     using ConditionStoreLibrary for ConditionStoreLibrary.ConditionList;
-    using EpochLibrary for EpochLibrary.EpochList;
+    using IEpochLibrary for IEpochLibrary.EpochList;
 
     address private createRole;
     ConditionStoreLibrary.ConditionList private conditionList;
-    EpochLibrary.EpochList private epochList;
+    IEpochLibrary.EpochList private epochList;
 
     modifier onlyCreateRole(){
         require(
