@@ -1,6 +1,5 @@
 pragma solidity 0.5.3;
 
-import './sol';
 import 'openzeppelin-eth/contracts/math/SafeMath.sol';
 
 library EpochLibrary {

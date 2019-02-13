@@ -4,8 +4,8 @@ const fs = require('fs')
 const setupWallet = require('./setupWallet')
 
 const walletPath = './wallets.json'
-async function createWallet() {
-    if (fs.existsSync(walletPath)) {
+async function createWallet(force = false) {
+    if (!force && fs.existsSync(walletPath)) {
         console.log('wallets.json already exists')
     } else {
         await setupWallet(web3, artifacts)

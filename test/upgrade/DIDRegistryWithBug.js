@@ -2,36 +2,33 @@
 /* global web3, artifacts, assert, contract, describe, it, before, beforeEach */
 
 const testUtils = require('../helpers/utils.js')
-const ZeppelinHelper = require('../helpers/ZeppelinHelper.js')
+const deploy = require('../helpers/zos/deploy')
+const upgrade = require('../helpers/zos/upgrade')
+const loadWallet = require('../helpers/wallet/loadWallet')
+const createWallet = require('../helpers/wallet/createWallet')
 
 const DIDRegistry = artifacts.require('DIDRegistry')
 const DIDRegistryWithBug = artifacts.require('DIDRegistryWithBug')
 
 contract('DIDRegistry', (accounts) => {
-    let zos
-    let dIDRegistryAddress
-
-    before('Restore zos before all tests', async function() {
-        zos = new ZeppelinHelper('DIDRegistry')
-        await zos.restoreState(accounts[9])
-    })
+    let adminWallet,
+        proxyAddress
 
     beforeEach('Deploy with zos before each tests', async function() {
-        zos = new ZeppelinHelper('DIDRegistry')
-        await zos.initialize(accounts[0], true)
-        dIDRegistryAddress = zos.getProxyAddress('DIDRegistry')
+        await createWallet(true)
+        adminWallet = await loadWallet('upgrader') // zos admin MultiSig
+        proxyAddress = await deploy('deploy', ['DIDRegistry'])
     })
 
     describe('Test upgradability for DIDRegistry', () => {
         it('Should be possible to fix/add a bug', async () => {
-            // register attribute
-            let registry = await DIDRegistry.at(dIDRegistryAddress)
+            let proxy = await DIDRegistry.at(proxyAddress)
 
             let did = web3.utils.sha3('did:ocn:test-attr')
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
 
-            let result = await registry.registerAttribute(did, checksum, value)
+            let result = await proxy.registerAttribute(did, checksum, value)
 
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
@@ -42,13 +39,20 @@ contract('DIDRegistry', (accounts) => {
             assert.strictEqual(value, payload.value)
 
             // Upgrade to insert bug
-            await zos.upgradeToNewContract('DIDRegistryWithBug', accounts[0])
-            let p = await DIDRegistryWithBug.at(dIDRegistryAddress)
-            await zos.approveLatestTransaction(accounts[1])
+            // Upgrade to new version
+            const txId = await upgrade(
+                'DIDRegistry',
+                'DIDRegistryWithBug',
+                proxyAddress,
+                adminWallet,
+                accounts[0]
+            )
+            await adminWallet.confirmTransaction(txId, { from: accounts[1] })
+            proxy = await DIDRegistryWithBug.at(proxyAddress)
 
             // check functionality works
             did = web3.utils.sha3('did:ocn:test-attrN')
-            result = await registry.registerAttribute(did, checksum, value)
+            result = await proxy.registerAttribute(did, checksum, value)
 
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
@@ -59,8 +63,9 @@ contract('DIDRegistry', (accounts) => {
             assert.strictEqual(value, payload.value)
 
             // test for bug
-            let n = await p.getUpdateAt(did)
-            assert.equal(n.toNumber(), 42, 'getUpdatedAt value is not 42 (according to bug)')
+            assert.equal(
+                (await proxy.getUpdateAt(did)).toNumber(), 42,
+                'getUpdatedAt value is not 42 (according to bug)')
         })
     })
 })
