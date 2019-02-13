@@ -33,7 +33,7 @@ class ZeppelinHelperBase {
         execSync(`npx zos init oceanprotocol v${pkg.version} --force -v`)
         // add all contracts again
         console.log('adding contracts')
-        const contracts = ['DIDRegistry', 'OceanToken', 'Dispenser', 'EpochLibrary']
+        const contracts = ['DIDRegistry', 'OceanToken', 'Dispenser', 'EpochLibrary', 'StorageContract']
         execSync(`npx zos add ${contracts.join(' ')} --skip-compile -v`)
         // push contracts
         console.log('pushing contracts')
@@ -84,6 +84,9 @@ module.exports = class ZeppelinHelper extends ZeppelinHelperBase {
             }
             let cmd
             switch (contract) {
+                case 'StorageContract':
+                    cmd = `StorageContract`
+                    break
                 case 'EpochLibrary':
                     cmd = `EpochLibrary --init`
                     break

@@ -1,14 +1,23 @@
 pragma solidity 0.5.3;
 
-import './IEpochLibrary.sol';
+import './EpochLibrary.sol';
 import 'openzeppelin-eth/contracts/math/SafeMath.sol';
 
 library EpochLibrary {
 
     using SafeMath for uint256;
 
-    function initialize() public {}
+    struct Epoch {
+        uint256 timeLock;
+        uint256 timeOut;
+        uint256 blockNumber;
+    }
 
+    struct EpochList {
+        mapping(bytes32 => Epoch) epochs;
+        bytes32[] epochIds;
+    }
+    
    /**
     * @notice create creates new Epoch
     * @param _self is the Epoch storage pointer
@@ -16,13 +25,12 @@ library EpochLibrary {
     * @param _timeOut value in block count (can not fulfill after)
     */
     function create(
-        IEpochLibrary.EpochList storage _self,
+        EpochLibrary.EpochList storage _self,
         bytes32 _id,
         uint256 _timeLock,
         uint256 _timeOut
     )
-//        internal
-        public
+        internal
         returns (uint size)
     {
         require(
@@ -39,7 +47,7 @@ library EpochLibrary {
                 'Invalid time margin'
             );
         }
-        _self.epochs[_id] = IEpochLibrary.Epoch({
+        _self.epochs[_id] = EpochLibrary.Epoch({
             timeLock: _timeLock,
             timeOut: _timeOut,
             blockNumber: block.number
@@ -54,7 +62,7 @@ library EpochLibrary {
     * @return true if the current block number is gt timeOut
     */
     function isTimedOut(
-        IEpochLibrary.EpochList storage _self,
+        EpochLibrary.EpochList storage _self,
         bytes32 _id
     )
         public
@@ -72,7 +80,7 @@ library EpochLibrary {
     * @return true if the current block number is gt timeLock
     */
     function isTimeLocked(
-        IEpochLibrary.EpochList storage _self,
+        EpochLibrary.EpochList storage _self,
         bytes32 _id
     )
         public
@@ -87,7 +95,7 @@ library EpochLibrary {
     * @param _self is the Epoch storage pointer
     */
     function getEpochTimeOut(
-        IEpochLibrary.Epoch storage _self
+        EpochLibrary.Epoch storage _self
     )
         public
         view
@@ -101,7 +109,7 @@ library EpochLibrary {
     * @param _self is the Epoch storage pointer
     */
     function getEpochTimeLock(
-        IEpochLibrary.Epoch storage _self
+        EpochLibrary.Epoch storage _self
     )
         public
         view
