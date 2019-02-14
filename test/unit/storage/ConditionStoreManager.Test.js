@@ -7,11 +7,11 @@ const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
-const Common = artifacts.require('Common.sol')
-const HashLockCondition = artifacts.require('HashLockCondition.sol')
-const EpochLibrary = artifacts.require('EpochLibrary.sol')
-const ConditionStoreLibrary = artifacts.require('ConditionStoreLibrary.sol')
-const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
+const Common = artifacts.require('Common')
+const HashLockCondition = artifacts.require('HashLockCondition')
+const EpochLibrary = artifacts.require('EpochLibrary')
+const ConditionStoreLibrary = artifacts.require('ConditionStoreLibrary')
+const ConditionStoreManager = artifacts.require('ConditionStoreManager')
 
 const constants = require('../../helpers/constants.js')
 const increaseTime = require('../../helpers/increaseTime.js')

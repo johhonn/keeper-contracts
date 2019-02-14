@@ -6,7 +6,7 @@ const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
-const EpochLibrary = artifacts.require('EpochLibrary.sol')
+const EpochLibrary = artifacts.require('EpochLibrary')
 
 contract('EpochLibrary', (accounts) => {
     describe('deploy and setup', () => {

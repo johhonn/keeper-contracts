@@ -1,7 +1,7 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
 /* global artifacts, assert, contract, describe, it, before, beforeEach */
-const OceanToken = artifacts.require('OceanToken.sol')
+const OceanToken = artifacts.require('OceanToken')
 
 contract('OceanToken', (accounts) => {
     let oceanToken
