@@ -264,7 +264,7 @@ contract('ConditionStoreManager', (accounts) => {
 
             await assert.isRejected(
                 conditionStoreManager.createCondition(conditionId, conditionType),
-                constants.condition.id.error.idAlreadyExists
+                constants.error.idAlreadyExists
             )
         })
     })

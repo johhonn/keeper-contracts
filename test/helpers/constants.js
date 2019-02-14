@@ -13,12 +13,11 @@ let constants = {
         zero: '0x0000000000000000000000000000000000000000000000000000000000000000',
         one: '0x0000000000000000000000000000000000000000000000000000000000000001'
     },
+    error: {
+        idAlreadyExists: 'Id already exists',
+        revert: 'Returned error: VM Exception while processing transaction: revert'
+    },
     condition: {
-        id: {
-            error: {
-                idAlreadyExists: 'Id already exists'
-            }
-        },
         state: {
             uninitialized: 0,
             unfulfilled: 1,
@@ -70,11 +69,13 @@ let constants = {
     template: {
         state: {
             uninitialized: 0,
-            active: 1,
-            revoked: 2
+            proposed: 1,
+            approved: 2,
+            revoked: 3
         },
         error: {
-            templateNotActive: 'Template not active'
+            templateNotProposed: 'Template not Proposed',
+            templateNotApproved: 'Template not Approved'
         }
     },
     acl: {

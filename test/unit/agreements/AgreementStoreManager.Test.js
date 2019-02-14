@@ -245,7 +245,7 @@ contract('AgreementStoreManager', (accounts) => {
                     otherAgreementId,
                     ...Object.values(otherAgreement)
                 ),
-                constants.condition.id.error.idAlreadyExists
+                constants.error.idAlreadyExists
             )
         })
 
@@ -309,7 +309,7 @@ contract('AgreementStoreManager', (accounts) => {
                     otherAgreementId,
                     ...Object.values(otherAgreement)
                 ),
-                constants.condition.id.error.idAlreadyExists
+                constants.error.idAlreadyExists
             )
         })
     })
