@@ -22,12 +22,12 @@ async function setupWallet(web3) {
         throw new Error('Unable to create wallet, too few accounts on this node.')
     }
 
-    // create account list for MultiSig
-    const multiSigAccounts = accounts.slice(0, accountAmount)
-
-    const block = await web3.eth.getBlock('latest')
-    const { gasLimit } = block
     const deployerRole = accounts[0]
+
+    // create account list for MultiSig
+    const multiSigAccounts = accounts.slice(1, accountAmount)
+
+    console.log(`Setting owner to:\n ${JSON.stringify(multiSigAccounts, null, 2)}`)
 
     const walletParameters = [
         multiSigAccounts,
@@ -35,31 +35,32 @@ async function setupWallet(web3) {
         web3.utils.toWei(dailiyLimitInEther.toString(10), 'Ether')
     ]
 
-    // deploy wallet to the blockchain
+    const txParameters = {
+        from: deployerRole
+    }
+
+    // deploy wallets to the blockchain
+
     const upgraderWallet = await MultiSigWalletWithDailyLimit.new(
-        ...walletParameters, {
-            gas: gasLimit,
-            from: deployerRole
-        })
+        ...walletParameters,
+        txParameters
+    )
 
     const ownerWallet = await MultiSigWalletWithDailyLimit.new(
-        ...walletParameters, {
-            gas: gasLimit,
-            from: deployerRole
-        })
+        ...walletParameters,
+        txParameters
+    )
 
-    let wallets = [{
+    const wallets = [{
         name: 'upgrader',
-        address: upgraderWallet.address,
-        owners: multiSigAccounts
+        address: upgraderWallet.address
     }, {
         name: 'owner',
-        address: ownerWallet.address,
-        owners: multiSigAccounts
+        address: ownerWallet.address
     }]
 
     const walletsString = JSON.stringify(wallets, null, 4)
-    console.log('Wallets created:\n', walletsString)
+    console.log(`Wallets created:\n ${walletsString}`)
 
     // write to file
     await fs.writeFileSync(

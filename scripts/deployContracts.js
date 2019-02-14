@@ -81,17 +81,17 @@ async function loadWallet(name) {
     return wallet
 }
 
-async function requestContractUpgrade(contractName, deployerRole, adminWallet) {
+async function requestContractUpgrade(contractName, upgraderRole, adminWallet) {
     const p = contractName.split(':')
     console.log(`Upgrading contract: ${p[1]} with ${p[0]}`)
     const implementationAddress = await getAddressForImplementation(p[1])
     const upgradeCallData = encodeCall('upgradeTo', ['address'], [implementationAddress])
     const args = [
         require(`../artifacts/${p[1]}.${NETWORK.toLowerCase()}.json`).address,
-        0,
+        0, // value in ether
         upgradeCallData
     ]
-    const tx = await adminWallet.submitTransaction(...args, { from: deployerRole })
+    const tx = await adminWallet.submitTransaction(...args, { from: upgraderRole })
     console.log(`Upgraded contract: ${p[1]}`)
     return tx.logs[0].args.transactionId.toNumber()
 }
@@ -117,7 +117,8 @@ async function deployContracts(operation = 'deploy', contracts) {
 
     const roles = {
         deployer: accounts[0],
-        initialMinter: accounts[1],
+        upgrader: accounts[1],
+        initialMinter: accounts[2],
         owner: ownerWallet.address,
         admin: adminWallet.address
     }
@@ -146,7 +147,7 @@ async function deployContracts(operation = 'deploy', contracts) {
 
         for (const contractName of contracts) {
             // const transactionId =
-            await requestContractUpgrade(contractName, roles.deployer, adminWallet)
+            await requestContractUpgrade(contractName, roles.upgrader, adminWallet)
         }
     }
 }
