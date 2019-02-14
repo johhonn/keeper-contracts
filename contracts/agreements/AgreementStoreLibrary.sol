@@ -6,7 +6,7 @@ library AgreementStoreLibrary {
     struct Agreement {
         bytes32 did;
         address didOwner;
-        bytes32 templateId;
+        address templateId;
         bytes32[] conditionIds;
         address lastUpdatedBy;
         uint256 blockNumberUpdated;
@@ -22,7 +22,7 @@ library AgreementStoreLibrary {
         bytes32 _id,
         bytes32 _did,
         address _didOwner,
-        bytes32 _templateId,
+        address _templateId,
         bytes32[] memory _conditionIds
     )
         internal

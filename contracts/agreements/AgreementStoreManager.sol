@@ -38,7 +38,7 @@ contract AgreementStoreManager is Initializable {
         bytes32 _id,
         bytes32 _did,
         address _didOwner,
-        bytes32 _templateId,
+        address[] memory _conditionTypes,
         bytes32[] memory _conditionIds,
         uint[] memory _timeLocks,
         uint[] memory _timeOuts
@@ -47,24 +47,20 @@ contract AgreementStoreManager is Initializable {
         returns (uint size)
     {
         require(
-            templateStoreManager.isTemplateActive(_templateId) == true,
+            templateStoreManager.isTemplateActive(msg.sender) == true,
             'Template not active'
         );
-
-        address[] memory conditionTypes = templateStoreManager
-            .getConditionTypes(_templateId);
-
         require(
-            _conditionIds.length == conditionTypes.length &&
-            _timeLocks.length == conditionTypes.length &&
-            _timeOuts.length == conditionTypes.length,
+            _conditionIds.length == _conditionTypes.length &&
+            _timeLocks.length == _conditionTypes.length &&
+            _timeOuts.length == _conditionTypes.length,
             'Arguments have wrong length'
         );
 
-        for (uint256 i = 0; i < conditionTypes.length; i++) {
+        for (uint256 i = 0; i < _conditionTypes.length; i++) {
             conditionStoreManager.createCondition(
                 _conditionIds[i],
-                conditionTypes[i],
+                _conditionTypes[i],
                 _timeLocks[i],
                 _timeOuts[i]
             );
@@ -73,7 +69,7 @@ contract AgreementStoreManager is Initializable {
             _id,
             _did,
             _didOwner,
-            _templateId,
+            msg.sender,
             _conditionIds
         );
     }

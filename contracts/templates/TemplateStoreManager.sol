@@ -1,33 +1,44 @@
 pragma solidity 0.5.3;
 
 import './TemplateStoreLibrary.sol';
-import 'zos-lib/contracts/Initializable.sol';
+import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
-contract TemplateStoreManager is Initializable {
+contract TemplateStoreManager is Ownable {
 
     using TemplateStoreLibrary for TemplateStoreLibrary.TemplateList;
 
     TemplateStoreLibrary.TemplateList private templateList;
 
-    modifier onlyTemplateOwner(bytes32 _id){
+    modifier onlyOwnerOrTemplateOwner(bytes32 _id){
         require(
-            templateList.templates[_id].lastUpdatedBy == msg.sender,
+            owner() == msg.sender ||
+            templateList.templates[_id].owner == msg.sender,
             'Invalid UpdateRole'
         );
         _;
     }
 
-    function createTemplate(
-        bytes32 _id,
-        address[] memory _conditionTypes
+    function proposeTemplate(
+        bytes32 _id
     )
         public
         returns (uint size)
     {
-        return templateList.create(
-            _id,
-            _conditionTypes
-        );
+        return templateList.create(_id);
+    }
+
+    function acceptTemplate(bytes32 _id)
+        public
+        onlyOwner
+    {
+        return templateList.revoke(_id);
+    }
+
+    function revokeTemplate(bytes32 _id)
+        public
+        onlyOwnerOrTemplateOwner(_id)
+    {
+        return templateList.revoke(_id);
     }
 
     function getTemplate(bytes32 _id)
@@ -36,24 +47,14 @@ contract TemplateStoreManager is Initializable {
         returns (
             TemplateStoreLibrary.TemplateState state,
             address owner,
-            address[] memory conditionTypes,
             address lastUpdatedBy,
             uint blockNumberUpdated
         )
     {
         state = templateList.templates[_id].state;
         owner = templateList.templates[_id].owner;
-        conditionTypes = templateList.templates[_id].conditionTypes;
         lastUpdatedBy = templateList.templates[_id].lastUpdatedBy;
         blockNumberUpdated = templateList.templates[_id].blockNumberUpdated;
-    }
-
-    function getConditionTypes(bytes32 _id)
-        public
-        view
-        returns (address[] memory)
-    {
-        return templateList.templates[_id].conditionTypes;
     }
 
     function getTemplateListSize() public view returns (uint size) {
@@ -63,12 +64,5 @@ contract TemplateStoreManager is Initializable {
     function isTemplateActive(bytes32 _id) public view returns (bool) {
         return templateList.templates[_id].state ==
             TemplateStoreLibrary.TemplateState.Active;
-    }
-
-    function revoke(bytes32 _id)
-        public
-        onlyTemplateOwner(_id)
-    {
-        return templateList.revoke(_id);
     }
 }

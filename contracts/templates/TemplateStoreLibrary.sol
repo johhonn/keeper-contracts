@@ -2,12 +2,11 @@ pragma solidity 0.5.3;
 
 library TemplateStoreLibrary {
 
-    enum TemplateState { Uninitialized, Active, Revoked }
+    enum TemplateState { Uninitialized, Proposed, Active, Revoked }
 
     struct Template {
         TemplateState state;
         address owner;
-        address[] conditionTypes;
         address lastUpdatedBy;
         uint256 blockNumberUpdated;
     }
@@ -17,10 +16,9 @@ library TemplateStoreLibrary {
         bytes32[] templateIds;
     }
 
-    function create(
+    function propose(
         TemplateList storage _self,
-        bytes32 _id,
-        address[] memory _conditionTypes
+        bytes32 _id
     )
         internal
         returns (uint size)
@@ -31,7 +29,7 @@ library TemplateStoreLibrary {
         );
 
         _self.templates[_id] = Template({
-            state: TemplateState.Active,
+            state: TemplateState.Proposed,
             owner: msg.sender,
             conditionTypes: _conditionTypes,
             lastUpdatedBy: msg.sender,
@@ -39,6 +37,21 @@ library TemplateStoreLibrary {
         });
         _self.templateIds.push(_id);
         return _self.templateIds.length;
+    }
+
+    function accept(
+        TemplateList storage _self,
+        bytes32 _id
+    )
+        internal
+    {
+        require(
+            _self.templates[_id].state == TemplateState.Proposed,
+            'Template not Proposed'
+        );
+        _self.templates[_id].state = TemplateState.Revoked;
+        _self.templates[_id].lastUpdateBy = msg.sender;
+        _self.templates[_id].blockNumberUpdated = block.number;
     }
 
     function revoke(
@@ -49,10 +62,10 @@ library TemplateStoreLibrary {
     {
         require(
             _self.templates[_id].state == TemplateState.Active,
-            'Template not active'
+            'Template not Active'
         );
-
         _self.templates[_id].state = TemplateState.Revoked;
+        _self.templates[_id].lastUpdateBy = msg.sender;
         _self.templates[_id].blockNumberUpdated = block.number;
     }
 }
