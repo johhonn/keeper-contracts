@@ -1,7 +1,7 @@
 pragma solidity 0.5.3;
 
 import './Reward.sol';
-import '../../libraries/ConditionStoreLibrary.sol';
+import '../ConditionStoreLibrary.sol';
 
 contract EscrowReward is Reward {
 

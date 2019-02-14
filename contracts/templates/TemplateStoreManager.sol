@@ -1,6 +1,6 @@
 pragma solidity 0.5.3;
 
-import '../libraries/TemplateStoreLibrary.sol';
+import './TemplateStoreLibrary.sol';
 import 'zos-lib/contracts/Initializable.sol';
 
 contract TemplateStoreManager is Initializable {

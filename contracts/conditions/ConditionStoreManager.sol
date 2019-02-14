@@ -2,7 +2,7 @@ pragma solidity 0.5.3;
 
 import '../Common.sol';
 import '../libraries/EpochLibrary.sol';
-import '../libraries/ConditionStoreLibrary.sol';
+import './ConditionStoreLibrary.sol';
 import 'zos-lib/contracts/Initializable.sol';
 
 contract ConditionStoreManager is Initializable, Common {

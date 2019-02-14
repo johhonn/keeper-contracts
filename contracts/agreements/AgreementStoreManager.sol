@@ -1,8 +1,8 @@
 pragma solidity 0.5.3;
 
-import './ConditionStoreManager.sol';
-import './TemplateStoreManager.sol';
-import '../libraries/AgreementStoreLibrary.sol';
+import '../conditions/ConditionStoreManager.sol';
+import '../templates/TemplateStoreManager.sol';
+import './AgreementStoreLibrary.sol';
 import 'zos-lib/contracts/Initializable.sol';
 
 contract AgreementStoreManager is Initializable {
