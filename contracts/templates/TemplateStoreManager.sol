@@ -9,7 +9,7 @@ contract TemplateStoreManager is Ownable {
 
     TemplateStoreLibrary.TemplateList private templateList;
 
-    modifier onlyOwnerOrTemplateOwner(bytes32 _id){
+    modifier onlyOwnerOrTemplateOwner(address _id){
         require(
             owner() == msg.sender ||
             templateList.templates[_id].owner == msg.sender,
@@ -18,30 +18,41 @@ contract TemplateStoreManager is Ownable {
         _;
     }
 
-    function proposeTemplate(
-        bytes32 _id
+    function initialize(
+        address _owner
     )
+        public
+        initializer()
+    {
+        require(
+            _owner != address(0),
+            'Invalid address'
+        );
+        Ownable.initialize(_owner);
+    }
+
+    function proposeTemplate(address _id)
         public
         returns (uint size)
     {
-        return templateList.create(_id);
+        return templateList.propose(_id);
     }
 
-    function acceptTemplate(bytes32 _id)
+    function approveTemplate(address _id)
         public
         onlyOwner
     {
-        return templateList.revoke(_id);
+        return templateList.approve(_id);
     }
 
-    function revokeTemplate(bytes32 _id)
+    function revokeTemplate(address _id)
         public
         onlyOwnerOrTemplateOwner(_id)
     {
         return templateList.revoke(_id);
     }
 
-    function getTemplate(bytes32 _id)
+    function getTemplate(address _id)
         external
         view
         returns (
@@ -61,8 +72,8 @@ contract TemplateStoreManager is Ownable {
         return templateList.templateIds.length;
     }
 
-    function isTemplateActive(bytes32 _id) public view returns (bool) {
+    function isTemplateApproved(address _id) public view returns (bool) {
         return templateList.templates[_id].state ==
-            TemplateStoreLibrary.TemplateState.Active;
+            TemplateStoreLibrary.TemplateState.Approved;
     }
 }

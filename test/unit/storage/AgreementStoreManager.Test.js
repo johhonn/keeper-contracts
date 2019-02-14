@@ -20,7 +20,7 @@ contract('AgreementStoreManager', (accounts) => {
         agreementId = constants.bytes32.one,
         conditionIds = [constants.address.dummy],
         createRole = accounts[0],
-        setupConditionStoreManager = true
+        owner = accounts[1]
     } = {}) {
         const common = await Common.new()
         const epochLibrary = await EpochLibrary.new()
@@ -34,36 +34,132 @@ contract('AgreementStoreManager', (accounts) => {
         await agreementStoreManager.initialize(
             conditionStoreManager.address,
             templateStoreManager.address,
-            { from: createRole }
+            owner,
+            { from: owner }
         )
 
-        if (setupConditionStoreManager) {
-            await conditionStoreManager.initialize(
-                agreementStoreManager.address,
-                { from: accounts[0] }
-            )
-        }
+        await conditionStoreManager.initialize(
+            owner,
+            agreementStoreManager.address,
+            { from: owner }
+        )
 
         return {
+            common,
             agreementStoreManager,
             conditionStoreManager,
             templateStoreManager,
             agreementId,
             conditionIds,
             createRole,
-            common
+            owner
         }
     }
 
     describe('deploy and setup', () => {
-        it('contract should deploy', async () => {
-            // act-assert
+        it('contract should deploy and initialize', async () => {
             const epochLibrary = await EpochLibrary.new()
             await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
             const agreementStoreLibrary = await AgreementStoreLibrary.new()
             await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
             await AgreementStoreManager.new()
+        })
+
+        it('contract should not initialize with zero owner', async () => {
+            const createRole = accounts[0]
+            const owner = constants.address.zero
+
+            const epochLibrary = await EpochLibrary.new()
+            await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
+            const conditionStoreManager = await ConditionStoreManager.new()
+            const templateStoreManager = await TemplateStoreManager.new()
+            const agreementStoreLibrary = await AgreementStoreLibrary.new()
+            await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
+            const agreementStoreManager = await AgreementStoreManager.new()
+
+            // setup with zero fails
+            await assert.isRejected(
+                agreementStoreManager.initialize(
+                    conditionStoreManager.address,
+                    templateStoreManager.address,
+                    owner,
+                    { from: createRole }
+                ),
+                constants.address.error.invalidAddress0x0
+            )
+        })
+
+        it('contract should not initialize with zero conditionStoreManager address', async () => {
+            const createRole = accounts[0]
+            const owner = constants.address.zero
+
+            const templateStoreManager = await TemplateStoreManager.new()
+            const agreementStoreLibrary = await AgreementStoreLibrary.new()
+            await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
+            const agreementStoreManager = await AgreementStoreManager.new()
+
+            // setup with zero fails
+            await assert.isRejected(
+                agreementStoreManager.initialize(
+                    owner,
+                    templateStoreManager.address,
+                    createRole,
+                    { from: createRole }
+                ),
+                constants.address.error.invalidAddress0x0
+            )
+        })
+
+        it('contract should not initialize with zero templateStoreManager address', async () => {
+            const createRole = accounts[0]
+            const owner = constants.address.zero
+
+            const epochLibrary = await EpochLibrary.new()
+            await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
+            const conditionStoreManager = await ConditionStoreManager.new()
+            const agreementStoreLibrary = await AgreementStoreLibrary.new()
+            await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
+            const agreementStoreManager = await AgreementStoreManager.new()
+
+            // setup with zero fails
+            await assert.isRejected(
+                agreementStoreManager.initialize(
+                    conditionStoreManager.address,
+                    owner,
+                    createRole,
+                    { from: createRole }
+                ),
+                constants.address.error.invalidAddress0x0
+            )
+        })
+
+        it('contract should not initialize without arguments', async () => {
+            const owner = accounts[0]
+
+            const agreementStoreLibrary = await AgreementStoreLibrary.new()
+            await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
+            const agreementStoreManager = await AgreementStoreManager.new()
+
+            // setup with zero fails
+            await assert.isRejected(
+                agreementStoreManager.initialize(),
+                constants.initialize.error.invalidNumberParamsGot0Expected3
+            )
+        })
+
+        it('contract should not initialize with one argument', async () => {
+            const owner = accounts[0]
+
+            const agreementStoreLibrary = await AgreementStoreLibrary.new()
+            await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
+            const agreementStoreManager = await AgreementStoreManager.new()
+
+            // setup with zero fails
+            await assert.isRejected(
+                agreementStoreManager.initialize(owner),
+                constants.initialize.error.invalidNumberParamsGot1Expected3
+            )
         })
     })
 

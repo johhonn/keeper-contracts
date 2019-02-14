@@ -13,6 +13,7 @@ contract EscrowAccessSecretStoreTemplate is Ownable {
     using TemplateStoreLibrary for TemplateStoreLibrary.TemplateList;
 
     TemplateStoreLibrary.TemplateList private templateList;
+    address[] private conditionTypes;
 
     AgreementStoreManager private agreementStoreManager;
     AccessSecretStoreCondition private accessSecretStoreCondition;
@@ -20,21 +21,25 @@ contract EscrowAccessSecretStoreTemplate is Ownable {
     EscrowReward private escrowReward;
 
     function initialize(
+        address _owner,
         address _agreementStoreManagerAddress,
         address _accessSecretStoreConditionAddress,
         address _lockRewardConditionAddress,
-        address _escrowRewardAddress
+        address payable _escrowRewardAddress
     )
         public
         initializer()
     {
         require(
+            _owner != address(0) &&
             _agreementStoreManagerAddress != address(0) &&
             _accessSecretStoreConditionAddress != address(0) &&
             _lockRewardConditionAddress != address(0) &&
             _escrowRewardAddress != address(0) ,
             'Invalid address'
         );
+        Ownable.initialize(_owner);
+
         agreementStoreManager = AgreementStoreManager(
             _agreementStoreManagerAddress
         );
@@ -47,6 +52,10 @@ contract EscrowAccessSecretStoreTemplate is Ownable {
         escrowReward = EscrowReward(
             _escrowRewardAddress
         );
+
+        conditionTypes.push(address(accessSecretStoreCondition));
+        conditionTypes.push(address(lockRewardCondition));
+        conditionTypes.push(address(escrowReward));
     }
 
     function createAgreement(
@@ -60,12 +69,12 @@ contract EscrowAccessSecretStoreTemplate is Ownable {
         public
         returns (uint size)
     {
-        return AgreementStoreManager.createAgreement(
+        return agreementStoreManager.createAgreement(
             _id,
             _did,
             _didOwner,
             getConditionTypes(),
-            _conditionsIds,
+            _conditionIds,
             _timeLocks,
             _timeOuts
         );
@@ -76,11 +85,6 @@ contract EscrowAccessSecretStoreTemplate is Ownable {
         view
         returns (address[] memory)
     {
-        return
-        [
-            address(accessSecretStoreCondition),
-            address(lockRewardCondition),
-            address(escrowReward)
-        ];
+        return conditionTypes;
     }
 }

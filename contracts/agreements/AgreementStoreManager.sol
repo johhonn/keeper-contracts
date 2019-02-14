@@ -3,9 +3,9 @@ pragma solidity 0.5.3;
 import '../conditions/ConditionStoreManager.sol';
 import '../templates/TemplateStoreManager.sol';
 import './AgreementStoreLibrary.sol';
-import 'zos-lib/contracts/Initializable.sol';
+import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
-contract AgreementStoreManager is Initializable {
+contract AgreementStoreManager is Ownable {
 
     using AgreementStoreLibrary for AgreementStoreLibrary.AgreementList;
 
@@ -14,15 +14,29 @@ contract AgreementStoreManager is Initializable {
     AgreementStoreLibrary.AgreementList private agreementList;
 
     function initialize(
+        address _sender
+    )
+        public
+        initializer
+    {
+        require(
+            true == false,
+            'Invalid number of parameters for "initialize". Got 1 expected 3!'
+        );
+    }
+
+    function initialize(
         address _conditionStoreManagerAddress,
-        address _templateStoreManagerAddress
+        address _templateStoreManagerAddress,
+        address _owner
     )
         public
         initializer()
     {
         require(
             _conditionStoreManagerAddress != address(0) &&
-            _templateStoreManagerAddress != address(0),
+            _templateStoreManagerAddress != address(0) &&
+            _owner != address(0),
             'Invalid address'
         );
 
@@ -32,6 +46,7 @@ contract AgreementStoreManager is Initializable {
         templateStoreManager = TemplateStoreManager(
             _templateStoreManagerAddress
         );
+        Ownable.initialize(_owner);
     }
 
     function createAgreement(
@@ -47,7 +62,7 @@ contract AgreementStoreManager is Initializable {
         returns (uint size)
     {
         require(
-            templateStoreManager.isTemplateActive(msg.sender) == true,
+            templateStoreManager.isTemplateApproved(msg.sender) == true,
             'Template not active'
         );
         require(
@@ -80,7 +95,7 @@ contract AgreementStoreManager is Initializable {
         returns (
             bytes32 did,
             address didOwner,
-            bytes32 templateId,
+            address templateId,
             bytes32[] memory conditionIds,
             address lastUpdatedBy,
             uint256 blockNumberUpdated

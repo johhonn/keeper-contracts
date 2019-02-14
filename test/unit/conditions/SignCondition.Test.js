@@ -17,23 +17,22 @@ contract('SignCondition constructor', (accounts) => {
         conditionId = constants.bytes32.one,
         conditionType = constants.address.dummy,
         createRole = accounts[0],
-        setupConditionStoreManager = true
+        owner = accounts[1]
     } = {}) {
         const epochLibrary = await EpochLibrary.new()
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
         const conditionStoreManager = await ConditionStoreManager.new()
+        await conditionStoreManager.initialize(
+            owner,
+            createRole,
+            { from: accounts[0] }
+        )
 
-        if (setupConditionStoreManager) {
-            await conditionStoreManager.initialize(
-                createRole,
-                { from: accounts[0] }
-            )
-        }
         const signCondition = await SignCondition.new()
         await signCondition.initialize(conditionStoreManager.address, { from: accounts[0] })
 
-        return { signCondition, conditionStoreManager, conditionId, conditionType, createRole }
+        return { signCondition, conditionStoreManager, conditionId, conditionType, createRole, owner }
     }
 
     describe('deploy and setup', () => {
@@ -49,7 +48,7 @@ contract('SignCondition constructor', (accounts) => {
 
     describe('fulfill non existing condition', () => {
         it('should not fulfill if conditions do not exist for bytes32 message', async () => {
-            const { signCondition } = await setupTest({ setupConditionStoreManager: false })
+            const { signCondition } = await setupTest()
 
             let nonce = constants.bytes32.one
             let {

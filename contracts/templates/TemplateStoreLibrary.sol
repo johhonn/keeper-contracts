@@ -2,7 +2,7 @@ pragma solidity 0.5.3;
 
 library TemplateStoreLibrary {
 
-    enum TemplateState { Uninitialized, Proposed, Active, Revoked }
+    enum TemplateState { Uninitialized, Proposed, Approved, Revoked }
 
     struct Template {
         TemplateState state;
@@ -12,13 +12,13 @@ library TemplateStoreLibrary {
     }
 
     struct TemplateList {
-        mapping(bytes32 => Template) templates;
-        bytes32[] templateIds;
+        mapping(address => Template) templates;
+        address[] templateIds;
     }
 
     function propose(
         TemplateList storage _self,
-        bytes32 _id
+        address _id
     )
         internal
         returns (uint size)
@@ -27,11 +27,9 @@ library TemplateStoreLibrary {
             _self.templates[_id].blockNumberUpdated == 0,
             'Id already exists'
         );
-
         _self.templates[_id] = Template({
             state: TemplateState.Proposed,
             owner: msg.sender,
-            conditionTypes: _conditionTypes,
             lastUpdatedBy: msg.sender,
             blockNumberUpdated: block.number
         });
@@ -39,9 +37,9 @@ library TemplateStoreLibrary {
         return _self.templateIds.length;
     }
 
-    function accept(
+    function approve(
         TemplateList storage _self,
-        bytes32 _id
+        address _id
     )
         internal
     {
@@ -49,23 +47,23 @@ library TemplateStoreLibrary {
             _self.templates[_id].state == TemplateState.Proposed,
             'Template not Proposed'
         );
-        _self.templates[_id].state = TemplateState.Revoked;
-        _self.templates[_id].lastUpdateBy = msg.sender;
+        _self.templates[_id].state = TemplateState.Approved;
+        _self.templates[_id].lastUpdatedBy = msg.sender;
         _self.templates[_id].blockNumberUpdated = block.number;
     }
 
     function revoke(
         TemplateList storage _self,
-        bytes32 _id
+        address _id
     )
         internal
     {
         require(
-            _self.templates[_id].state == TemplateState.Active,
-            'Template not Active'
+            _self.templates[_id].state == TemplateState.Approved,
+            'Template not Approved'
         );
         _self.templates[_id].state = TemplateState.Revoked;
-        _self.templates[_id].lastUpdateBy = msg.sender;
+        _self.templates[_id].lastUpdatedBy = msg.sender;
         _self.templates[_id].blockNumberUpdated = block.number;
     }
 }
