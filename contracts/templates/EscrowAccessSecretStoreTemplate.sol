@@ -12,6 +12,18 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
     LockRewardCondition private lockRewardCondition;
     EscrowReward private escrowReward;
 
+    EscrowAccessSecretStoreAgreementList private agreementList;
+
+    struct EscrowAccessSecretStoreAgreement {
+        address provider;
+        address consumer;
+    }
+
+    struct EscrowAccessSecretStoreAgreementList {
+        mapping(bytes32 => EscrowAccessSecretStoreAgreement) agreements;
+        bytes32[] agreementIds;
+    }
+
     function initialize(
         address _owner,
         address _agreementStoreManagerAddress,
@@ -48,5 +60,33 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
         conditionTypes.push(address(accessSecretStoreCondition));
         conditionTypes.push(address(lockRewardCondition));
         conditionTypes.push(address(escrowReward));
+    }
+
+    function createAgreement(
+        bytes32 _id,
+        bytes32 _did,
+        address _didOwner,
+        bytes32[] memory _conditionIds,
+        uint[] memory _timeLocks,
+        uint[] memory _timeOuts,
+        address _consumer
+    )
+        public
+        returns (uint size)
+    {
+        super.createAgreement(
+            _id,
+            _did,
+            _didOwner,
+            _conditionIds,
+            _timeLocks,
+            _timeOuts
+        );
+        agreementList.agreements[_id] = EscrowAccessSecretStoreAgreement({
+            provider: _didOwner,
+            consumer: _consumer
+        });
+        agreementList.agreementIds.push(_id);
+        return agreementList.agreementIds.length;
     }
 }

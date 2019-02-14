@@ -157,7 +157,8 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
                     conditionIdEscrow
                 ],
                 timeLocks: [0, 0, 0],
-                timeOuts: [0, 0, 0]
+                timeOuts: [0, 0, 0],
+                consumer: accounts[1]
             }
 
             await escrowAccessSecretStoreTemplate.createAgreement(
@@ -279,7 +280,8 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
                     conditionIdEscrow
                 ],
                 timeLocks: [0, 0, 0],
-                timeOuts: [timeOutAccess, 0, 0]
+                timeOuts: [timeOutAccess, 0, 0],
+                consumer: accounts[1]
             }
 
             await escrowAccessSecretStoreTemplate.createAgreement(
@@ -375,7 +377,8 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
                     conditionIdEscrow
                 ],
                 timeLocks: [timeLockAccess, 0, 0],
-                timeOuts: [0, 0, 0]
+                timeOuts: [0, 0, 0],
+                consumer: accounts[1]
             }
 
             await escrowAccessSecretStoreTemplate.createAgreement(
