@@ -241,7 +241,7 @@ async function deploy(contracts, roles) {
      * -----------------------------------------------------------------------
      */
     const { name } = require('../zos.json')
-    exportArtifacts(name, 'Library')
+    exportArtifacts(name)
 }
 
 module.exports = (cb, a) => {

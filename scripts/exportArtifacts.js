@@ -8,7 +8,7 @@ const outDir = './artifacts/'
 const network = process.env.NETWORK || 'development'
 const version = `v${pkg.version}`
 
-function exportArtifacts(name, substrFilter) {
+function exportArtifacts(name) {
     const zosFile = glob.sync('./zos.*.json', 'utf-8')[0]
     /* eslint-disable-next-line security/detect-non-literal-fs-filename */
     const migration = JSON.parse(fs.readFileSync(zosFile, 'utf-8').toString())
@@ -20,27 +20,25 @@ function exportArtifacts(name, substrFilter) {
     console.log(name, version, network)
 
     contractNames.forEach((contractName) => {
-        if (contractName.indexOf(substrFilter) > -1) {
-            /* eslint-disable-next-line no-console */
-            console.log('Skipping library file: ', contractName)
-        } else {
-            /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-            const contract = JSON.parse(fs.readFileSync(`${buildDir}${contractName}.json`, 'utf-8').toString())
+        /* eslint-disable-next-line no-console */
+        console.log(`Exporting artifact: ${contractName}`)
 
-            generateFunctionSignaturesInABI(contract.abi)
+        /* eslint-disable-next-line security/detect-non-literal-fs-filename */
+        const contract = JSON.parse(fs.readFileSync(`${buildDir}${contractName}.json`, 'utf-8').toString())
 
-            const artifact = {
-                abi: contract.abi,
-                bytecode: contract.bytecode,
-                address: proxies[`${name}/${contractName}`][0].address,
-                version
-            }
+        generateFunctionSignaturesInABI(contract.abi)
 
-            const filename = `${contractName}.${network.toLowerCase()}.json`
-
-            /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-            fs.writeFileSync(`${outDir}${filename}`, JSON.stringify(artifact, null, 2))
+        const artifact = {
+            abi: contract.abi,
+            bytecode: contract.bytecode,
+            address: proxies[`${name}/${contractName}`][0].address,
+            version
         }
+
+        const filename = `${contractName}.${network.toLowerCase()}.json`
+
+        /* eslint-disable-next-line security/detect-non-literal-fs-filename */
+        fs.writeFileSync(`${outDir}${filename}`, JSON.stringify(artifact, null, 2))
     })
 }
 
