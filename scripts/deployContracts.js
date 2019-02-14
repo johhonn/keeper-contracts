@@ -3,11 +3,13 @@
 const { execSync } = require('child_process')
 const fs = require('fs')
 const glob = require('glob')
+const { argv } = require('yargs')
+const { encodeCall } = require('zos-lib')
+const contract = require('truffle-contract')
+
 const { exportArtifacts } = require('./exportArtifacts')
 const { setupWallet } = require('./setupWallet')
 const pkg = require('../package.json')
-const { encodeCall } = require('zos-lib')
-const contract = require('truffle-contract')
 
 const OceanToken = artifacts.require('OceanToken')
 
@@ -246,8 +248,9 @@ async function deploy(contracts, roles) {
 }
 
 module.exports = (cb, a) => {
-    const operation = process.argv[4]
-    const contracts = process.argv.splice(5)
+    const parameters = argv._
+    const operation = parameters[2]
+    const contracts = parameters.splice(3)
     deployContracts(operation, contracts)
         .then(() => cb())
         .catch(err => cb(err))

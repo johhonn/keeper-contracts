@@ -71,6 +71,7 @@
     "truffle-hdwallet-provider": "^1.0.2",
     "web3": "1.0.0-beta.37",
     "web3-provider-engine": "^14.1.0",
+    "yargs": "^13.1.0",
     "zos": "^2.1.0",
     "zos-lib": "^2.1.0"
   }
