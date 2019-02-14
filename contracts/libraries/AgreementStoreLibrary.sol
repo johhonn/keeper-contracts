@@ -3,6 +3,14 @@ pragma solidity 0.5.3;
 
 library AgreementStoreLibrary {
 
+    event AgreementCreated(
+        bytes32 indexed _agreementId,
+        bytes32 indexed _did,
+        address indexed _sender,
+        address _didOwner,
+        bytes32 _templateId
+    );
+
     struct Agreement {
         bytes32 did;
         address didOwner;
@@ -41,6 +49,15 @@ library AgreementStoreLibrary {
             blockNumberUpdated: block.number
         });
         _self.agreementIds.push(_id);
+
+        emit AgreementCreated(
+            _id,
+            _did,
+            msg.sender,
+            _didOwner,
+            _templateId
+        );
+
         return _self.agreementIds.length;
     }
 }
