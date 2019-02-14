@@ -1,7 +1,7 @@
 pragma solidity 0.5.3;
 
 // Contain upgraded version of the contracts for test
-import "../../Dispenser.sol";
+import '../../Dispenser.sol';
 
 contract DispenserWithBug is Dispenser {
     using SafeMath for uint256;

@@ -6,13 +6,10 @@ const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 const Web3 = require('web3')
 const { encodeCall } = require('zos-lib')
-const constants = require('../helpers/constants.js')
-const testUtils = require('../helpers/utils.js')
 const deploy = require('../helpers/zos/deploy')
 const upgrade = require('../helpers/zos/upgrade')
 const loadWallet = require('../helpers/wallet/loadWallet')
 const createWallet = require('../helpers/wallet/createWallet')
-const getBalance = require('../helpers/getBalance.js')
 
 const OceanToken = artifacts.require('OceanToken')
 const Dispenser = artifacts.require('Dispenser')
@@ -25,13 +22,15 @@ const DispenserWithBug = artifacts.require('DispenserWithBug')
 contract('Dispenser', (accounts) => {
     let adminWallet,
         OceanTokenAddress,
-        DispenserAddress
+        DispenserAddress,
+        addresses,
+        owner
 
     beforeEach('Load wallet each time', async function() {
         await createWallet(true)
         adminWallet = await loadWallet('upgrader') // zos admin MultiSig
         owner = await loadWallet('owner')
-        addresses = await deploy('deploy', ['OceanToken','Dispenser'])
+        addresses = await deploy('deploy', ['OceanToken', 'Dispenser'])
         OceanTokenAddress = addresses.oceanTokenAddress
         DispenserAddress = addresses.dispenserAddress
     })
@@ -48,7 +47,7 @@ contract('Dispenser', (accounts) => {
 
     describe('Test upgradability for Dispenser', () => {
         it('Should be possible to fix/add a bug', async () => {
-            let { dispenser, oceanToken, DispenserAddress } = await setupTest()
+            let { dispenser, DispenserAddress } = await setupTest()
 
             const txId = await upgrade(
                 'Dispenser',
@@ -75,7 +74,7 @@ contract('Dispenser', (accounts) => {
             ]
 
             const tx = await owner.submitTransaction(...args, { from: accounts[1] })
-            await owner.confirmTransaction(txId, { from: accounts[2] })
+            await owner.confirmTransaction(tx.logs[0].args.transactionId.toNumber(), { from: accounts[2] })
 
             const newMaxAmount = await dispenser.getMaxAmount()
             assert.strictEqual(
@@ -86,19 +85,62 @@ contract('Dispenser', (accounts) => {
         })
 
         it('Should be possible to change function signature', async () => {
+            let { DispenserAddress } = await setupTest()
 
+            const txId = await upgrade(
+                'Dispenser',
+                'DispenserChangeFunctionSignature',
+                DispenserAddress,
+                adminWallet,
+                accounts[0]
+            )
+
+            await adminWallet.confirmTransaction(txId, { from: accounts[1] })
+            await DispenserChangeFunctionSignature.at(DispenserAddress)
         })
 
         it('Should be possible to append storage variables ', async () => {
+            let { DispenserAddress } = await setupTest()
 
+            const txId = await upgrade(
+                'Dispenser',
+                'DispenserChangeInStorage',
+                DispenserAddress,
+                adminWallet,
+                accounts[0]
+            )
+
+            await adminWallet.confirmTransaction(txId, { from: accounts[1] })
+            await DispenserChangeInStorage.at(DispenserAddress)
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
+            let { DispenserAddress } = await setupTest()
 
+            const txId = await upgrade(
+                'Dispenser',
+                'DispenserChangeInStorageAndLogic',
+                DispenserAddress,
+                adminWallet,
+                accounts[0]
+            )
+
+            await adminWallet.confirmTransaction(txId, { from: accounts[1] })
+            await DispenserChangeInStorageAndLogic.at(DispenserAddress)
         })
 
         it('Should be able to call new method added after upgrade is approved', async () => {
+            let { DispenserAddress } = await setupTest()
 
+            const txId = await upgrade(
+                'Dispenser',
+                'DispenserExtraFunctionality',
+                DispenserAddress,
+                adminWallet,
+                accounts[0]
+            )
+            await adminWallet.confirmTransaction(txId, { from: accounts[1] })
+            await DispenserExtraFunctionality.at(DispenserAddress)
         })
     })
 })

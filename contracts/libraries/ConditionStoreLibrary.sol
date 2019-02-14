@@ -68,8 +68,8 @@ library ConditionStoreLibrary {
         returns (ConditionState)
     {
         require(
-            (_self.conditions[_id].state == ConditionState.Unfulfilled) &&
-            (_newState > _self.conditions[_id].state),
+            _self.conditions[_id].state == ConditionState.Unfulfilled &&
+            _newState > _self.conditions[_id].state,
             'Invalid state transition'
         );
 

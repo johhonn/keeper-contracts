@@ -21,14 +21,14 @@ const DIDRegistryWithBug = artifacts.require('DIDRegistryWithBug')
 
 contract('DIDRegistry', (accounts) => {
     let adminWallet,
-        proxyAddress
+        proxyAddress,
+        addresses
 
     beforeEach('Load wallet each time', async function() {
         await createWallet(true)
         adminWallet = await loadWallet('upgrader') // zos admin MultiSig
-        addresses= await deploy('deploy', ['DIDRegistry'])
+        addresses = await deploy('deploy', ['DIDRegistry'])
         proxyAddress = addresses.contractAddress
-
     })
 
     async function setupTest({

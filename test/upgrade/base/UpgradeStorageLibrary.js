@@ -12,7 +12,8 @@ const StorageContractLibraryExtendedData = artifacts.require('StorageContractLib
 
 contract('StorageContract', (accounts) => {
     let adminWallet,
-        proxyAddress
+        proxyAddress,
+        addresses
 
     beforeEach('Deploy with zos before each tests', async function() {
         await createWallet(true)
