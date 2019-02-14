@@ -246,10 +246,9 @@ contract('AgreementStoreManager', (accounts) => {
             )
 
             expect((await agreementStoreManager.getAgreementListSize()).toNumber()).to.equal(1)
-            const agr = await agreementStoreManager.getAgreement(agreementId)
-            console.log('agreement: ', agr.did, agr.didOwner, result.logs)
 
             testUtils.assertEmitted(result, 1, 'AgreementCreated')
+
             const eventArgs = testUtils.getEventArgsFromTx(result, 'AgreementCreated')
             expect(eventArgs._agreementId).to.equal(agreementId)
             expect(eventArgs._did).to.equal(constants.did[0])
