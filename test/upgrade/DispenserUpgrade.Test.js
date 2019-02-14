@@ -42,7 +42,7 @@ contract('Dispenser', (accounts) => {
         const dispenser = await Dispenser.at(DispenserAddress)
         // act
         await dispenser.requestTokens(requestedAmount, { from: accounts[1] })
-        return { dispenser, oceanToken, DispenserAddress, OceanTokenAddress }
+        return { dispenser, oceanToken, DispenserAddress, OceanTokenAddress, requestedAmount }
     }
 
     describe('Test upgradability for Dispenser', () => {
@@ -77,6 +77,8 @@ contract('Dispenser', (accounts) => {
             await owner.confirmTransaction(tx.logs[0].args.transactionId.toNumber(), { from: accounts[2] })
 
             const newMaxAmount = await dispenser.getMaxAmount()
+
+            // assert
             assert.strictEqual(
                 newMaxAmount.toString(),
                 Web3.utils.toBN(20).toString(),
@@ -85,7 +87,7 @@ contract('Dispenser', (accounts) => {
         })
 
         it('Should be possible to change function signature', async () => {
-            let { DispenserAddress } = await setupTest()
+            let { DispenserAddress, requestedAmount } = await setupTest()
 
             const txId = await upgrade(
                 'Dispenser',
@@ -95,11 +97,22 @@ contract('Dispenser', (accounts) => {
                 accounts[0]
             )
 
+            // act
             await adminWallet.confirmTransaction(txId, { from: accounts[1] })
-            await DispenserChangeFunctionSignature.at(DispenserAddress)
+            const dispenser = await DispenserChangeFunctionSignature.at(DispenserAddress)
+
+            // assert
+            await assert.isRejected(
+                dispenser.requestTokens(
+                    requestedAmount,
+                    accounts[1],
+                    { from: accounts[3] }
+                ),
+                'Invalid caller address'
+            )
         })
 
-        it('Should be possible to append storage variables ', async () => {
+        it('Should be possible to append storage variable(s) ', async () => {
             let { DispenserAddress } = await setupTest()
 
             const txId = await upgrade(
@@ -110,12 +123,21 @@ contract('Dispenser', (accounts) => {
                 accounts[0]
             )
 
+            // act
             await adminWallet.confirmTransaction(txId, { from: accounts[1] })
-            await DispenserChangeInStorage.at(DispenserAddress)
+            const dispenser = await DispenserChangeInStorage.at(DispenserAddress)
+            const totalUnMintedAmount = await dispenser.totalUnMintedAmount()
+
+            // assert
+            assert.strictEqual(
+                totalUnMintedAmount.toString(),
+                Web3.utils.toBN(0).toString(),
+                'totalUnMintedAmount storage variable does not exists'
+            )
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
-            let { DispenserAddress } = await setupTest()
+            let { DispenserAddress, requestedAmount } = await setupTest()
 
             const txId = await upgrade(
                 'Dispenser',
@@ -125,8 +147,27 @@ contract('Dispenser', (accounts) => {
                 accounts[0]
             )
 
+            // act
             await adminWallet.confirmTransaction(txId, { from: accounts[1] })
-            await DispenserChangeInStorageAndLogic.at(DispenserAddress)
+            const dispenser = await DispenserChangeInStorageAndLogic.at(DispenserAddress)
+
+            const totalUnMintedAmount = await dispenser.totalUnMintedAmount()
+
+            // assert
+            assert.strictEqual(
+                totalUnMintedAmount.toString(),
+                Web3.utils.toBN(0).toString(),
+                'totalUnMintedAmount storage variable does not exists'
+            )
+
+            await assert.isRejected(
+                dispenser.requestTokens(
+                    requestedAmount,
+                    accounts[1],
+                    { from: accounts[3] }
+                ),
+                'Invalid caller address'
+            )
         })
 
         it('Should be able to call new method added after upgrade is approved', async () => {
@@ -139,8 +180,17 @@ contract('Dispenser', (accounts) => {
                 adminWallet,
                 accounts[0]
             )
+
+            // act
             await adminWallet.confirmTransaction(txId, { from: accounts[1] })
-            await DispenserExtraFunctionality.at(DispenserAddress)
+            const dispenser = await DispenserExtraFunctionality.at(DispenserAddress)
+
+            // assert
+            assert.strictEqual(
+                await dispenser.dummyFunction(),
+                true,
+                'failed to inject a new method!'
+            )
         })
     })
 })
