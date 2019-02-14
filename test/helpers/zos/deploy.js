@@ -211,7 +211,7 @@ async function deploy(contracts, roles) {
     // exportArtifacts(name, 'Library')
 
     console.log(contractAddress)
-    return { contractAddress, oceanTokenAddress, dispenserAddress }
+    return contractAddress
 }
 
 module.exports = deployContracts

@@ -63,7 +63,7 @@ contract AgreementStoreManager is Ownable {
     {
         require(
             templateStoreManager.isTemplateApproved(msg.sender) == true,
-            'Template not active'
+            'Template not Approved'
         );
         require(
             _conditionIds.length == _conditionTypes.length &&

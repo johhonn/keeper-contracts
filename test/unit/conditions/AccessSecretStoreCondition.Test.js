@@ -23,8 +23,8 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
     } = {}) {
         const epochLibrary = await EpochLibrary.new()
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
-
         const conditionStoreManager = await ConditionStoreManager.new()
+
         const templateStoreManager = await TemplateStoreManager.new()
         await templateStoreManager.initialize(
             owner,
