@@ -3,10 +3,10 @@ pragma solidity 0.5.3;
 import '../conditions/AccessSecretStoreCondition.sol';
 import '../conditions/LockRewardCondition.sol';
 import '../conditions/rewards/EscrowReward.sol';
-import './Template.sol';
+import './AgreementTemplate.sol';
 
 
-contract EscrowAccessSecretStoreTemplate is Template {
+contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
 
     AccessSecretStoreCondition private accessSecretStoreCondition;
     LockRewardCondition private lockRewardCondition;
@@ -17,7 +17,7 @@ contract EscrowAccessSecretStoreTemplate is Template {
         address _agreementStoreManagerAddress,
         address _accessSecretStoreConditionAddress,
         address _lockRewardConditionAddress,
-        address payable _escrowRewardAddress
+        address _escrowRewardAddress
     )
         public
         initializer()

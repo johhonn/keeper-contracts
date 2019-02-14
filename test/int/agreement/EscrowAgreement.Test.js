@@ -180,12 +180,22 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
             // fulfill lock reward
             await oceanToken.mint(sender, amount, { from: owner })
 
+            assert.strictEqual(await getBalance(oceanToken, sender), amount)
+            assert.strictEqual(await getBalance(oceanToken, lockRewardCondition.address), 0)
+            assert.strictEqual(await getBalance(oceanToken, escrowReward.address), 0)
+            assert.strictEqual(await getBalance(oceanToken, receiver), 0)
+
             await oceanToken.approve(
                 lockRewardCondition.address,
                 amount,
                 { from: sender })
 
             await lockRewardCondition.fulfill(agreementId, escrowReward.address, amount)
+
+            assert.strictEqual(await getBalance(oceanToken, sender), 0)
+            assert.strictEqual(await getBalance(oceanToken, lockRewardCondition.address), 0)
+            assert.strictEqual(await getBalance(oceanToken, escrowReward.address), amount)
+            assert.strictEqual(await getBalance(oceanToken, receiver), 0)
 
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(conditionIdLock)).toNumber(),
@@ -212,6 +222,9 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
                 constants.condition.state.fulfilled
             )
 
+            assert.strictEqual(await getBalance(oceanToken, sender), 0)
+            assert.strictEqual(await getBalance(oceanToken, lockRewardCondition.address), 0)
+            assert.strictEqual(await getBalance(oceanToken, escrowReward.address), 0)
             assert.strictEqual(await getBalance(oceanToken, receiver), amount)
         })
 

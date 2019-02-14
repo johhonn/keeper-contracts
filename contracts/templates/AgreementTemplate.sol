@@ -1,10 +1,10 @@
-pragma solidity ^0.5.3;
+pragma solidity 0.5.3;
 
 import './TemplateStoreLibrary.sol';
 import '../agreements/AgreementStoreManager.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
-contract Template is Ownable {
+contract AgreementTemplate is Ownable {
 
     using TemplateStoreLibrary for TemplateStoreLibrary.TemplateList;
 

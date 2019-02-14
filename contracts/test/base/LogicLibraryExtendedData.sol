@@ -14,7 +14,10 @@ library LogicLibraryExtendedData {
         _self.s = _s;
     }
 
-    function getS(LogicLibraryExtendedData.S storage _self) public view returns (uint s, address sender){
+    function getS(LogicLibraryExtendedData.S storage _self)
+        public view
+        returns (uint s, address sender)
+    {
         s = _self.s;
         sender = _self.sender;
     }

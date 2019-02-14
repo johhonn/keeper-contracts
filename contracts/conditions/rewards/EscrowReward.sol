@@ -23,7 +23,7 @@ contract EscrowReward is Reward {
         token = OceanToken(_tokenAddress);
     }
 
-    function() external payable {}
+//    function() external payable {}
 
     function hashValues(
         uint256 _amount,

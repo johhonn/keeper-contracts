@@ -117,8 +117,6 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('contract should not initialize without arguments', async () => {
-            const owner = accounts[0]
-
             const conditionStoreManager = await ConditionStoreManager.new()
 
             // setup with zero fails

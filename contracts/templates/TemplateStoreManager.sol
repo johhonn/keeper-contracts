@@ -11,7 +11,7 @@ contract TemplateStoreManager is Ownable {
 
     modifier onlyOwnerOrTemplateOwner(address _id){
         require(
-            owner() == msg.sender ||
+            isOwner() ||
             templateList.templates[_id].owner == msg.sender,
             'Invalid UpdateRole'
         );
