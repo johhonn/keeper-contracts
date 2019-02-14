@@ -12,7 +12,7 @@ const upgrade = require('../helpers/zos/upgrade')
 const loadWallet = require('../helpers/wallet/loadWallet')
 const createWallet = require('../helpers/wallet/createWallet')
 
-const DIDRegistryUpgradeTest = artifacts.require('DIDRegistry')
+const DIDRegistry = artifacts.require('DIDRegistry')
 const DIDRegistryChangeFunctionSignature = artifacts.require('DIDRegistryChangeFunctionSignature')
 const DIDRegistryChangeInStorage = artifacts.require('DIDRegistryChangeInStorage')
 const DIDRegistryChangeInStorageAndLogic = artifacts.require('DIDRegistryChangeInStorageAndLogic')
@@ -21,22 +21,26 @@ const DIDRegistryWithBug = artifacts.require('DIDRegistryWithBug')
 
 contract('DIDRegistry', (accounts) => {
     let adminWallet,
-        proxy,
         proxyAddress
-    const did = constants.did[0]
 
-    beforeEach('Deploy with zos before each tests', async function() {
+    beforeEach('Load wallet each time', async function() {
         await createWallet(true)
         adminWallet = await loadWallet('upgrader') // zos admin MultiSig
         proxyAddress = await deploy('deploy', ['DIDRegistry'])
-        proxy = await DIDRegistryUpgradeTest.at(proxyAddress)
+    })
 
-        const checksum = testUtils.generateId()
-        const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+    async function setupTest({
+        did = constants.did[0],
+        owner = accounts[0],
+        checksum = testUtils.generateId(),
+        value = 'https://example.com/did/ocean/test-attr-example.txt'
+    } = {}) {
+        const proxy = await DIDRegistry.at(proxyAddress)
 
         let result = await proxy.registerAttribute(
             did, checksum, value
         )
+        // some quick checks
 
         testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
@@ -45,10 +49,13 @@ contract('DIDRegistry', (accounts) => {
         assert.strictEqual(accounts[0], payload.owner)
         assert.strictEqual(checksum, payload.checksum)
         assert.strictEqual(value, payload.value)
-    })
+
+        return { proxy, did, checksum, value }
+    }
 
     describe('Test upgradability for DIDRegistry', () => {
         it('Should be possible to fix/add a bug', async () => {
+            let { proxy } = await setupTest()
             // Upgrade to new version
             const txId = await upgrade(
                 'DIDRegistry',
@@ -81,6 +88,7 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('Should be possible to change function signature', async () => {
+            let { proxy } = await setupTest()
             // Upgrade to new version
             const txId = await upgrade(
                 'DIDRegistry',
@@ -114,6 +122,7 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('Should be possible to append storage variables ', async () => {
+            let { proxy, did } = await setupTest()
             // Upgrade to new version
             const txId = await upgrade(
                 'DIDRegistry',
@@ -127,7 +136,6 @@ contract('DIDRegistry', (accounts) => {
 
             // should not be able to be called before upgrade is approved
             await testUtils.assertRevert(proxy.timeOfRegister(did))
-
             // call again after approved
             await adminWallet.confirmTransaction(txId, { from: accounts[1] })
             assert.equal(
@@ -136,6 +144,7 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
+            let { proxy, did } = await setupTest()
             // Upgrade to new version
             const txId = await upgrade(
                 'DIDRegistry',
@@ -177,6 +186,7 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('Should be able to call new method added after upgrade is approved', async () => {
+            let { proxy } = await setupTest()
             // Upgrade to new version
             const txId = await upgrade(
                 'DIDRegistry',
