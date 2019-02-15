@@ -2,16 +2,14 @@ pragma solidity 0.5.3;
 
 import 'openzeppelin-eth/contracts/math/SafeMath.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
-import 'zos-lib/contracts/Initializable.sol';
 import './OceanToken.sol';
-
 
 /**
  * @title Ocean Protocol Dispenser Contract
  * @author Ocean Protocol Team
  * @dev All function calls are currently implemented without side effects
  */
-contract Dispenser is Initializable, Ownable {
+contract Dispenser is Ownable {
 
     using SafeMath for uint256;
     using SafeMath for uint;

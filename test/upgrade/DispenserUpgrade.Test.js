@@ -103,10 +103,10 @@ contract('Dispenser', (accounts) => {
 
             // assert
             await assert.isRejected(
-                dispenser.requestTokens(
-                    requestedAmount,
+                dispenser.setMinPeriod(
+                    0,
                     accounts[1],
-                    { from: accounts[3] }
+                    { from: accounts[0] }
                 ),
                 'Invalid caller address'
             )
@@ -161,10 +161,10 @@ contract('Dispenser', (accounts) => {
             )
 
             await assert.isRejected(
-                dispenser.requestTokens(
-                    requestedAmount,
+                dispenser.setMinPeriod(
+                    0,
                     accounts[1],
-                    { from: accounts[3] }
+                    { from: accounts[0] }
                 ),
                 'Invalid caller address'
             )
