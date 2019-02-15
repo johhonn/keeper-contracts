@@ -1,7 +1,7 @@
 pragma solidity 0.5.3;
 
 import './Condition.sol';
-import '../storage/AgreementStoreManager.sol';
+import '../agreements/AgreementStoreManager.sol';
 import '../ISecretStore.sol';
 
 contract AccessSecretStoreCondition is Condition {

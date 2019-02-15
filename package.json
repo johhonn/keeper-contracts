@@ -16,12 +16,17 @@
     "deploy:rinkeby": "export NETWORK=rinkeby&&npm run deploy -- --network rinkeby",
     "deploy:mainnet": "export NETWORK=mainnet&&npm run deploy -- --network mainnet",
     "upgrade": "npx truffle exec ./scripts/deployContracts.js upgrade",
+    "upgrade:spree": "export NETWORK=spree&&npm run upgrade -- --network spree",
+    "upgrade:nile": "export NETWORK=nile&&npm run upgrade -- --network nile",
+    "upgrade:kovan": "export NETWORK=kovan&&npm run upgrade -- --network kovan",
+    "upgrade:rinkeby": "export NETWORK=rinkeby&&npm run upgrade -- --network rinkeby",
+    "upgrade:mainnet": "export NETWORK=mainnet&&npm run upgrade -- --network mainnet",
+    "test": "npm run test:ensurewallet&& truffle test",
     "test:ensurewallet": "if [ -z ${NETWORK} ]; then export NETWORK='development'; fi && if [ ! -f ./wallets.json ]; then truffle exec ./scripts/setupWalletWrapper.js --network $NETWORK; fi",
     "test:unit": "truffle test $(find ./test/unit/ -name '*.js')",
     "test:integration": "truffle test $(find ./test/int/ -name '*.js')",
     "test:fast": "truffle test $(find ./test/unit/ -name '*.js') $(find ./test/int/ -name '*.js')",
     "test:upgrade": "npm run clean && npm run compile && truffle test $(find ./test/upgrade/ -name '*.js')",
-    "test": "npm run test:ensurewallet&& truffle test",
     "test:cover": "export NETWORK='coverage' && solidity-coverage",
     "report-coverage": "cat ./coverage/lcov.info | codacy-coverage --token b95545c0da4b45848cc5eef363c2711e  --prefix ./",
     "release": "./bumpversion.sh patch",
@@ -31,8 +36,8 @@
     "lint:ethlint": "solium -d ./contracts/",
     "lint:ethlint:watch": "npm run lint:solium -- --watch",
     "lint:fix": "npm run lint:eslint -- --fix && npm run lint:solium -- --fix",
-    "security:mythril": "truffle compile && myth -x --truffle --max-depth 8 --outform markdown 2>&1 | tee mythrilReport.md || true",
-    "security:securify": "docker run -v $(pwd):/project chainsecurity/securify 2>&1 | tee securifyReport.txt || true",
+    "security:mythril": "truffle compile && myth -x --truffle --max-depth 12 --outform markdown 2>&1 | tee mythrilReport.md",
+    "security:securify": "docker run -v $(pwd):/project chainsecurity/securify -t 2>&1 | tee securifyReport.txt",
     "security:surya": "surya graph contracts/**/*.sol | dot -Tpng > KeeperContracts.png"
   },
   "directories": {
@@ -51,7 +56,7 @@
   "author": "Ocean Protocol",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@oceanprotocol/multisigwallet": "git+https://github.com/oceanprotocol/MultiSigWallet.git#v0.2.0",
+    "@oceanprotocol/multisigwallet": "git+https://github.com/oceanprotocol/MultiSigWallet.git#v2.0.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "chai-subset": "^1.6.0",
@@ -65,13 +70,14 @@
     "openzeppelin-eth": "^2.1.3",
     "should": "^13.2.3",
     "solidity-coverage": "^0.5.11",
+    "solium": "^1.2.3",
     "solium-plugin-security": "^0.1.1",
-    "truffle": "^5.0.2",
-    "truffle-contract": "^4.0.4",
-    "truffle-hdwallet-provider": "^1.0.2",
+    "truffle": "^5.0.4",
+    "truffle-contract": "^4.0.5",
+    "truffle-hdwallet-provider": "^1.0.4",
     "web3": "1.0.0-beta.37",
     "web3-provider-engine": "^14.1.0",
-    "zos": "^2.1.0",
-    "zos-lib": "^2.1.0"
+    "zos": "~2.1.0",
+    "zos-lib": "~2.1.0"
   }
 }
