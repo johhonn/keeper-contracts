@@ -10,7 +10,6 @@ contract DispenserChangeFunctionSignature is Dispenser {
         address caller
     )
         public
-        isValidAddress(msg.sender)
         returns (bool tokensTransferred)
     {
         require(
