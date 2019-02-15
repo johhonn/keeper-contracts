@@ -7,9 +7,10 @@ const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
-const EpochLibrary = artifacts.require('EpochLibrary.sol')
-const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
-const SignCondition = artifacts.require('SignCondition.sol')
+const EpochLibrary = artifacts.require('EpochLibrary')
+const ConditionStoreManager = artifacts.require('ConditionStoreManager')
+const SignCondition = artifacts.require('SignCondition')
+
 const constants = require('../../helpers/constants.js')
 
 contract('SignCondition constructor', (accounts) => {

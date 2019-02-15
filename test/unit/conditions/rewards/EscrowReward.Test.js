@@ -7,11 +7,12 @@ const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
-const EpochLibrary = artifacts.require('EpochLibrary.sol')
-const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
-const OceanToken = artifacts.require('OceanToken.sol')
-const LockRewardCondition = artifacts.require('LockRewardCondition.sol')
-const EscrowReward = artifacts.require('EscrowReward.sol')
+const EpochLibrary = artifacts.require('EpochLibrary')
+const ConditionStoreManager = artifacts.require('ConditionStoreManager')
+const OceanToken = artifacts.require('OceanToken')
+const LockRewardCondition = artifacts.require('LockRewardCondition')
+const EscrowReward = artifacts.require('EscrowReward')
+
 const constants = require('../../../helpers/constants.js')
 
 contract('EscrowReward constructor', (accounts) => {

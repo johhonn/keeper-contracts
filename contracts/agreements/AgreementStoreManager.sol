@@ -13,6 +13,14 @@ contract AgreementStoreManager is Ownable {
     TemplateStoreManager private templateStoreManager;
     AgreementStoreLibrary.AgreementList private agreementList;
 
+    event AgreementCreated(
+        bytes32 indexed _agreementId,
+        bytes32 indexed _did,
+        address indexed _sender,
+        address _didOwner,
+        address _templateId
+    );
+
     function initialize(
         address _sender
     )
@@ -80,13 +88,23 @@ contract AgreementStoreManager is Ownable {
                 _timeOuts[i]
             );
         }
-        return agreementList.create(
+        agreementList.create(
             _id,
             _did,
             _didOwner,
             msg.sender,
             _conditionIds
         );
+
+        emit AgreementCreated(
+            _id,
+            _did,
+            msg.sender,
+            _didOwner,
+            msg.sender
+        );
+
+        return getAgreementListSize();
     }
 
     function getAgreement(bytes32 _id)

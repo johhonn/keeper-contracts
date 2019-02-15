@@ -7,9 +7,10 @@ const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
-const EpochLibrary = artifacts.require('EpochLibrary.sol')
-const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
-const HashLockCondition = artifacts.require('HashLockCondition.sol')
+const EpochLibrary = artifacts.require('EpochLibrary')
+const ConditionStoreManager = artifacts.require('ConditionStoreManager')
+const HashLockCondition = artifacts.require('HashLockCondition')
+
 const constants = require('../../helpers/constants.js')
 
 contract('HashLockCondition constructor', (accounts) => {

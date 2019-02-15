@@ -138,14 +138,13 @@ The contract addresses deployed on Ocean Nile testnet:
 
 | Contract                  | Version | Address                                      |
 |---------------------------|---------|----------------------------------------------|
-| AccessConditions          | v0.6.12 | `0x1be580a31d79a7facf1f5c70d8f2727f2ede75bd` |
-| ComputeConditions         | v0.6.12 | `0x3a0dd5af939cce8df99acadd6a13afa13957cd59` |
-| DIDRegistry               | v0.6.12 | `0x9d306ca587ff4b311c7963e62f48f3d6b59ec1a1` |
-| Dispenser                 | v0.6.12 | `0xb8b0ec3ac0bf28ebb47b3cce4b1b7607dd7fa2db` |
-| FitchainConditions        | v0.6.12 | `0xb875d1126a4d17ef1cccb44707e8585ccd5b854e` |
-| OceanToken                | v0.6.12 | `0x88caa68f41dd7cfdd431bca036e11bd20ef58882` |
-| PaymentConditions         | v0.6.12 | `0xc00b256ff109edaa5a375799cfb7386221863329` |
-| ServiceExecutionAgreement | v0.6.12 | `0xffcb6bea15bbf19dd3bcdc82f1864a92f359284a` |
+| ConditionStoreManager     | v0.7.0  | `0xa11ab1263ae3df547a9bbf705218975c497893f9` |
+| DIDRegistry               | v0.7.0  | `0x121d92f7ec45f91f504e946ce35d08a27ca7c401` |
+| Dispenser                 | v0.7.0  | `0xe489ac0bae65042de3e48890ed5829520872728d` |
+| HashLockCondition         | v0.7.0  | `0x9dd31d43b418b6f3361a264a90c782be9b11f151` |
+| LockRewardCondition       | v0.7.0  | `0x393851125bcac3f90006451998b9b222f205b815` |
+| OceanToken                | v0.7.0  | `0xaab0f2bf4b9267440caedaf32a9cfa6f27befc41` |
+| SignCondition             | v0.7.0  | `0x3066e8a50e42d63c1bf612cad991d07bc16457de` |
 
 #### Kovan Testnet
 
