@@ -5,7 +5,7 @@ import '../../libraries/EpochLibrary.sol';
 import '../../libraries/ConditionStoreLibrary.sol';
 import 'zos-lib/contracts/Initializable.sol';
 
-contract ConditionStoreChangeInFunctionSignature is Initializable, Common {
+contract ConditionStoreChangeFunctionSignature is Initializable, Common {
 
     using ConditionStoreLibrary for ConditionStoreLibrary.ConditionList;
     using EpochLibrary for EpochLibrary.EpochList;

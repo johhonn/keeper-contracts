@@ -5,7 +5,7 @@ import '../../libraries/EpochLibrary.sol';
 import '../../libraries/ConditionStoreLibrary.sol';
 import 'zos-lib/contracts/Initializable.sol';
 
-contract ConditionStoreChangeInStorageAndLogic is Initializable, Common {
+contract ConditionStoreWithBug is Initializable, Common {
 
     using ConditionStoreLibrary for ConditionStoreLibrary.ConditionList;
     using EpochLibrary for EpochLibrary.EpochList;
