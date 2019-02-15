@@ -1,11 +1,11 @@
 /* eslint-env mocha */
 /* global assert */
 const Web3 = require('web3')
+const constants = require('./constants')
 
 const utils = {
     getWeb3: () => {
-        const nodeUrl = `http://localhost:${process.env.ETHEREUM_RPC_PORT || '8545'}`
-        return new Web3(new Web3.providers.HttpProvider(nodeUrl))
+        return new Web3(new Web3.providers.HttpProvider(constants.keeper.nodeUrl))
     },
 
     generateId: () => {
