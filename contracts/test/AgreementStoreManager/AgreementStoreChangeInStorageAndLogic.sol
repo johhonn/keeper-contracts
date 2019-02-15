@@ -5,5 +5,5 @@ import './AgreementStoreChangeInStorage.sol';
 
 contract AgreementStoreChangeInStorageAndLogic is
     AgreementStoreChangeFunctionSignature,
-    AgreementStoreChangeInStorage
-{}
+    AgreementStoreChangeInStorage {
+}
