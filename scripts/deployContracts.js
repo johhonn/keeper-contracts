@@ -244,6 +244,7 @@ async function deploy(contracts, roles) {
      * -----------------------------------------------------------------------
      */
 
+    // TODO: @sebastian - please check
     if (agreementStoreManagerAddress) {
         const conditionStoreManager = await ConditionStoreManager.at(conditionStoreManagerAddress)
         await conditionStoreManager.initialize(
