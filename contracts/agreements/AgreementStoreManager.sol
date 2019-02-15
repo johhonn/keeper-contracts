@@ -9,9 +9,9 @@ contract AgreementStoreManager is Ownable {
 
     using AgreementStoreLibrary for AgreementStoreLibrary.AgreementList;
 
-    ConditionStoreManager private conditionStoreManager;
-    TemplateStoreManager private templateStoreManager;
-    AgreementStoreLibrary.AgreementList private agreementList;
+    ConditionStoreManager internal conditionStoreManager;
+    TemplateStoreManager internal templateStoreManager;
+    AgreementStoreLibrary.AgreementList internal agreementList;
 
     event AgreementCreated(
         bytes32 indexed _agreementId,
