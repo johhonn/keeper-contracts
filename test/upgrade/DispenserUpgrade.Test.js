@@ -10,6 +10,7 @@ const deploy = require('../helpers/zos/deploy')
 const upgrade = require('../helpers/zos/upgrade')
 const loadWallet = require('../helpers/wallet/loadWallet')
 const createWallet = require('../helpers/wallet/createWallet')
+const testUtils = require('../helpers/utils')
 
 const OceanToken = artifacts.require('OceanToken')
 const Dispenser = artifacts.require('Dispenser')
@@ -102,14 +103,13 @@ contract('Dispenser', (accounts) => {
             const dispenser = await DispenserChangeFunctionSignature.at(DispenserAddress)
 
             // assert
-            await assert.isRejected(
-                dispenser.setMinPeriod(
-                    requestedAmount,
-                    accounts[1],
-                    { from: accounts[0] }
-                ),
-                'Invalid caller address'
+            const result = await dispenser.setMinPeriod(
+                requestedAmount,
+                accounts[1],
+                { from: accounts[0] }
             )
+
+            testUtils.assertEmitted(result, 1, 'DispenserChangeFunctionSignatureEvent')
         })
 
         it('Should be possible to append storage variable(s) ', async () => {
@@ -159,15 +159,13 @@ contract('Dispenser', (accounts) => {
                 Web3.utils.toBN(0).toString(),
                 'totalUnMintedAmount storage variable does not exists'
             )
-
-            await assert.isRejected(
-                dispenser.setMinPeriod(
-                    requestedAmount,
-                    accounts[1],
-                    { from: accounts[0] }
-                ),
-                'Invalid caller address'
+            const result = await dispenser.setMinPeriod(
+                requestedAmount,
+                accounts[1],
+                { from: accounts[0] }
             )
+
+            testUtils.assertEmitted(result, 1, 'DispenserChangeFunctionSignatureEvent')
         })
 
         it('Should be able to call new method added after upgrade is approved', async () => {
