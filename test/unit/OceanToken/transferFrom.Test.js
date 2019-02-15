@@ -1,16 +1,11 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, assert, contract, describe, it, before, beforeEach */
+/* global artifacts, assert, contract, describe, it, beforeEach */
 const OceanToken = artifacts.require('OceanToken')
 
 contract('OceanToken', (accounts) => {
     let oceanToken
-    let spender
-
-    before('restore state before all tests', async () => {
-        /* eslint-disable-next-line */
-        spender = accounts[1]
-    })
+    const spender = accounts[1]
 
     describe('transferFrom', () => {
         beforeEach('mint tokens before each test', async () => {
