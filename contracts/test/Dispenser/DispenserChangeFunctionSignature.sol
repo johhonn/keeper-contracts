@@ -9,7 +9,7 @@ import '../../OceanToken.sol';
  * @author Ocean Protocol Team
  * @dev All function calls are currently implemented without side effects
  */
-contract Dispenser is Ownable {
+contract DispenserChangeFunctionSignature is Ownable {
 
     using SafeMath for uint256;
     using SafeMath for uint;
