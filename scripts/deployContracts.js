@@ -7,7 +7,7 @@ const { argv } = require('yargs')
 const { encodeCall } = require('zos-lib')
 const contract = require('truffle-contract')
 
-const { exportArtifacts } = require('./exportArtifacts')
+const { exportArtifacts, updateArtifacts } = require('./exportArtifacts')
 const { setupWallet } = require('./setupWallet')
 const pkg = require('../package.json')
 
@@ -95,6 +95,7 @@ async function requestContractUpgrade(contractName, upgraderRole, adminWallet) {
     ]
     const tx = await adminWallet.submitTransaction(...args, { from: upgraderRole })
     console.log(`Upgraded contract: ${p[1]}`)
+    updateArtifacts(p[1], p[0])
     return tx.logs[0].args.transactionId.toNumber()
 }
 

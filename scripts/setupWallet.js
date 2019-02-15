@@ -27,7 +27,7 @@ async function setupWallet(web3) {
     // create account list for MultiSig
     const multiSigAccounts = accounts.slice(1, accountAmount)
 
-    console.log(`Setting owner to:\n ${JSON.stringify(multiSigAccounts, null, 2)}`)
+    console.log(`Using multisig owners:\n ${JSON.stringify(multiSigAccounts, null, 2)}`)
 
     const walletParameters = [
         multiSigAccounts,
