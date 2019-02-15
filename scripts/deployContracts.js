@@ -12,6 +12,7 @@ const { setupWallet } = require('./setupWallet')
 const pkg = require('../package.json')
 
 const OceanToken = artifacts.require('OceanToken')
+const ConditionStoreManager = artifacts.require('ConditionStoreManager')
 
 process.chdir('../')
 
@@ -31,11 +32,16 @@ const timeout = 36000
 // List of contracts
 const contractNames = [
     'ConditionStoreManager',
+    'TemplateStoreManager',
+    'AgreementStoreManager',
     'SignCondition',
     'HashLockCondition',
+    'LockRewardCondition',
+    'AccessSecretStoreCondition',
+    'EscrowReward',
+    'EscrowAccessSecretStoreTemplate',
     'OceanToken',
     'Dispenser',
-    'LockRewardCondition',
     'DIDRegistry'
 ]
 
@@ -160,7 +166,12 @@ async function deploy(contracts, roles) {
 
     let conditionStoreManagerAddress,
         oceanTokenAddress,
-        dispenserAddress
+        dispenserAddress,
+        templateStoreManagerAddress,
+        agreementStoreManagerAddress,
+        lockRewardConditionAddress,
+        escrowRewardAddress,
+        accessSecretStoreConditionAddress
 
     // v0.7
     if (contracts.indexOf('DIDRegistry') > -1) {
@@ -171,23 +182,59 @@ async function deploy(contracts, roles) {
         oceanTokenAddress = execSync(`npx zos create OceanToken --init --args ${roles.owner},${roles.initialMinter} -v`).toString().trim()
     }
 
-    if (contracts.indexOf('Dispenser') > -1) {
-        dispenserAddress = execSync(`npx zos create Dispenser --init initialize --args ${oceanTokenAddress},${roles.owner} -v`).toString().trim()
+    if (oceanTokenAddress) {
+        if (contracts.indexOf('Dispenser') > -1) {
+            dispenserAddress = execSync(`npx zos create Dispenser --init initialize --args ${oceanTokenAddress},${roles.owner} -v`).toString().trim()
+        }
     }
 
     if (contracts.indexOf('ConditionStoreManager') > -1) {
         conditionStoreManagerAddress = execSync(`npx zos create ConditionStoreManager`).toString().trim()
     }
 
-    if (conditionStoreManagerAddress && oceanTokenAddress) {
+    if (contracts.indexOf('TemplateStoreManager') > -1) {
+        templateStoreManagerAddress = execSync(`npx zos create TemplateStoreManager --init initialize --args ${roles.owner} -v`).toString().trim()
+    }
+
+    if (conditionStoreManagerAddress) {
         if (contracts.indexOf('SignCondition') > -1) {
-            execSync(`npx zos create SignCondition --init initialize --args ${conditionStoreManagerAddress} -v`)
+            execSync(`npx zos create SignCondition --init initialize --args ${roles.owner},${conditionStoreManagerAddress} -v`)
         }
         if (contracts.indexOf('HashLockCondition') > -1) {
-            execSync(`npx zos create HashLockCondition --init initialize --args ${conditionStoreManagerAddress} -v`)
+            execSync(`npx zos create HashLockCondition --init initialize --args ${roles.owner},${conditionStoreManagerAddress} -v`)
         }
+    }
+
+    if (conditionStoreManagerAddress &&
+        templateStoreManagerAddress) {
+        if (contracts.indexOf('AgreementStoreManager') > -1) {
+            agreementStoreManagerAddress = execSync(`npx zos create AgreementStoreManager --init initialize --args ${roles.owner},${conditionStoreManagerAddress},${templateStoreManagerAddress} -v`).toString().trim()
+        }
+    }
+
+    if (conditionStoreManagerAddress &&
+        oceanTokenAddress) {
         if (contracts.indexOf('LockRewardCondition') > -1) {
-            execSync(`npx zos create LockRewardCondition --init initialize --args ${conditionStoreManagerAddress},${oceanTokenAddress} -v`)
+            lockRewardConditionAddress = execSync(`npx zos create LockRewardCondition --init initialize --args ${roles.owner},${conditionStoreManagerAddress},${oceanTokenAddress} -v`).toString().trim()
+        }
+        if (contracts.indexOf('EscrowReward') > -1) {
+            escrowRewardAddress = execSync(`npx zos create EscrowReward --init initialize --args ${roles.owner},${conditionStoreManagerAddress},${oceanTokenAddress} -v`).toString().trim()
+        }
+    }
+
+    if (conditionStoreManagerAddress &&
+        agreementStoreManagerAddress) {
+        if (contracts.indexOf('AccessSecretStoreCondition') > -1) {
+            accessSecretStoreConditionAddress = execSync(`npx zos create AccessSecretStoreCondition --init initialize --args ${roles.owner},${conditionStoreManagerAddress},${agreementStoreManagerAddress} -v`).toString().trim()
+        }
+    }
+
+    if (agreementStoreManagerAddress &&
+        accessSecretStoreConditionAddress &&
+        lockRewardConditionAddress &&
+        escrowRewardAddress) {
+        if (contracts.indexOf('EscrowAccessSecretStoreTemplate') > -1) {
+            execSync(`npx zos create EscrowAccessSecretStoreTemplate --init initialize --args ${roles.owner},${agreementStoreManagerAddress},${accessSecretStoreConditionAddress},${lockRewardConditionAddress},${escrowRewardAddress} -v`)
         }
     }
 
@@ -196,26 +243,35 @@ async function deploy(contracts, roles) {
      * setup deployed contracts
      * -----------------------------------------------------------------------
      */
+
+    if (agreementStoreManagerAddress) {
+        const conditionStoreManager = await ConditionStoreManager.at(conditionStoreManagerAddress)
+        await conditionStoreManager.initialize(
+            roles.owner,
+            agreementStoreManagerAddress,
+            { from: roles.upgrader })
+    }
+
     if (oceanTokenAddress) {
         const oceanToken = await OceanToken.at(oceanTokenAddress)
 
-        if (oceanTokenAddress && dispenserAddress) {
+        if (dispenserAddress) {
             console.log(`adding dispenser as a minter ${dispenserAddress} from ${roles.initialMinter}`)
             await oceanToken.addMinter(
                 dispenserAddress,
                 { from: roles.initialMinter })
         }
 
-        console.log(`Renouning initialMinter as a minter from ${roles.initialMinter}`)
+        console.log(`Renouncing initialMinter as a minter from ${roles.initialMinter}`)
         await oceanToken.renounceMinter({ from: roles.initialMinter })
     }
 
     /*
      * -----------------------------------------------------------------------
-     * Change admin priviliges to multisig
+     * Change admin privileges to multisig
      * -----------------------------------------------------------------------
      */
-    console.log(`Setting zos-admin to MultiSigWsllet ${roles.admin}`)
+    console.log(`Setting zos-admin to MultiSigWallet ${roles.admin}`)
     for (const contract of contracts) {
         execSync(`npx zos set-admin ${contract} ${roles.admin} --yes`)
     }
