@@ -238,7 +238,7 @@ contract('AgreementStoreManager', (accounts) => {
                 timeLocks: [0, 1],
                 timeOuts: [2, 3]
             }
-            const agreementId = '0x0000000000000000000000000000000000000000000000000000000000000009'
+            const agreementId = testUtils.generateId()
 
             const result = await agreementStoreManager.createAgreement(
                 agreementId,
