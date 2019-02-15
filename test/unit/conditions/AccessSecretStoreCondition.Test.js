@@ -222,7 +222,6 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
 
             await accessSecretStoreCondition.fulfill(nonce, documentId, grantee)
 
-            console.log('test')
             await assert.isRejected(
                 accessSecretStoreCondition.fulfill(nonce, documentId, grantee),
                 constants.condition.state.error.invalidStateTransition
