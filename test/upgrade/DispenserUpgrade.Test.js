@@ -104,7 +104,7 @@ contract('Dispenser', (accounts) => {
             // assert
             await assert.isRejected(
                 dispenser.setMinPeriod(
-                    0,
+                    requestedAmount,
                     accounts[1],
                     { from: accounts[0] }
                 ),
@@ -162,7 +162,7 @@ contract('Dispenser', (accounts) => {
 
             await assert.isRejected(
                 dispenser.setMinPeriod(
-                    0,
+                    requestedAmount,
                     accounts[1],
                     { from: accounts[0] }
                 ),
