@@ -8,6 +8,7 @@ contract LockRewardCondition is Condition {
     OceanToken private token;
 
     function initialize(
+        address _owner,
         address _conditionStoreManagerAddress,
         address _tokenAddress
     )
@@ -19,6 +20,7 @@ contract LockRewardCondition is Condition {
             _conditionStoreManagerAddress != address(0),
             'Invalid address'
         );
+        Ownable.initialize(_owner);
         conditionStoreManager = ConditionStoreManager(
             _conditionStoreManagerAddress
         );

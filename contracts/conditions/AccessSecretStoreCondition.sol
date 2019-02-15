@@ -11,12 +11,14 @@ contract AccessSecretStoreCondition is Condition {
     AgreementStoreManager private agreementStoreManager;
 
     function initialize(
+        address _owner,
         address _conditionStoreManagerAddress,
         address _agreementStoreManagerAddress
     )
         public
         initializer()
     {
+        Ownable.initialize(_owner);
         conditionStoreManager = ConditionStoreManager(
             _conditionStoreManagerAddress
         );

@@ -43,9 +43,9 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
         await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
         const agreementStoreManager = await AgreementStoreManager.new({ from: deployer })
         await agreementStoreManager.initialize(
+            owner,
             conditionStoreManager.address,
             templateStoreManager.address,
-            owner,
             { from: deployer }
         )
 
@@ -60,6 +60,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
 
         const lockRewardCondition = await LockRewardCondition.new({ from: deployer })
         await lockRewardCondition.initialize(
+            owner,
             conditionStoreManager.address,
             oceanToken.address,
             { from: deployer }
@@ -68,6 +69,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
         const accessSecretStoreCondition = await AccessSecretStoreCondition.new({ from: deployer })
 
         await accessSecretStoreCondition.initialize(
+            owner,
             conditionStoreManager.address,
             agreementStoreManager.address,
             { from: deployer }
@@ -75,6 +77,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
 
         const escrowReward = await EscrowReward.new({ from: deployer })
         await escrowReward.initialize(
+            owner,
             conditionStoreManager.address,
             oceanToken.address,
             { from: deployer }

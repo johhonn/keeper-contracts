@@ -6,7 +6,10 @@ import 'openzeppelin-eth/contracts/cryptography/ECDSA.sol';
 
 contract SignCondition is Condition {
 
-    function initialize(address _conditionStoreManagerAddress)
+    function initialize(
+        address _owner,
+        address _conditionStoreManagerAddress
+    )
         public
         initializer()
     {
@@ -14,6 +17,7 @@ contract SignCondition is Condition {
             _conditionStoreManagerAddress != address(0),
             'Invalid address'
         );
+        Ownable.initialize(_owner);
         conditionStoreManager = ConditionStoreManager(
             _conditionStoreManagerAddress
         );

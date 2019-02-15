@@ -37,7 +37,11 @@ contract('ConditionStoreManager', (accounts) => {
         )
 
         const hashLockCondition = await HashLockCondition.new()
-        await hashLockCondition.initialize(conditionStoreManager.address, { from: owner })
+        await hashLockCondition.initialize(
+            owner,
+            conditionStoreManager.address,
+            { from: owner }
+        )
 
         return {
             common,
@@ -126,18 +130,6 @@ contract('ConditionStoreManager', (accounts) => {
             )
         })
 
-        it('contract should not initialize with one argument', async () => {
-            const owner = accounts[0]
-
-            const conditionStoreManager = await ConditionStoreManager.new()
-
-            // setup with zero fails
-            await assert.isRejected(
-                conditionStoreManager.initialize(owner),
-                constants.initialize.error.invalidNumberParamsGot1Expected2
-            )
-        })
-
         it('anyone should not change createRole after initialize', async () => {
             const createRole = accounts[0]
             const owner = accounts[1]
@@ -155,7 +147,10 @@ contract('ConditionStoreManager', (accounts) => {
             const otherCreateRole = accounts[2]
             assert.notEqual(otherCreateRole, createRole)
             await assert.isRejected(
-                conditionStoreManager.initialize(otherCreateRole),
+                conditionStoreManager.initialize(
+                    owner,
+                    otherCreateRole
+                ),
                 'Contract instance has already been initialized'
             )
             assert.strictEqual(

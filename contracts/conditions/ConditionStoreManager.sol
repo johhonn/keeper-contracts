@@ -33,18 +33,6 @@ contract ConditionStoreManager is Ownable, Common {
     }
 
     function initialize(
-        address _sender
-    )
-        public
-        initializer
-    {
-        require(
-            true == false,
-            'Invalid number of parameters for "initialize". Got 1 expected 2!'
-        );
-    }
-
-    function initialize(
         address _owner,
         address _createRole
     )

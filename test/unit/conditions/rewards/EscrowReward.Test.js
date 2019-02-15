@@ -37,6 +37,7 @@ contract('EscrowReward constructor', (accounts) => {
 
         const lockRewardCondition = await LockRewardCondition.new()
         await lockRewardCondition.initialize(
+            owner,
             conditionStoreManager.address,
             oceanToken.address,
             { from: owner }
@@ -44,6 +45,7 @@ contract('EscrowReward constructor', (accounts) => {
 
         const escrowReward = await EscrowReward.new()
         await escrowReward.initialize(
+            owner,
             conditionStoreManager.address,
             oceanToken.address,
             { from: createRole }
@@ -71,6 +73,7 @@ contract('EscrowReward constructor', (accounts) => {
 
             const escrowReward = await EscrowReward.new()
             await escrowReward.initialize(
+                accounts[0],
                 conditionStoreManager.address,
                 oceanToken.address,
                 { from: accounts[0] }

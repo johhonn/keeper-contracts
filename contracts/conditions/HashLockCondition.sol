@@ -4,7 +4,10 @@ import './Condition.sol';
 
 contract HashLockCondition is Condition {
 
-    function initialize(address _conditionStoreManagerAddress)
+    function initialize(
+        address _owner,
+        address _conditionStoreManagerAddress
+    )
         public
         initializer()
     {
@@ -12,6 +15,7 @@ contract HashLockCondition is Condition {
             _conditionStoreManagerAddress != address(0),
             'Invalid address'
         );
+        Ownable.initialize(_owner);
         conditionStoreManager = ConditionStoreManager(
             _conditionStoreManagerAddress
         );
