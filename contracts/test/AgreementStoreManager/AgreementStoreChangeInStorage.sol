@@ -1,7 +1,7 @@
 pragma solidity 0.5.3;
 
 // Contain upgraded version of the contracts for test
-import '../../storage/AgreementStoreManager.sol';
+import '../../agreements/AgreementStoreManager.sol';
 
 contract AgreementStoreChangeInStorage is AgreementStoreManager {
 

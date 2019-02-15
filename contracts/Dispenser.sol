@@ -18,18 +18,18 @@ contract Dispenser is Initializable, Ownable {
 
     // limit period for request of tokens
     // mapping from address to last time of request
-    mapping(address => uint256) private tokenRequests;
-    uint256 private totalMintAmount;
+    mapping(address => uint256) internal tokenRequests;
+    uint256 internal totalMintAmount;
 
     // max amount of tokens user can get for each request
-    uint256 private maxAmount;
+    uint256 internal maxAmount;
 
     // max amount of tokens that can be minted using this dispenser in total
-    uint256 private maxMintAmount;
+    uint256 internal maxMintAmount;
 
      // min amount of time to wait before request token again
-    uint256 private minPeriod;
-    uint256 private scale;
+    uint256 internal minPeriod;
+    uint256 internal scale;
 
     OceanToken public oceanToken;
 

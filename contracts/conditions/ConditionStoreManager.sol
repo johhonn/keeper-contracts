@@ -12,8 +12,8 @@ contract ConditionStoreManager is Ownable, Common {
     using EpochLibrary for EpochLibrary.EpochList;
 
     address private createRole;
-    ConditionStoreLibrary.ConditionList private conditionList;
-    EpochLibrary.EpochList private epochList;
+    ConditionStoreLibrary.ConditionList internal conditionList;
+    EpochLibrary.EpochList internal epochList;
 
     modifier onlyCreateRole(){
         require(
