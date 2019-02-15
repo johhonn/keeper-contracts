@@ -23,7 +23,8 @@ contract OceanToken is Initializable, Ownable, ERC20Detailed, ERC20Capped {
         address _owner,
         address _initialMinter
     )
-        public initializer()
+        public
+        initializer
     {
         uint256 CAP = 1410000000;
         uint256 TOTALSUPPLY = CAP.mul(10 ** 18);

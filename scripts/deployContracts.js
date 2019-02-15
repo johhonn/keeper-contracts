@@ -3,11 +3,13 @@
 const { execSync } = require('child_process')
 const fs = require('fs')
 const glob = require('glob')
-const { exportArtifacts } = require('./exportArtifacts')
-const { setupWallet } = require('./setupWallet')
-const pkg = require('../package.json')
+const { argv } = require('yargs')
 const { encodeCall } = require('zos-lib')
 const contract = require('truffle-contract')
+
+const { exportArtifacts, updateArtifacts } = require('./exportArtifacts')
+const { setupWallet } = require('./setupWallet')
+const pkg = require('../package.json')
 
 const OceanToken = artifacts.require('OceanToken')
 
@@ -69,7 +71,7 @@ async function getAddressForImplementation(contractName) {
 }
 
 async function loadWallet(name) {
-    console.log(`Loading wallet ${name}`)
+    console.log(`Loading ${name} wallet`)
     /* eslint-disable-next-line security/detect-non-literal-fs-filename */
     const wallets = JSON.parse(fs.readFileSync(walletPath))
     const walletAddress = wallets.find((wallet) => wallet.name === name).address
@@ -77,23 +79,23 @@ async function loadWallet(name) {
         contract(require('@oceanprotocol/multisigwallet/build/contracts/MultiSigWalletWithDailyLimit.json'))
     MultiSigWalletWithDailyLimit.setProvider(web3.currentProvider)
     const wallet = await MultiSigWalletWithDailyLimit.at(walletAddress)
-    console.log(`Loaded wallet ${name} ${wallet.address}`)
+    console.log(`Loaded ${name} wallet at ${wallet.address}`)
     return wallet
 }
 
-async function requestContractUpgrade(contractName, deployerRole, adminWallet) {
-    console.log(`Upgrading contract: ${contractName}`)
+async function requestContractUpgrade(contractName, upgraderRole, adminWallet) {
     const p = contractName.split(':')
+    console.log(`Upgrading contract: ${p[1]} with ${p[0]}`)
     const implementationAddress = await getAddressForImplementation(p[1])
     const upgradeCallData = encodeCall('upgradeTo', ['address'], [implementationAddress])
     const args = [
         require(`../artifacts/${p[1]}.${NETWORK.toLowerCase()}.json`).address,
-        0,
+        0, // value in ether
         upgradeCallData
     ]
-    console.log(args)
-    const tx = await adminWallet.submitTransaction(...args, { from: deployerRole })
-    console.log(`Upgraded contract ${contractName}`)
+    const tx = await adminWallet.submitTransaction(...args, { from: upgraderRole })
+    console.log(`Upgraded contract: ${p[1]}`)
+    updateArtifacts(p[1], p[0])
     return tx.logs[0].args.transactionId.toNumber()
 }
 
@@ -118,7 +120,8 @@ async function deployContracts(operation = 'deploy', contracts) {
 
     const roles = {
         deployer: accounts[0],
-        initialMinter: accounts[1],
+        upgrader: accounts[1],
+        initialMinter: accounts[2],
         owner: ownerWallet.address,
         admin: adminWallet.address
     }
@@ -147,7 +150,7 @@ async function deployContracts(operation = 'deploy', contracts) {
 
         for (const contractName of contracts) {
             // const transactionId =
-            await requestContractUpgrade(contractName, roles.deployer, adminWallet)
+            await requestContractUpgrade(contractName, roles.upgrader, adminWallet)
         }
     }
 }
@@ -242,12 +245,13 @@ async function deploy(contracts, roles) {
      * -----------------------------------------------------------------------
      */
     const { name } = require('../zos.json')
-    exportArtifacts(name, 'Library')
+    exportArtifacts(name)
 }
 
 module.exports = (cb, a) => {
-    const operation = process.argv[4]
-    const contracts = process.argv.splice(5)
+    const parameters = argv._
+    const operation = parameters[2]
+    const contracts = parameters.splice(3)
     deployContracts(operation, contracts)
         .then(() => cb())
         .catch(err => cb(err))

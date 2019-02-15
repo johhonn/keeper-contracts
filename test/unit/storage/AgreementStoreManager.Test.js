@@ -7,12 +7,13 @@ const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
-const Common = artifacts.require('Common.sol')
-const EpochLibrary = artifacts.require('EpochLibrary.sol')
-const AgreementStoreLibrary = artifacts.require('AgreementStoreLibrary.sol')
-const ConditionStoreManager = artifacts.require('ConditionStoreManager.sol')
-const TemplateStoreManager = artifacts.require('TemplateStoreManager.sol')
-const AgreementStoreManager = artifacts.require('AgreementStoreManager.sol')
+const Common = artifacts.require('Common')
+const EpochLibrary = artifacts.require('EpochLibrary')
+const AgreementStoreLibrary = artifacts.require('AgreementStoreLibrary')
+const ConditionStoreManager = artifacts.require('ConditionStoreManager')
+const TemplateStoreManager = artifacts.require('TemplateStoreManager')
+const AgreementStoreManager = artifacts.require('AgreementStoreManager')
+
 const constants = require('../../helpers/constants.js')
 
 contract('AgreementStoreManager', (accounts) => {
