@@ -1,7 +1,7 @@
 pragma solidity 0.5.3;
 
 import './Reward.sol';
-import '../../libraries/ConditionStoreLibrary.sol';
+import '../ConditionStoreLibrary.sol';
 
 contract EscrowReward is Reward {
 
@@ -22,8 +22,6 @@ contract EscrowReward is Reward {
         );
         token = OceanToken(_tokenAddress);
     }
-
-    function() external payable {}
 
     function hashValues(
         uint256 _amount,

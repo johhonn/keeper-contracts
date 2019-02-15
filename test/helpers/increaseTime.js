@@ -1,7 +1,5 @@
-const Web3 = require('web3')
-const constants = require('./constants.js')
-
-const web3 = new Web3(new Web3.providers.HttpProvider(constants.keeper.nodeUrl))
+const testUtils = require('./utils')
+const web3 = testUtils.getWeb3()
 
 // source: https://michalzalecki.com/ethereum-test-driven-introduction-to-solidity-part-2/
 const increaseTime = function increaseTime(duration) {

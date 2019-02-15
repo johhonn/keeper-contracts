@@ -23,7 +23,7 @@ contract DIDRegistry is Initializable, Ownable {
         uint updatedAt
     );
 
-    mapping(bytes32 => DIDRegister) private didRegister;
+    mapping(bytes32 => DIDRegister) internal didRegister;
 
     modifier onlyValidDIDArgs(
         bytes32 did,

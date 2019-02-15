@@ -20,27 +20,26 @@ contract('EscrowReward constructor', (accounts) => {
         conditionId = constants.bytes32.one,
         conditionType = constants.address.dummy,
         createRole = accounts[0],
-        setupConditionStoreManager = true
+        owner = accounts[1]
     } = {}) {
         const epochLibrary = await EpochLibrary.new()
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
         const conditionStoreManager = await ConditionStoreManager.new()
-        if (setupConditionStoreManager) {
-            await conditionStoreManager.initialize(
-                createRole,
-                { from: accounts[0] }
-            )
-        }
+        await conditionStoreManager.initialize(
+            owner,
+            createRole,
+            { from: owner }
+        )
 
         const oceanToken = await OceanToken.new()
-        await oceanToken.initialize(createRole, createRole)
+        await oceanToken.initialize(owner, owner)
 
         const lockRewardCondition = await LockRewardCondition.new()
         await lockRewardCondition.initialize(
             conditionStoreManager.address,
             oceanToken.address,
-            { from: createRole }
+            { from: owner }
         )
 
         const escrowReward = await EscrowReward.new()
@@ -50,7 +49,16 @@ contract('EscrowReward constructor', (accounts) => {
             { from: createRole }
         )
 
-        return { escrowReward, lockRewardCondition, oceanToken, conditionStoreManager, conditionId, conditionType, createRole }
+        return {
+            escrowReward,
+            lockRewardCondition,
+            oceanToken,
+            conditionStoreManager,
+            conditionId,
+            conditionType,
+            createRole,
+            owner
+        }
     }
 
     describe('deploy and setup', () => {
@@ -97,7 +105,13 @@ contract('EscrowReward constructor', (accounts) => {
 
     describe('fulfill existing condition', () => {
         it('should fulfill if conditions exist for account address', async () => {
-            const { escrowReward, lockRewardCondition, oceanToken, conditionStoreManager } = await setupTest()
+            const {
+                escrowReward,
+                lockRewardCondition,
+                oceanToken,
+                conditionStoreManager,
+                owner
+            } = await setupTest()
 
             let nonce = constants.bytes32.one
             let sender = accounts[0]
@@ -130,7 +144,7 @@ contract('EscrowReward constructor', (accounts) => {
                 conditionId,
                 escrowReward.address)
 
-            await oceanToken.mint(sender, amount)
+            await oceanToken.mint(sender, amount, { from: owner })
             await oceanToken.approve(
                 lockRewardCondition.address,
                 amount,

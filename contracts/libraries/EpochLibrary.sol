@@ -16,28 +16,7 @@ library EpochLibrary {
         mapping(bytes32 => Epoch) epochs;
         bytes32[] epochIds;
     }
-
-    modifier onlyValidTimeMargin(
-        uint256 timeLock,
-        uint256 timeOut)
-    {
-        require(
-            timeLock >= 0,
-            'Invalid time margin'
-        );
-        require(
-            timeOut >= 0,
-            'Invalid time margin'
-        );
-        if(timeOut > 0 && timeLock > 0){
-            require(
-                timeLock < timeOut,
-                'Invalid time margin'
-            );
-        }
-        _;
-    }
-
+    
    /**
     * @notice create creates new Epoch
     * @param _self is the Epoch storage pointer
@@ -51,9 +30,22 @@ library EpochLibrary {
         uint256 _timeOut
     )
         internal
-        onlyValidTimeMargin(_timeLock, _timeOut)
         returns (uint size)
     {
+        require(
+            _timeLock >= 0,
+            'Invalid time margin'
+        );
+        require(
+            _timeOut >= 0,
+            'Invalid time margin'
+        );
+        if(_timeOut > 0 && _timeLock > 0){
+            require(
+                _timeLock < _timeOut,
+                'Invalid time margin'
+            );
+        }
         _self.epochs[_id] = Epoch({
             timeLock: _timeLock,
             timeOut: _timeOut,

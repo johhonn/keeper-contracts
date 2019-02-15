@@ -1,6 +1,6 @@
 pragma solidity 0.5.3;
 
-import '../storage/ConditionStoreManager.sol';
+import './ConditionStoreManager.sol';
 import 'zos-lib/contracts/Initializable.sol';
 
 contract Condition is Initializable {

@@ -3,17 +3,13 @@
 const { execSync } = require('child_process')
 const fs = require('fs')
 const glob = require('glob')
-const { argv } = require('yargs')
+// const { exportArtifacts } = require('./exportArtifacts')
+const createWallet = require('../wallet/createWallet')
+const loadWallet = require('../wallet/loadWallet')
+const pkg = require('../../../package.json')
 const { encodeCall } = require('zos-lib')
-const contract = require('truffle-contract')
-
-const { exportArtifacts, updateArtifacts } = require('./exportArtifacts')
-const { setupWallet } = require('./setupWallet')
-const pkg = require('../package.json')
 
 const OceanToken = artifacts.require('OceanToken')
-
-process.chdir('../')
 
 /*
  *-----------------------------------------------------------------------
@@ -21,8 +17,7 @@ process.chdir('../')
  * -----------------------------------------------------------------------
  * Config variables for initializers
  */
-const walletPath = './wallets.json'
-// load NETWORK from environment
+
 const NETWORK = process.env.NETWORK || 'development'
 // load current version from package
 const VERSION = `v${pkg.version}`
@@ -37,17 +32,13 @@ const contractNames = [
     'Dispenser',
     'LockRewardCondition',
     'DIDRegistry'
+//    'ServiceExecutionAgreement',
+//    'LockRewardCondition'
+//    'AccessConditions',
+//    'FitchainConditions',
+//    'ComputeConditions',
+//    'PaymentConditions',
 ]
-
-// prepare multisig wallet
-async function createWallet() {
-    if (fs.existsSync(walletPath)) {
-        console.log('wallets.json already exists')
-    } else {
-        await setupWallet(web3, artifacts)
-    }
-    return JSON.parse(fs.readFileSync(walletPath, 'utf-8').toString())
-}
 
 async function getAddressForImplementation(contractName) {
     let files = glob.sync('./zos.dev-*.json')
@@ -61,38 +52,25 @@ async function getAddressForImplementation(contractName) {
     return imp.address
 }
 
-async function loadWallet(name) {
-    console.log(`Loading ${name} wallet`)
-    /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-    const wallets = JSON.parse(fs.readFileSync(walletPath))
-    const walletAddress = wallets.find((wallet) => wallet.name === name).address
-    const MultiSigWalletWithDailyLimit =
-        contract(require('@oceanprotocol/multisigwallet/build/contracts/MultiSigWalletWithDailyLimit.json'))
-    MultiSigWalletWithDailyLimit.setProvider(web3.currentProvider)
-    const wallet = await MultiSigWalletWithDailyLimit.at(walletAddress)
-    console.log(`Loaded ${name} wallet at ${wallet.address}`)
-    return wallet
-}
-
-async function requestContractUpgrade(contractName, upgraderRole, adminWallet) {
+async function requestContractUpgrade(contractName, deployerRole, adminWallet, contractAddress) {
+    console.log(`Upgrading contract: ${contractName}`)
     const p = contractName.split(':')
-    console.log(`Upgrading contract: ${p[1]} with ${p[0]}`)
     const implementationAddress = await getAddressForImplementation(p[1])
     const upgradeCallData = encodeCall('upgradeTo', ['address'], [implementationAddress])
     const args = [
-        require(`../artifacts/${p[1]}.${NETWORK.toLowerCase()}.json`).address,
-        0, // value in ether
+        contractAddress || require(`../artifacts/${p[1]}.${NETWORK.toLowerCase()}.json`).address,
+        0,
         upgradeCallData
     ]
-    const tx = await adminWallet.submitTransaction(...args, { from: upgraderRole })
-    console.log(`Upgraded contract: ${p[1]}`)
-    updateArtifacts(p[1], p[0])
+    console.log(args)
+    const tx = await adminWallet.submitTransaction(...args, { from: deployerRole })
+    console.log(`Upgraded contract ${contractName}`)
     return tx.logs[0].args.transactionId.toNumber()
 }
 
-async function deployContracts(operation = 'deploy', contracts) {
+async function deployContracts(operation = 'deploy', contracts, contractAddress) {
     contracts = !contracts || contracts.length === 0 ? contractNames : contracts
-
+    console.log(contracts)
     /*
      * -----------------------------------------------------------------------
      * Script setup
@@ -111,8 +89,7 @@ async function deployContracts(operation = 'deploy', contracts) {
 
     const roles = {
         deployer: accounts[0],
-        upgrader: accounts[1],
-        initialMinter: accounts[2],
+        initialMinter: accounts[1],
         owner: ownerWallet.address,
         admin: adminWallet.address
     }
@@ -135,14 +112,15 @@ async function deployContracts(operation = 'deploy', contracts) {
 
     if (operation === 'deploy') {
         execSync(`npx zos push --skip-compile -v`)
-        await deploy(contracts, roles)
+        return deploy(contracts, roles)
     } else if (operation === 'upgrade') {
         execSync(`npx zos push --force --skip-compile -v`)
 
+        let transactionId
         for (const contractName of contracts) {
-            // const transactionId =
-            await requestContractUpgrade(contractName, roles.upgrader, adminWallet)
+            transactionId = await requestContractUpgrade(contractName, roles.deployer, adminWallet, contractAddress)
         }
+        return transactionId
     }
 }
 
@@ -160,37 +138,41 @@ async function deploy(contracts, roles) {
 
     let conditionStoreManagerAddress,
         oceanTokenAddress,
-        dispenserAddress
+        dispenserAddress,
+        contractAddress
 
     // v0.7
+    if (contracts.indexOf('StorageContract') > -1) {
+        contractAddress = execSync(`npx zos create StorageContract`).toString().trim()
+    }
+
     if (contracts.indexOf('DIDRegistry') > -1) {
-        execSync(`npx zos create DIDRegistry --init initialize --args ${roles.owner}`)
+        contractAddress = execSync(`npx zos create DIDRegistry --init initialize --args ${roles.owner}`).toString().trim()
     }
 
     if (contracts.indexOf('OceanToken') > -1) {
-        oceanTokenAddress = execSync(`npx zos create OceanToken --init --args ${roles.owner},${roles.initialMinter} -v`).toString().trim()
+        contractAddress = oceanTokenAddress = execSync(`npx zos create OceanToken --init --args ${roles.owner},${roles.initialMinter} -v`).toString().trim()
     }
 
     if (contracts.indexOf('Dispenser') > -1) {
-        dispenserAddress = execSync(`npx zos create Dispenser --init initialize --args ${oceanTokenAddress},${roles.owner} -v`).toString().trim()
+        contractAddress = dispenserAddress = execSync(`npx zos create Dispenser --init initialize --args ${oceanTokenAddress},${roles.owner} -v`).toString().trim()
     }
 
     if (contracts.indexOf('ConditionStoreManager') > -1) {
-        conditionStoreManagerAddress = execSync(`npx zos create ConditionStoreManager`).toString().trim()
+        contractAddress = conditionStoreManagerAddress = execSync(`npx zos create ConditionStoreManager`).toString().trim()
     }
 
     if (conditionStoreManagerAddress && oceanTokenAddress) {
         if (contracts.indexOf('SignCondition') > -1) {
-            execSync(`npx zos create SignCondition --init initialize --args ${conditionStoreManagerAddress} -v`)
+            contractAddress = execSync(`npx zos create SignCondition --init initialize --args ${conditionStoreManagerAddress} -v`).toString().trim()
         }
         if (contracts.indexOf('HashLockCondition') > -1) {
-            execSync(`npx zos create HashLockCondition --init initialize --args ${conditionStoreManagerAddress} -v`)
+            contractAddress = execSync(`npx zos create HashLockCondition --init initialize --args ${conditionStoreManagerAddress} -v`).toString().trim()
         }
         if (contracts.indexOf('LockRewardCondition') > -1) {
-            execSync(`npx zos create LockRewardCondition --init initialize --args ${conditionStoreManagerAddress},${oceanTokenAddress} -v`)
+            contractAddress = execSync(`npx zos create LockRewardCondition --init initialize --args ${conditionStoreManagerAddress},${oceanTokenAddress} -v`).toString().trim()
         }
     }
-
     /*
      * -----------------------------------------------------------------------
      * setup deployed contracts
@@ -225,15 +207,11 @@ async function deploy(contracts, roles) {
      * export artifacts
      * -----------------------------------------------------------------------
      */
-    const { name } = require('../zos.json')
-    exportArtifacts(name)
+    // const { name } = require('../zos.json')
+    // exportArtifacts(name, 'Library')
+
+    console.log(contractAddress)
+    return contractAddress
 }
 
-module.exports = (cb, a) => {
-    const parameters = argv._
-    const operation = parameters[2]
-    const contracts = parameters.splice(3)
-    deployContracts(operation, contracts)
-        .then(() => cb())
-        .catch(err => cb(err))
-}
+module.exports = deployContracts

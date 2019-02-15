@@ -45,11 +45,7 @@ contract LockRewardCondition is Condition {
         returns (ConditionStoreLibrary.ConditionState)
     {
         require(
-            token.transferFrom(msg.sender, address(this), _amount),
-            'Could not transfer token'
-        );
-        require(
-            token.transfer(_rewardAddress, _amount),
+            token.transferFrom(msg.sender, _rewardAddress, _amount),
             'Could not transfer token'
         );
         return super.fulfill(

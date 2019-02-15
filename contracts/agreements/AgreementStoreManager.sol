@@ -1,11 +1,11 @@
 pragma solidity 0.5.3;
 
-import './ConditionStoreManager.sol';
-import './TemplateStoreManager.sol';
-import '../libraries/AgreementStoreLibrary.sol';
-import 'zos-lib/contracts/Initializable.sol';
+import '../conditions/ConditionStoreManager.sol';
+import '../templates/TemplateStoreManager.sol';
+import './AgreementStoreLibrary.sol';
+import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
-contract AgreementStoreManager is Initializable {
+contract AgreementStoreManager is Ownable {
 
     using AgreementStoreLibrary for AgreementStoreLibrary.AgreementList;
 
@@ -18,19 +18,33 @@ contract AgreementStoreManager is Initializable {
         bytes32 indexed _did,
         address indexed _sender,
         address _didOwner,
-        bytes32 _templateId
+        address _templateId
     );
 
     function initialize(
+        address _sender
+    )
+        public
+        initializer
+    {
+        require(
+            true == false,
+            'Invalid number of parameters for "initialize". Got 1 expected 3!'
+        );
+    }
+
+    function initialize(
         address _conditionStoreManagerAddress,
-        address _templateStoreManagerAddress
+        address _templateStoreManagerAddress,
+        address _owner
     )
         public
         initializer()
     {
         require(
             _conditionStoreManagerAddress != address(0) &&
-            _templateStoreManagerAddress != address(0),
+            _templateStoreManagerAddress != address(0) &&
+            _owner != address(0),
             'Invalid address'
         );
 
@@ -40,13 +54,14 @@ contract AgreementStoreManager is Initializable {
         templateStoreManager = TemplateStoreManager(
             _templateStoreManagerAddress
         );
+        Ownable.initialize(_owner);
     }
 
     function createAgreement(
         bytes32 _id,
         bytes32 _did,
         address _didOwner,
-        bytes32 _templateId,
+        address[] memory _conditionTypes,
         bytes32[] memory _conditionIds,
         uint[] memory _timeLocks,
         uint[] memory _timeOuts
@@ -55,24 +70,20 @@ contract AgreementStoreManager is Initializable {
         returns (uint size)
     {
         require(
-            templateStoreManager.isTemplateActive(_templateId) == true,
-            'Template not active'
+            templateStoreManager.isTemplateApproved(msg.sender) == true,
+            'Template not Approved'
         );
-
-        address[] memory conditionTypes = templateStoreManager
-            .getConditionTypes(_templateId);
-
         require(
-            _conditionIds.length == conditionTypes.length &&
-            _timeLocks.length == conditionTypes.length &&
-            _timeOuts.length == conditionTypes.length,
+            _conditionIds.length == _conditionTypes.length &&
+            _timeLocks.length == _conditionTypes.length &&
+            _timeOuts.length == _conditionTypes.length,
             'Arguments have wrong length'
         );
 
-        for (uint256 i = 0; i < conditionTypes.length; i++) {
+        for (uint256 i = 0; i < _conditionTypes.length; i++) {
             conditionStoreManager.createCondition(
                 _conditionIds[i],
-                conditionTypes[i],
+                _conditionTypes[i],
                 _timeLocks[i],
                 _timeOuts[i]
             );
@@ -81,7 +92,7 @@ contract AgreementStoreManager is Initializable {
             _id,
             _did,
             _didOwner,
-            _templateId,
+            msg.sender,
             _conditionIds
         );
 
@@ -90,11 +101,10 @@ contract AgreementStoreManager is Initializable {
             _did,
             msg.sender,
             _didOwner,
-            _templateId
+            msg.sender
         );
 
         return getAgreementListSize();
-
     }
 
     function getAgreement(bytes32 _id)
@@ -103,7 +113,7 @@ contract AgreementStoreManager is Initializable {
         returns (
             bytes32 did,
             address didOwner,
-            bytes32 templateId,
+            address templateId,
             bytes32[] memory conditionIds,
             address lastUpdatedBy,
             uint256 blockNumberUpdated
