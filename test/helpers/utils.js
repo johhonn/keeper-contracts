@@ -1,7 +1,6 @@
 /* eslint-env mocha */
 /* global assert */
 const Web3 = require('web3')
-const abi = require('ethereumjs-abi')
 
 const utils = {
     getWeb3: () => {
