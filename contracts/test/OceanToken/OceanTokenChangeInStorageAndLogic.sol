@@ -5,15 +5,16 @@ import '../../OceanToken.sol';
 import 'openzeppelin-eth/contracts/math/SafeMath.sol';
 
 
-contract OceanTokenExtraFunctionality is OceanToken {
+contract OceanTokenChangeInStorageAndLogic is OceanToken {
     using SafeMath for uint256;
     //returns a number
     function incrementMintCount()
-        public view
+        public
         returns(uint256)
     {
-        return mintCount.add(1);
+        mintCount = mintCount.add(1);
+        return mintCount;
     }
 
-    uint256 mintCount;
+    uint256 public mintCount;
 }

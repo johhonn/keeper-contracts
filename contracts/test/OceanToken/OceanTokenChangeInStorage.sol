@@ -4,7 +4,7 @@ pragma solidity 0.5.3;
 import '../../OceanToken.sol';
 
 
-contract OceanTokenExtraFunctionality is OceanToken {
+contract OceanTokenChangeInStorage is OceanToken {
     using SafeMath for uint256;
-    uint256 mintCount;
+    uint256 public mintCount;
 }
