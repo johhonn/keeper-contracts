@@ -3,15 +3,13 @@ pragma solidity 0.5.3;
 import 'openzeppelin-eth/contracts/token/ERC20/ERC20Capped.sol';
 import 'openzeppelin-eth/contracts/token/ERC20/ERC20Detailed.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
-import 'zos-lib/contracts/Initializable.sol';
-
 
 /**
  * @title Ocean Protocol ERC20 Token Contract
  * @author Ocean Protocol Team
  * @dev All function calls are currently implemented without side effects
  */
-contract OceanToken is Initializable, Ownable, ERC20Detailed, ERC20Capped {
+contract OceanToken is Ownable, ERC20Detailed, ERC20Capped {
 
     using SafeMath for uint256;
 
