@@ -20,18 +20,11 @@ contract DispenserWithBug is Dispenser {
         maxAmount = 20;
     }
 
-    /**
-     * @dev the Owner can set the max amount for token requests
-     * @param amount the max amount of tokens that can be requested
-     */
-    function setMaxMintAmount(
-        uint amount
-    )
+    function getMaxAmount()
         public
-        onlyOwner
+        view
+        returns(uint256)
     {
-        // set max amount for each request
-        // adding bug here
-        maxMintAmount = amount.mul(scale);
+        return maxAmount;
     }
 }
