@@ -13,6 +13,14 @@ contract AgreementStoreManager is Initializable {
     TemplateStoreManager private templateStoreManager;
     AgreementStoreLibrary.AgreementList private agreementList;
 
+    event AgreementCreated(
+        bytes32 indexed _agreementId,
+        bytes32 indexed _did,
+        address indexed _sender,
+        address _didOwner,
+        bytes32 _templateId
+    );
+
     function initialize(
         address _conditionStoreManagerAddress,
         address _templateStoreManagerAddress
@@ -69,13 +77,24 @@ contract AgreementStoreManager is Initializable {
                 _timeOuts[i]
             );
         }
-        return agreementList.create(
+        agreementList.create(
             _id,
             _did,
             _didOwner,
             _templateId,
             _conditionIds
         );
+
+        emit AgreementCreated(
+            _id,
+            _did,
+            msg.sender,
+            _didOwner,
+            _templateId
+        );
+
+        return getAgreementListSize();
+
     }
 
     function getAgreement(bytes32 _id)

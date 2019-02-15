@@ -15,6 +15,7 @@ const TemplateStoreManager = artifacts.require('TemplateStoreManager')
 const AgreementStoreManager = artifacts.require('AgreementStoreManager')
 
 const constants = require('../../helpers/constants.js')
+const testUtils = require('../../helpers/utils.js')
 
 contract('AgreementStoreManager', (accounts) => {
     async function setupTest({
@@ -216,6 +217,45 @@ contract('AgreementStoreManager', (accounts) => {
                 ),
                 constants.condition.id.error.idAlreadyExists
             )
+        })
+
+        it('create agreement should emit `AgreementCreated` event', async () => {
+            const { agreementStoreManager, templateStoreManager } = await setupTest()
+
+            const templateId = constants.bytes32.one
+            await templateStoreManager.createTemplate(
+                templateId,
+                [
+                    constants.address.dummy,
+                    accounts[0]
+                ]
+            )
+
+            const agreement = {
+                did: constants.did[0],
+                didOwner: constants.address.dummy,
+                templateId: templateId,
+                conditionIds: [constants.bytes32.zero, constants.bytes32.one],
+                timeLocks: [0, 1],
+                timeOuts: [2, 3]
+            }
+            const agreementId = testUtils.generateId()
+
+            const result = await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement)
+            )
+
+            expect((await agreementStoreManager.getAgreementListSize()).toNumber()).to.equal(1)
+
+            testUtils.assertEmitted(result, 1, 'AgreementCreated')
+
+            const eventArgs = testUtils.getEventArgsFromTx(result, 'AgreementCreated')
+            expect(eventArgs._agreementId).to.equal(agreementId)
+            expect(eventArgs._did).to.equal(constants.did[0])
+            expect(eventArgs._sender).to.equal(accounts[0])
+            expect(eventArgs._didOwner).to.equal(constants.address.dummy)
+            expect(eventArgs._templateId).to.equal(templateId)
         })
     })
 
