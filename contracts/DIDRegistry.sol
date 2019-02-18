@@ -1,15 +1,13 @@
 pragma solidity 0.5.3;
 
-import 'zos-lib/contracts/Initializable.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
-
 
 /**
  * @title DID Registry
  * @author Ocean Protocol Team
  * @dev All function calls are currently implemented without side effects
  */
-contract DIDRegistry is Initializable, Ownable {
+contract DIDRegistry is Ownable {
     struct DIDRegister {
         address owner;
         uint updateAt;

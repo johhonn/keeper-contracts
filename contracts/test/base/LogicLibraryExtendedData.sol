@@ -9,13 +9,16 @@ library LogicLibraryExtendedData {
         address sender;
     }
 
-    function setS(LogicLibraryExtendedData.S storage _self, uint _s) public {
+    function setS(LogicLibraryExtendedData.S storage _self, uint _s)
+        public
+    {
         _self.sender = msg.sender;
         _self.s = _s;
     }
 
     function getS(LogicLibraryExtendedData.S storage _self)
-        public view
+        public
+        view
         returns (uint s, address sender)
     {
         s = _self.s;

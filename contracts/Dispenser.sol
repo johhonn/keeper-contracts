@@ -2,34 +2,32 @@ pragma solidity 0.5.3;
 
 import 'openzeppelin-eth/contracts/math/SafeMath.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
-import 'zos-lib/contracts/Initializable.sol';
 import './OceanToken.sol';
-
 
 /**
  * @title Ocean Protocol Dispenser Contract
  * @author Ocean Protocol Team
  * @dev All function calls are currently implemented without side effects
  */
-contract Dispenser is Initializable, Ownable {
+contract Dispenser is Ownable {
 
     using SafeMath for uint256;
     using SafeMath for uint;
 
     // limit period for request of tokens
     // mapping from address to last time of request
-    mapping(address => uint256) private tokenRequests;
-    uint256 private totalMintAmount;
+    mapping(address => uint256) internal tokenRequests;
+    uint256 internal totalMintAmount;
 
     // max amount of tokens user can get for each request
-    uint256 private maxAmount;
+    uint256 internal maxAmount;
 
     // max amount of tokens that can be minted using this dispenser in total
-    uint256 private maxMintAmount;
+    uint256 internal maxMintAmount;
 
      // min amount of time to wait before request token again
-    uint256 private minPeriod;
-    uint256 private scale;
+    uint256 internal minPeriod;
+    uint256 internal scale;
 
     OceanToken public oceanToken;
 

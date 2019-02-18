@@ -31,7 +31,11 @@ contract('HashLockCondition constructor', (accounts) => {
         )
 
         const hashLockCondition = await HashLockCondition.new()
-        await hashLockCondition.initialize(conditionStoreManager.address, { from: owner })
+        await hashLockCondition.initialize(
+            owner,
+            conditionStoreManager.address,
+            { from: owner }
+        )
         return { hashLockCondition, conditionStoreManager, conditionId, conditionType, owner, createRole }
     }
 
@@ -42,7 +46,11 @@ contract('HashLockCondition constructor', (accounts) => {
 
             const conditionStoreManager = await ConditionStoreManager.new()
             const hashLockCondition = await HashLockCondition.new()
-            await hashLockCondition.initialize(conditionStoreManager.address, { from: accounts[0] })
+            await hashLockCondition.initialize(
+                accounts[0],
+                conditionStoreManager.address,
+                { from: accounts[0] }
+            )
         })
     })
 

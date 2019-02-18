@@ -9,9 +9,9 @@ contract AgreementStoreManager is Ownable {
 
     using AgreementStoreLibrary for AgreementStoreLibrary.AgreementList;
 
-    ConditionStoreManager private conditionStoreManager;
-    TemplateStoreManager private templateStoreManager;
-    AgreementStoreLibrary.AgreementList private agreementList;
+    ConditionStoreManager internal conditionStoreManager;
+    TemplateStoreManager internal templateStoreManager;
+    AgreementStoreLibrary.AgreementList internal agreementList;
 
     event AgreementCreated(
         bytes32 indexed _agreementId,
@@ -22,21 +22,9 @@ contract AgreementStoreManager is Ownable {
     );
 
     function initialize(
-        address _sender
-    )
-        public
-        initializer
-    {
-        require(
-            true == false,
-            'Invalid number of parameters for "initialize". Got 1 expected 3!'
-        );
-    }
-
-    function initialize(
+        address _owner,
         address _conditionStoreManagerAddress,
-        address _templateStoreManagerAddress,
-        address _owner
+        address _templateStoreManagerAddress
     )
         public
         initializer()
@@ -47,14 +35,13 @@ contract AgreementStoreManager is Ownable {
             _owner != address(0),
             'Invalid address'
         );
-
+        Ownable.initialize(_owner);
         conditionStoreManager = ConditionStoreManager(
             _conditionStoreManagerAddress
         );
         templateStoreManager = TemplateStoreManager(
             _templateStoreManagerAddress
         );
-        Ownable.initialize(_owner);
     }
 
     function createAgreement(

@@ -6,6 +6,7 @@ import '../ConditionStoreLibrary.sol';
 contract EscrowReward is Reward {
 
     function initialize(
+        address _owner,
         address _conditionStoreManagerAddress,
         address _tokenAddress
     )
@@ -17,6 +18,7 @@ contract EscrowReward is Reward {
             _conditionStoreManagerAddress != address(0),
             'Invalid address'
         );
+        Ownable.initialize(_owner);
         conditionStoreManager = ConditionStoreManager(
             _conditionStoreManagerAddress
         );

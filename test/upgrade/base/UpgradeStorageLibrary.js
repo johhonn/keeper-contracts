@@ -12,12 +12,14 @@ const StorageContractLibraryExtendedData = artifacts.require('StorageContractLib
 
 contract('StorageContract', (accounts) => {
     let adminWallet,
-        proxyAddress
+        proxyAddress,
+        addresses
 
     beforeEach('Deploy with zos before each tests', async function() {
         await createWallet(true)
         adminWallet = await loadWallet('upgrader') // zos admin MultiSig
-        proxyAddress = await deploy('deploy', ['StorageContract'])
+        addresses = await deploy('deploy', ['StorageContract'])
+        proxyAddress = addresses.contractAddress
     })
 
     describe('Test upgradability for StorageContract', () => {

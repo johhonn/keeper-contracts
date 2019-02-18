@@ -31,7 +31,11 @@ contract('SignCondition constructor', (accounts) => {
         )
 
         const signCondition = await SignCondition.new()
-        await signCondition.initialize(conditionStoreManager.address, { from: accounts[0] })
+        await signCondition.initialize(
+            owner,
+            conditionStoreManager.address,
+            { from: accounts[0] }
+        )
 
         return { signCondition, conditionStoreManager, conditionId, conditionType, createRole, owner }
     }
@@ -43,7 +47,11 @@ contract('SignCondition constructor', (accounts) => {
 
             const conditionStoreManager = await ConditionStoreManager.new()
             const signCondition = await SignCondition.new()
-            await signCondition.initialize(conditionStoreManager.address, { from: accounts[0] })
+            await signCondition.initialize(
+                accounts[0],
+                conditionStoreManager.address,
+                { from: accounts[0] }
+            )
         })
     })
 

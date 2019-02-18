@@ -12,8 +12,8 @@ contract ConditionStoreManager is Ownable, Common {
     using EpochLibrary for EpochLibrary.EpochList;
 
     address private createRole;
-    ConditionStoreLibrary.ConditionList private conditionList;
-    EpochLibrary.EpochList private epochList;
+    ConditionStoreLibrary.ConditionList internal conditionList;
+    EpochLibrary.EpochList internal epochList;
 
     modifier onlyCreateRole(){
         require(
@@ -30,18 +30,6 @@ contract ConditionStoreManager is Ownable, Common {
             'Invalid UpdateRole'
         );
         _;
-    }
-
-    function initialize(
-        address _sender
-    )
-        public
-        initializer
-    {
-        require(
-            true == false,
-            'Invalid number of parameters for "initialize". Got 1 expected 2!'
-        );
     }
 
     function initialize(

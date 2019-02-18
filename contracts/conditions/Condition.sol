@@ -1,9 +1,9 @@
 pragma solidity 0.5.3;
 
 import './ConditionStoreManager.sol';
-import 'zos-lib/contracts/Initializable.sol';
+import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
-contract Condition is Initializable {
+contract Condition is Ownable {
 
     ConditionStoreManager internal conditionStoreManager;
 

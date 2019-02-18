@@ -39,9 +39,9 @@ contract('AgreementStoreManager', (accounts) => {
         const agreementStoreManager = await AgreementStoreManager.new()
 
         await agreementStoreManager.initialize(
+            owner,
             conditionStoreManager.address,
             templateStoreManager.address,
-            owner,
             { from: owner }
         )
 
@@ -88,9 +88,9 @@ contract('AgreementStoreManager', (accounts) => {
             // setup with zero fails
             await assert.isRejected(
                 agreementStoreManager.initialize(
+                    owner,
                     conditionStoreManager.address,
                     templateStoreManager.address,
-                    owner,
                     { from: createRole }
                 ),
                 constants.address.error.invalidAddress0x0
@@ -132,8 +132,8 @@ contract('AgreementStoreManager', (accounts) => {
             // setup with zero fails
             await assert.isRejected(
                 agreementStoreManager.initialize(
-                    conditionStoreManager.address,
                     owner,
+                    conditionStoreManager.address,
                     createRole,
                     { from: createRole }
                 ),
@@ -150,20 +150,6 @@ contract('AgreementStoreManager', (accounts) => {
             await assert.isRejected(
                 agreementStoreManager.initialize(),
                 constants.initialize.error.invalidNumberParamsGot0Expected3
-            )
-        })
-
-        it('contract should not initialize with one argument', async () => {
-            const owner = accounts[0]
-
-            const agreementStoreLibrary = await AgreementStoreLibrary.new()
-            await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-            const agreementStoreManager = await AgreementStoreManager.new()
-
-            // setup with zero fails
-            await assert.isRejected(
-                agreementStoreManager.initialize(owner),
-                constants.initialize.error.invalidNumberParamsGot1Expected3
             )
         })
     })

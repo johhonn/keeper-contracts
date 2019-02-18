@@ -37,9 +37,9 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
         const agreementStoreManager = await AgreementStoreManager.new()
 
         await agreementStoreManager.initialize(
+            owner,
             conditionStoreManager.address,
             templateStoreManager.address,
-            owner,
             { from: owner }
         )
 
@@ -51,6 +51,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
 
         const accessSecretStoreCondition = await AccessSecretStoreCondition.new()
         await accessSecretStoreCondition.initialize(
+            owner,
             conditionStoreManager.address,
             agreementStoreManager.address,
             { from: owner }
@@ -79,6 +80,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             const accessSecretStoreCondition = await AccessSecretStoreCondition.new()
 
             await accessSecretStoreCondition.initialize(
+                accounts[0],
                 conditionStoreManager.address,
                 agreementStoreManager.address,
                 { from: accounts[0] }
@@ -222,7 +224,6 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
 
             await accessSecretStoreCondition.fulfill(nonce, documentId, grantee)
 
-            console.log('test')
             await assert.isRejected(
                 accessSecretStoreCondition.fulfill(nonce, documentId, grantee),
                 constants.condition.state.error.invalidStateTransition
