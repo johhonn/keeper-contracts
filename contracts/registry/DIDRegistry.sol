@@ -8,7 +8,7 @@ import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
  * @author Ocean Protocol Team
  *
  * @dev Implementation of the DID Registry.
- * https://github.com/oceanprotocol/OEPs/tree/master/7#registry
+ *      https://github.com/oceanprotocol/OEPs/tree/master/7#registry
  */
 contract DIDRegistry is Ownable {
 
@@ -24,7 +24,7 @@ contract DIDRegistry is Ownable {
 
     /**
      * @dev This implementation does not store _value on-chain,
-     * but emits DIDAttributeRegistered events to store it in the event log.
+     *      but emits DIDAttributeRegistered events to store it in the event log.
      */
     event DIDAttributeRegistered(
         bytes32 indexed _did,
@@ -36,7 +36,9 @@ contract DIDRegistry is Ownable {
     );
 
     /**
-     * @dev Initialize the owner for admin functionality
+     * @dev DIDRegistry Initializer
+     *      Initialize ownable. Only on contract creation.
+     * @param _owner refers to the owner of the contract
      */
     function initialize(
         address _owner
@@ -51,12 +53,12 @@ contract DIDRegistry is Ownable {
      * @notice Register DID attributes.
      *
      * @dev The first attribute of a DID registered sets the DID owner.
-     * Subsequent updates record _checksum and update info
+     *      Subsequent updates record _checksum and update info
      *
      * @param _did refers to decentralized identifier (a byte32 length ID)
      * @param _checksum includes a one-way HASH calculated using the DDO content
      * @param _value refers to the attribute value, limited to 2048 bytes
-     * @returns the size of the registry after the register action
+     * @return the size of the registry after the register action
      */
     function registerAttribute (
         bytes32 _did,
