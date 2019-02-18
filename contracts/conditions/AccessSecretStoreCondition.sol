@@ -4,7 +4,7 @@ import './Condition.sol';
 import '../agreements/AgreementStoreManager.sol';
 import '../ISecretStore.sol';
 
-contract AccessSecretStoreCondition is Condition {
+contract AccessSecretStoreCondition is Condition, ISecretStore {
 
     mapping(bytes32 => mapping(address => bool)) private documentPermissions;
 
