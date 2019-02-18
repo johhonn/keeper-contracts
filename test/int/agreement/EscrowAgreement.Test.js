@@ -385,7 +385,6 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
             const documentId = constants.did[0]
             const grantee = accounts[1]
 
-
             const hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
             const conditionIdLock = await lockRewardCondition.generateId(agreementId, hashValuesLock)
 

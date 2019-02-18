@@ -38,7 +38,7 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
             _agreementStoreManagerAddress != address(0) &&
             _accessSecretStoreConditionAddress != address(0) &&
             _lockRewardConditionAddress != address(0) &&
-            _escrowRewardAddress != address(0) ,
+            _escrowRewardAddress != address(0),
             'Invalid address'
         );
         Ownable.initialize(_owner);
