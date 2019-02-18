@@ -55,8 +55,8 @@ async function createWallet() {
     return JSON.parse(fs.readFileSync(walletPath, 'utf-8').toString())
 }
 
-async function getAddressForImplementation(contractName) {
-    let files = glob.sync('./zos.dev-*.json')
+function getAddressForImplementation(contractName) {
+    let files = glob.sync('./zos.*.json')
     if (files === undefined || files.length === 0) {
         // array empty or does not exist
         throw Error(`zos config file not found`)
@@ -83,7 +83,7 @@ async function loadWallet(name) {
 async function requestContractUpgrade(contractName, upgraderRole, adminWallet) {
     const p = contractName.split(':')
     console.log(`Upgrading contract: ${p[1]} with ${p[0]}`)
-    const implementationAddress = await getAddressForImplementation(p[1])
+    const implementationAddress = getAddressForImplementation(p[1])
     const upgradeCallData = encodeCall('upgradeTo', ['address'], [implementationAddress])
     const args = [
         require(`../artifacts/${p[1]}.${NETWORK.toLowerCase()}.json`).address,
