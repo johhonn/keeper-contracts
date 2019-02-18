@@ -115,43 +115,25 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
                 owner
             } = await setupTest()
 
-            // propose and approve account as agreement factory
+            // propose and approve account as agreement factory - not for production :)
             const templateId = accounts[0]
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId, { from: owner })
 
-            // register DID
+            const staker = accounts[0]
+            const stakeAmount = 1000
+            const stakePeriod = 5
             const did = constants.did[0]
             const { url } = constants.registry
             const checksum = constants.bytes32.one
-
-            await didRegistry.registerAttribute(did, checksum, url)
+            // use signature as release, could also be hash of secret
+            const { message, publicKey, signature } = constants.condition.sign.bytes32
 
             // generate IDs from attributes
             const agreementId = constants.bytes32.one
-
-            const staker = accounts[0]
-            const amount = 10
-            const stakePeriod = 5
-            let {
-                message,
-                publicKey,
-                signature
-            } = constants.condition.sign.bytes32
-
-            let hashValuesSign = await signCondition.hashValues(message, publicKey)
-            let conditionIdSign = await signCondition.generateId(agreementId, hashValuesSign)
-
-            const hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
-            const conditionIdLock = await lockRewardCondition.generateId(agreementId, hashValuesLock)
-
-            const hashValuesEscrow = await escrowReward.hashValues(
-                amount,
-                staker,
-                staker,
-                conditionIdLock,
-                conditionIdSign)
-            const conditionIdEscrow = await escrowReward.generateId(agreementId, hashValuesEscrow)
+            const conditionIdSign = await signCondition.generateId(agreementId, await signCondition.hashValues(message, publicKey))
+            const conditionIdLock = await lockRewardCondition.generateId(agreementId, await lockRewardCondition.hashValues(escrowReward.address, stakeAmount))
+            const conditionIdEscrow = await escrowReward.generateId(agreementId, await escrowReward.hashValues(stakeAmount, staker, staker, conditionIdLock, conditionIdSign))
 
             // construct agreement
             const agreement = {
@@ -170,19 +152,22 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
                 timeOuts: [0, 0, 0]
             }
 
+            // register DID
+            await didRegistry.registerAttribute(did, checksum, url)
+            // create agreement as approved account - not for production ;)
             await agreementStoreManager.createAgreement(
                 agreementId,
                 ...Object.values(agreement)
             )
 
             // fulfill lock reward
-            await oceanToken.mint(staker, amount, { from: owner })
-            await oceanToken.approve(lockRewardCondition.address, amount, { from: staker })
+            await oceanToken.mint(staker, stakeAmount, { from: owner })
+            await oceanToken.approve(lockRewardCondition.address, stakeAmount, { from: staker })
 
-            await lockRewardCondition.fulfill(agreementId, escrowReward.address, amount)
+            await lockRewardCondition.fulfill(agreementId, escrowReward.address, stakeAmount)
 
             assert.strictEqual(await getBalance(oceanToken, staker), 0)
-            assert.strictEqual(await getBalance(oceanToken, escrowReward.address), amount)
+            assert.strictEqual(await getBalance(oceanToken, escrowReward.address), stakeAmount)
 
             // fulfill before stake period
             await assert.isRejected(
@@ -195,13 +180,13 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
             // get reward
             await escrowReward.fulfill(
                 agreementId,
-                amount,
+                stakeAmount,
                 staker,
                 staker,
                 conditionIdLock,
                 conditionIdSign)
 
-            assert.strictEqual(await getBalance(oceanToken, staker), amount)
+            assert.strictEqual(await getBalance(oceanToken, staker), stakeAmount)
             assert.strictEqual(await getBalance(oceanToken, escrowReward.address), 0)
         })
     })
