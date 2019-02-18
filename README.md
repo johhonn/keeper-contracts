@@ -15,11 +15,6 @@
 
 ---
 
-Ocean Keeper implementation where we put the following modules together:
-
-* **TCRs**: users create challenges and resolve them through voting to maintain registries;
-* **Ocean Tokens**: the intrinsic tokens circulated inside Ocean network, which is used in the voting of TCRs;
-* **Marketplace**: the core marketplace where people can transact with each other with Ocean tokens.
 
 ## Table of Contents
 
@@ -33,8 +28,6 @@ Ocean Keeper implementation where we put the following modules together:
   - [Testing](#testing)
      - [Code Linting](#code-linting)
   - [Documentation](#documentation)
-     - [Use Case 1: Register data asset](#use-case-1-register-data-asset)
-     - [Use Case 2: Authorize access with OceanAuth contract](#use-case-2-authorize-access-with-oceanauth-contract)
   - [New Version / New Release](#new-version-new-release)
   - [Contributing](#contributing)
   - [Prior Art](#prior-art)
@@ -204,84 +197,6 @@ Code style is enforced through the CI test process, builds will fail if there're
 * [Packaging of libraries](doc/packaging.md)
 * [Upgrading contracts](doc/upgrades.md)
 
-### Use Case 1: Register data asset
-
-```Javascript
-const Market = artifacts.require('OceanMarket.sol')
-...
-
-// get instance of OceanMarket contract
-const market = await Market.deployed()
-...
-
-// generate resource id
-const name = 'resource name'
-const resourceId = await market.generateId(name, { from: accounts[0] })
-const resourcePrice = 100
-
-// register data asset on-chain
-await market.register(resourceId, resourcePrice, { from: accounts[0] })
-```
-
-### Use Case 2: Authorize access with OceanAuth contract
-
-Here is an example of authorization process with OceanAuth contract.
-
-`accounts[0]` is provider and `accounts[1]` is consumer.
-
-Note that different cryptographic algorithms can be chosen to encrypt and decrypt access token using key pairs (i.e., public key and private key). This example uses [URSA](https://www.npmjs.com/package/ursa) to demonstrate the process for illustration purpose.
-
-```Javascript
-const Token = artifacts.require('OceanToken.sol')
-const Market = artifacts.require('OceanMarket.sol')
-const Auth = artifacts.require('OceanAuth.sol')
-...
-const ursa = require('ursa')
-const ethers = require('ethers')
-const Web3 = require('web3')
-...
-// get instances of deployed contracts
-const token = await Token.deployed()
-const market = await Market.deployed()
-const auth = await Auth.deployed()
-...
-// consumer request some testing tokens to buy data asset
-await market.requestTokens(200, { from: accounts[1] })
-// consumers approve withdraw limit of their funds
-await token.approve(market.address, 200, { from: accounts[1] })
-...
-// consumer generates temporary key pairs in local
-const modulusBit = 512
-const key = ursa.generatePrivateKey(modulusBit, 65537)
-const privatePem = ursa.createPrivateKey(key.toPrivatePem())
-const publicPem = ursa.createPublicKey(key.toPublicPem())
-const publicKey = publicPem.toPublicPem('utf8')
-...
-// consumer initiate a new access request and pass public key
-await auth.initiateAccessRequest(resourceId, accounts[0], publicKey, expireTime, { from: accounts[1] })
-// provider commit the access request
-await auth.commitAccessRequest(accessId, true, expireTime, '', '', '', '', { from: accounts[0] })
-...
-// consumer sends the payment to OceanMarket contract
-await market.sendPayment(accessId, accounts[0], price, expireTime, { from: accounts[1] })
-...
-// provider encrypt "JSON Web Token" (JWT) using consumer's temp public key
-const encJWT = getPubKeyPem.encrypt('JWT', 'utf8', 'hex')
-// provider delivers the encrypted JWT on-chain
-await auth.deliverAccessToken(accessId, `0x${encJWT}`, { from: accounts[0] })
-...
-// consumer generate signature of encrypte JWT and send to provider
-const prefix = '0x'
-const hexString = Buffer.from(onChainencToken).toString('hex')
-const signature = web3.eth.sign(accounts[1], `${prefix}${hexString}`)
-...
-// provider verify the signature from consumer to prove delivery of access token
-const sig = ethers.utils.splitSignature(signature)
-const fixedMsg = `\x19Ethereum Signed Message:\n${onChainencToken.length}${onChainencToken}`
-const fixedMsgSha = web3.sha3(fixedMsg)
-await auth.verifyAccessTokenDelivery(accessId, accounts[1], fixedMsgSha, sig.v, sig.r, sig.s, { from: accounts[0] })
-```
-
 ## New Version / New Release
 
 See [RELEASE_PROCESS.md](RELEASE_PROCESS.md)
@@ -294,9 +209,7 @@ See the page titled "[Ways to Contribute](https://docs.oceanprotocol.com/concept
 
 This project builds on top of the work done in open source projects:
 
-- [ConsenSys/PLCRVoting](https://github.com/ConsenSys/PLCRVoting)
-- [skmgoldin/tcr](https://github.com/skmgoldin/tcr)
-- [OpenZeppelin/openzeppelin-solidity](https://github.com/OpenZeppelin/openzeppelin-solidity)
+- [OpenZeppelin/openzeppelin-eth](https://github.com/OpenZeppelin/openzeppelin-eth)
 
 ## License
 
