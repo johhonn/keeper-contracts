@@ -1,17 +1,17 @@
 /* eslint-env mocha */
-/* global artifacts, assert, contract, describe, it, beforeEach, before */
+/* global artifacts, assert, contract, describe, it, beforeEach */
 
-const DIDRegistry = artifacts.require('DIDRegistry.sol')
+const DIDRegistry = artifacts.require('DIDRegistry')
 const testUtils = require('../../helpers/utils.js')
 
 const web3 = testUtils.getWeb3()
 
 contract('DIDRegistry', (accounts) => {
-    let registry
+    let didRegistry
 
     beforeEach(async () => {
-        registry = await DIDRegistry.new()
-        await registry.initialize(accounts[0])
+        didRegistry = await DIDRegistry.new()
+        await didRegistry.initialize(accounts[0])
     })
 
     describe('Register decentralised identifiers with attributes, fetch attributes by DID', () => {
@@ -19,7 +19,7 @@ contract('DIDRegistry', (accounts) => {
             const did = web3.utils.fromAscii('did:ocn:test-attr')
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
-            const result = await registry.registerAttribute(did, checksum, value)
+            const result = await didRegistry.registerAttribute(did, checksum, value)
 
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
@@ -34,16 +34,16 @@ contract('DIDRegistry', (accounts) => {
             const did = web3.utils.sha3('did:ocn:test-read-event-from-filter-using-block-number')
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
-            const result = await registry.registerAttribute(did, checksum, value)
+            const result = await didRegistry.registerAttribute(did, checksum, value)
 
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             // get owner for a did
-            const owner = await registry.getOwner(did)
+            const owner = await didRegistry.getDidOwner(did)
             assert.strictEqual(accounts[0], owner)
 
             // get the blockNumber for the last update
-            const blockNumber = await registry.getUpdateAt(did)
+            const blockNumber = await didRegistry.getUpdateAt(did)
             assert(blockNumber > 0)
 
             // filter on the blockNumber only
@@ -55,7 +55,7 @@ contract('DIDRegistry', (accounts) => {
                     owner: owner
                 }
             }
-            registry.getPastEvents(filterOptions, function(error, logItems) {
+            didRegistry.getPastEvents(filterOptions, function(error, logItems) {
                 if (!error) {
                     if (logItems.length > 0) {
                         const logItem = logItems[logItems.length - 1]
@@ -71,10 +71,10 @@ contract('DIDRegistry', (accounts) => {
             const did = web3.utils.fromAscii('did:ocn:test-attr-twice')
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
-            await registry.registerAttribute(did, checksum, value)
+            await didRegistry.registerAttribute(did, checksum, value)
 
             // try to register the same attribute the second time
-            const result = await registry.registerAttribute(did, checksum, value)
+            const result = await didRegistry.registerAttribute(did, checksum, value)
 
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
         })
@@ -84,7 +84,7 @@ contract('DIDRegistry', (accounts) => {
             const did = web3.utils.sha3(crazyLongDID)
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
-            const result = await registry.registerAttribute(did, checksum, value)
+            const result = await didRegistry.registerAttribute(did, checksum, value)
 
             const payload = result.logs[0].args
             assert.strictEqual(did, payload.did)
@@ -94,7 +94,7 @@ contract('DIDRegistry', (accounts) => {
             const did = web3.utils.fromAscii('did:ocn:test-attr')
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
-            await registry.registerAttribute(did, checksum, value)
+            await didRegistry.registerAttribute(did, checksum, value)
 
             const anotherPerson = { from: accounts[1] }
 
@@ -102,7 +102,7 @@ contract('DIDRegistry', (accounts) => {
             let failed = false
             try {
                 // must not be able to add attributes to someone else's DID
-                await registry.registerAttribute(did, checksum, value, anotherPerson)
+                await didRegistry.registerAttribute(did, checksum, value, anotherPerson)
             } catch (e) {
                 failed = true
             }
@@ -115,7 +115,7 @@ contract('DIDRegistry', (accounts) => {
             const value = 'dabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345xdfwfg'
 
             try {
-                await registry.registerAttribute(did, checksum, value)
+                await didRegistry.registerAttribute(did, checksum, value)
             } catch (e) {
                 assert.strictEqual(e.reason, 'Invalid url size')
             }

@@ -1,31 +1,33 @@
-pragma solidity 0.4.25;
+pragma solidity 0.5.3;
 
 import 'openzeppelin-eth/contracts/math/SafeMath.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
-import 'zos-lib/contracts/Initializable.sol';
 import './OceanToken.sol';
-
 
 /**
  * @title Ocean Protocol Dispenser Contract
  * @author Ocean Protocol Team
  * @dev All function calls are currently implemented without side effects
  */
-contract Dispenser is Initializable, Ownable {
+contract Dispenser is Ownable {
 
     using SafeMath for uint256;
     using SafeMath for uint;
 
     // limit period for request of tokens
     // mapping from address to last time of request
-    mapping(address => uint256) private tokenRequests;
+    mapping(address => uint256) internal tokenRequests;
+    uint256 internal totalMintAmount;
 
     // max amount of tokens user can get for each request
-    uint256 private maxAmount;
-    
+    uint256 internal maxAmount;
+
+    // max amount of tokens that can be minted using this dispenser in total
+    uint256 internal maxMintAmount;
+
      // min amount of time to wait before request token again
-    uint256 private minPeriod;
-    uint256 private scale;
+    uint256 internal minPeriod;
+    uint256 internal scale;
 
     OceanToken public oceanToken;
 
@@ -41,31 +43,28 @@ contract Dispenser is Initializable, Ownable {
         uint256 maxAmount
     );
 
-    modifier isValidAddress(address sender) {
+    modifier isValidAddress(address _address) {
         require(
-            sender != address(0x0),
-            'Sender address is 0x0.'
+            _address != address(0x0),
+            'isValidAddress failed, Address is 0x0.'
         );
         _;
     }
 
     /**
-    * @dev Dispenser Initializer
-    * @param _oceanTokenAddress The deployed contract address of an OceanToken
-    * @param _owner The owner of the Dispenser
-    * Runs only on initial contract creation.
-    */
+     * @dev Dispenser Initializer
+     * @param _oceanTokenAddress The deployed contract address of an OceanToken
+     * @param _owner The owner of the Dispenser
+     * Runs only on initial contract creation.
+     */
     function initialize(
         address _oceanTokenAddress,
         address _owner
     )
-        public initializer()
+        public
+        initializer
+        isValidAddress(_oceanTokenAddress)
     {
-        require(
-            _oceanTokenAddress != address(0x0),
-            'Token address is 0x0.'
-        );
-
         Ownable.initialize(_owner);
 
         // instantiate OceanToken contract
@@ -74,19 +73,29 @@ contract Dispenser is Initializable, Ownable {
         scale = 10 ** uint256(oceanToken.decimals());
         maxAmount = uint256(1000).mul(scale);
         minPeriod = 0;
+
+        maxMintAmount = uint256(100000000).mul(scale);
     }
 
     /**
-    * @dev user can request some tokens for testing
-    * @param amount the amount of tokens to be requested
-    * @return valid Boolean indication of tokens are requested
-    */
+     * @dev user can request some tokens for testing
+     * @param amount the amount of tokens to be requested
+     * @return valid Boolean indication of tokens are requested
+     */
     function requestTokens(
         uint256 amount
     )
-        public isValidAddress(msg.sender)
+        public
+        isValidAddress(msg.sender)
         returns (bool tokensTransferred)
     {
+        uint256 amountWithDigits = amount.mul(scale);
+
+        require(
+            amountWithDigits + totalMintAmount < maxMintAmount,
+            'Exceeded maxMintAmount'
+        );
+
         /* solium-disable-next-line security/no-block-members */
         if (block.timestamp < tokenRequests[msg.sender] + minPeriod) {
             // Failed, requested to frequently
@@ -98,7 +107,7 @@ contract Dispenser is Initializable, Ownable {
         }
 
         // amount should not exceed maxAmount
-        if (amount.mul(scale) > maxAmount) {
+        if (amountWithDigits > maxAmount) {
             // Failed, requested to much tokens
             emit RequestLimitExceeded(
                 msg.sender,
@@ -108,42 +117,58 @@ contract Dispenser is Initializable, Ownable {
             return false;
         } else {
             require(
-                oceanToken.mint(msg.sender, amount),
+                oceanToken.mint(msg.sender, amountWithDigits),
                 'Token minting failed.'
             );
 
             /* solium-disable-next-line security/no-block-members */
             tokenRequests[msg.sender] = block.timestamp;
 
+            totalMintAmount.add(amountWithDigits);
+
             return true;
         }
     }
 
     /**
-    * @dev the Owner can set the min period for token requests
-    * @param period the min amount of time before next request
-    */
+     * @dev the Owner can set the min period for token requests
+     * @param period the min amount of time before next request
+     */
     function setMinPeriod(
         uint period
     )
         public
-        onlyOwner()
+        onlyOwner
     {
         // set min period of time before next request (in seconds)
         minPeriod = period;
     }
 
     /**
-    * @dev the Owner can set the max amount for token requests
-    * @param amount the max amount of tokens that can be requested
-    */
+     * @dev the Owner can set the max amount for token requests
+     * @param amount the max amount of tokens that can be requested
+     */
     function setMaxAmount(
-        uint amount
+        uint256 amount
     )
         public
-        onlyOwner()
+        onlyOwner
     {
         // set max amount for each request
         maxAmount = amount.mul(scale);
+    }
+
+    /**
+     * @dev the Owner can set the max amount for token requests
+     * @param amount the max amount of tokens that can be requested
+     */
+    function setMaxMintAmount(
+        uint amount
+    )
+        public
+        onlyOwner
+    {
+        // set max amount for each request
+        maxMintAmount = amount.mul(scale);
     }
 }

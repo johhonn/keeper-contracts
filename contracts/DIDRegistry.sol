@@ -1,15 +1,13 @@
-pragma solidity 0.4.25;
+pragma solidity 0.5.3;
 
-import 'zos-lib/contracts/Initializable.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
-
 
 /**
  * @title DID Registry
  * @author Ocean Protocol Team
  * @dev All function calls are currently implemented without side effects
  */
-contract DIDRegistry is Initializable, Ownable {
+contract DIDRegistry is Ownable {
     struct DIDRegister {
         address owner;
         uint updateAt;
@@ -23,9 +21,14 @@ contract DIDRegistry is Initializable, Ownable {
         uint updatedAt
     );
 
-    mapping(bytes32 => DIDRegister) private didRegister;
+    mapping(bytes32 => DIDRegister) internal didRegister;
 
-    modifier onlyValidDIDArgs(bytes32 did, bytes32 checksum, string value){
+    modifier onlyValidDIDArgs(
+        bytes32 did,
+        bytes32 checksum,
+        string memory value
+    )
+    {
         address currentOwner = didRegister[did].owner;
         require(
             currentOwner == address(0x0) || currentOwner == msg.sender,
@@ -42,7 +45,8 @@ contract DIDRegistry is Initializable, Ownable {
     function initialize(
         address _owner
     )
-        public initializer()
+        public
+        initializer
     {
         Ownable.initialize(_owner);
     }
@@ -79,19 +83,19 @@ contract DIDRegistry is Initializable, Ownable {
     */
     function getUpdateAt(bytes32 did)
         public view
-        returns(uint)
+        returns(uint updateAt)
     {
         return didRegister[did].updateAt;
     }
 
    /**
-    * @notice getOwner is called by anyone.
+    * @notice getDidOwner is called by anyone.
     * @param did refers to decentralized identifier (a byte32 length ID)
     * @return the address of the owner
     */
-    function getOwner(bytes32 did)
+    function getDidOwner(bytes32 did)
         public view
-        returns(address)
+        returns(address didOwner)
     {
         return didRegister[did].owner;
     }

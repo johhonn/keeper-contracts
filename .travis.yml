@@ -62,8 +62,9 @@ script:
     - npm run lint
     - npm run test:cover
     - npm run report-coverage
+    - npm run test:upgrade
     - npm run compile
-    - npm run migrate
+    - npm run deploy
     - git status
     - git add package-lock.json
     - git diff-index --quiet HEAD || git commit -m "Travis update"
@@ -71,9 +72,14 @@ script:
         if [ "${TRAVIS_BRANCH}" = "develop" ]; then
             python2 -c 'import os,sys,fcntl; flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL); fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags&~os.O_NONBLOCK);'
             npm run security:surya
-            mkdir -p $HOME/.mythril && curl -L -o $HOME/.mythril/signatures.db https://github.com/ConsenSys/mythril-classic/raw/develop/signatures.db
+            mkdir -p $HOME/.mythril && cp -rp assets/* $HOME/.mythril/
+            sed -i 's/pragma solidity >=0.4.24 <0.6.0;/pragma solidity 0.5.3;/g' node_modules/zos-lib/contracts/Initializable.sol
             npm run security:mythril
-            travis_wait 30 npm run security:securify
+            #find contracts -type f -name "*.sol" -exec ./truffle-flattener-travis.sh {} \;
+            #rm -rf contracts
+            #mv contracts_flatten contracts
+            #travis_wait 60 npm run security:securify
+            #git checkout HEAD contracts
         fi
 
 after_script:
