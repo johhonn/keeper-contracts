@@ -4,8 +4,6 @@
 
 There are several folders and each includes solidity source files for each module:
 
-<img src="img/files.jpg" width="250" />
-
 * **Contracts Documentation**
     - [Agreements](contracts/agreements/)
         - [Agreement Store Manager](contracts/agreements/)
