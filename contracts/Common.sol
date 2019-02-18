@@ -2,7 +2,11 @@ pragma solidity 0.5.3;
 
 import 'zos-lib/contracts/Initializable.sol';
 
-contract Common is Initializable {
+/**
+ * @title Common functions
+ * @author Ocean Protocol Team
+ */
+contract Common {
     /**
     * @notice getCurrentBlockNumber get block number
     * @return the current block number

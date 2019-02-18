@@ -7,7 +7,6 @@ import './OceanToken.sol';
 /**
  * @title Ocean Protocol Dispenser Contract
  * @author Ocean Protocol Team
- * @dev All function calls are currently implemented without side effects
  */
 contract Dispenser is Ownable {
 

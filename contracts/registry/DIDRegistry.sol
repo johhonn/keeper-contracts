@@ -13,7 +13,7 @@ import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 contract DIDRegistry is Ownable {
 
     /**
-     * @dev The DIDRegistry Library takes care of the basic storage functions
+     * @dev The DIDRegistry Library takes care of the basic storage functions.
      */
     using DIDRegistryLibrary for DIDRegistryLibrary.DIDRegisterList;
 
@@ -37,8 +37,8 @@ contract DIDRegistry is Ownable {
 
     /**
      * @dev DIDRegistry Initializer
-     *      Initialize ownable. Only on contract creation.
-     * @param _owner refers to the owner of the contract
+     *      Initialize Ownable. Only on contract creation.
+     * @param _owner refers to the owner of the contract.
      */
     function initialize(
         address _owner
@@ -53,12 +53,12 @@ contract DIDRegistry is Ownable {
      * @notice Register DID attributes.
      *
      * @dev The first attribute of a DID registered sets the DID owner.
-     *      Subsequent updates record _checksum and update info
+     *      Subsequent updates record _checksum and update info.
      *
-     * @param _did refers to decentralized identifier (a byte32 length ID)
-     * @param _checksum includes a one-way HASH calculated using the DDO content
-     * @param _value refers to the attribute value, limited to 2048 bytes
-     * @return the size of the registry after the register action
+     * @param _did refers to decentralized identifier (a bytes32 length ID).
+     * @param _checksum includes a one-way HASH calculated using the DDO content.
+     * @param _value refers to the attribute value, limited to 2048 bytes.
+     * @return the size of the registry after the register action.
      */
     function registerAttribute (
         bytes32 _did,
@@ -94,8 +94,8 @@ contract DIDRegistry is Ownable {
     }
 
     /**
-     * @param _did refers to decentralized identifier (a byte32 length ID)
-     * @return last modified (update) block number of a DID
+     * @param _did refers to decentralized identifier (a bytes32 length ID).
+     * @return last modified (update) block number of a DID.
      */
     function getBlockNumberUpdated(bytes32 _did)
         public view
@@ -105,8 +105,8 @@ contract DIDRegistry is Ownable {
     }
 
     /**
-     * @param _did refers to decentralized identifier (a byte32 length ID)
-     * @return the address of the DID owner
+     * @param _did refers to decentralized identifier (a bytes32 length ID).
+     * @return the address of the DID owner.
      */
     function getDIDOwner(bytes32 _did)
         public view
@@ -116,7 +116,7 @@ contract DIDRegistry is Ownable {
     }
 
     /**
-     * @return the length of the DID registry
+     * @return the length of the DID registry.
      */
     function getDIDRegistrySize()
         public
