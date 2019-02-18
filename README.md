@@ -136,17 +136,20 @@ The transaction should show up on the account: `0x90eE7A30339D05E07d9c6e65747132
 
 The contract addresses deployed on Ocean Nile testnet:
 
-| Contract                  | Version | Address                                      |
-|---------------------------|---------|----------------------------------------------|
-| ConditionStoreManager     | v0.7.0  | `TBD` |
-| AgreementStoreManager     | v0.7.0  | `TBD` |
-| TemplateStoreManager      | v0.7.0  | `TBD` |
-| DIDRegistry               | v0.7.0  | `TBD` |
-| Dispenser                 | v0.7.0  | `TBD` |
-| HashLockCondition         | v0.7.0  | `TBD` |
-| LockRewardCondition       | v0.7.0  | `TBD` |
-| OceanToken                | v0.7.0  | `TBD` |
-| SignCondition             | v0.7.0  | `TBD` |
+| Contract                          | Version | Address                                      |
+|-----------------------------------|---------|----------------------------------------------|
+| AccessSecretStoreCondition        | v0.7.0  | `0x146becf5607b4daea1be310781ee20a84d232541` |
+| AgreementStoreManager             | v0.7.0  | `0x3ec8be9fb4c3b5840650f6deab7e537917ba2243` |
+| ConditionStoreManager             | v0.7.0  | `0x4ca8a132f33989358d0a3042cd5394b57b820931` |
+| DIDRegistry                       | v0.7.0  | `0xa1f09400b6959c3de6a32a58e625858ae0370401` |
+| Dispenser                         | v0.7.0  | `0x3ebd0ab62a354bd3baeeed7345cf369ec7a1f2c5` |
+| EscrowAccessSecretStoreTemplate   | v0.7.0  | `0x743e848db40fb8a3cd996970feeabee0bfd0d2b6` |
+| EscrowReward                      | v0.7.0  | `0xc3ba87cb998d2d529c3ad97aa18a16468764e108` |
+| HashLockCondition                 | v0.7.0  | `0xe7ee67fc1b3009a04d89401eaa8356d6f6e407af` |
+| LockRewardCondition               | v0.7.0  | `0x918eb48009ccc25dbd6b4a6812cc5a859036df7e` |
+| OceanToken                        | v0.7.0  | `0x1e8a47dc8af56d48a2a6a3c9335537778adca420` |
+| SignCondition                     | v0.7.0  | `0x70f90441db73675436c60cdd5b0beb8d14aee01f` |
+| TemplateStoreManager              | v0.7.0  | `0x2778ae1d2e5a0af155b073d7de259f82f7d8f88f` |
 
 #### Kovan Testnet
 
@@ -164,17 +167,20 @@ The transaction should show up on: `https://kovan.etherscan.io/address/0x2c0d5f4
 
 The contract addresses deployed on Kovan testnet:
 
-| Contract                  | Version | Address                                      |
-|---------------------------|---------|----------------------------------------------|
-| ConditionStoreManager     | v0.7.0  | `TBD` |
-| AgreementStoreManager     | v0.7.0  | `TBD` |
-| TemplateStoreManager      | v0.7.0  | `TBD` |
-| DIDRegistry               | v0.7.0  | `TBD` |
-| Dispenser                 | v0.7.0  | `TBD` |
-| HashLockCondition         | v0.7.0  | `TBD` |
-| LockRewardCondition       | v0.7.0  | `TBD` |
-| OceanToken                | v0.7.0  | `TBD` |
-| SignCondition             | v0.7.0  | `TBD` |
+| Contract                          | Version | Address                                      |
+|-----------------------------------|---------|----------------------------------------------|
+| AccessSecretStoreCondition        | v0.7.0  | `0x6e0e0e474102c2f326bfbd5e367455258ed87d1e` |
+| AgreementStoreManager             | v0.7.0  | `0xd462a1b14cbd7a6c2cbea0958d2f755a6f0901a6` |
+| ConditionStoreManager             | v0.7.0  | `0x459ff387330e3f3aadcc46dda6de964aa8e63421` |
+| DIDRegistry                       | v0.7.0  | `0x7061c669fad3efe6ebcb863646649210bd08f534` |
+| Dispenser                         | v0.7.0  | `0xb38d23fdc5c4340144c4ff92954b2a4b47648459` |
+| EscrowAccessSecretStoreTemplate   | v0.7.0  | `0xaeb99e067c09b332c8ff15f6bd4213f5a3327b4e` |
+| EscrowReward                      | v0.7.0  | `0x5e349b50e477dcfebb028f788e2c7c0a4a38505b` |
+| HashLockCondition                 | v0.7.0  | `0x3553a5e64598291e3b4820c368db1ad5bea9b549` |
+| LockRewardCondition               | v0.7.0  | `0x3a25d63058f9c33aba700577a4c0097c47b3998b` |
+| OceanToken                        | v0.7.0  | `0x94b139d39257f3b9b7bd1772749076f8b7f74790` |
+| SignCondition                     | v0.7.0  | `0x7d4959e62be3a32c199c47c14a445eb92d3d8879` |
+| TemplateStoreManager              | v0.7.0  | `0x9660ca4a3d5a114b56050bbe0382f3c44ad4dae7` |
 
 ## Libraries
 
