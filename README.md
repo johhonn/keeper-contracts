@@ -112,6 +112,7 @@ npm run deploy
 
 # for redeployment run this instead
 npm run clean
+npm run compile
 npm run deploy
 ```
 
