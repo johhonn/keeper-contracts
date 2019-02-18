@@ -108,10 +108,16 @@ ganache-cli
 Switch back to your other terminal and deploy the contracts:
 
 ```bash
-npm run migrate
+npm run deploy
 
 # for redeployment run this instead
-npm run migrate -- --reset
+npm run clean
+npm run deploy
+```
+
+Upgrade contract [**optional**]:
+```bash
+npm run upgrade <DEPLOYED_CONTRACT>:<NEW_CONTRACT>
 ```
 
 ### Testnet deployment
@@ -122,7 +128,7 @@ Follow the steps for local deployment. Make sure that the address `0x90eE7A30339
 
 ```bash
 export NMEMORIC=<your nile nmemoric>
-npm run migrate:nile
+npm run deploy:nile
 ```
 
 The transaction should show up on the account: `0x90eE7A30339D05E07d9c6e65747132933ff6e624`
@@ -131,13 +137,15 @@ The contract addresses deployed on Ocean Nile testnet:
 
 | Contract                  | Version | Address                                      |
 |---------------------------|---------|----------------------------------------------|
-| ConditionStoreManager     | v0.7.0  | `0xa11ab1263ae3df547a9bbf705218975c497893f9` |
-| DIDRegistry               | v0.7.0  | `0x121d92f7ec45f91f504e946ce35d08a27ca7c401` |
-| Dispenser                 | v0.7.0  | `0xe489ac0bae65042de3e48890ed5829520872728d` |
-| HashLockCondition         | v0.7.0  | `0x9dd31d43b418b6f3361a264a90c782be9b11f151` |
-| LockRewardCondition       | v0.7.0  | `0x393851125bcac3f90006451998b9b222f205b815` |
-| OceanToken                | v0.7.0  | `0xaab0f2bf4b9267440caedaf32a9cfa6f27befc41` |
-| SignCondition             | v0.7.0  | `0x3066e8a50e42d63c1bf612cad991d07bc16457de` |
+| ConditionStoreManager     | v0.7.0  | `TBD` |
+| AgreementStoreManager     | v0.7.0  | `TBD` |
+| TemplateStoreManager      | v0.7.0  | `TBD` |
+| DIDRegistry               | v0.7.0  | `TBD` |
+| Dispenser                 | v0.7.0  | `TBD` |
+| HashLockCondition         | v0.7.0  | `TBD` |
+| LockRewardCondition       | v0.7.0  | `TBD` |
+| OceanToken                | v0.7.0  | `TBD` |
+| SignCondition             | v0.7.0  | `TBD` |
 
 #### Kovan Testnet
 
@@ -157,14 +165,15 @@ The contract addresses deployed on Kovan testnet:
 
 | Contract                  | Version | Address                                      |
 |---------------------------|---------|----------------------------------------------|
-| AccessConditions          | v0.6.10 | `0xa5a8c65a5db8f1d18ccbb4759692e4dbe1434974` |
-| ComputeConditions         | v0.6.10 | `0xa33b8526f2842bb21d996a27f58e285f3fc1e355` |
-| DIDRegistry               | v0.6.10 | `0xe838039bc5a796e63cfbc35e68cd21b16b34d9a6` |
-| Dispenser                 | v0.6.10 | `0x7077fb27fbcd4fc8369cbd188c1808d27df54aad` |
-| FitchainConditions        | v0.6.10 | `0xe48abe6c24c6cf0a43578622964b6a09f51db415` |
-| OceanToken                | v0.6.10 | `0xdb003f6eec829d4e936ecee2b4d9db98e676bc5f` |
-| PaymentConditions         | v0.6.10 | `0xf15c29421c85bcddfe4e14b945aa5fc1c15315bb` |
-| ServiceExecutionAgreement | v0.6.10 | `0x513e54350ecbb1513b5c63132a86e340edda34b8` |
+| ConditionStoreManager     | v0.7.0  | `TBD` |
+| AgreementStoreManager     | v0.7.0  | `TBD` |
+| TemplateStoreManager      | v0.7.0  | `TBD` |
+| DIDRegistry               | v0.7.0  | `TBD` |
+| Dispenser                 | v0.7.0  | `TBD` |
+| HashLockCondition         | v0.7.0  | `TBD` |
+| LockRewardCondition       | v0.7.0  | `TBD` |
+| OceanToken                | v0.7.0  | `TBD` |
+| SignCondition             | v0.7.0  | `TBD` |
 
 ## Libraries
 
@@ -181,7 +190,7 @@ The libraries provided currently are:
 Run tests with `npm test`, e.g.:
 
 ```bash
-npm test -- test/Auth.Test.js
+npm run test -- test/unit/agreements/AgreementStoreManager.Test.js
 ```
 
 ### Code Linting
@@ -192,8 +201,8 @@ Code style is enforced through the CI test process, builds will fail if there're
 
 ## Documentation
 
-* [**Main Documentation: TCR, Market and Ocean Tokens**](doc/)
-* [Architecture (pdf)](doc/files/Smart-Contract-UML-class-diagram.pdf)
+* [Main Documentation](doc/)
+* [Contracts Architecture](doc/files/Smart-Contract-UML-class-diagram.pdf)
 * [Packaging of libraries](doc/packaging.md)
 * [Upgrading contracts](doc/upgrades.md)
 
@@ -208,7 +217,7 @@ See the page titled "[Ways to Contribute](https://docs.oceanprotocol.com/concept
 ## Prior Art
 
 This project builds on top of the work done in open source projects:
-
+- [zeppelinos/zos](https://github.com/zeppelinos/zos)
 - [OpenZeppelin/openzeppelin-eth](https://github.com/OpenZeppelin/openzeppelin-eth)
 
 ## License
@@ -228,4 +237,3 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
-
