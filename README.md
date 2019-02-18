@@ -202,7 +202,7 @@ Code style is enforced through the CI test process, builds will fail if there're
 ## Documentation
 
 * [Main Documentation](doc/)
-* [Contracts Architecture](doc/files/Smart-Contract-UML-class-diagram.pdf)
+* [Keeper-contracts Diagram](doc/files/Keeper-Contracts.png)
 * [Packaging of libraries](doc/packaging.md)
 * [Upgrading contracts](doc/upgrades.md)
 
