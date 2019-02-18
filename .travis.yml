@@ -79,7 +79,7 @@ script:
             #find contracts -type f -name "*.sol" -exec ./truffle-flattener-travis.sh {} \;
             #rm -rf contracts
             #mv contracts_flatten contracts
-            travis_wait 40 npm run security:securify
+            travis_wait 60 npm run security:securify
             #git checkout HEAD contracts
         fi
 
