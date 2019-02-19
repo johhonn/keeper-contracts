@@ -38,7 +38,8 @@
     "lint:fix": "npm run lint:eslint -- --fix && npm run lint:solium -- --fix",
     "security:mythril": "truffle compile && myth -x --truffle --max-depth 12 --outform markdown 2>&1 | tee mythrilReport.md",
     "security:securify": "docker run -v $(pwd):/project chainsecurity/securify -t 2>&1 | tee securifyReport.txt",
-    "security:surya": "surya graph contracts/**/*.sol | dot -Tpng > KeeperContracts.png"
+    "security:surya": "surya graph contracts/**/*.sol | dot -Tpng > KeeperContracts.png",
+    "security:slither": "slither . 2>&1 | tee slitherReport.txt"
   },
   "directories": {
     "doc": "doc",
