@@ -1,5 +1,5 @@
 
-# Contract: Condition
+# contract: Condition
 
 
 ## Variables

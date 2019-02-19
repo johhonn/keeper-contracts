@@ -1,5 +1,5 @@
 
-# Contract: TemplateStoreManager
+# contract: TemplateStoreManager
 
 
 ## Variables

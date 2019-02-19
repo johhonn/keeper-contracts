@@ -1,5 +1,5 @@
 
-# Contract: SignCondition
+# contract: SignCondition
 
 
 ## Functions

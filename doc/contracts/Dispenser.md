@@ -1,5 +1,5 @@
 
-# Contract: Dispenser
+# contract: Dispenser
 
 Documentation:
 ```

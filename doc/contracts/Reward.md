@@ -1,5 +1,5 @@
 
-# Contract: Reward
+# contract: Reward
 
 
 ## Variables

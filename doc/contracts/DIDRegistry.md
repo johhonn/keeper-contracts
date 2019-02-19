@@ -1,5 +1,5 @@
 
-# Contract: DIDRegistry
+# contract: DIDRegistry
 
 Documentation:
 ```

@@ -1,5 +1,5 @@
 
-# Contract: DIDRegistryLibrary
+# library: DIDRegistryLibrary
 
 Documentation:
 ```

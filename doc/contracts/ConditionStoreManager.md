@@ -1,5 +1,5 @@
 
-# Contract: ConditionStoreManager
+# contract: ConditionStoreManager
 
 
 ## Variables

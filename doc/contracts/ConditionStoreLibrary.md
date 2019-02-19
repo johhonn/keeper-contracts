@@ -1,5 +1,5 @@
 
-# Contract: ConditionStoreLibrary
+# library: ConditionStoreLibrary
 
 
 ## Structs

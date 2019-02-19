@@ -1,5 +1,5 @@
 
-# Contract: Common
+# contract: Common
 
 Documentation:
 ```

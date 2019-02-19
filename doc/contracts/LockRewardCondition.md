@@ -1,5 +1,5 @@
 
-# Contract: LockRewardCondition
+# contract: LockRewardCondition
 
 
 ## Variables

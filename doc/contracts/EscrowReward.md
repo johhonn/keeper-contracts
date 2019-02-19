@@ -1,5 +1,5 @@
 
-# Contract: EscrowReward
+# contract: EscrowReward
 
 
 ## Functions

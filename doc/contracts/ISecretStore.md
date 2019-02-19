@@ -1,5 +1,5 @@
 
-# Contract: ISecretStore
+# interface: ISecretStore
 
 Documentation:
 ```

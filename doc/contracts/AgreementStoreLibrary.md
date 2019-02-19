@@ -1,5 +1,5 @@
 
-# Contract: AgreementStoreLibrary
+# library: AgreementStoreLibrary
 
 
 ## Structs

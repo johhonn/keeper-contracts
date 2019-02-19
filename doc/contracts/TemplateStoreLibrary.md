@@ -1,5 +1,5 @@
 
-# Contract: TemplateStoreLibrary
+# library: TemplateStoreLibrary
 
 
 ## Structs

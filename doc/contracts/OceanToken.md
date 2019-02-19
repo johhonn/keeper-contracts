@@ -1,5 +1,5 @@
 
-# Contract: OceanToken
+# contract: OceanToken
 
 Documentation:
 ```

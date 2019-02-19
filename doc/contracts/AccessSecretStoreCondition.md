@@ -1,5 +1,5 @@
 
-# Contract: AccessSecretStoreCondition
+# contract: AccessSecretStoreCondition
 
 
 ## Variables

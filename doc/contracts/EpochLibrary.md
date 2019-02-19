@@ -1,5 +1,5 @@
 
-# Contract: EpochLibrary
+# library: EpochLibrary
 
 
 ## Structs

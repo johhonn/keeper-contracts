@@ -1,5 +1,5 @@
 
-# Contract: AgreementTemplate
+# contract: AgreementTemplate
 
 
 ## Variables

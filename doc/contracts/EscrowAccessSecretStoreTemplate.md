@@ -1,5 +1,5 @@
 
-# Contract: EscrowAccessSecretStoreTemplate
+# contract: EscrowAccessSecretStoreTemplate
 
 
 ## Structs

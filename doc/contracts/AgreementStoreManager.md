@@ -1,5 +1,5 @@
 
-# Contract: AgreementStoreManager
+# contract: AgreementStoreManager
 
 Documentation:
 ```

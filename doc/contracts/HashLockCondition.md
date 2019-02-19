@@ -1,5 +1,5 @@
 
-# Contract: HashLockCondition
+# contract: HashLockCondition
 
 
 ## Functions
