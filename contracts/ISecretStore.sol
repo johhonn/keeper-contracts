@@ -4,9 +4,9 @@ pragma solidity 0.5.3;
 /**
  * @title Parity Secret Store Interface
  * @author Ocean Protocol Team
- * @dev All function calls are currently implemented without side effects
  */
 interface ISecretStore {
+
    /**
     *@notice checkPermissions is called by Parity secret store
     */
