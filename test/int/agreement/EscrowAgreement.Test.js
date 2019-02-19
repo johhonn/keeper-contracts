@@ -96,9 +96,10 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
         )
 
         escrowAccessSecretStoreTemplate = await EscrowAccessSecretStoreTemplate.new({ from: deployer })
-        await escrowAccessSecretStoreTemplate.initialize(
+        await escrowAccessSecretStoreTemplate.methods['initialize(address,address,address,address,address,address)'](
             owner,
             agreementStoreManager.address,
+            didRegistry.address,
             accessSecretStoreCondition.address,
             lockRewardCondition.address,
             escrowReward.address,
