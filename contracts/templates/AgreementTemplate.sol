@@ -16,7 +16,6 @@ contract AgreementTemplate is Ownable {
     function createAgreement(
         bytes32 _id,
         bytes32 _did,
-        address _didOwner,
         bytes32[] memory _conditionIds,
         uint[] memory _timeLocks,
         uint[] memory _timeOuts
@@ -27,7 +26,6 @@ contract AgreementTemplate is Ownable {
         return agreementStoreManager.createAgreement(
             _id,
             _did,
-            _didOwner,
             getConditionTypes(),
             _conditionIds,
             _timeLocks,

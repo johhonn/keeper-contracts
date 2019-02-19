@@ -55,8 +55,8 @@ async function createWallet() {
     return JSON.parse(fs.readFileSync(walletPath, 'utf-8').toString())
 }
 
-async function getAddressForImplementation(contractName) {
-    let files = glob.sync('./zos.dev-*.json')
+function getAddressForImplementation(contractName) {
+    let files = glob.sync('./zos.*.json')
     if (files === undefined || files.length === 0) {
         // array empty or does not exist
         throw Error(`zos config file not found`)
@@ -83,7 +83,7 @@ async function loadWallet(name) {
 async function requestContractUpgrade(contractName, upgraderRole, adminWallet) {
     const p = contractName.split(':')
     console.log(`Upgrading contract: ${p[1]} with ${p[0]}`)
-    const implementationAddress = await getAddressForImplementation(p[1])
+    const implementationAddress = getAddressForImplementation(p[1])
     const upgradeCallData = encodeCall('upgradeTo', ['address'], [implementationAddress])
     const args = [
         require(`../artifacts/${p[1]}.${NETWORK.toLowerCase()}.json`).address,
@@ -164,7 +164,8 @@ async function deploy(contracts, roles) {
     // NOTE: A dapp could now use the address of the proxy specified in zos.<network_name>.json
     // instance=MyContract.at(proxyAddress)
 
-    let conditionStoreManagerAddress,
+    let didRegistryAddress,
+        conditionStoreManagerAddress,
         oceanTokenAddress,
         dispenserAddress,
         templateStoreManagerAddress,
@@ -175,7 +176,7 @@ async function deploy(contracts, roles) {
 
     // v0.7
     if (contracts.indexOf('DIDRegistry') > -1) {
-        execSync(`npx zos create DIDRegistry --init initialize --args ${roles.owner}`)
+        didRegistryAddress = execSync(`npx zos create DIDRegistry --init initialize --args ${roles.owner} -v`).toString().trim()
     }
 
     if (contracts.indexOf('OceanToken') > -1) {
@@ -206,9 +207,10 @@ async function deploy(contracts, roles) {
     }
 
     if (conditionStoreManagerAddress &&
-        templateStoreManagerAddress) {
+        templateStoreManagerAddress &&
+        didRegistryAddress) {
         if (contracts.indexOf('AgreementStoreManager') > -1) {
-            agreementStoreManagerAddress = execSync(`npx zos create AgreementStoreManager --init initialize --args ${roles.owner},${conditionStoreManagerAddress},${templateStoreManagerAddress} -v`).toString().trim()
+            agreementStoreManagerAddress = execSync(`npx zos create AgreementStoreManager --init initialize --args ${roles.owner},${conditionStoreManagerAddress},${templateStoreManagerAddress},${didRegistryAddress} -v`).toString().trim()
         }
     }
 
