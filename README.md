@@ -160,7 +160,7 @@ If you managed to deploy the contracts locally do:
 ```bash
 export INFURA_TOKEN=<your infura token>
 export NMEMORIC=<your kovan nmemoric>
-npm run migrate:kovan
+npm run deploy:kovan
 ```
 
 The transaction should show up on: `https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616`
