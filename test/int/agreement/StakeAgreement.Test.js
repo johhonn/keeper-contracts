@@ -21,6 +21,7 @@ const EscrowReward = artifacts.require('EscrowReward')
 
 const constants = require('../../helpers/constants.js')
 const getBalance = require('../../helpers/getBalance.js')
+const increaseTime = require('../../helpers/increaseTime.js')
 
 contract('Stake Agreement integration test', (accounts) => {
     async function setupTest({
@@ -174,6 +175,9 @@ contract('Stake Agreement integration test', (accounts) => {
                 signCondition.fulfill(agreementId, message, publicKey, signature),
                 constants.condition.epoch.error.isTimeLocked
             )
+
+            await increaseTime(1)
+            await increaseTime(1)
 
             await signCondition.fulfill(agreementId, message, publicKey, signature)
 
