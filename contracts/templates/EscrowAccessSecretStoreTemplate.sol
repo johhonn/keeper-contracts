@@ -15,7 +15,6 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
     EscrowAccessSecretStoreAgreementList private agreementList;
 
     struct EscrowAccessSecretStoreAgreement {
-        address provider;
         address consumer;
     }
 
@@ -39,7 +38,7 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
             _agreementStoreManagerAddress != address(0) &&
             _accessSecretStoreConditionAddress != address(0) &&
             _lockRewardConditionAddress != address(0) &&
-            _escrowRewardAddress != address(0) ,
+            _escrowRewardAddress != address(0),
             'Invalid address'
         );
         Ownable.initialize(_owner);
@@ -65,7 +64,6 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
     function createAgreement(
         bytes32 _id,
         bytes32 _did,
-        address _didOwner,
         bytes32[] memory _conditionIds,
         uint[] memory _timeLocks,
         uint[] memory _timeOuts,
@@ -77,13 +75,11 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
         super.createAgreement(
             _id,
             _did,
-            _didOwner,
             _conditionIds,
             _timeLocks,
             _timeOuts
         );
         agreementList.agreements[_id] = EscrowAccessSecretStoreAgreement({
-            provider: _didOwner,
             consumer: _consumer
         });
         agreementList.agreementIds.push(_id);

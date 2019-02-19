@@ -8,6 +8,8 @@ const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
 const EpochLibrary = artifacts.require('EpochLibrary')
+const DIDRegistryLibrary = artifacts.require('DIDRegistryLibrary')
+const DIDRegistry = artifacts.require('DIDRegistry')
 const AgreementStoreLibrary = artifacts.require('AgreementStoreLibrary')
 const ConditionStoreManager = artifacts.require('ConditionStoreManager')
 const TemplateStoreManager = artifacts.require('TemplateStoreManager')
@@ -28,8 +30,12 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
         deployer = accounts[8],
         owner = accounts[9]
     } = {}) {
-        const epochLibrary = await EpochLibrary.new({ from: deployer })
+        const didRegistryLibrary = await DIDRegistryLibrary.new()
+        await DIDRegistry.link('DIDRegistryLibrary', didRegistryLibrary.address)
+        const didRegistry = await DIDRegistry.new()
+        await didRegistry.initialize(owner)
 
+        const epochLibrary = await EpochLibrary.new({ from: deployer })
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
         const conditionStoreManager = await ConditionStoreManager.new({ from: deployer })
 
@@ -42,10 +48,11 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
         const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: deployer })
         await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
         const agreementStoreManager = await AgreementStoreManager.new({ from: deployer })
-        await agreementStoreManager.initialize(
+        await agreementStoreManager.methods['initialize(address,address,address,address)'](
             owner,
             conditionStoreManager.address,
             templateStoreManager.address,
+            didRegistry.address,
             { from: deployer }
         )
 
@@ -95,6 +102,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
 
         return {
             oceanToken,
+            didRegistry,
             agreementStoreManager,
             conditionStoreManager,
             templateStoreManager,
@@ -112,6 +120,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
         it('should create escrow agreement and fulfill', async () => {
             const {
                 oceanToken,
+                didRegistry,
                 agreementStoreManager,
                 templateStoreManager,
                 conditionStoreManager,
@@ -126,6 +135,13 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
             const templateId = escrowAccessSecretStoreTemplate.address
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId, { from: owner })
+
+            // register DID
+            const did = constants.did[0]
+            const { url } = constants.registry
+            const checksum = constants.bytes32.one
+
+            await didRegistry.registerAttribute(did, checksum, url)
 
             // generate IDs from attributes
             const agreementId = constants.bytes32.one
@@ -152,8 +168,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
 
             // construct agreement
             const agreement = {
-                did: constants.did[0],
-                didOwner: accounts[0],
+                did: did,
                 conditionIds: [
                     conditionIdAccess,
                     conditionIdLock,
@@ -235,6 +250,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
         it('should create escrow agreement and abort after timeout', async () => {
             const {
                 oceanToken,
+                didRegistry,
                 templateStoreManager,
                 conditionStoreManager,
                 accessSecretStoreCondition,
@@ -248,6 +264,13 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
             const templateId = escrowAccessSecretStoreTemplate.address
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId, { from: owner })
+
+            // register DID
+            const did = constants.did[0]
+            const { url } = constants.registry
+            const checksum = constants.bytes32.one
+
+            await didRegistry.registerAttribute(did, checksum, url)
 
             // generate IDs from attributes
             const agreementId = constants.bytes32.one
@@ -275,8 +298,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
             // create agreement with timeout on access
             const timeOutAccess = 1
             const agreement = {
-                did: constants.did[0],
-                didOwner: accounts[0],
+                did: did,
                 conditionIds: [
                     conditionIdAccess,
                     conditionIdLock,
@@ -332,6 +354,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
         it('should create escrow agreement and fulfill', async () => {
             const {
                 oceanToken,
+                didRegistry,
                 templateStoreManager,
                 conditionStoreManager,
                 accessSecretStoreCondition,
@@ -345,6 +368,13 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
             const templateId = escrowAccessSecretStoreTemplate.address
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId, { from: owner })
+
+            // register DID
+            const did = constants.did[0]
+            const { url } = constants.registry
+            const checksum = constants.bytes32.one
+
+            await didRegistry.registerAttribute(did, checksum, url)
 
             // generate IDs from attributes
             const agreementId = constants.bytes32.one
@@ -372,8 +402,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
             // create agreement with time lock on access
             const timeLockAccess = 6
             const agreement = {
-                did: constants.did[0],
-                didOwner: accounts[0],
+                did: did,
                 conditionIds: [
                     conditionIdAccess,
                     conditionIdLock,

@@ -5,7 +5,6 @@ library AgreementStoreLibrary {
 
     struct Agreement {
         bytes32 did;
-        address didOwner;
         address templateId;
         bytes32[] conditionIds;
         address lastUpdatedBy;
@@ -21,7 +20,6 @@ library AgreementStoreLibrary {
         AgreementList storage _self,
         bytes32 _id,
         bytes32 _did,
-        address _didOwner,
         address _templateId,
         bytes32[] memory _conditionIds
     )
@@ -34,7 +32,6 @@ library AgreementStoreLibrary {
         );
         _self.agreements[_id] = Agreement({
             did: _did,
-            didOwner: _didOwner,
             templateId: _templateId,
             conditionIds: _conditionIds,
             lastUpdatedBy: msg.sender,
