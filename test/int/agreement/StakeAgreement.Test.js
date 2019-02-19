@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, contract, describe, it, expect */
+/* global artifacts, contract, describe, it */
 
 const chai = require('chai')
 const { assert } = chai

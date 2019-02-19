@@ -450,7 +450,7 @@ contract('AgreementStoreManager', (accounts) => {
                 .to.equal(blockNumber.toNumber())
         })
 
-        it('should get multiple agreements for same did', async () => {
+        it('should get multiple agreements for same did & template', async () => {
             const {
                 agreementStoreManager,
                 templateStoreManager,
@@ -491,8 +491,13 @@ contract('AgreementStoreManager', (accounts) => {
                 ...Object.values(otherAgreement),
                 { from: templateId }
             )
-            const agreementIds = await agreementStoreManager.getAgreementIdsForDID(did)
-            assert.lengthOf(agreementIds, 2)
+
+            assert.lengthOf(
+                await agreementStoreManager.getAgreementIdsForDID(did),
+                2)
+            assert.lengthOf(
+                await agreementStoreManager.getAgreementIdsForTemplateId(templateId),
+                2)
         })
     })
 })

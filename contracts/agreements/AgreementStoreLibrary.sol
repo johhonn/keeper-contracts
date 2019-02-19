@@ -14,6 +14,7 @@ library AgreementStoreLibrary {
     struct AgreementList {
         mapping(bytes32 => Agreement) agreements;
         mapping(bytes32 => bytes32[]) didToAgreementIds;
+        mapping(address => bytes32[]) templateIdToAgreementIds;
         bytes32[] agreementIds;
     }
 
@@ -40,6 +41,7 @@ library AgreementStoreLibrary {
         });
         _self.agreementIds.push(_id);
         _self.didToAgreementIds[_did].push(_id);
+        _self.templateIdToAgreementIds[_templateId].push(_id);
         return _self.agreementIds.length;
     }
 }
