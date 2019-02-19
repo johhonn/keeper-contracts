@@ -1,22 +1,35 @@
 /* eslint-env mocha */
-/* global artifacts, assert, contract, describe, it, beforeEach */
+/* global artifacts, contract, describe, it */
+const chai = require('chai')
+const { assert } = chai
+const chaiAsPromised = require('chai-as-promised')
+chai.use(chaiAsPromised)
 
+const DIDRegistryLibrary = artifacts.require('DIDRegistryLibrary')
 const DIDRegistry = artifacts.require('DIDRegistry')
 const testUtils = require('../../helpers/utils.js')
-
-const web3 = testUtils.getWeb3()
+const constants = require('../../helpers/constants.js')
 
 contract('DIDRegistry', (accounts) => {
-    let didRegistry
+    async function setupTest({
+        owner = accounts[1]
+    } = {}) {
+        const didRegistryLibrary = await DIDRegistryLibrary.new()
+        await DIDRegistry.link('DIDRegistryLibrary', didRegistryLibrary.address)
+        const didRegistry = await DIDRegistry.new()
 
-    beforeEach(async () => {
-        didRegistry = await DIDRegistry.new()
-        await didRegistry.initialize(accounts[0])
-    })
+        await didRegistry.initialize(owner)
+
+        return {
+            didRegistry,
+            owner
+        }
+    }
 
     describe('Register decentralised identifiers with attributes, fetch attributes by DID', () => {
         it('Should discover the attribute after registering it', async () => {
-            const did = web3.utils.fromAscii('did:ocn:test-attr')
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
             const result = await didRegistry.registerAttribute(did, checksum, value)
@@ -24,14 +37,15 @@ contract('DIDRegistry', (accounts) => {
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             const payload = result.logs[0].args
-            assert.strictEqual('did:ocn:test-attr', web3.utils.hexToString(payload.did))
-            assert.strictEqual(accounts[0], payload.owner)
-            assert.strictEqual(checksum, payload.checksum)
-            assert.strictEqual(value, payload.value)
+            assert.strictEqual(did, payload._did)
+            assert.strictEqual(accounts[0], payload._owner)
+            assert.strictEqual(checksum, payload._checksum)
+            assert.strictEqual(value, payload._value)
         })
 
         it('Should find the event from the block number', async () => {
-            const did = web3.utils.sha3('did:ocn:test-read-event-from-filter-using-block-number')
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
             const result = await didRegistry.registerAttribute(did, checksum, value)
@@ -39,11 +53,11 @@ contract('DIDRegistry', (accounts) => {
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             // get owner for a did
-            const owner = await didRegistry.getDidOwner(did)
+            const owner = await didRegistry.getDIDOwner(did)
             assert.strictEqual(accounts[0], owner)
 
             // get the blockNumber for the last update
-            const blockNumber = await didRegistry.getUpdateAt(did)
+            const blockNumber = await didRegistry.getBlockNumberUpdated(did)
             assert(blockNumber > 0)
 
             // filter on the blockNumber only
@@ -59,16 +73,17 @@ contract('DIDRegistry', (accounts) => {
                 if (!error) {
                     if (logItems.length > 0) {
                         const logItem = logItems[logItems.length - 1]
-                        assert.strictEqual(did, logItem.returnValues.did)
-                        assert.strictEqual(owner, logItem.returnValues.owner)
-                        assert.strictEqual(value, logItem.returnValues.value)
+                        assert.strictEqual(did, logItem.returnValues._did)
+                        assert.strictEqual(owner, logItem.returnValues._owner)
+                        assert.strictEqual(value, logItem.returnValues._value)
                     }
                 }
             })
         })
 
         it('Should not fail to register the same attribute twice', async () => {
-            const did = web3.utils.fromAscii('did:ocn:test-attr-twice')
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
             await didRegistry.registerAttribute(did, checksum, value)
@@ -79,19 +94,9 @@ contract('DIDRegistry', (accounts) => {
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
         })
 
-        it('Should not fail to register crazy long did', async () => {
-            const crazyLongDID = 'did:ocn:test-attr-twice-crazy-long-dude-really-oh-yeah'
-            const did = web3.utils.sha3(crazyLongDID)
-            const checksum = testUtils.generateId()
-            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
-            const result = await didRegistry.registerAttribute(did, checksum, value)
-
-            const payload = result.logs[0].args
-            assert.strictEqual(did, payload.did)
-        })
-
         it('Should only allow the owner to set an attribute', async () => {
-            const did = web3.utils.fromAscii('did:ocn:test-attr')
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
             await didRegistry.registerAttribute(did, checksum, value)
@@ -99,26 +104,24 @@ contract('DIDRegistry', (accounts) => {
             const anotherPerson = { from: accounts[1] }
 
             // a different owner can register his own DID
-            let failed = false
-            try {
+            await assert.isRejected(
                 // must not be able to add attributes to someone else's DID
-                await didRegistry.registerAttribute(did, checksum, value, anotherPerson)
-            } catch (e) {
-                failed = true
-            }
-            assert.equal(true, failed)
+                didRegistry.registerAttribute(did, checksum, value, anotherPerson),
+                constants.registry.error.onlyDIDOwner
+            )
         })
+
         it('Should not allow url value gt 2048 bytes long', async () => {
-            const did = web3.utils.fromAscii('did:ocn:test-attr')
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
             const checksum = testUtils.generateId()
             // value is about 2049
             const value = 'dabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345xdfwfg'
 
-            try {
-                await didRegistry.registerAttribute(did, checksum, value)
-            } catch (e) {
-                assert.strictEqual(e.reason, 'Invalid url size')
-            }
+            await assert.isRejected(
+                didRegistry.registerAttribute(did, checksum, value),
+                constants.registry.error.invalidValueSize
+            )
         })
     })
 })

@@ -1,26 +1,47 @@
 pragma solidity 0.5.3;
 
 // Contain upgraded version of the contracts for test
-import '../../DIDRegistry.sol';
+import '../../registry/DIDRegistry.sol';
 
 contract DIDRegistryWithBug is DIDRegistry {
 
-    function registerAttribute(
-        bytes32 _did,
+   /**
+    * @notice registerAttribute is called only by DID owner.
+    * @dev this function registers DID attributes
+    * @param _did refers to decentralized identifier (a byte32 length ID)
+    * @param _checksum includes a one-way HASH calculated using the DDO content
+    * @param _value refers to the attribute value
+    */
+    function registerAttribute (
         bytes32 _checksum,
+        bytes32 _did,
         string memory _value
     )
         public
-        onlyValidDIDArgs(_did, _checksum, _value)
+        returns (uint size)
     {
+        require(
+            didRegisterList.didRegisters[_did].owner == address(0x0) ||
+            didRegisterList.didRegisters[_did].owner == msg.sender,
+            'Attributes must be registered by the DID owners.'
+        );
+        require(
+            //TODO: 2048 should be changed in the future
+            bytes(_value).length <= 2048,
+            'Invalid value size'
+        );
+        didRegisterList.update(_did, _checksum);
         // add bug here
-        didRegister[_did] = DIDRegister(msg.sender, 42);
+        didRegisterList.didRegisters[_did].blockNumberUpdated = 42;
         emit DIDAttributeRegistered(
             _did,
-            msg.sender,
+            didRegisterList.didRegisters[_did].owner,
             _checksum,
             _value,
+            msg.sender,
             block.number
         );
+
+        return getDIDRegistrySize();
     }
 }
