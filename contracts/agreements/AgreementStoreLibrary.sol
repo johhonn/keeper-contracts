@@ -4,7 +4,6 @@ pragma solidity 0.5.3;
 library AgreementStoreLibrary {
 
     struct Agreement {
-        bytes32 did;
         address templateId;
         bytes32[] conditionIds;
         address lastUpdatedBy;
@@ -13,6 +12,8 @@ library AgreementStoreLibrary {
 
     struct AgreementList {
         mapping(bytes32 => Agreement) agreements;
+        mapping(bytes32 => bytes32) agreementIdToDID;
+        mapping(bytes32 => bytes32[]) didToAgreementIds;
         bytes32[] agreementIds;
     }
 
@@ -31,13 +32,14 @@ library AgreementStoreLibrary {
             'Id already exists'
         );
         _self.agreements[_id] = Agreement({
-            did: _did,
             templateId: _templateId,
             conditionIds: _conditionIds,
             lastUpdatedBy: msg.sender,
             blockNumberUpdated: block.number
         });
         _self.agreementIds.push(_id);
+        _self.agreementIdToDID[_id] = _did;
+        _self.didToAgreementIds[_did].push(_id);
         return _self.agreementIds.length;
     }
 }

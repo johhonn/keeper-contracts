@@ -160,7 +160,7 @@ contract AgreementStoreManager is Ownable {
             uint256 blockNumberUpdated
         )
     {
-        did = agreementList.agreements[_id].did;
+        did = agreementList.agreementIdToDID[_id];
         didOwner = didRegistry.getDIDOwner(did);
         templateId = agreementList.agreements[_id].templateId;
         conditionIds = agreementList.agreements[_id].conditionIds;
@@ -178,7 +178,7 @@ contract AgreementStoreManager is Ownable {
         view
         returns (address didOwner)
     {
-        bytes32 did = agreementList.agreements[_id].did;
+        bytes32 did = agreementList.agreementIdToDID[_id];
         return didRegistry.getDIDOwner(did);
     }
 
@@ -191,5 +191,17 @@ contract AgreementStoreManager is Ownable {
         returns (uint size)
     {
         return agreementList.agreementIds.length;
+    }
+
+    /**
+     * @param _did is the bytes32 DID of the asset.
+     * @return the agreement IDs for a given DID
+     */
+    function getAgreementIdsForDID(bytes32 _did)
+        public
+        view
+        returns (bytes32[] memory)
+    {
+        return agreementList.didToAgreementIds[_did];
     }
 }
