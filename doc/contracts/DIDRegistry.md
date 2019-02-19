@@ -1,38 +1,47 @@
 
-# Contract: DIDRegistry
+# contract: DIDRegistry
 
 Documentation:
 ```
 @title DID Registry
 @author Ocean Protocol Team
-@dev All function calls are currently implemented without side effects
+ * @dev Implementation of the DID Registry.
+     https://github.com/oceanprotocol/OEPs/tree/master/7#registry
 ```
-
-## Structs
-
-### public DIDRegister
-Members:
-* address owner
-* uint256 updateAt
 
 ## Variables
 
-### private didRegister
+### internal didRegisterList
 
 ## Events
 
 ###  DIDAttributeRegistered
+
+Documentation:
+
+```
+@dev This implementation does not store _value on-chain,
+     but emits DIDAttributeRegistered events to store it in the event log.
+```
 Parameters:
-* bytes32 did
-* address owner
-* bytes32 key
-* string value
-* enum DIDRegistry.ValueType valueType
-* uint256 updatedAt
+* bytes32 _did
+* address _owner
+* bytes32 _checksum
+* string _value
+* address _lastUpdatedBy
+* uint256 _blockNumberUpdated
 
 ## Functions
 
 ### public initialize
+
+Documentation:
+
+```
+@dev DIDRegistry Initializer
+     Initialize Ownable. Only on contract creation.
+@param _owner refers to the owner of the contract.
+```
 Parameters:
 * address _owner
 
@@ -41,39 +50,45 @@ Parameters:
 Documentation:
 
 ```
-@notice registerAttribute is called only by DID owner.
-@dev this function registers DID attributes
-@param did refers to decentralized identifier (a byte32 length ID)
-@param valueType includes DID, DID reference , URL, or DDO
-@param key represents the attribute key
-@param value refers to the attribute value
+@notice Register DID attributes.
+     * @dev The first attribute of a DID registered sets the DID owner.
+     Subsequent updates record _checksum and update info.
+     * @param _did refers to decentralized identifier (a bytes32 length ID).
+@param _checksum includes a one-way HASH calculated using the DDO content.
+@param _value refers to the attribute value, limited to 2048 bytes.
+@return the size of the registry after the register action.
 ```
 Parameters:
-* bytes32 did
-* enum DIDRegistry.ValueType valueType
-* bytes32 key
-* string value
+* bytes32 _did
+* bytes32 _checksum
+* string _value
 
-### public getUpdateAt
+### public getBlockNumberUpdated
 
 Documentation:
 
 ```
-@notice getUpdateAt is called by anyone.
-@param did refers to decentralized identifier (a byte32 length ID)
-@return last modified (update) time of a DID
+@param _did refers to decentralized identifier (a bytes32 length ID).
+@return last modified (update) block number of a DID.
 ```
 Parameters:
-* bytes32 did
+* bytes32 _did
 
-### public getOwner
+### public getDIDOwner
 
 Documentation:
 
 ```
-@notice getOwner is called by anyone.
-@param did refers to decentralized identifier (a byte32 length ID)
-@return the address of the owner
+@param _did refers to decentralized identifier (a bytes32 length ID).
+@return the address of the DID owner.
 ```
 Parameters:
-* bytes32 did
+* bytes32 _did
+
+### public getDIDRegistrySize
+
+Documentation:
+
+```
+@return the length of the DID registry.
+```

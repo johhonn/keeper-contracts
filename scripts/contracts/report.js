@@ -7,6 +7,7 @@ class Report {
         this.report = {
             contract: {
                 name: undefined,
+                kind: undefined,
                 documentation: undefined,
                 variables: [],
                 structs: [],
@@ -67,6 +68,7 @@ class Report {
                         break
                     case 'Contract':
                         this.report.contract.name = node.name
+                        this.report.contract.kind = node.contractKind
                         this.report.contract.documentation = node.documentation
                         break
                     case 'Variable':
@@ -146,7 +148,7 @@ ${item.documentation}
 
         this.deflateNodes(contract.ast.nodes)
 
-        output += `\n# Contract: ${this.report.contract.name}\n\n`
+        output += `\n# ${this.report.contract.kind}: ${this.report.contract.name}\n\n`
 
         if (this.report.contract.documentation) {
             output +=
@@ -168,8 +170,8 @@ ${this.report.contract.documentation}
         if (this.report.contract.variables.length > 0) {
             output += '\n## Variables\n'
 
-            for (const event of this.report.contract.variables) {
-                logItem(event)
+            for (const variable of this.report.contract.variables) {
+                logItem(variable)
             }
         }
 
