@@ -22,11 +22,16 @@ const EscrowAccessSecretStoreTemplate = artifacts.require('EscrowAccessSecretSto
 
 const constants = require('../../helpers/constants.js')
 const getBalance = require('../../helpers/getBalance.js')
+const increaseTime = require('../../helpers/increaseTime.js')
 
 contract('Escrow Access Secret Store integration test', (accounts) => {
+    let lockRewardCondition,
+        escrowReward,
+        accessSecretStoreCondition,
+        escrowAccessSecretStoreTemplate,
+        templateStoreManager
+
     async function setupTest({
-        agreementId = constants.bytes32.one,
-        conditionIds = [constants.address.dummy],
         deployer = accounts[8],
         owner = accounts[9]
     } = {}) {
@@ -39,7 +44,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
         const conditionStoreManager = await ConditionStoreManager.new({ from: deployer })
 
-        const templateStoreManager = await TemplateStoreManager.new({ from: deployer })
+        templateStoreManager = await TemplateStoreManager.new({ from: deployer })
         await templateStoreManager.initialize(
             owner,
             { from: deployer }
@@ -65,7 +70,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
         const oceanToken = await OceanToken.new({ from: deployer })
         await oceanToken.initialize(owner, owner)
 
-        const lockRewardCondition = await LockRewardCondition.new({ from: deployer })
+        lockRewardCondition = await LockRewardCondition.new({ from: deployer })
         await lockRewardCondition.initialize(
             owner,
             conditionStoreManager.address,
@@ -73,7 +78,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
             { from: deployer }
         )
 
-        const accessSecretStoreCondition = await AccessSecretStoreCondition.new({ from: deployer })
+        accessSecretStoreCondition = await AccessSecretStoreCondition.new({ from: deployer })
 
         await accessSecretStoreCondition.initialize(
             owner,
@@ -82,7 +87,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
             { from: deployer }
         )
 
-        const escrowReward = await EscrowReward.new({ from: deployer })
+        escrowReward = await EscrowReward.new({ from: deployer })
         await escrowReward.initialize(
             owner,
             conditionStoreManager.address,
@@ -90,7 +95,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
             { from: deployer }
         )
 
-        const escrowAccessSecretStoreTemplate = await EscrowAccessSecretStoreTemplate.new({ from: deployer })
+        escrowAccessSecretStoreTemplate = await EscrowAccessSecretStoreTemplate.new({ from: deployer })
         await escrowAccessSecretStoreTemplate.initialize(
             owner,
             agreementStoreManager.address,
@@ -100,89 +105,74 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
             { from: deployer }
         )
 
+        // propose and approve template
+        const templateId = escrowAccessSecretStoreTemplate.address
+        await templateStoreManager.proposeTemplate(templateId)
+        await templateStoreManager.approveTemplate(templateId, { from: owner })
+
         return {
             oceanToken,
             didRegistry,
             agreementStoreManager,
             conditionStoreManager,
-            templateStoreManager,
-            lockRewardCondition,
-            accessSecretStoreCondition,
-            escrowReward,
-            escrowAccessSecretStoreTemplate,
-            agreementId,
-            conditionIds,
+            templateId,
             owner
+        }
+    }
+
+    async function prepareEscrowAgreement({
+        agreementId = constants.bytes32.one,
+        sender = accounts[0],
+        receiver = accounts[1],
+        escrowAmount = 10,
+        timeLockAccess = 0,
+        timeOutAccess = 0,
+        did = constants.did[0],
+        url = constants.registry.url,
+        checksum = constants.bytes32.one
+    } = {}) {
+        // generate IDs from attributes
+        const conditionIdAccess = await accessSecretStoreCondition.generateId(agreementId, await accessSecretStoreCondition.hashValues(did, receiver))
+        const conditionIdLock = await lockRewardCondition.generateId(agreementId, await lockRewardCondition.hashValues(escrowReward.address, escrowAmount))
+        const conditionIdEscrow = await escrowReward.generateId(agreementId, await escrowReward.hashValues(escrowAmount, receiver, sender, conditionIdLock, conditionIdAccess))
+
+        // construct agreement
+        const agreement = {
+            did: did,
+            conditionIds: [
+                conditionIdAccess,
+                conditionIdLock,
+                conditionIdEscrow
+            ],
+            timeLocks: [timeLockAccess, 0, 0],
+            timeOuts: [timeOutAccess, 0, 0],
+            consumer: receiver
+        }
+        return {
+            agreementId,
+            agreement,
+            sender,
+            receiver,
+            escrowAmount,
+            timeLockAccess,
+            timeOutAccess,
+            checksum,
+            url
         }
     }
 
     describe('create and fulfill escrow agreement', () => {
         it('should create escrow agreement and fulfill', async () => {
-            const {
-                oceanToken,
-                didRegistry,
-                agreementStoreManager,
-                templateStoreManager,
-                conditionStoreManager,
-                accessSecretStoreCondition,
-                lockRewardCondition,
-                escrowReward,
-                escrowAccessSecretStoreTemplate,
-                owner
-            } = await setupTest()
+            const { oceanToken, didRegistry, agreementStoreManager, conditionStoreManager, owner } = await setupTest()
 
-            // propose and approve template
-            const templateId = escrowAccessSecretStoreTemplate.address
-            await templateStoreManager.proposeTemplate(templateId)
-            await templateStoreManager.approveTemplate(templateId, { from: owner })
+            // prepare: escrow agreement
+            const { agreementId, agreement, sender, receiver, escrowAmount, checksum, url } = await prepareEscrowAgreement()
 
             // register DID
-            const did = constants.did[0]
-            const { url } = constants.registry
-            const checksum = constants.bytes32.one
+            await didRegistry.registerAttribute(agreement.did, checksum, url)
 
-            await didRegistry.registerAttribute(did, checksum, url)
-
-            // generate IDs from attributes
-            const agreementId = constants.bytes32.one
-
-            const sender = accounts[0]
-            const receiver = accounts[1]
-            const amount = 10
-            const documentId = constants.did[0]
-            const grantee = accounts[1]
-
-            const hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
-            const conditionIdLock = await lockRewardCondition.generateId(agreementId, hashValuesLock)
-
-            const hashValuesAccess = await accessSecretStoreCondition.hashValues(documentId, grantee)
-            const conditionIdAccess = await accessSecretStoreCondition.generateId(agreementId, hashValuesAccess)
-
-            const hashValuesEscrow = await escrowReward.hashValues(
-                amount,
-                receiver,
-                sender,
-                conditionIdLock,
-                conditionIdAccess)
-            const conditionIdEscrow = await escrowReward.generateId(agreementId, hashValuesEscrow)
-
-            // construct agreement
-            const agreement = {
-                did: did,
-                conditionIds: [
-                    conditionIdAccess,
-                    conditionIdLock,
-                    conditionIdEscrow
-                ],
-                timeLocks: [0, 0, 0],
-                timeOuts: [0, 0, 0],
-                consumer: accounts[1]
-            }
-
-            await escrowAccessSecretStoreTemplate.createAgreement(
-                agreementId,
-                ...Object.values(agreement)
-            )
+            // create agreement
+            await escrowAccessSecretStoreTemplate.createAgreement(agreementId, ...Object.values(agreement))
 
             // check state of agreement and conditions
             expect((await agreementStoreManager.getAgreement(agreementId)).did)
@@ -196,278 +186,138 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
                 expect(storedCondition.state.toNumber()).to.equal(constants.condition.state.unfulfilled)
             })
 
-            // fulfill lock reward
-            await oceanToken.mint(sender, amount, { from: owner })
+            // fill up wallet
+            await oceanToken.mint(sender, escrowAmount, { from: owner })
 
-            assert.strictEqual(await getBalance(oceanToken, sender), amount)
+            assert.strictEqual(await getBalance(oceanToken, sender), escrowAmount)
             assert.strictEqual(await getBalance(oceanToken, lockRewardCondition.address), 0)
             assert.strictEqual(await getBalance(oceanToken, escrowReward.address), 0)
             assert.strictEqual(await getBalance(oceanToken, receiver), 0)
 
-            await oceanToken.approve(
-                lockRewardCondition.address,
-                amount,
-                { from: sender })
-
-            await lockRewardCondition.fulfill(agreementId, escrowReward.address, amount)
+            // fulfill lock reward
+            await oceanToken.approve(lockRewardCondition.address, escrowAmount, { from: sender })
+            await lockRewardCondition.fulfill(agreementId, escrowReward.address, escrowAmount)
 
             assert.strictEqual(await getBalance(oceanToken, sender), 0)
             assert.strictEqual(await getBalance(oceanToken, lockRewardCondition.address), 0)
-            assert.strictEqual(await getBalance(oceanToken, escrowReward.address), amount)
+            assert.strictEqual(await getBalance(oceanToken, escrowReward.address), escrowAmount)
             assert.strictEqual(await getBalance(oceanToken, receiver), 0)
 
             assert.strictEqual(
-                (await conditionStoreManager.getConditionState(conditionIdLock)).toNumber(),
+                (await conditionStoreManager.getConditionState(agreement.conditionIds[1])).toNumber(),
                 constants.condition.state.fulfilled)
 
             // fulfill access
-            await accessSecretStoreCondition.fulfill(agreementId, documentId, grantee)
+            await accessSecretStoreCondition.fulfill(agreementId, agreement.did, receiver)
 
             assert.strictEqual(
-                (await conditionStoreManager.getConditionState(conditionIdAccess)).toNumber(),
+                (await conditionStoreManager.getConditionState(agreement.conditionIds[0])).toNumber(),
                 constants.condition.state.fulfilled)
 
             // get reward
-            await escrowReward.fulfill(
-                agreementId,
-                amount,
-                receiver,
-                sender,
-                conditionIdLock,
-                conditionIdAccess)
+            await escrowReward.fulfill(agreementId, escrowAmount, receiver, sender, agreement.conditionIds[1], agreement.conditionIds[0])
 
             assert.strictEqual(
-                (await conditionStoreManager.getConditionState(conditionIdEscrow)).toNumber(),
+                (await conditionStoreManager.getConditionState(agreement.conditionIds[2])).toNumber(),
                 constants.condition.state.fulfilled
             )
 
             assert.strictEqual(await getBalance(oceanToken, sender), 0)
             assert.strictEqual(await getBalance(oceanToken, lockRewardCondition.address), 0)
             assert.strictEqual(await getBalance(oceanToken, escrowReward.address), 0)
-            assert.strictEqual(await getBalance(oceanToken, receiver), amount)
+            assert.strictEqual(await getBalance(oceanToken, receiver), escrowAmount)
         })
 
         it('should create escrow agreement and abort after timeout', async () => {
-            const {
-                oceanToken,
-                didRegistry,
-                templateStoreManager,
-                conditionStoreManager,
-                accessSecretStoreCondition,
-                lockRewardCondition,
-                escrowReward,
-                escrowAccessSecretStoreTemplate,
-                owner
-            } = await setupTest()
+            const { oceanToken, didRegistry, conditionStoreManager, owner } = await setupTest()
 
-            // propose and approve template
-            const templateId = escrowAccessSecretStoreTemplate.address
-            await templateStoreManager.proposeTemplate(templateId)
-            await templateStoreManager.approveTemplate(templateId, { from: owner })
+            // prepare: escrow agreement
+            const { agreementId, agreement, sender, receiver, escrowAmount, timeOutAccess, checksum, url } = await prepareEscrowAgreement({ timeOutAccess: 10 })
 
             // register DID
-            const did = constants.did[0]
-            const { url } = constants.registry
-            const checksum = constants.bytes32.one
+            await didRegistry.registerAttribute(agreement.did, checksum, url)
 
-            await didRegistry.registerAttribute(did, checksum, url)
+            // create agreement
+            await escrowAccessSecretStoreTemplate.createAgreement(agreementId, ...Object.values(agreement))
 
-            // generate IDs from attributes
-            const agreementId = constants.bytes32.one
+            // fill up wallet
+            await oceanToken.mint(sender, escrowAmount, { from: owner })
 
-            const sender = accounts[0]
-            const receiver = accounts[1]
-            const amount = 10
-            const documentId = constants.did[0]
-            const grantee = accounts[1]
-
-            const hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
-            const conditionIdLock = await lockRewardCondition.generateId(agreementId, hashValuesLock)
-
-            const hashValuesAccess = await accessSecretStoreCondition.hashValues(documentId, grantee)
-            const conditionIdAccess = await accessSecretStoreCondition.generateId(agreementId, hashValuesAccess)
-
-            const hashValuesEscrow = await escrowReward.hashValues(
-                amount,
-                receiver,
-                sender,
-                conditionIdLock,
-                conditionIdAccess)
-            const conditionIdEscrow = await escrowReward.generateId(agreementId, hashValuesEscrow)
-
-            // create agreement with timeout on access
-            const timeOutAccess = 1
-            const agreement = {
-                did: did,
-                conditionIds: [
-                    conditionIdAccess,
-                    conditionIdLock,
-                    conditionIdEscrow
-                ],
-                timeLocks: [0, 0, 0],
-                timeOuts: [timeOutAccess, 0, 0],
-                consumer: accounts[1]
-            }
-
-            await escrowAccessSecretStoreTemplate.createAgreement(
-                agreementId,
-                ...Object.values(agreement)
-            )
-
-            await oceanToken.mint(sender, amount, { from: owner })
-
-            await oceanToken.approve(
-                lockRewardCondition.address,
-                amount,
-                { from: sender })
-
-            await lockRewardCondition.fulfill(agreementId, escrowReward.address, amount)
-
+            // fulfill lock reward
+            await oceanToken.approve(lockRewardCondition.address, escrowAmount, { from: sender })
+            await lockRewardCondition.fulfill(agreementId, escrowReward.address, escrowAmount)
             assert.strictEqual(
-                (await conditionStoreManager.getConditionState(conditionIdLock)).toNumber(),
+                (await conditionStoreManager.getConditionState(agreement.conditionIds[1])).toNumber(),
                 constants.condition.state.fulfilled)
 
-            await accessSecretStoreCondition.fulfill(agreementId, documentId, grantee)
+            // wait: for time out
+            await increaseTime(timeOutAccess)
 
+            // abort: fulfill access after timeout
+            await accessSecretStoreCondition.fulfill(agreementId, agreement.did, receiver)
             assert.strictEqual(
-                (await conditionStoreManager.getConditionState(conditionIdAccess)).toNumber(),
+                (await conditionStoreManager.getConditionState(agreement.conditionIds[0])).toNumber(),
                 constants.condition.state.aborted)
 
-            await escrowReward.fulfill(
-                agreementId,
-                amount,
-                receiver,
-                sender,
-                conditionIdLock,
-                conditionIdAccess)
-
+            // refund
+            await escrowReward.fulfill(agreementId, escrowAmount, receiver, sender, agreement.conditionIds[1], agreement.conditionIds[0])
             assert.strictEqual(
-                (await conditionStoreManager.getConditionState(conditionIdEscrow)).toNumber(),
+                (await conditionStoreManager.getConditionState(agreement.conditionIds[2])).toNumber(),
                 constants.condition.state.fulfilled
             )
-
-            assert.strictEqual(await getBalance(oceanToken, sender), amount)
+            assert.strictEqual(await getBalance(oceanToken, receiver), 0)
+            assert.strictEqual(await getBalance(oceanToken, sender), escrowAmount)
         })
     })
 
     describe('create and fulfill escrow agreement with access secret store and timeLock', () => {
         it('should create escrow agreement and fulfill', async () => {
-            const {
-                oceanToken,
-                didRegistry,
-                templateStoreManager,
-                conditionStoreManager,
-                accessSecretStoreCondition,
-                lockRewardCondition,
-                escrowReward,
-                escrowAccessSecretStoreTemplate,
-                owner
-            } = await setupTest()
+            const { oceanToken, didRegistry, conditionStoreManager, owner } = await setupTest()
 
-            // propose and approve template
-            const templateId = escrowAccessSecretStoreTemplate.address
-            await templateStoreManager.proposeTemplate(templateId)
-            await templateStoreManager.approveTemplate(templateId, { from: owner })
+            // prepare: escrow agreement
+            const { agreementId, agreement, sender, receiver, escrowAmount, timeLockAccess, checksum, url } = await prepareEscrowAgreement({ timeLockAccess: 10 })
 
             // register DID
-            const did = constants.did[0]
-            const { url } = constants.registry
-            const checksum = constants.bytes32.one
+            await didRegistry.registerAttribute(agreement.did, checksum, url)
+            // fill up wallet
+            await oceanToken.mint(sender, escrowAmount, { from: owner })
 
-            await didRegistry.registerAttribute(did, checksum, url)
+            // create agreement
+            await escrowAccessSecretStoreTemplate.createAgreement(agreementId, ...Object.values(agreement))
 
-            // generate IDs from attributes
-            const agreementId = constants.bytes32.one
-
-            const sender = accounts[0]
-            const receiver = accounts[1]
-            const amount = 10
-            const documentId = constants.did[0]
-            const grantee = accounts[1]
-
-            const hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
-            const conditionIdLock = await lockRewardCondition.generateId(agreementId, hashValuesLock)
-
-            const hashValuesAccess = await accessSecretStoreCondition.hashValues(documentId, grantee)
-            const conditionIdAccess = await accessSecretStoreCondition.generateId(agreementId, hashValuesAccess)
-
-            const hashValuesEscrow = await escrowReward.hashValues(
-                amount,
-                receiver,
-                sender,
-                conditionIdLock,
-                conditionIdAccess)
-            const conditionIdEscrow = await escrowReward.generateId(agreementId, hashValuesEscrow)
-
-            // create agreement with time lock on access
-            const timeLockAccess = 6
-            const agreement = {
-                did: did,
-                conditionIds: [
-                    conditionIdAccess,
-                    conditionIdLock,
-                    conditionIdEscrow
-                ],
-                timeLocks: [timeLockAccess, 0, 0],
-                timeOuts: [0, 0, 0],
-                consumer: accounts[1]
-            }
-
-            await escrowAccessSecretStoreTemplate.createAgreement(
-                agreementId,
-                ...Object.values(agreement)
-            )
-
-            await oceanToken.mint(sender, amount, { from: owner })
-
-            await oceanToken.approve(
-                lockRewardCondition.address,
-                amount,
-                { from: sender })
-
-            await lockRewardCondition.fulfill(agreementId, escrowReward.address, amount)
-
+            // fulfill lock reward
+            await oceanToken.approve(lockRewardCondition.address, escrowAmount, { from: sender })
+            await lockRewardCondition.fulfill(agreementId, escrowReward.address, escrowAmount)
             assert.strictEqual(
-                (await conditionStoreManager.getConditionState(conditionIdLock)).toNumber(),
+                (await conditionStoreManager.getConditionState(agreement.conditionIds[1])).toNumber(),
                 constants.condition.state.fulfilled)
+            expect(await accessSecretStoreCondition.checkPermissions(receiver, agreement.did)).to.equal(false)
 
+            // fail: fulfill access before time lock
             await assert.isRejected(
-                accessSecretStoreCondition.fulfill(agreementId, documentId, grantee),
+                accessSecretStoreCondition.fulfill(agreementId, agreement.did, receiver),
                 constants.condition.epoch.error.isTimeLocked
             )
+            expect(await accessSecretStoreCondition.checkPermissions(receiver, agreement.did)).to.equal(false)
 
-            await assert.isRejected(
-                accessSecretStoreCondition.fulfill(agreementId, documentId, grantee,
-                    { from: accounts[1] }),
-                constants.acl.error.invalidUpdateRole
-            )
+            // wait: for time lock
+            await increaseTime(timeLockAccess)
 
-            expect(await accessSecretStoreCondition.checkPermissions(grantee, documentId))
-                .to.equal(false)
-
-            await accessSecretStoreCondition.fulfill(agreementId, documentId, grantee)
-
+            // execute: fulfill access after time lock
+            await accessSecretStoreCondition.fulfill(agreementId, agreement.did, receiver)
             assert.strictEqual(
-                (await conditionStoreManager.getConditionState(conditionIdAccess)).toNumber(),
+                (await conditionStoreManager.getConditionState(agreement.conditionIds[0])).toNumber(),
                 constants.condition.state.fulfilled)
+            expect(await accessSecretStoreCondition.checkPermissions(receiver, agreement.did)).to.equal(true)
 
-            await escrowReward.fulfill(
-                agreementId,
-                amount,
-                receiver,
-                sender,
-                conditionIdLock,
-                conditionIdAccess)
-
+            // execute payment
+            await escrowReward.fulfill(agreementId, escrowAmount, receiver, sender, agreement.conditionIds[1], agreement.conditionIds[0])
             assert.strictEqual(
-                (await conditionStoreManager.getConditionState(conditionIdEscrow)).toNumber(),
+                (await conditionStoreManager.getConditionState(agreement.conditionIds[2])).toNumber(),
                 constants.condition.state.fulfilled
             )
-
-            expect(await accessSecretStoreCondition.checkPermissions(grantee, documentId))
-                .to.equal(true)
-
-            assert.strictEqual(await getBalance(oceanToken, receiver), amount)
+            assert.strictEqual(await getBalance(oceanToken, sender), 0)
+            assert.strictEqual(await getBalance(oceanToken, receiver), escrowAmount)
         })
     })
 })
