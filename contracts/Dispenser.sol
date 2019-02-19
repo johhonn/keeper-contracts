@@ -65,7 +65,8 @@ contract Dispenser is Ownable {
         isValidAddress(_oceanTokenAddress)
     {
         Ownable.initialize(_owner);
-
+        // init total mint amount
+        totalMintAmount = 0;
         // instantiate OceanToken contract
         oceanToken = OceanToken(_oceanTokenAddress);
 
