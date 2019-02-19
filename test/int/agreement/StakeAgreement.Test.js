@@ -22,7 +22,7 @@ const EscrowReward = artifacts.require('EscrowReward')
 const constants = require('../../helpers/constants.js')
 const getBalance = require('../../helpers/getBalance.js')
 
-contract('Escrow Access Secret Store integration test', (accounts) => {
+contract('Stake Agreement integration test', (accounts) => {
     async function setupTest({
         agreementId = constants.bytes32.one,
         conditionIds = [constants.address.dummy],
@@ -102,8 +102,8 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
         }
     }
 
-    describe('create and fulfill escrow agreement', () => {
-        it('should create escrow agreement and fulfill', async () => {
+    describe('create and fulfill stake agreement', () => {
+        it('stake agreement as an escrow with self-sign release', async () => {
             const {
                 oceanToken,
                 didRegistry,
