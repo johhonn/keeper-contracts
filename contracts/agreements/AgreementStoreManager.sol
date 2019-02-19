@@ -115,7 +115,7 @@ contract AgreementStoreManager is Ownable {
             'Arguments have wrong length'
         );
 
-        // create the conditions in condition store. Can fail if conditionID already exists.
+        // create the conditions in condition store. Fail if conditionId already exists.
         for (uint256 i = 0; i < _conditionTypes.length; i++) {
             conditionStoreManager.createCondition(
                 _conditionIds[i],
@@ -191,5 +191,29 @@ contract AgreementStoreManager is Ownable {
         returns (uint size)
     {
         return agreementList.agreementIds.length;
+    }
+
+    /**
+     * @param _did is the bytes32 DID of the asset.
+     * @return the agreement IDs for a given DID
+     */
+    function getAgreementIdsForDID(bytes32 _did)
+        public
+        view
+        returns (bytes32[] memory)
+    {
+        return agreementList.didToAgreementIds[_did];
+    }
+
+    /**
+     * @param _templateId is the address of the agreement template.
+     * @return the agreement IDs for a given DID
+     */
+    function getAgreementIdsForTemplateId(address _templateId)
+        public
+        view
+        returns (bytes32[] memory)
+    {
+        return agreementList.templateIdToAgreementIds[_templateId];
     }
 }
