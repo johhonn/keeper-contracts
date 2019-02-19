@@ -9,5 +9,5 @@ contract DispenserChangeInStorage is Dispenser {
     // Old variables should be kept even if unused
     // No base contracts swap
     // https://github.com/jackandtheblockstalk/upgradeable-proxy#331-you-can-1
-    uint256 public totalUnMintedAmount;
+    uint256 public totalUnMintedAmount = 0;
 }

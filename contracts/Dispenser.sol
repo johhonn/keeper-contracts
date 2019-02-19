@@ -17,17 +17,17 @@ contract Dispenser is Ownable {
     // limit period for request of tokens
     // mapping from address to last time of request
     mapping(address => uint256) internal tokenRequests;
-    uint256 internal totalMintAmount = 0;
+    uint256 internal totalMintAmount;
 
     // max amount of tokens user can get for each request
-    uint256 internal maxAmount = 0;
+    uint256 internal maxAmount;
 
     // max amount of tokens that can be minted using this dispenser in total
-    uint256 internal maxMintAmount = 0;
+    uint256 internal maxMintAmount;
 
      // min amount of time to wait before request token again
-    uint256 internal minPeriod = 0;
-    uint256 internal scale = 0;
+    uint256 internal minPeriod;
+    uint256 internal scale;
 
     OceanToken public oceanToken;
 
@@ -66,7 +66,8 @@ contract Dispenser is Ownable {
         isValidAddress(_oceanTokenAddress)
     {
         Ownable.initialize(_owner);
-
+        // init total mint amount
+        totalMintAmount = 0;
         // instantiate OceanToken contract
         oceanToken = OceanToken(_oceanTokenAddress);
 
