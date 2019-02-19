@@ -3,6 +3,8 @@ pragma solidity 0.5.3;
 import '../conditions/ConditionStoreManager.sol';
 import '../templates/TemplateStoreManager.sol';
 import './AgreementStoreLibrary.sol';
+import '../registry/DIDRegistry.sol';
+
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
 contract AgreementStoreManager is Ownable {
@@ -12,27 +14,29 @@ contract AgreementStoreManager is Ownable {
     ConditionStoreManager internal conditionStoreManager;
     TemplateStoreManager internal templateStoreManager;
     AgreementStoreLibrary.AgreementList internal agreementList;
+    DIDRegistry internal didRegistry;
 
     event AgreementCreated(
         bytes32 indexed _agreementId,
         bytes32 indexed _did,
         address indexed _sender,
-        address _didOwner,
         address _templateId
     );
 
     function initialize(
         address _owner,
         address _conditionStoreManagerAddress,
-        address _templateStoreManagerAddress
+        address _templateStoreManagerAddress,
+        address _didRegistryAddress
     )
         public
         initializer()
     {
         require(
+            _owner != address(0) &&
             _conditionStoreManagerAddress != address(0) &&
             _templateStoreManagerAddress != address(0) &&
-            _owner != address(0),
+            _didRegistryAddress != address(0),
             'Invalid address'
         );
         Ownable.initialize(_owner);
@@ -42,12 +46,14 @@ contract AgreementStoreManager is Ownable {
         templateStoreManager = TemplateStoreManager(
             _templateStoreManagerAddress
         );
+        didRegistry = DIDRegistry(
+            _didRegistryAddress
+        );
     }
 
     function createAgreement(
         bytes32 _id,
         bytes32 _did,
-        address _didOwner,
         address[] memory _conditionTypes,
         bytes32[] memory _conditionIds,
         uint[] memory _timeLocks,
@@ -59,6 +65,10 @@ contract AgreementStoreManager is Ownable {
         require(
             templateStoreManager.isTemplateApproved(msg.sender) == true,
             'Template not Approved'
+        );
+        require(
+            didRegistry.getBlockNumberUpdated(_did) > 0,
+            'DID not registered'
         );
         require(
             _conditionIds.length == _conditionTypes.length &&
@@ -78,7 +88,6 @@ contract AgreementStoreManager is Ownable {
         agreementList.create(
             _id,
             _did,
-            _didOwner,
             msg.sender,
             _conditionIds
         );
@@ -87,7 +96,6 @@ contract AgreementStoreManager is Ownable {
             _id,
             _did,
             msg.sender,
-            _didOwner,
             msg.sender
         );
 
@@ -107,19 +115,20 @@ contract AgreementStoreManager is Ownable {
         )
     {
         did = agreementList.agreements[_id].did;
-        didOwner = agreementList.agreements[_id].didOwner;
+        didOwner = didRegistry.getDIDOwner(did);
         templateId = agreementList.agreements[_id].templateId;
         conditionIds = agreementList.agreements[_id].conditionIds;
         lastUpdatedBy = agreementList.agreements[_id].lastUpdatedBy;
         blockNumberUpdated = agreementList.agreements[_id].blockNumberUpdated;
     }
 
-    function getAgreementDidOwner(bytes32 _id)
+    function getAgreementDIDOwner(bytes32 _id)
         external
         view
         returns (address didOwner)
     {
-        return agreementList.agreements[_id].didOwner;
+        bytes32 did = agreementList.agreements[_id].did;
+        return didRegistry.getDIDOwner(did);
     }
 
     function getAgreementListSize()

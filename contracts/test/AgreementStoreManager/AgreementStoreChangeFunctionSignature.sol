@@ -7,7 +7,6 @@ contract AgreementStoreChangeFunctionSignature is AgreementStoreManager {
     function createAgreement(
         bytes32 _id,
         bytes32 _did,
-        address _didOwner,
         address[] memory _conditionTypes,
         bytes32[] memory _conditionIds,
         uint[] memory _timeLocks,
@@ -43,7 +42,6 @@ contract AgreementStoreChangeFunctionSignature is AgreementStoreManager {
         agreementList.create(
             _id,
             _did,
-            _didOwner,
             msg.sender,
             _conditionIds
         );
@@ -52,7 +50,6 @@ contract AgreementStoreChangeFunctionSignature is AgreementStoreManager {
             _id,
             _did,
             msg.sender,
-            _didOwner,
             msg.sender
         );
 

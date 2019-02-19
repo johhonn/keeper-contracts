@@ -86,6 +86,7 @@ let constants = {
     },
     initialize: {
         error: {
+            invalidNumberParamsGot0Expected1: 'Invalid number of parameters for "initialize". Got 0 expected 1!',
             invalidNumberParamsGot0Expected2: 'Invalid number of parameters for "initialize". Got 0 expected 2!',
             invalidNumberParamsGot0Expected3: 'Invalid number of parameters for "initialize". Got 0 expected 3!',
             invalidNumberParamsGot1Expected2: 'Invalid number of parameters for "initialize". Got 1 expected 2!',
@@ -95,7 +96,15 @@ let constants = {
     did: [
         '0x0000000000000000000000000000000000000000000000000000000001111111',
         '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
-    ]
+    ],
+    registry: {
+        error: {
+            onlyDIDOwner: 'Attributes must be registered by the DID owners.',
+            invalidValueSize: 'Invalid value size',
+            didNotRegistered: 'DID not registered'
+        },
+        url: 'https://example.com/did/ocean/test-attr-example.txt'
+    }
 }
 
 module.exports = constants

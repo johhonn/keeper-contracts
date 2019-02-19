@@ -47,17 +47,17 @@ contract('DIDRegistry', (accounts) => {
         testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
         let payload = result.logs[0].args
-        assert.strictEqual(did, payload.did)
-        assert.strictEqual(accounts[0], payload.owner)
-        assert.strictEqual(checksum, payload.checksum)
-        assert.strictEqual(value, payload.value)
+        assert.strictEqual(did, payload._did)
+        assert.strictEqual(accounts[0], payload._owner)
+        assert.strictEqual(checksum, payload._checksum)
+        assert.strictEqual(value, payload._value)
 
         return { proxy, did, checksum, value }
     }
 
     describe('Test upgradability for DIDRegistry', () => {
         it('Should be possible to fix/add a bug', async () => {
-            let { proxy } = await setupTest()
+            let { proxy, did } = await setupTest()
             // Upgrade to new version
             const txId = await upgrade(
                 'DIDRegistry',
@@ -69,23 +69,25 @@ contract('DIDRegistry', (accounts) => {
             await adminWallet.confirmTransaction(txId, { from: accounts[1] })
             proxy = await DIDRegistryWithBug.at(proxyAddress)
 
+            assert.strictEqual(await proxy.getDIDOwner(did), accounts[0])
+
             // check functionality works
             const newDid = constants.did[1]
             const newChecksum = testUtils.generateId()
             const newValue = 'https://example.com/newdid/ocean/test.txt'
-            const result = await proxy.registerAttribute(newDid, newChecksum, newValue)
+            const result = await proxy.registerAttribute(newChecksum, newDid, newValue)
 
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             const payload = result.logs[0].args
-            assert.strictEqual(newDid, payload.did)
-            assert.strictEqual(accounts[0], payload.owner)
-            assert.strictEqual(newChecksum, payload.checksum)
-            assert.strictEqual(newValue, payload.value)
+            assert.strictEqual(newDid, payload._did)
+            assert.strictEqual(accounts[0], payload._owner)
+            assert.strictEqual(newChecksum, payload._checksum)
+            assert.strictEqual(newValue, payload._value)
 
             // test for bug
             assert.equal(
-                (await proxy.getUpdateAt(newDid)).toNumber(), 42,
+                (await proxy.getBlockNumberUpdated(newDid)).toNumber(), 42,
                 'getUpdatedAt value is not 42 (according to bug)')
         })
 
@@ -117,10 +119,10 @@ contract('DIDRegistry', (accounts) => {
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             const payload = result.logs[0].args
-            assert.strictEqual(newDid, payload.did)
-            assert.strictEqual(accounts[0], payload.owner)
-            assert.strictEqual(newChecksum, payload.checksum)
-            assert.strictEqual(newValue, payload.value)
+            assert.strictEqual(newDid, payload._did)
+            assert.strictEqual(accounts[0], payload._owner)
+            assert.strictEqual(newChecksum, payload._checksum)
+            assert.strictEqual(newValue, payload._value)
         })
 
         it('Should be possible to append storage variables ', async () => {
@@ -172,19 +174,20 @@ contract('DIDRegistry', (accounts) => {
             const newValue = 'https://example.com/newdid/ocean/test.txt'
 
             // act
-            const result = await proxy.registerAttribute(newDid, newChecksum, newValue)
+            const result = await proxy.registerAttribute(newChecksum, newDid, newValue)
 
             // eval
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             const payload = result.logs[0].args
-            assert.strictEqual(newDid, payload.did)
-            assert.strictEqual(accounts[0], payload.owner)
-            assert.strictEqual(newChecksum, payload.checksum)
-            assert.strictEqual(newValue, payload.value)
+            assert.strictEqual(newDid, payload._did)
+            assert.strictEqual(accounts[0], payload._owner)
+            assert.strictEqual(newChecksum, payload._checksum)
+            assert.strictEqual(newValue, payload._value)
 
-            assert.equal((await proxy.timeOfRegister(newDid)).toNumber() > 0,
-                true, 'time of registry not created')
+            assert.equal(
+                (await proxy.timeOfRegister(did)).toNumber(), 0,
+                'Error calling added storage variable')
         })
 
         it('Should be able to call new method added after upgrade is approved', async () => {
