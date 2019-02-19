@@ -12,7 +12,7 @@ contract Common {
     * @return the current block number
     */
     function getCurrentBlockNumber()
-        public
+        external
         view
         returns (uint)
     {

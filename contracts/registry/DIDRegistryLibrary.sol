@@ -32,7 +32,7 @@ library DIDRegistryLibrary {
         bytes32 _did,
         bytes32 _checksum
     )
-        public
+        external
         returns (uint size)
     {
         address owner = _self.didRegisters[_did].owner;

@@ -98,7 +98,7 @@ contract DIDRegistry is Ownable {
      * @return last modified (update) block number of a DID.
      */
     function getBlockNumberUpdated(bytes32 _did)
-        public view
+        external view
         returns(uint updateAt)
     {
         return didRegisterList.didRegisters[_did].blockNumberUpdated;
@@ -109,7 +109,7 @@ contract DIDRegistry is Ownable {
      * @return the address of the DID owner.
      */
     function getDIDOwner(bytes32 _did)
-        public view
+        external view
         returns(address didOwner)
     {
         return didRegisterList.didRegisters[_did].owner;
@@ -119,7 +119,7 @@ contract DIDRegistry is Ownable {
      * @return the length of the DID registry.
      */
     function getDIDRegistrySize()
-        public
+        internal
         view
         returns (uint size)
     {
