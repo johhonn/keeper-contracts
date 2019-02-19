@@ -194,7 +194,7 @@ The libraries provided currently are:
 
 ## Testing
 
-Run tests with `npm test`, e.g.:
+Run tests with `npm run test`, e.g.:
 
 ```bash
 npm run test -- test/unit/agreements/AgreementStoreManager.Test.js
