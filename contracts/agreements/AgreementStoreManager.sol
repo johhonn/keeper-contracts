@@ -1,9 +1,9 @@
 pragma solidity 0.5.3;
 
-import '../conditions/ConditionStoreManager.sol';
-import '../templates/TemplateStoreManager.sol';
 import './AgreementStoreLibrary.sol';
+import '../conditions/ConditionStoreManager.sol';
 import '../registry/DIDRegistry.sol';
+import '../templates/TemplateStoreManager.sol';
 
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 

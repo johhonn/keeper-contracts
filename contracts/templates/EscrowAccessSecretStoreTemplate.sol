@@ -1,31 +1,34 @@
 pragma solidity 0.5.3;
 
+import './AgreementTemplate.sol';
 import '../conditions/AccessSecretStoreCondition.sol';
 import '../conditions/LockRewardCondition.sol';
 import '../conditions/rewards/EscrowReward.sol';
-import './AgreementTemplate.sol';
-
+import '../registry/DIDRegistry.sol';
 
 contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
 
-    AccessSecretStoreCondition private accessSecretStoreCondition;
-    LockRewardCondition private lockRewardCondition;
-    EscrowReward private escrowReward;
+    DIDRegistry internal didRegistry;
+    AccessSecretStoreCondition internal accessSecretStoreCondition;
+    LockRewardCondition internal lockRewardCondition;
+    EscrowReward internal escrowReward;
 
-    EscrowAccessSecretStoreAgreementList private agreementList;
+    AgreementData internal agreementData;
 
-    struct EscrowAccessSecretStoreAgreement {
-        address consumer;
+    struct AgreementDataModel {
+        address accessConsumer;
+        address accessProvider;
     }
 
-    struct EscrowAccessSecretStoreAgreementList {
-        mapping(bytes32 => EscrowAccessSecretStoreAgreement) agreements;
+    struct AgreementData {
+        mapping(bytes32 => AgreementDataModel) agreementDataItems;
         bytes32[] agreementIds;
     }
 
     function initialize(
         address _owner,
         address _agreementStoreManagerAddress,
+        address _didRegistryAddress,
         address _accessSecretStoreConditionAddress,
         address _lockRewardConditionAddress,
         address _escrowRewardAddress
@@ -36,6 +39,7 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
         require(
             _owner != address(0) &&
             _agreementStoreManagerAddress != address(0) &&
+            _didRegistryAddress != address(0) &&
             _accessSecretStoreConditionAddress != address(0) &&
             _lockRewardConditionAddress != address(0) &&
             _escrowRewardAddress != address(0),
@@ -45,6 +49,9 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
 
         agreementStoreManager = AgreementStoreManager(
             _agreementStoreManagerAddress
+        );
+        didRegistry = DIDRegistry(
+            _didRegistryAddress
         );
         accessSecretStoreCondition = AccessSecretStoreCondition(
             _accessSecretStoreConditionAddress
@@ -67,7 +74,7 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
         bytes32[] memory _conditionIds,
         uint[] memory _timeLocks,
         uint[] memory _timeOuts,
-        address _consumer
+        address _accessConsumer
     )
         public
         returns (uint size)
@@ -79,10 +86,24 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
             _timeLocks,
             _timeOuts
         );
-        agreementList.agreements[_id] = EscrowAccessSecretStoreAgreement({
-            consumer: _consumer
-        });
-        agreementList.agreementIds.push(_id);
-        return agreementList.agreementIds.length;
+        // storing some additional information for the template
+        agreementData.agreementDataItems[_id]
+            .accessConsumer = _accessConsumer;
+        agreementData.agreementDataItems[_id]
+            .accessProvider = didRegistry.getDIDOwner(_did);
+        agreementData.agreementIds.push(_id);
+        return agreementData.agreementIds.length;
+    }
+
+    function getAgreementData(bytes32 _id)
+        external
+        view
+        returns (
+            address accessConsumer,
+            address accessProvider
+        )
+    {
+        accessConsumer = agreementData.agreementDataItems[_id].accessConsumer;
+        accessProvider = agreementData.agreementDataItems[_id].accessProvider;
     }
 }
