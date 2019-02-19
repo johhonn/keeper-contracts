@@ -6,13 +6,26 @@ import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 /**
  * @title DID Registry
  * @author Ocean Protocol Team
- * @dev All function calls are currently implemented without side effects
+ *
+ * @dev Implementation of the DID Registry.
+ *      https://github.com/oceanprotocol/OEPs/tree/master/7#registry
  */
 contract DIDRegistry is Ownable {
 
+    /**
+     * @dev The DIDRegistry Library takes care of the basic storage functions.
+     */
     using DIDRegistryLibrary for DIDRegistryLibrary.DIDRegisterList;
+
+    /**
+     * @dev state storage for the DID registry
+     */
     DIDRegistryLibrary.DIDRegisterList internal didRegisterList;
 
+    /**
+     * @dev This implementation does not store _value on-chain,
+     *      but emits DIDAttributeRegistered events to store it in the event log.
+     */
     event DIDAttributeRegistered(
         bytes32 indexed _did,
         address indexed _owner,
@@ -22,7 +35,11 @@ contract DIDRegistry is Ownable {
         uint256 _blockNumberUpdated
     );
 
-
+    /**
+     * @dev DIDRegistry Initializer
+     *      Initialize Ownable. Only on contract creation.
+     * @param _owner refers to the owner of the contract.
+     */
     function initialize(
         address _owner
     )
@@ -32,13 +49,17 @@ contract DIDRegistry is Ownable {
         Ownable.initialize(_owner);
     }
 
-   /**
-    * @notice registerAttribute is called only by DID owner.
-    * @dev this function registers DID attributes
-    * @param _did refers to decentralized identifier (a byte32 length ID)
-    * @param _checksum includes a one-way HASH calculated using the DDO content
-    * @param _value refers to the attribute value
-    */
+    /**
+     * @notice Register DID attributes.
+     *
+     * @dev The first attribute of a DID registered sets the DID owner.
+     *      Subsequent updates record _checksum and update info.
+     *
+     * @param _did refers to decentralized identifier (a bytes32 length ID).
+     * @param _checksum includes a one-way HASH calculated using the DDO content.
+     * @param _value refers to the attribute value, limited to 2048 bytes.
+     * @return the size of the registry after the register action.
+     */
     function registerAttribute (
         bytes32 _did,
         bytes32 _checksum,
@@ -72,11 +93,10 @@ contract DIDRegistry is Ownable {
         return getDIDRegistrySize();
     }
 
-   /**
-    * @notice getUpdateAt is called by anyone.
-    * @param _did refers to decentralized identifier (a byte32 length ID)
-    * @return last modified (update) time of a DID
-    */
+    /**
+     * @param _did refers to decentralized identifier (a bytes32 length ID).
+     * @return last modified (update) block number of a DID.
+     */
     function getBlockNumberUpdated(bytes32 _did)
         public view
         returns(uint updateAt)
@@ -84,11 +104,10 @@ contract DIDRegistry is Ownable {
         return didRegisterList.didRegisters[_did].blockNumberUpdated;
     }
 
-   /**
-    * @notice getDidOwner is called by anyone.
-    * @param _did refers to decentralized identifier (a byte32 length ID)
-    * @return the address of the owner
-    */
+    /**
+     * @param _did refers to decentralized identifier (a bytes32 length ID).
+     * @return the address of the DID owner.
+     */
     function getDIDOwner(bytes32 _did)
         public view
         returns(address didOwner)
@@ -96,6 +115,9 @@ contract DIDRegistry is Ownable {
         return didRegisterList.didRegisters[_did].owner;
     }
 
+    /**
+     * @return the length of the DID registry.
+     */
     function getDIDRegistrySize()
         public
         view

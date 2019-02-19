@@ -449,5 +449,55 @@ contract('AgreementStoreManager', (accounts) => {
             expect(storedAgreement.blockNumberUpdated.toNumber())
                 .to.equal(blockNumber.toNumber())
         })
+
+        it('should get multiple agreements for same did & template', async () => {
+            const {
+                agreementStoreManager,
+                templateStoreManager,
+                did,
+                owner
+            } = await setupTest({ registerDID: true })
+
+            const templateId = accounts[2]
+            await templateStoreManager.proposeTemplate(templateId)
+            await templateStoreManager.approveTemplate(templateId, { from: owner })
+
+            const agreement = {
+                did: did,
+                conditionTypes: [accounts[3]],
+                conditionIds: [constants.bytes32.zero],
+                timeLocks: [0],
+                timeOuts: [2]
+            }
+            const agreementId = constants.bytes32.zero
+
+            await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement),
+                { from: templateId }
+            )
+
+            const otherAgreement = {
+                did: did,
+                conditionTypes: [accounts[3]],
+                conditionIds: [constants.bytes32.one],
+                timeLocks: [2],
+                timeOuts: [3]
+            }
+            const otherAgreementId = constants.bytes32.one
+
+            await agreementStoreManager.createAgreement(
+                otherAgreementId,
+                ...Object.values(otherAgreement),
+                { from: templateId }
+            )
+
+            assert.lengthOf(
+                await agreementStoreManager.getAgreementIdsForDID(did),
+                2)
+            assert.lengthOf(
+                await agreementStoreManager.getAgreementIdsForTemplateId(templateId),
+                2)
+        })
     })
 })
