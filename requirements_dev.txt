@@ -42,3 +42,4 @@ twine==1.11.0
 urllib3==1.23
 virtualenv==16.0.0
 watchdog==0.8.3
+slither-analyzer==0.7.2
