@@ -12,7 +12,7 @@ const EscrowAccessSecretStoreTemplate = artifacts.require('EscrowAccessSecretSto
 const constants = require('../../helpers/constants.js')
 const deployManagers = require('../../helpers/deployManagers.js')
 
-contract('TemplateStoreManager', (accounts) => {
+contract('EscrowAccessSecretStoreTemplate', (accounts) => {
     async function setupTest({
         deployer = accounts[8],
         owner = accounts[9]
@@ -87,10 +87,7 @@ contract('TemplateStoreManager', (accounts) => {
                 owner
             } = await setupTest()
 
-            const {
-                agreementId,
-                agreement
-            } = await prepareAgreement()
+            const { agreementId, agreement } = await prepareAgreement()
 
             await assert.isRejected(
                 escrowAccessSecretStoreTemplate.createAgreement(agreementId, ...Object.values(agreement)),
@@ -122,13 +119,16 @@ contract('TemplateStoreManager', (accounts) => {
             expect(storedAgreement.lastUpdatedBy)
                 .to.equal(templateId)
 
-            agreement.conditionIds.forEach(async (conditionId, i) => {
-                let storedCondition = await conditionStoreManager.getCondition(conditionId)
-                expect(storedCondition.typeRef).to.equal(agreement.conditionTypes[i])
+            let i = 0
+            const conditionTypes = await escrowAccessSecretStoreTemplate.getConditionTypes()
+            for (const conditionId of agreement.conditionIds) {
+                const storedCondition = await conditionStoreManager.getCondition(conditionId)
+                expect(storedCondition.typeRef).to.equal(conditionTypes[i])
                 expect(storedCondition.state.toNumber()).to.equal(constants.condition.state.unfulfilled)
                 expect(storedCondition.timeLock.toNumber()).to.equal(agreement.timeLocks[i])
                 expect(storedCondition.timeOut.toNumber()).to.equal(agreement.timeOuts[i])
-            })
+                i++
+            }
         })
     })
 })
