@@ -5,7 +5,6 @@ Documentation:
 ```
 @title Ocean Protocol Dispenser Contract
 @author Ocean Protocol Team
-@dev All function calls are currently implemented without side effects
 ```
 
 ## Variables
