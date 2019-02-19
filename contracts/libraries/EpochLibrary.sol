@@ -64,7 +64,7 @@ library EpochLibrary {
         EpochList storage _self,
         bytes32 _id
     )
-        public
+        external
         view
         returns(bool)
     {
@@ -82,7 +82,7 @@ library EpochLibrary {
         EpochList storage _self,
         bytes32 _id
     )
-        public
+        external
         view
         returns(bool)
     {
