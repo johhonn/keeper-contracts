@@ -10,7 +10,7 @@ contract EscrowReward is Reward {
         address _conditionStoreManagerAddress,
         address _tokenAddress
     )
-        public
+        external
         initializer()
     {
         require(
@@ -54,7 +54,7 @@ contract EscrowReward is Reward {
         bytes32 _lockCondition,
         bytes32 _releaseCondition
     )
-        public
+        external
         returns (ConditionStoreLibrary.ConditionState)
     {
         bytes32 id = generateId(
