@@ -60,7 +60,7 @@ contract Dispenser is Ownable {
         address _oceanTokenAddress,
         address _owner
     )
-        public
+        external
         initializer
         isValidAddress(_oceanTokenAddress)
     {

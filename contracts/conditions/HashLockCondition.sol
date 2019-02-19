@@ -8,7 +8,7 @@ contract HashLockCondition is Condition {
         address _owner,
         address _conditionStoreManagerAddress
     )
-        public
+        external
         initializer()
     {
         require(

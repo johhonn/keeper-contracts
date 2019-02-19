@@ -15,7 +15,7 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         address _conditionStoreManagerAddress,
         address _agreementStoreManagerAddress
     )
-        public
+        external
         initializer()
     {
         Ownable.initialize(_owner);

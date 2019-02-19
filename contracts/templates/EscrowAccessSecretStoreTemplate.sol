@@ -30,7 +30,7 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
         address _lockRewardConditionAddress,
         address _escrowRewardAddress
     )
-        public
+        external
         initializer()
     {
         require(

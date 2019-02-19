@@ -10,7 +10,7 @@ contract EscrowReward is Reward {
         address _conditionStoreManagerAddress,
         address _tokenAddress
     )
-        public
+        external
         initializer()
     {
         require(

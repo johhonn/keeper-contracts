@@ -36,7 +36,7 @@ contract ConditionStoreManager is Ownable, Common {
         address _owner,
         address _createRole
     )
-        public
+        external
         initializer
     {
         require(
@@ -116,7 +116,11 @@ contract ConditionStoreManager is Ownable, Common {
         return conditionList.updateState(_id, updateState);
     }
 
-    function getConditionListSize() external view returns (uint size) {
+    function getConditionListSize()
+        external
+        view
+        returns (uint size)
+    {
         return conditionList.conditionIds.length;
     }
 
