@@ -1,6 +1,7 @@
 const testUtils = require('./utils')
 const web3 = testUtils.getWeb3()
 
+// https://stackoverflow.com/a/30452949
 const times = x => f => {
     if (x > 0) {
         f()
