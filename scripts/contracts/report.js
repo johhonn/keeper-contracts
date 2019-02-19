@@ -168,8 +168,8 @@ ${this.report.contract.documentation}
         if (this.report.contract.variables.length > 0) {
             output += '\n## Variables\n'
 
-            for (const event of this.report.contract.variables) {
-                logItem(event)
+            for (const variable of this.report.contract.variables) {
+                logItem(variable)
             }
         }
 

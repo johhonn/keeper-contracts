@@ -10,13 +10,17 @@ Documentation:
 
 ## Variables
 
-### private tokenRequests
+### internal tokenRequests
 
-### private maxAmount
+### internal totalMintAmount
 
-### private minPeriod
+### internal maxAmount
 
-### private scale
+### internal maxMintAmount
+
+### internal minPeriod
+
+### internal scale
 
 ### public oceanToken
 
@@ -37,7 +41,7 @@ Parameters:
 
 ### internal isValidAddress
 Parameters:
-* address sender
+* address _address
 
 ## Functions
 
@@ -79,6 +83,17 @@ Parameters:
 * uint256 period
 
 ### public setMaxAmount
+
+Documentation:
+
+```
+@dev the Owner can set the max amount for token requests
+@param amount the max amount of tokens that can be requested
+```
+Parameters:
+* uint256 amount
+
+### public setMaxMintAmount
 
 Documentation:
 

@@ -2,14 +2,18 @@ const { Report } = require('./report')
 const fs = require('fs')
 
 const contracts = [
-    'DIDRegistry',
+    'ConditionStoreManager',
+    'TemplateStoreManager',
+    'AgreementStoreManager',
+    'SignCondition',
+    'HashLockCondition',
+    'LockRewardCondition',
+    'AccessSecretStoreCondition',
+    'EscrowReward',
+    'EscrowAccessSecretStoreTemplate',
     'OceanToken',
     'Dispenser',
-    'ServiceExecutionAgreement',
-    'AccessConditions',
-    'FitchainConditions',
-    'ComputeConditions',
-    'PaymentConditions'
+    'DIDRegistry'
 ]
 
 contracts.forEach((contractName) => {

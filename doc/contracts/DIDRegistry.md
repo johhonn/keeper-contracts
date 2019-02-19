@@ -8,27 +8,20 @@ Documentation:
 @dev All function calls are currently implemented without side effects
 ```
 
-## Structs
-
-### public DIDRegister
-Members:
-* address owner
-* uint256 updateAt
-
 ## Variables
 
-### private didRegister
+### internal didRegisterList
 
 ## Events
 
 ###  DIDAttributeRegistered
 Parameters:
-* bytes32 did
-* address owner
-* bytes32 key
-* string value
-* enum DIDRegistry.ValueType valueType
-* uint256 updatedAt
+* bytes32 _did
+* address _owner
+* bytes32 _checksum
+* string _value
+* address _lastUpdatedBy
+* uint256 _blockNumberUpdated
 
 ## Functions
 
@@ -43,37 +36,37 @@ Documentation:
 ```
 @notice registerAttribute is called only by DID owner.
 @dev this function registers DID attributes
-@param did refers to decentralized identifier (a byte32 length ID)
-@param valueType includes DID, DID reference , URL, or DDO
-@param key represents the attribute key
-@param value refers to the attribute value
+@param _did refers to decentralized identifier (a byte32 length ID)
+@param _checksum includes a one-way HASH calculated using the DDO content
+@param _value refers to the attribute value
 ```
 Parameters:
-* bytes32 did
-* enum DIDRegistry.ValueType valueType
-* bytes32 key
-* string value
+* bytes32 _did
+* bytes32 _checksum
+* string _value
 
-### public getUpdateAt
+### public getBlockNumberUpdated
 
 Documentation:
 
 ```
 @notice getUpdateAt is called by anyone.
-@param did refers to decentralized identifier (a byte32 length ID)
+@param _did refers to decentralized identifier (a byte32 length ID)
 @return last modified (update) time of a DID
 ```
 Parameters:
-* bytes32 did
+* bytes32 _did
 
-### public getOwner
+### public getDIDOwner
 
 Documentation:
 
 ```
-@notice getOwner is called by anyone.
-@param did refers to decentralized identifier (a byte32 length ID)
+@notice getDidOwner is called by anyone.
+@param _did refers to decentralized identifier (a byte32 length ID)
 @return the address of the owner
 ```
 Parameters:
-* bytes32 did
+* bytes32 _did
+
+### public getDIDRegistrySize
