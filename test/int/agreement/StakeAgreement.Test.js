@@ -24,9 +24,12 @@ const getBalance = require('../../helpers/getBalance.js')
 const increaseTime = require('../../helpers/increaseTime.js')
 
 contract('Stake Agreement integration test', (accounts) => {
+    let signCondition,
+        lockRewardCondition,
+        escrowReward,
+        templateStoreManager
+
     async function setupTest({
-        agreementId = constants.bytes32.one,
-        conditionIds = [constants.address.dummy],
         deployer = accounts[8],
         owner = accounts[9]
     } = {}) {
@@ -39,7 +42,7 @@ contract('Stake Agreement integration test', (accounts) => {
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
         const conditionStoreManager = await ConditionStoreManager.new({ from: deployer })
 
-        const templateStoreManager = await TemplateStoreManager.new({ from: deployer })
+        templateStoreManager = await TemplateStoreManager.new({ from: deployer })
         await templateStoreManager.initialize(
             owner,
             { from: deployer }
@@ -65,7 +68,7 @@ contract('Stake Agreement integration test', (accounts) => {
         const oceanToken = await OceanToken.new({ from: deployer })
         await oceanToken.initialize(owner, owner)
 
-        const lockRewardCondition = await LockRewardCondition.new({ from: deployer })
+        lockRewardCondition = await LockRewardCondition.new({ from: deployer })
         await lockRewardCondition.initialize(
             owner,
             conditionStoreManager.address,
@@ -73,7 +76,7 @@ contract('Stake Agreement integration test', (accounts) => {
             { from: deployer }
         )
 
-        const escrowReward = await EscrowReward.new({ from: deployer })
+        escrowReward = await EscrowReward.new({ from: deployer })
         await escrowReward.initialize(
             owner,
             conditionStoreManager.address,
@@ -81,7 +84,7 @@ contract('Stake Agreement integration test', (accounts) => {
             { from: deployer }
         )
 
-        const signCondition = await SignCondition.new()
+        signCondition = await SignCondition.new()
         await signCondition.initialize(
             owner,
             conditionStoreManager.address,
@@ -93,104 +96,98 @@ contract('Stake Agreement integration test', (accounts) => {
             didRegistry,
             agreementStoreManager,
             conditionStoreManager,
-            templateStoreManager,
-            lockRewardCondition,
-            signCondition,
-            escrowReward,
-            agreementId,
-            conditionIds,
             owner
+        }
+    }
+
+    async function approveTemplateAccount(owner, templateAccount) {
+        await templateStoreManager.proposeTemplate(templateAccount)
+        await templateStoreManager.approveTemplate(templateAccount, { from: owner })
+    }
+
+    async function prepareStakeAgreement({
+        agreementId = constants.bytes32.one,
+        staker = accounts[0],
+        stakeAmount = 1000,
+        stakePeriod = 5,
+        // uses signature as release, could also be hash of secret
+        sign = constants.condition.sign.bytes32,
+        did = constants.did[0],
+        url = constants.registry.url,
+        checksum = constants.bytes32.one
+    } = {}) {
+        // generate IDs from attributes
+
+        const conditionIdSign = await signCondition.generateId(agreementId, await signCondition.hashValues(sign.message, sign.publicKey))
+        const conditionIdLock = await lockRewardCondition.generateId(agreementId, await lockRewardCondition.hashValues(escrowReward.address, stakeAmount))
+        const conditionIdEscrow = await escrowReward.generateId(agreementId, await escrowReward.hashValues(stakeAmount, staker, staker, conditionIdLock, conditionIdSign))
+
+        // construct agreement
+        const agreement = {
+            did: did,
+            conditionTypes: [
+                signCondition.address,
+                lockRewardCondition.address,
+                escrowReward.address
+            ],
+            conditionIds: [
+                conditionIdSign,
+                conditionIdLock,
+                conditionIdEscrow
+            ],
+            timeLocks: [stakePeriod, 0, 0],
+            timeOuts: [0, 0, 0]
+        }
+        return {
+            agreementId,
+            agreement,
+            stakeAmount,
+            stakePeriod,
+            sign,
+            checksum,
+            url
         }
     }
 
     describe('create and fulfill stake agreement', () => {
         it('stake agreement as an escrow with self-sign release', async () => {
-            const {
-                oceanToken,
-                didRegistry,
-                agreementStoreManager,
-                templateStoreManager,
-                signCondition,
-                lockRewardCondition,
-                escrowReward,
-                owner
-            } = await setupTest()
+            const { oceanToken, didRegistry, agreementStoreManager, owner } = await setupTest()
 
+            const alice = accounts[0]
             // propose and approve account as agreement factory - not for production :)
-            const templateId = accounts[0]
-            await templateStoreManager.proposeTemplate(templateId)
-            await templateStoreManager.approveTemplate(templateId, { from: owner })
+            await approveTemplateAccount(owner, alice)
 
-            const staker = accounts[0]
-            const stakeAmount = 1000
-            const stakePeriod = 5
-            const did = constants.did[0]
-            const { url } = constants.registry
-            const checksum = constants.bytes32.one
-            // use signature as release, could also be hash of secret
-            const { message, publicKey, signature } = constants.condition.sign.bytes32
+            // prepare: stake agreement
+            const { agreementId, stakeAmount, stakePeriod, sign, checksum, url, agreement } = await prepareStakeAgreement()
 
-            // generate IDs from attributes
-            const agreementId = constants.bytes32.one
-            const conditionIdSign = await signCondition.generateId(agreementId, await signCondition.hashValues(message, publicKey))
-            const conditionIdLock = await lockRewardCondition.generateId(agreementId, await lockRewardCondition.hashValues(escrowReward.address, stakeAmount))
-            const conditionIdEscrow = await escrowReward.generateId(agreementId, await escrowReward.hashValues(stakeAmount, staker, staker, conditionIdLock, conditionIdSign))
-
-            // construct agreement
-            const agreement = {
-                did: did,
-                conditionTypes: [
-                    signCondition.address,
-                    lockRewardCondition.address,
-                    escrowReward.address
-                ],
-                conditionIds: [
-                    conditionIdSign,
-                    conditionIdLock,
-                    conditionIdEscrow
-                ],
-                timeLocks: [stakePeriod, 0, 0],
-                timeOuts: [0, 0, 0]
-            }
+            // fill up wallet
+            await oceanToken.mint(alice, stakeAmount, { from: owner })
 
             // register DID
-            await didRegistry.registerAttribute(did, checksum, url)
-            // create agreement as approved account - not for production ;)
-            await agreementStoreManager.createAgreement(
-                agreementId,
-                ...Object.values(agreement)
-            )
+            await didRegistry.registerAttribute(agreement.did, checksum, url)
 
-            // fulfill lock reward
-            await oceanToken.mint(staker, stakeAmount, { from: owner })
-            await oceanToken.approve(lockRewardCondition.address, stakeAmount, { from: staker })
+            // create agreement: as approved account - not for production ;)
+            await agreementStoreManager.createAgreement(agreementId, ...Object.values(agreement))
 
+            // stake: fulfill lock reward
+            await oceanToken.approve(lockRewardCondition.address, stakeAmount, { from: alice })
             await lockRewardCondition.fulfill(agreementId, escrowReward.address, stakeAmount)
-
-            assert.strictEqual(await getBalance(oceanToken, staker), 0)
+            assert.strictEqual(await getBalance(oceanToken, alice), 0)
             assert.strictEqual(await getBalance(oceanToken, escrowReward.address), stakeAmount)
 
-            // fulfill before stake period
+            // unstake: fail to fulfill before stake period
             await assert.isRejected(
-                signCondition.fulfill(agreementId, message, publicKey, signature),
+                signCondition.fulfill(agreementId, sign.message, sign.publicKey, sign.signature),
                 constants.condition.epoch.error.isTimeLocked
             )
 
-            await increaseTime(1)
-            await increaseTime(1)
+            // wait: for stake period
+            await increaseTime(stakePeriod)
 
-            await signCondition.fulfill(agreementId, message, publicKey, signature)
-
-            // get reward
-            await escrowReward.fulfill(
-                agreementId,
-                stakeAmount,
-                staker,
-                staker,
-                conditionIdLock,
-                conditionIdSign)
-
-            assert.strictEqual(await getBalance(oceanToken, staker), stakeAmount)
+            // unstake: waited and fulfill after stake period
+            await signCondition.fulfill(agreementId, sign.message, sign.publicKey, sign.signature)
+            await escrowReward.fulfill(agreementId, stakeAmount, alice, alice, agreement.conditionIds[1], agreement.conditionIds[0])
+            assert.strictEqual(await getBalance(oceanToken, alice), stakeAmount)
             assert.strictEqual(await getBalance(oceanToken, escrowReward.address), 0)
         })
     })
