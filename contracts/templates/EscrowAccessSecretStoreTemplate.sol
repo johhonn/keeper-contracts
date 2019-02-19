@@ -87,8 +87,10 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
             _timeOuts
         );
         // storing some additional information for the template
-        agreementData.agreementDataItems[_id].accessConsumer = _accessConsumer;
-        agreementData.agreementDataItems[_id].accessProvider = didRegistry.getDIDOwner(_did);
+        agreementData.agreementDataItems[_id]
+            .accessConsumer = _accessConsumer;
+        agreementData.agreementDataItems[_id]
+            .accessProvider = didRegistry.getDIDOwner(_did);
         agreementData.agreementIds.push(_id);
         return agreementData.agreementIds.length;
     }

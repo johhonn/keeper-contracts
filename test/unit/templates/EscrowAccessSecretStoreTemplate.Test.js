@@ -60,8 +60,6 @@ contract('TemplateStoreManager', (accounts) => {
         sender = accounts[0],
         receiver = accounts[1],
         escrowAmount = 10,
-        timeLockAccess = 0,
-        timeOutAccess = 0,
         did = constants.did[0]
     } = {}) {
         // construct agreement
