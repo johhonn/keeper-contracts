@@ -3,6 +3,14 @@ const fs = require('fs')
 
 const contracts = [
     'ConditionStoreManager',
+    'ConditionStoreLibrary',
+    'EpochLibrary',
+    'Condition',
+    'Reward',
+    'AgreementTemplate',
+    'DIDRegistryLibrary',
+    'AgreementStoreLibrary',
+    'TemplateStoreLibrary',
     'TemplateStoreManager',
     'AgreementStoreManager',
     'SignCondition',
@@ -13,7 +21,9 @@ const contracts = [
     'EscrowAccessSecretStoreTemplate',
     'OceanToken',
     'Dispenser',
-    'DIDRegistry'
+    'DIDRegistry',
+    'ISecretStore',
+    'Common'
 ]
 
 contracts.forEach((contractName) => {
