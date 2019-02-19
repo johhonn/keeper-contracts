@@ -7,7 +7,9 @@ import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 /**
  * @title Ocean Protocol ERC20 Token Contract
  * @author Ocean Protocol Team
- * @dev All function calls are currently implemented without side effects
+ *
+ * @dev Implementation of the Ocean Token.
+ *      TODO: OEP
  */
 contract OceanToken is Ownable, ERC20Detailed, ERC20Capped {
 
@@ -15,7 +17,9 @@ contract OceanToken is Ownable, ERC20Detailed, ERC20Capped {
 
     /**
     * @dev OceanToken Initializer
-    * Runs only on initial contract creation.
+    *      Runs only on initial contract creation.
+    * @param _owner refers to the owner of the contract
+    * @param _initialMinter is the first token minter added
     */
     function initialize(
         address _owner,

@@ -1,16 +1,23 @@
 const testUtils = require('./utils')
 const web3 = testUtils.getWeb3()
 
-// source: https://michalzalecki.com/ethereum-test-driven-introduction-to-solidity-part-2/
-const increaseTime = function increaseTime(duration) {
-    const id = Date.now()
+// https://stackoverflow.com/a/30452949
+const times = x => f => {
+    if (x > 0) {
+        f()
+        times(x - 1)(f)
+    }
+}
 
+// source: https://michalzalecki.com/ethereum-test-driven-introduction-to-solidity-part-2/
+const increaseTimeOnce = function() {
+    const id = Date.now()
     return new Promise((resolve, reject) => {
         web3.currentProvider.send(
             {
                 jsonrpc: '2.0',
                 method: 'evm_increaseTime',
-                params: [duration],
+                params: [1],
                 id: id
             },
             err1 => {
@@ -29,6 +36,10 @@ const increaseTime = function increaseTime(duration) {
             }
         )
     })
+}
+
+const increaseTime = async (duration) => {
+    times(duration)(() => increaseTimeOnce())
 }
 
 module.exports = increaseTime
