@@ -12,7 +12,7 @@ contract LockRewardCondition is Condition {
         address _conditionStoreManagerAddress,
         address _tokenAddress
     )
-        public
+        external
         initializer()
     {
         require(
@@ -43,7 +43,7 @@ contract LockRewardCondition is Condition {
         address _rewardAddress,
         uint256 _amount
     )
-        public
+        external
         returns (ConditionStoreLibrary.ConditionState)
     {
         require(

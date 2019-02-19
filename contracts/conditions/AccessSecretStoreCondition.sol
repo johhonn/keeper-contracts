@@ -15,7 +15,7 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         address _conditionStoreManagerAddress,
         address _agreementStoreManagerAddress
     )
-        public
+        external
         initializer()
     {
         Ownable.initialize(_owner);
@@ -67,7 +67,7 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         address _grantee,
         bytes32 _documentId
     )
-        public view
+        external view
         returns(bool permissionGranted)
     {
         return documentPermissions[_documentId][_grantee];

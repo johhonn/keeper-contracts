@@ -8,7 +8,7 @@ contract HashLockCondition is Condition {
         address _owner,
         address _conditionStoreManagerAddress
     )
-        public
+        external
         initializer()
     {
         require(
@@ -58,7 +58,7 @@ contract HashLockCondition is Condition {
         bytes32 _agreementId,
         uint256 _preimage
     )
-        public
+        external
         returns (ConditionStoreLibrary.ConditionState)
     {
         return _fulfill(generateId(_agreementId, hashValues(_preimage)));
@@ -78,7 +78,7 @@ contract HashLockCondition is Condition {
         bytes32 _agreementId,
         bytes32 _preimage
     )
-        public
+        external
         returns (ConditionStoreLibrary.ConditionState)
     {
         return _fulfill(generateId(_agreementId, hashValues(_preimage)));
