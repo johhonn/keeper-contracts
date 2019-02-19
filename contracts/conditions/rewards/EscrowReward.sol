@@ -54,7 +54,7 @@ contract EscrowReward is Reward {
         bytes32 _lockCondition,
         bytes32 _releaseCondition
     )
-        public
+        external
         returns (ConditionStoreLibrary.ConditionState)
     {
         bytes32 id = generateId(

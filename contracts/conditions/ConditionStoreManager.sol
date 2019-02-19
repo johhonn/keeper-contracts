@@ -53,7 +53,7 @@ contract ConditionStoreManager is Ownable, Common {
     }
 
     function getCreateRole()
-        public
+        external
         view
         returns (address)
     {
@@ -64,7 +64,7 @@ contract ConditionStoreManager is Ownable, Common {
         bytes32 _id,
         address _typeRef
     )
-        public
+        external
         returns (uint size)
     {
         return createCondition(
@@ -99,7 +99,7 @@ contract ConditionStoreManager is Ownable, Common {
         bytes32 _id,
         ConditionStoreLibrary.ConditionState _newState
     )
-        public
+        external
         onlyUpdateRole(_id)
         returns (ConditionStoreLibrary.ConditionState)
     {
@@ -116,7 +116,7 @@ contract ConditionStoreManager is Ownable, Common {
         return conditionList.updateState(_id, updateState);
     }
 
-    function getConditionListSize() public view returns (uint size) {
+    function getConditionListSize() external view returns (uint size) {
         return conditionList.conditionIds.length;
     }
 
@@ -143,7 +143,7 @@ contract ConditionStoreManager is Ownable, Common {
     }
 
     function getConditionState(bytes32 _id)
-        public
+        external
         view
         returns (ConditionStoreLibrary.ConditionState)
     {

@@ -43,7 +43,7 @@ contract LockRewardCondition is Condition {
         address _rewardAddress,
         uint256 _amount
     )
-        public
+        external
         returns (ConditionStoreLibrary.ConditionState)
     {
         require(

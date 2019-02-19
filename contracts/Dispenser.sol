@@ -84,7 +84,7 @@ contract Dispenser is Ownable {
     function requestTokens(
         uint256 amount
     )
-        public
+        external
         isValidAddress(msg.sender)
         returns (bool tokensTransferred)
     {
@@ -136,7 +136,7 @@ contract Dispenser is Ownable {
     function setMinPeriod(
         uint period
     )
-        public
+        external
         onlyOwner
     {
         // set min period of time before next request (in seconds)
@@ -150,7 +150,7 @@ contract Dispenser is Ownable {
     function setMaxAmount(
         uint256 amount
     )
-        public
+        external
         onlyOwner
     {
         // set max amount for each request
@@ -164,7 +164,7 @@ contract Dispenser is Ownable {
     function setMaxMintAmount(
         uint amount
     )
-        public
+        external
         onlyOwner
     {
         // set max amount for each request
