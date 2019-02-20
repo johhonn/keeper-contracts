@@ -139,7 +139,7 @@ contract('DIDRegistry', (accounts) => {
             proxy = await DIDRegistryChangeInStorage.at(proxyAddress)
 
             // should not be able to be called before upgrade is approved
-            await testUtils.assertRevert(proxy.timeOfRegister(did))
+            await assert.isRejected(proxy.timeOfRegister(did))
             // call again after approved
             await adminWallet.confirmTransaction(txId, { from: accounts[1] })
             assert.equal(
@@ -161,7 +161,7 @@ contract('DIDRegistry', (accounts) => {
             proxy = await DIDRegistryChangeInStorageAndLogic.at(proxyAddress)
 
             // should not be able to be called before upgrade is approved
-            await testUtils.assertRevert(proxy.timeOfRegister(did))
+            await assert.isRejected(proxy.timeOfRegister(did))
             await adminWallet.confirmTransaction(txId, { from: accounts[1] })
 
             // Approve and call again
@@ -204,7 +204,7 @@ contract('DIDRegistry', (accounts) => {
             proxy = await DIDRegistryExtraFunctionality.at(proxyAddress)
 
             // should not be able to be called before upgrade is approved
-            await testUtils.assertRevert(proxy.getNumber())
+            await assert.isRejected(proxy.getNumber())
             await adminWallet.confirmTransaction(txId, { from: accounts[1] })
 
             // Approve and call again
