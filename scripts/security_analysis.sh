@@ -31,73 +31,84 @@ EOF
 export subfilename=${TRAVIS_BRANCH//\//-}
 export subfilename=${subfilename//_/-}
 
-cat <<EOF | kubectl apply -f -
+# Check if there is jobs already running for this branch
+if ! kubectl get pods -l analysis=mythril,branch=${TRAVIS_BRANCH} 2>&1 | grep -q Running; then
+  cat <<EOF | kubectl apply -f -
 apiVersion: batch/v1
 kind: Job
 metadata:
- name: mythril-analysis-${subfilename}-${TRAVIS_JOB_ID}
- namespace: ${KUBE_NAMESPACE}
+  name: mythril-analysis-${subfilename}-${TRAVIS_JOB_ID}
+  namespace: ${KUBE_NAMESPACE}
+  labels:
+    analysis: mythril
+    branch: ${TRAVIS_BRANCH}
 spec:
- template:
-   spec:
-     restartPolicy: Never
-     containers:
-     - name: mythril-test
-       image: "ubuntu:18.04"
-       command:
-       - /bin/entrypoint.sh
-       - ${TRAVIS_BRANCH}
-       volumeMounts:
-       - name: script-volume
-         mountPath: /bin/entrypoint.sh
-         readOnly: true
-         subPath: entrypoint.sh
-       - name: sshkey
-         readOnly: true
-         mountPath: "/etc/ssh_key"
-     volumes:
-     - name: script-volume
-       configMap:
-         defaultMode: 0777
-         name: keeper-contract-mythril-analysis
-     - name: sshkey
-       secret:
-         defaultMode: 0600
-         secretName: sshkey
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: mythril-test
+        image: "ubuntu:18.04"
+        command:
+        - /bin/entrypoint.sh
+        - ${TRAVIS_BRANCH}
+        volumeMounts:
+        - name: script-volume
+          mountPath: /bin/entrypoint.sh
+          readOnly: true
+          subPath: entrypoint.sh
+        - name: sshkey
+          readOnly: true
+          mountPath: "/etc/ssh_key"
+      volumes:
+      - name: script-volume
+        configMap:
+          defaultMode: 0777
+          name: keeper-contract-mythril-analysis
+      - name: sshkey
+        secret:
+          defaultMode: 0600
+          secretName: sshkey
 EOF
+fi
 
-cat <<EOF | kubectl apply -f -
+if ! kubectl get pods -l analysis=securify,branch=${TRAVIS_BRANCH} 2>&1 | grep -q Running; then
+  cat <<EOF | kubectl apply -f -
 apiVersion: batch/v1
 kind: Job
 metadata:
- name: securify-analysis-${subfilename}-${TRAVIS_JOB_ID}
- namespace: ${KUBE_NAMESPACE}
+  name: securify-analysis-${subfilename}-${TRAVIS_JOB_ID}
+  namespace: ${KUBE_NAMESPACE}
+  labels:
+    analysis: securify
+    branch: ${TRAVIS_BRANCH}
 spec:
- template:
-   spec:
-     restartPolicy: Never
-     containers:
-     - name: securify
-       image: "chainsecurity/securify:latest"
-       command:
-       - /bin/entrypoint.sh
-       - ${TRAVIS_BRANCH}
-       volumeMounts:
-       - name: script-volume
-         mountPath: /bin/entrypoint.sh
-         readOnly: true
-         subPath: entrypoint.sh
-       - name: sshkey
-         readOnly: true
-         mountPath: "/etc/ssh_key"
-     volumes:
-     - name: script-volume
-       configMap:
-         defaultMode: 0777
-         name: keeper-contract-securify-analysis
-     - name: sshkey
-       secret:
-         defaultMode: 0600
-         secretName: sshkey
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: securify
+        image: "chainsecurity/securify:latest"
+        command:
+        - /bin/entrypoint.sh
+        - ${TRAVIS_BRANCH}
+        volumeMounts:
+        - name: script-volume
+          mountPath: /bin/entrypoint.sh
+          readOnly: true
+          subPath: entrypoint.sh
+        - name: sshkey
+          readOnly: true
+          mountPath: "/etc/ssh_key"
+      volumes:
+      - name: script-volume
+        configMap:
+          defaultMode: 0777
+          name: keeper-contract-securify-analysis
+      - name: sshkey
+        secret:
+          defaultMode: 0600
+          secretName: sshkey
 EOF
+fi
 
