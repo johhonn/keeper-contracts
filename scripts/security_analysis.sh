@@ -4,6 +4,7 @@ curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s htt
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 
+mkdir -p ~/.kube
 cat<<EOF > ~/.kube/config
 apiVersion: v1
 clusters:
@@ -23,16 +24,18 @@ preferences: {}
 users:
 - name: ${KUBE_USER}
   user:
-    exec:
-      client-key-data: ${KUBE_CLIENT_KEY_DATA}
-      token: ${KUBE_TOKEN}
+    client-key-data: ${KUBE_CLIENT_KEY_DATA}
+    token: ${KUBE_TOKEN}
 EOF
+
+export subfilename=${TRAVIS_BRANCH//\//-}
+export subfilename=${subfilename//_/-}
 
 cat <<EOF | kubectl apply -f -
 apiVersion: batch/v1
 kind: Job
 metadata:
- name: mythril-analysis-${TRAVIS_BRANCH}-${TRAVIS_JOB_ID}
+ name: mythril-analysis-${subfilename}-${TRAVIS_JOB_ID}
  namespace: ${KUBE_NAMESPACE}
 spec:
  template:
@@ -67,7 +70,7 @@ cat <<EOF | kubectl apply -f -
 apiVersion: batch/v1
 kind: Job
 metadata:
- name: securify-analysis-${TRAVIS_BRANCH}-${TRAVIS_JOB_ID}
+ name: securify-analysis-${subfilename}-${TRAVIS_JOB_ID}
  namespace: ${KUBE_NAMESPACE}
 spec:
  template:
