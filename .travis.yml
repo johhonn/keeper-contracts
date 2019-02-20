@@ -62,7 +62,6 @@ script:
     - git status
     - git add package-lock.json
     - git diff-index --quiet HEAD || git commit -m "Travis update"
-    - scripts/security_analysis.sh
     - |
         if [ "${TRAVIS_BRANCH}" = "develop" ]; then
           scripts/security_analysis.sh
