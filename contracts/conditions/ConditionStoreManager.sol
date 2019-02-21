@@ -11,6 +11,7 @@ contract ConditionStoreManager is Ownable, Common {
     using ConditionStoreLibrary for ConditionStoreLibrary.ConditionList;
     using EpochLibrary for EpochLibrary.EpochList;
 
+    enum RoleType { Create, Update }
     address private createRole;
     ConditionStoreLibrary.ConditionList internal conditionList;
     EpochLibrary.EpochList internal epochList;
@@ -58,6 +59,17 @@ contract ConditionStoreManager is Ownable, Common {
         returns (address)
     {
         return createRole;
+    }
+
+    function delegateCreateRole(address delegatee)
+        external
+        onlyCreateRole()
+    {
+        require(
+            delegatee != address(0),
+            'Invalid delegatee address'
+        );
+        createRole = delegatee;
     }
 
     function createCondition(
