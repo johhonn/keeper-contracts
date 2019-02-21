@@ -7,95 +7,53 @@ const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
-const EpochLibrary = artifacts.require('EpochLibrary')
-const DIDRegistryLibrary = artifacts.require('DIDRegistryLibrary')
-const DIDRegistry = artifacts.require('DIDRegistry')
-const AgreementStoreLibrary = artifacts.require('AgreementStoreLibrary')
-const ConditionStoreManager = artifacts.require('ConditionStoreManager')
-const TemplateStoreManager = artifacts.require('TemplateStoreManager')
-const AgreementStoreManager = artifacts.require('AgreementStoreManager')
-const OceanToken = artifacts.require('OceanToken')
-const LockRewardCondition = artifacts.require('LockRewardCondition')
-const AccessSecretStoreCondition = artifacts.require('AccessSecretStoreCondition')
-const EscrowReward = artifacts.require('EscrowReward')
 const EscrowAccessSecretStoreTemplate = artifacts.require('EscrowAccessSecretStoreTemplate')
 
 const constants = require('../../helpers/constants.js')
+const deployConditions = require('../../helpers/deployConditions.js')
+const deployManagers = require('../../helpers/deployManagers.js')
 const getBalance = require('../../helpers/getBalance.js')
 const increaseTime = require('../../helpers/increaseTime.js')
 
 contract('Escrow Access Secret Store integration test', (accounts) => {
-    let lockRewardCondition,
-        escrowReward,
-        accessSecretStoreCondition,
+    let oceanToken,
+        didRegistry,
+        agreementStoreManager,
+        conditionStoreManager,
+        templateStoreManager,
         escrowAccessSecretStoreTemplate,
-        templateStoreManager
+        accessSecretStoreCondition,
+        lockRewardCondition,
+        escrowReward
 
     async function setupTest({
         deployer = accounts[8],
         owner = accounts[9]
     } = {}) {
-        const didRegistryLibrary = await DIDRegistryLibrary.new()
-        await DIDRegistry.link('DIDRegistryLibrary', didRegistryLibrary.address)
-        const didRegistry = await DIDRegistry.new()
-        await didRegistry.initialize(owner)
+        ({
+            oceanToken,
+            didRegistry,
+            agreementStoreManager,
+            conditionStoreManager,
+            templateStoreManager
+        } = await deployManagers(
+            deployer,
+            owner
+        ));
 
-        const epochLibrary = await EpochLibrary.new({ from: deployer })
-        await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
-        const conditionStoreManager = await ConditionStoreManager.new({ from: deployer })
-
-        templateStoreManager = await TemplateStoreManager.new({ from: deployer })
-        await templateStoreManager.initialize(
+        ({
+            accessSecretStoreCondition,
+            lockRewardCondition,
+            escrowReward
+        } = await deployConditions(
+            deployer,
             owner,
-            { from: deployer }
-        )
+            agreementStoreManager,
+            conditionStoreManager,
+            oceanToken
+        ))
 
-        const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: deployer })
-        await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-        const agreementStoreManager = await AgreementStoreManager.new({ from: deployer })
-        await agreementStoreManager.methods['initialize(address,address,address,address)'](
-            owner,
-            conditionStoreManager.address,
-            templateStoreManager.address,
-            didRegistry.address,
-            { from: deployer }
-        )
-
-        await conditionStoreManager.initialize(
-            owner,
-            agreementStoreManager.address,
-            { from: deployer }
-        )
-
-        const oceanToken = await OceanToken.new({ from: deployer })
-        await oceanToken.initialize(owner, owner)
-
-        lockRewardCondition = await LockRewardCondition.new({ from: deployer })
-        await lockRewardCondition.initialize(
-            owner,
-            conditionStoreManager.address,
-            oceanToken.address,
-            { from: deployer }
-        )
-
-        accessSecretStoreCondition = await AccessSecretStoreCondition.new({ from: deployer })
-
-        await accessSecretStoreCondition.initialize(
-            owner,
-            conditionStoreManager.address,
-            agreementStoreManager.address,
-            { from: deployer }
-        )
-
-        escrowReward = await EscrowReward.new({ from: deployer })
-        await escrowReward.initialize(
-            owner,
-            conditionStoreManager.address,
-            oceanToken.address,
-            { from: deployer }
-        )
-
-        escrowAccessSecretStoreTemplate = await EscrowAccessSecretStoreTemplate.new({ from: deployer })
+        escrowAccessSecretStoreTemplate = await EscrowAccessSecretStoreTemplate.new()
         await escrowAccessSecretStoreTemplate.methods['initialize(address,address,address,address,address,address)'](
             owner,
             agreementStoreManager.address,
@@ -112,10 +70,6 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
         await templateStoreManager.approveTemplate(templateId, { from: owner })
 
         return {
-            oceanToken,
-            didRegistry,
-            agreementStoreManager,
-            conditionStoreManager,
             templateId,
             owner
         }
@@ -164,7 +118,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
 
     describe('create and fulfill escrow agreement', () => {
         it('should create escrow agreement and fulfill', async () => {
-            const { oceanToken, didRegistry, agreementStoreManager, conditionStoreManager, owner } = await setupTest()
+            const { owner } = await setupTest()
 
             // prepare: escrow agreement
             const { agreementId, agreement, sender, receiver, escrowAmount, checksum, url } = await prepareEscrowAgreement()
@@ -230,7 +184,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
         })
 
         it('should create escrow agreement and abort after timeout', async () => {
-            const { oceanToken, didRegistry, conditionStoreManager, owner } = await setupTest()
+            const { owner } = await setupTest()
 
             // prepare: escrow agreement
             const { agreementId, agreement, sender, receiver, escrowAmount, timeOutAccess, checksum, url } = await prepareEscrowAgreement({ timeOutAccess: 10 })
@@ -273,7 +227,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
 
     describe('create and fulfill escrow agreement with access secret store and timeLock', () => {
         it('should create escrow agreement and fulfill', async () => {
-            const { oceanToken, didRegistry, conditionStoreManager, owner } = await setupTest()
+            const { owner } = await setupTest()
 
             // prepare: escrow agreement
             const { agreementId, agreement, sender, receiver, escrowAmount, timeLockAccess, checksum, url } = await prepareEscrowAgreement({ timeLockAccess: 10 })
