@@ -77,17 +77,18 @@ contract EscrowReward is Reward {
             'Not enough balance'
         );
 
-        if (
-            conditionStoreManager.getConditionState(_releaseCondition) ==
-            ConditionStoreLibrary.ConditionState.Fulfilled)
+        ConditionStoreLibrary.ConditionState state =
+            conditionStoreManager.getConditionState(_releaseCondition);
+
+        if (state == ConditionStoreLibrary.ConditionState.Fulfilled)
         {
-            return _transferAndFulfill(id, _receiver, _amount);
-        } else if (
-            conditionStoreManager.getConditionState(_releaseCondition) ==
-            ConditionStoreLibrary.ConditionState.Aborted)
+            state = _transferAndFulfill(id, _receiver, _amount);
+        } else if (state == ConditionStoreLibrary.ConditionState.Aborted)
         {
-            return _transferAndFulfill(id, _sender, _amount);
+            state = _transferAndFulfill(id, _sender, _amount);
         }
+
+        return state;
     }
 
     function _transferAndFulfill(
