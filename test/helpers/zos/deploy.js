@@ -3,7 +3,6 @@
 const { execSync } = require('child_process')
 const fs = require('fs')
 const glob = require('glob')
-// const { exportArtifacts } = require('./exportArtifacts')
 const createWallet = require('../wallet/createWallet')
 const loadWallet = require('../wallet/loadWallet')
 const pkg = require('../../../package.json')
@@ -22,6 +21,8 @@ const NETWORK = process.env.NETWORK || 'development'
 // load current version from package
 const VERSION = `v${pkg.version}`
 const timeout = 36000
+const verbose = false
+const flags = verbose ? '-v' : '-s'
 
 // List of contracts
 const contractNames = [
@@ -41,7 +42,7 @@ const contractNames = [
 ]
 
 async function getAddressForImplementation(contractName) {
-    let files = glob.sync('./zos.dev-*.json')
+    let files = glob.sync('./zos.*.json')
     if (files === undefined || files.length === 0) {
         // array empty or does not exist
         throw Error(`zos config file not found`)
@@ -70,7 +71,7 @@ async function requestContractUpgrade(contractName, deployerRole, adminWallet, c
 
 async function deployContracts(operation = 'deploy', contracts, contractAddress) {
     contracts = !contracts || contracts.length === 0 ? contractNames : contracts
-    console.log(contracts)
+
     /*
      * -----------------------------------------------------------------------
      * Script setup
@@ -105,16 +106,16 @@ async function deployContracts(operation = 'deploy', contracts, contractAddress)
 
     // Initialize project zOS project
     // NOTE: Creates a zos.json file that keeps track of the project's details
-    execSync(`npx zos init ${pkg.name} ${VERSION} -v`)
+    execSync(`npx zos init ${pkg.name} ${VERSION} ${flags}`)
 
     // Register contracts in the project as an upgradeable contract.
-    execSync(`npx zos add ${contracts.join(' ')} --skip-compile -v`)
+    execSync(`npx zos add ${contracts.join(' ')} --skip-compile ${flags}`)
 
     if (operation === 'deploy') {
-        execSync(`npx zos push --skip-compile -v`)
+        execSync(`npx zos push --skip-compile ${flags}`)
         return deploy(contracts, roles)
     } else if (operation === 'upgrade') {
-        execSync(`npx zos push --force --skip-compile -v`)
+        execSync(`npx zos push --force --skip-compile ${flags}`)
 
         let transactionId
         for (const contractName of contracts) {
@@ -143,34 +144,34 @@ async function deploy(contracts, roles) {
 
     // v0.7
     if (contracts.indexOf('StorageContract') > -1) {
-        contractAddress = execSync(`npx zos create StorageContract`).toString().trim()
+        contractAddress = execSync(`npx zos create StorageContract ${flags}`).toString().trim()
     }
 
     if (contracts.indexOf('DIDRegistry') > -1) {
-        contractAddress = execSync(`npx zos create DIDRegistry --init initialize --args ${roles.owner}`).toString().trim()
+        contractAddress = execSync(`npx zos create DIDRegistry --init initialize --args ${roles.owner} ${flags}`).toString().trim()
     }
 
     if (contracts.indexOf('OceanToken') > -1) {
-        contractAddress = oceanTokenAddress = execSync(`npx zos create OceanToken --init --args ${roles.owner},${roles.initialMinter} -v`).toString().trim()
+        contractAddress = oceanTokenAddress = execSync(`npx zos create OceanToken --init --args ${roles.owner},${roles.initialMinter} ${flags}`).toString().trim()
     }
 
     if (contracts.indexOf('Dispenser') > -1) {
-        contractAddress = dispenserAddress = execSync(`npx zos create Dispenser --init initialize --args ${oceanTokenAddress},${roles.owner} -v`).toString().trim()
+        contractAddress = dispenserAddress = execSync(`npx zos create Dispenser --init initialize --args ${oceanTokenAddress},${roles.owner} ${flags}`).toString().trim()
     }
 
     if (contracts.indexOf('ConditionStoreManager') > -1) {
-        contractAddress = conditionStoreManagerAddress = execSync(`npx zos create ConditionStoreManager`).toString().trim()
+        contractAddress = conditionStoreManagerAddress = execSync(`npx zos create ConditionStoreManager ${flags}`).toString().trim()
     }
 
     if (conditionStoreManagerAddress && oceanTokenAddress) {
         if (contracts.indexOf('SignCondition') > -1) {
-            contractAddress = execSync(`npx zos create SignCondition --init initialize --args ${conditionStoreManagerAddress} -v`).toString().trim()
+            contractAddress = execSync(`npx zos create SignCondition --init initialize --args ${conditionStoreManagerAddress} ${flags}`).toString().trim()
         }
         if (contracts.indexOf('HashLockCondition') > -1) {
-            contractAddress = execSync(`npx zos create HashLockCondition --init initialize --args ${conditionStoreManagerAddress} -v`).toString().trim()
+            contractAddress = execSync(`npx zos create HashLockCondition --init initialize --args ${conditionStoreManagerAddress} ${flags}`).toString().trim()
         }
         if (contracts.indexOf('LockRewardCondition') > -1) {
-            contractAddress = execSync(`npx zos create LockRewardCondition --init initialize --args ${conditionStoreManagerAddress},${oceanTokenAddress} -v`).toString().trim()
+            contractAddress = execSync(`npx zos create LockRewardCondition --init initialize --args ${conditionStoreManagerAddress},${oceanTokenAddress} ${flags}`).toString().trim()
         }
     }
     /*
@@ -199,7 +200,7 @@ async function deploy(contracts, roles) {
      */
     console.log(`Setting zos-admin to MultiSigWsllet ${roles.admin}`)
     for (const contract of contracts) {
-        execSync(`npx zos set-admin ${contract} ${roles.admin} --yes`)
+        execSync(`npx zos set-admin ${contract} ${roles.admin} --yes ${flags}`)
     }
 
     /*

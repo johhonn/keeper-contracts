@@ -1,5 +1,5 @@
 /* eslint-env mocha */
-/* global artifacts, contract, describe, it, beforeEach */
+/* global artifacts, contract, describe, it, beforeEach, before */
 const chai = require('chai')
 const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
@@ -24,11 +24,8 @@ contract('DIDRegistry', (accounts) => {
         proxyAddress,
         addresses
 
-    beforeEach('Load wallet each time', async function() {
+    before('Create wallet', async () => {
         await createWallet(true)
-        adminWallet = await loadWallet('upgrader') // zos admin MultiSig
-        addresses = await deploy('deploy', ['DIDRegistry'])
-        proxyAddress = addresses.contractAddress
     })
 
     async function setupTest({
@@ -56,6 +53,12 @@ contract('DIDRegistry', (accounts) => {
     }
 
     describe('Test upgradability for DIDRegistry', () => {
+        beforeEach('Load wallet each time', async function() {
+            adminWallet = await loadWallet('upgrader') // zos admin MultiSig
+            addresses = await deploy('deploy', ['DIDRegistry'])
+            proxyAddress = addresses.contractAddress
+        })
+
         it('Should be possible to fix/add a bug', async () => {
             let { proxy, did } = await setupTest()
             // Upgrade to new version
