@@ -56,6 +56,8 @@ script:
     - npm run lint
     - npm run test:cover
     - npm run report-coverage
+    - npm run clean
+    - npm run compile
     - npm run test:upgrade
     - npm run compile
     - npm run deploy
