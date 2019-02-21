@@ -40,7 +40,4 @@ contract('EpochLibrary', (accounts) => {
             )
         })
     })
-
-    describe('get epoch', () => {
-    })
 })
