@@ -97,8 +97,14 @@ contract('ConditionStoreManager', (accounts) => {
                 accounts[0],
                 'Invalid create role!'
             )
-            await assert.isRejected(
-                upgradedConditionStoreManager.createCondition(conditionId, conditionType, accounts[0], { from: accounts[1] })
+
+            await upgradedConditionStoreManager.createCondition(conditionId, conditionType, accounts[0], { from: accounts[0] })
+
+            // assert
+            assert.strictEqual(
+                (await upgradedConditionStoreManager.getConditionState(conditionId)).toNumber(),
+                constants.condition.state.unfulfilled,
+                'condition should be unfulfilled'
             )
         })
 
@@ -149,8 +155,12 @@ contract('ConditionStoreManager', (accounts) => {
 
             assert.strictEqual((await upgradedConditionStoreManager.conditionCount()).toNumber(), 0)
 
-            await assert.isRejected(
-                upgradedConditionStoreManager.createCondition(conditionId, conditionType, accounts[0], { from: accounts[1] })
+            await upgradedConditionStoreManager.createCondition(conditionId, conditionType, accounts[0], { from: accounts[0] })
+
+            assert.strictEqual(
+                (await upgradedConditionStoreManager.getConditionState(conditionId)).toNumber(),
+                constants.condition.state.unfulfilled,
+                'condition should be unfulfilled'
             )
         })
 
