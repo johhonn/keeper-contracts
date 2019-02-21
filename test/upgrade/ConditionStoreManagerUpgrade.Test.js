@@ -97,12 +97,9 @@ contract('ConditionStoreManager', (accounts) => {
                 accounts[0],
                 'Invalid create role!'
             )
-
-            try {
-                await upgradedConditionStoreManager.createCondition(conditionId, conditionType, accounts[0], { from: accounts[1] })
-            } catch (err) {
-                assert.equal(err.reason, 'Invalid _sender address change signature test should fail')
-            }
+            await assert.isRejected(
+                upgradedConditionStoreManager.createCondition(conditionId, conditionType, accounts[0], { from: accounts[1] })
+            )
         })
 
         it('Should be possible to append storage variable(s) ', async () => {
@@ -152,11 +149,9 @@ contract('ConditionStoreManager', (accounts) => {
 
             assert.strictEqual((await upgradedConditionStoreManager.conditionCount()).toNumber(), 0)
 
-            try {
-                await upgradedConditionStoreManager.createCondition(conditionId, conditionType, accounts[0], { from: accounts[1] })
-            } catch (err) {
-                assert.equal(err.reason, 'Invalid _sender address change signature test should fail')
-            }
+            await assert.isRejected(
+                upgradedConditionStoreManager.createCondition(conditionId, conditionType, accounts[0], { from: accounts[1] })
+            )
         })
 
         it('Should be able to call new method added after upgrade is approved', async () => {
