@@ -529,7 +529,7 @@ contract('ConditionStoreManager', (accounts) => {
                 constants.condition.epoch.error.isTimeLocked
             )
             // waited for a block
-            await increaseTime(1)
+            await increaseTime(2)
 
             await conditionStoreManager.updateConditionState(conditionId, newState)
             assert.strictEqual(

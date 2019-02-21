@@ -28,12 +28,6 @@ before_install:
     - npm install -g ganache-cli@~6.1.8 release-it greenkeeper-lockfile codacy-coverage surya@0.2.7
     - pyenv global system 3.6.7
     - |
-        if [ "${TRAVIS_BRANCH}" = "develop" ]; then
-            sudo apt-get -y install python3-apt dot2tex
-            pip3 install -r requirements_dev.txt
-            docker pull chainsecurity/securify
-        fi
-    - |
         if [ "${DEPLOY_PACKAGE}" = "true" ] && [ ! -z "${TRAVIS_TAG}" ]; then
           sudo apt-get -y install gnupg-agent python3-setuptools
           gpg-agent --daemon --no-grab --write-env-file $HOME/.gpg-agent-info
@@ -68,47 +62,10 @@ script:
     - git status
     - git add package-lock.json
     - git diff-index --quiet HEAD || git commit -m "Travis update"
-    - |
-        if [ "${TRAVIS_BRANCH}" = "develop" ]; then
-            python2 -c 'import os,sys,fcntl; flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL); fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags&~os.O_NONBLOCK);'
-            npm run security:slither
-            npm run security:surya
-            mkdir -p $HOME/.mythril && cp -rp assets/* $HOME/.mythril/
-            sed -i 's/pragma solidity >=0.4.24 <0.6.0;/pragma solidity 0.5.3;/g' node_modules/zos-lib/contracts/Initializable.sol
-            npm run security:mythril
-            #find contracts -type f -name "*.sol" -exec ./truffle-flattener-travis.sh {} \;
-            #rm -rf contracts
-            #mv contracts_flatten contracts
-            #travis_wait 60 npm run security:securify
-            #git checkout HEAD contracts
-        fi
+    - bash -x scripts/security_analysis.sh
 
 after_script:
     - greenkeeper-lockfile-upload
-
-after_success:
-  - |
-        if [ "${TRAVIS_BRANCH}" = "develop" ]; then
-            BRANCHNAME=${TRAVIS_BRANCH//\//_}
-            declare -r SSH_FILE="$(mktemp -u $HOME/.ssh/XXXXX)"
-            openssl aes-256-cbc -K $encrypted_387ed244ad7b_key -iv $encrypted_387ed244ad7b_iv -in .travis/travis_keeper-contracts-security-reports.enc -out $SSH_FILE -d
-            chmod 600 "$SSH_FILE" \
-            && printf "%s\n" \
-                  "Host github.com" \
-                  "  IdentityFile $SSH_FILE" \
-                  "  LogLevel ERROR" >> ~/.ssh/config
-
-            git clone git@github.com:oceanprotocol/keeper-contracts-security-reports.git
-            cp -rp mythrilReport.md keeper-contracts-security-reports/${BRANCHNAME}_mythrilReport.md
-            cp -rp slitherReport.txt keeper-contracts-security-reports/${BRANCHNAME}_slitherReport.txt
-            cp -rp securifyReport.txt keeper-contracts-security-reports/${BRANCHNAME}_securifyReport.txt
-            cp -rp KeeperContracts.png keeper-contracts-security-reports/${BRANCHNAME}_KeeperContracts.png
-            cd keeper-contracts-security-reports
-            git add .
-            git commit -m "UPSERT ${BRANCHNAME}"
-            git push
-            cd ..
-        fi
 
 notifications:
     email: false
@@ -138,7 +95,6 @@ deploy:
           tags: true
           all_branches: true
           condition: $DEPLOY_PACKAGE = true
-
 
     - provider: releases
       skip_cleanup: true
