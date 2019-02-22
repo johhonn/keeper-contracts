@@ -46,13 +46,6 @@ contract AgreementStoreChangeFunctionSignature is AgreementStoreManager {
             _conditionIds
         );
 
-        emit AgreementCreated(
-            _id,
-            _did,
-            msg.sender,
-            msg.sender
-        );
-
         return getAgreementListSize();
     }
 }

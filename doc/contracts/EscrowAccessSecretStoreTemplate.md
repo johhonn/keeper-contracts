@@ -23,6 +23,18 @@ Members:
 
 ### private agreementList
 
+## Events
+
+###  AgreementCreated
+Parameters:
+* bytes32   _agreementId
+* bytes32   _did
+* address   _accessProvider
+* address   _accessConsumer
+* bytes32[] _conditionIds
+* uint[]    _timeLocks
+* uint[]    _timeOuts
+
 ## Functions
 
 ### public initialize
