@@ -1,101 +1,57 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, contract, describe, it */
+/* global contract, describe, it */
 
 const chai = require('chai')
 const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
-const EpochLibrary = artifacts.require('EpochLibrary')
-const DIDRegistryLibrary = artifacts.require('DIDRegistryLibrary')
-const DIDRegistry = artifacts.require('DIDRegistry')
-const AgreementStoreLibrary = artifacts.require('AgreementStoreLibrary')
-const ConditionStoreManager = artifacts.require('ConditionStoreManager')
-const TemplateStoreManager = artifacts.require('TemplateStoreManager')
-const AgreementStoreManager = artifacts.require('AgreementStoreManager')
-const OceanToken = artifacts.require('OceanToken')
-const LockRewardCondition = artifacts.require('LockRewardCondition')
-const SignCondition = artifacts.require('SignCondition')
-const EscrowReward = artifacts.require('EscrowReward')
-
 const constants = require('../../helpers/constants.js')
+const deployConditions = require('../../helpers/deployConditions.js')
+const deployManagers = require('../../helpers/deployManagers.js')
 const getBalance = require('../../helpers/getBalance.js')
 const increaseTime = require('../../helpers/increaseTime.js')
 
 contract('Stake Agreement integration test', (accounts) => {
-    let signCondition,
+    let oceanToken,
+        didRegistry,
+        agreementStoreManager,
+        conditionStoreManager,
+        templateStoreManager,
+        signCondition,
         lockRewardCondition,
-        escrowReward,
-        templateStoreManager
+        escrowReward
 
     async function setupTest({
         deployer = accounts[8],
         owner = accounts[9]
     } = {}) {
-        const didRegistryLibrary = await DIDRegistryLibrary.new()
-        await DIDRegistry.link('DIDRegistryLibrary', didRegistryLibrary.address)
-        const didRegistry = await DIDRegistry.new()
-        await didRegistry.initialize(owner)
-
-        const epochLibrary = await EpochLibrary.new({ from: deployer })
-        await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
-        const conditionStoreManager = await ConditionStoreManager.new({ from: deployer })
-
-        templateStoreManager = await TemplateStoreManager.new({ from: deployer })
-        await templateStoreManager.initialize(
-            owner,
-            { from: deployer }
-        )
-
-        const agreementStoreLibrary = await AgreementStoreLibrary.new({ from: deployer })
-        await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-        const agreementStoreManager = await AgreementStoreManager.new({ from: deployer })
-        await agreementStoreManager.methods['initialize(address,address,address,address)'](
-            owner,
-            conditionStoreManager.address,
-            templateStoreManager.address,
-            didRegistry.address,
-            { from: deployer }
-        )
-
-        await conditionStoreManager.initialize(
-            owner,
-            agreementStoreManager.address,
-            { from: deployer }
-        )
-
-        const oceanToken = await OceanToken.new({ from: deployer })
-        await oceanToken.initialize(owner, owner)
-
-        lockRewardCondition = await LockRewardCondition.new({ from: deployer })
-        await lockRewardCondition.initialize(
-            owner,
-            conditionStoreManager.address,
-            oceanToken.address,
-            { from: deployer }
-        )
-
-        escrowReward = await EscrowReward.new({ from: deployer })
-        await escrowReward.initialize(
-            owner,
-            conditionStoreManager.address,
-            oceanToken.address,
-            { from: deployer }
-        )
-
-        signCondition = await SignCondition.new()
-        await signCondition.initialize(
-            owner,
-            conditionStoreManager.address,
-            { from: accounts[0] }
-        )
-
-        return {
+        ({
             oceanToken,
             didRegistry,
             agreementStoreManager,
             conditionStoreManager,
+            templateStoreManager
+        } = await deployManagers(
+            deployer,
+            owner
+        ));
+
+        ({
+            signCondition,
+            lockRewardCondition,
+            escrowReward
+        } = await deployConditions(
+            deployer,
+            owner,
+            agreementStoreManager,
+            conditionStoreManager,
+            oceanToken
+        ))
+
+        return {
+            deployer,
             owner
         }
     }
@@ -151,7 +107,7 @@ contract('Stake Agreement integration test', (accounts) => {
 
     describe('create and fulfill stake agreement', () => {
         it('stake agreement as an escrow with self-sign release', async () => {
-            const { oceanToken, didRegistry, agreementStoreManager, owner } = await setupTest()
+            const { owner } = await setupTest()
 
             const alice = accounts[0]
             // propose and approve account as agreement factory - not for production :)
