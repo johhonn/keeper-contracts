@@ -15,6 +15,19 @@ contract ConditionStoreManager is Ownable, Common {
     ConditionStoreLibrary.ConditionList internal conditionList;
     EpochLibrary.EpochList internal epochList;
 
+    event ConditionCreated(
+        bytes32 indexed _id,
+        address indexed _typeRef,
+        address indexed _who
+    );
+
+    event ConditionUpdated(
+        bytes32 indexed _id,
+        address indexed _typeRef,
+        address indexed _who,
+        ConditionStoreLibrary.ConditionState _state
+    );
+
     modifier onlyCreateRole(){
         require(
             createRole == msg.sender,
@@ -91,7 +104,10 @@ contract ConditionStoreManager is Ownable, Common {
             'Invalid address'
         );
         epochList.create(_id, _timeLock, _timeOut);
-        return conditionList.create(_id, _typeRef);
+
+        uint listSize = conditionList.create(_id, _typeRef);
+
+        return listSize;
     }
 
     // update: Unfulfilled --> Fulfilled | Aborted | ...
@@ -113,7 +129,17 @@ contract ConditionStoreManager is Ownable, Common {
         // auto abort after time out
         if (isConditionTimedOut(_id))
             updateState = ConditionStoreLibrary.ConditionState.Aborted;
-        return conditionList.updateState(_id, updateState);
+
+        ConditionStoreLibrary.ConditionState state = conditionList.updateState(_id, updateState);
+
+        emit ConditionUpdated(
+            _id,
+            _self.conditions[_id].typeRef,
+            msg.sender,
+            _newState
+        );
+
+        return state;
     }
 
     function getConditionListSize()

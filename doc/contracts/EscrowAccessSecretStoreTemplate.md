@@ -25,7 +25,7 @@ Members:
 
 ## Events
 
-###  AgreementCreated
+###  AgreementInitialized
 Parameters:
 * bytes32   _agreementId
 * bytes32   _did

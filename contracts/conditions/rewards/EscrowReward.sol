@@ -5,6 +5,20 @@ import '../ConditionStoreLibrary.sol';
 
 contract EscrowReward is Reward {
 
+    event PaymentReleased(
+        bytes32 indexed _agreementId,
+        bytes32 _conditionId,
+        address _receiver,
+        uint256 _amount
+    );
+
+    event PaymentRefund(
+        bytes32 indexed _agreementId,
+        bytes32 _conditionId,
+        address _receiver,
+        uint256 _amount
+    );
+
     function initialize(
         address _owner,
         address _conditionStoreManagerAddress,
@@ -83,9 +97,22 @@ contract EscrowReward is Reward {
         if (state == ConditionStoreLibrary.ConditionState.Fulfilled)
         {
             state = _transferAndFulfill(id, _receiver, _amount);
+            emit PaymentReleased(
+                _agreementId,
+                id,
+                _receiver,
+                _amount
+            );
+
         } else if (state == ConditionStoreLibrary.ConditionState.Aborted)
         {
             state = _transferAndFulfill(id, _sender, _amount);
+            emit PaymentRefund(
+                _agreementId,
+                id,
+                _sender,
+                _amount
+            );
         }
 
         return state;

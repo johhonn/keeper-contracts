@@ -10,6 +10,13 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
 
     AgreementStoreManager private agreementStoreManager;
 
+    event AccessGranted(
+        bytes32 indexed _agreementId,
+        bytes32 indexed _conditionId,
+        bytes32 indexed _documentId,
+        address _grantee
+    );
+
     function initialize(
         address _owner,
         address _conditionStoreManagerAddress,
@@ -51,10 +58,21 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
             'Invalid UpdateRole'
         );
         documentPermissions[_documentId][_grantee] = true;
-        return super.fulfill(
-            generateId(_agreementId, hashValues(_documentId, _grantee)),
+
+        bytes32 _id = generateId(_agreementId, hashValues(_documentId, _grantee));
+        ConditionStoreLibrary.ConditionState state = super.fulfill(
+            _id,
             ConditionStoreLibrary.ConditionState.Fulfilled
         );
+
+        emit AccessGranted(
+            _agreementId,
+            _id,
+            _documentId,
+            _grantee
+        );
+
+        return state;
     }
 
     /**

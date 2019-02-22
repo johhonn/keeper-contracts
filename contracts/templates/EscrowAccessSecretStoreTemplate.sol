@@ -15,7 +15,7 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
 
     AgreementData internal agreementData;
 
-    event AgreementCreated(
+    event AgreementInitialized(
         bytes32 indexed _agreementId,
         bytes32 indexed _did,
         address indexed _accessProvider,
@@ -102,7 +102,7 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
             .accessProvider = didRegistry.getDIDOwner(_did);
         agreementData.agreementIds.push(_id);
 
-        emit AgreementCreated(
+        emit AgreementInitialized(
             _id,
             _did,
             agreementData.agreementDataItems[_id].accessProvider,

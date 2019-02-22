@@ -7,6 +7,13 @@ contract LockRewardCondition is Condition {
 
     OceanToken private token;
 
+    event PaymentLocked(
+        bytes32 indexed _agreementId,
+        bytes32 _conditionId,
+        address _rewardAddress,
+        uint256 _amount
+    );
+
     function initialize(
         address _owner,
         address _conditionStoreManagerAddress,
@@ -50,9 +57,20 @@ contract LockRewardCondition is Condition {
             token.transferFrom(msg.sender, _rewardAddress, _amount),
             'Could not transfer token'
         );
-        return super.fulfill(
-            generateId(_agreementId, hashValues(_rewardAddress, _amount)),
+
+        bytes32 _id = generateId(_agreementId, hashValues(_rewardAddress, _amount));
+        ConditionStoreLibrary.ConditionState state = super.fulfill(
+            _id,
             ConditionStoreLibrary.ConditionState.Fulfilled
         );
+
+        emit PaymentLocked(
+            _agreementId,
+            _id,
+            _rewardAddress,
+            _amount
+        );
+
+        return state;
     }
 }

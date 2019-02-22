@@ -77,13 +77,6 @@ library ConditionStoreLibrary {
         _self.conditions[_id].lastUpdatedBy = msg.sender;
         _self.conditions[_id].blockNumberUpdated = block.number;
 
-        emit ConditionUpdated(
-            _id,
-            _self.conditions[_id].typeRef,
-            msg.sender,
-            _newState
-        );
-
         return _newState;
     }
 }
