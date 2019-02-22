@@ -94,6 +94,23 @@ contract('ConditionStoreManager', (accounts) => {
             )
         })
 
+        it('should able to delegate createRole from owner', async () => {
+            const createRole = accounts[1]
+            const owner = accounts[0]
+
+            const conditionStoreManager = await ConditionStoreManager.new()
+
+            // act
+            await conditionStoreManager.initialize(owner, owner)
+            await conditionStoreManager.delegateCreateRole(createRole, { from: owner })
+
+            // assert
+            assert.strictEqual(
+                await conditionStoreManager.getCreateRole(),
+                createRole
+            )
+        })
+
         it('contract should not initialize with zero owner', async () => {
             const createRole = accounts[0]
             const owner = constants.address.zero
