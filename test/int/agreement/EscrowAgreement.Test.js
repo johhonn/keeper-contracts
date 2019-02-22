@@ -62,7 +62,6 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
         )
 
         await conditionStoreManager.initialize(
-            owner,
             agreementStoreManager.address,
             { from: deployer }
         )

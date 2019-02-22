@@ -160,7 +160,7 @@ async function deploy(contracts, roles) {
     }
 
     if (contracts.indexOf('ConditionStoreManager') > -1) {
-        contractAddress = conditionStoreManagerAddress = execSync(`npx zos create ConditionStoreManager --init initialize --args ${roles.owner},${roles.owner} ${flags}`).toString().trim()
+        contractAddress = conditionStoreManagerAddress = execSync(`npx zos create ConditionStoreManager --init initialize --args ${roles.owner} ${flags}`).toString().trim()
     }
 
     if (conditionStoreManagerAddress && oceanTokenAddress) {

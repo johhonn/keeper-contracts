@@ -58,6 +58,10 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
 
         await conditionStoreManager.initialize(
             owner,
+            { from: owner }
+        )
+
+        await conditionStoreManager.delegateCreateRole(
             agreementStoreManager.address,
             { from: owner }
         )

@@ -60,7 +60,6 @@ contract('Stake Agreement integration test', (accounts) => {
         )
 
         await conditionStoreManager.initialize(
-            owner,
             agreementStoreManager.address,
             { from: deployer }
         )

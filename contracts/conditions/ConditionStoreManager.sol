@@ -34,15 +34,13 @@ contract ConditionStoreManager is Ownable, Common {
     }
 
     function initialize(
-        address _owner,
-        address _createRole
+        address _owner
     )
-        external
+        public
         initializer
     {
         require(
-            _owner != address(0) &&
-            _createRole != address(0),
+            _owner != address(0),
             'Invalid address'
         );
         require(
@@ -50,7 +48,7 @@ contract ConditionStoreManager is Ownable, Common {
             'Role already assigned'
         );
         Ownable.initialize(_owner);
-        createRole = _createRole;
+        createRole = _owner;
     }
 
     function getCreateRole()
@@ -63,7 +61,7 @@ contract ConditionStoreManager is Ownable, Common {
 
     function delegateCreateRole(address delegatee)
         external
-        onlyCreateRole()
+        onlyOwner()
     {
         require(
             delegatee != address(0),
