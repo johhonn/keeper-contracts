@@ -14,6 +14,7 @@ const LockRewardCondition = artifacts.require('LockRewardCondition')
 const EscrowReward = artifacts.require('EscrowReward')
 
 const constants = require('../../../helpers/constants.js')
+const getBalance = require('../../../helpers/getBalance.js')
 
 contract('EscrowReward constructor', (accounts) => {
     async function setupTest({
@@ -155,6 +156,9 @@ contract('EscrowReward constructor', (accounts) => {
 
             await lockRewardCondition.fulfill(nonce, escrowReward.address, amount)
 
+            assert.strictEqual(await getBalance(oceanToken, lockRewardCondition.address), 0)
+            assert.strictEqual(await getBalance(oceanToken, escrowReward.address), amount)
+
             await escrowReward.fulfill(
                 nonce,
                 amount,
@@ -166,6 +170,19 @@ contract('EscrowReward constructor', (accounts) => {
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
                 constants.condition.state.fulfilled
+            )
+
+            assert.strictEqual(await getBalance(oceanToken, escrowReward.address), 0)
+            assert.strictEqual(await getBalance(oceanToken, receiver), amount)
+
+            await oceanToken.mint(sender, amount, { from: owner })
+            await oceanToken.approve(escrowReward.address, amount, { from: sender })
+            await oceanToken.transfer(escrowReward.address, amount, { from: sender })
+
+            assert.strictEqual(await getBalance(oceanToken, escrowReward.address), amount)
+            await assert.isRejected(
+                escrowReward.fulfill(nonce, amount, receiver, sender, lockConditionId, releaseConditionId),
+                constants.condition.state.error.invalidStateTransition
             )
         })
     })
