@@ -20,11 +20,8 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
         bytes32 indexed _did,
         address indexed _accessProvider,
         address indexed _accessConsumer,
-        bytes32[] _conditionIds,
         uint[]  _timeLocks,
         uint[]  _timeOuts
-
-
     );
 
     struct AgreementDataModel {
@@ -110,7 +107,6 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
             _did,
             agreementData.agreementDataItems[_id].accessProvider,
             agreementData.agreementDataItems[_id].accessConsumer,
-            _conditionIds,
             _timeLocks,
             _timeOuts
         );
