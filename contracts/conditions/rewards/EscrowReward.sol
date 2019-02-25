@@ -84,8 +84,8 @@ contract EscrowReward is Reward {
             'Not enough balance'
         );
 
-        ConditionStoreLibrary.ConditionState state =
-            conditionStoreManager.getConditionState(_releaseCondition);
+        ConditionStoreLibrary.ConditionState state = conditionStoreManager
+            .getConditionState(_releaseCondition);
 
         address escrowReceiver = address(0x0);
         if (state == ConditionStoreLibrary.ConditionState.Fulfilled)

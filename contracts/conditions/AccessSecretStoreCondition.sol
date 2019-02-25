@@ -54,8 +54,8 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         returns (ConditionStoreLibrary.ConditionState)
     {
         require(
-            msg.sender
-            == agreementStoreManager.getAgreementDIDOwner(_agreementId),
+            msg.sender ==
+            agreementStoreManager.getAgreementDIDOwner(_agreementId),
             'Invalid UpdateRole'
         );
         documentPermissions[_documentId][_grantee] = true;

@@ -136,8 +136,8 @@ contract ConditionStoreManager is Ownable, Common {
         if (isConditionTimedOut(_id))
             updateState = ConditionStoreLibrary.ConditionState.Aborted;
 
-        ConditionStoreLibrary.ConditionState state =
-            conditionList.updateState(_id, updateState);
+        ConditionStoreLibrary.ConditionState state = conditionList
+            .updateState(_id, updateState);
 
         emit ConditionUpdated(
             _id,
