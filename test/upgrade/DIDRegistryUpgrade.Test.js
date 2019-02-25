@@ -27,8 +27,8 @@ contract('DIDRegistry', (accounts) => {
 
     // define the roles
     const owner = accounts[0]
-    const upgraderRole = accounts[1]
-    const approverRole = accounts[2]
+    const upgrader = accounts[1]
+    const approver = accounts[2]
 
     before('Create wallet', async () => {
         await setupWallets(web3, true)
@@ -80,10 +80,10 @@ contract('DIDRegistry', (accounts) => {
                 'DIDRegistryWithBug',
                 DIDRegistryProxyAddress,
                 adminWallet,
-                upgraderRole
+                upgrader
             )
 
-            await adminWallet.confirmTransaction(txId, { from: approverRole })
+            await adminWallet.confirmTransaction(txId, { from: approver })
             proxy = await DIDRegistryWithBug.at(DIDRegistryProxyAddress)
 
             assert.strictEqual(await proxy.getDIDOwner(did), owner)
@@ -117,10 +117,10 @@ contract('DIDRegistry', (accounts) => {
                 'DIDRegistryChangeFunctionSignature',
                 DIDRegistryProxyAddress,
                 adminWallet,
-                upgraderRole
+                upgrader
             )
 
-            await adminWallet.confirmTransaction(txId, { from: approverRole })
+            await adminWallet.confirmTransaction(txId, { from: approver })
             proxy = await DIDRegistryChangeFunctionSignature.at(DIDRegistryProxyAddress)
 
             // check functionality works
@@ -153,7 +153,7 @@ contract('DIDRegistry', (accounts) => {
                 'DIDRegistryChangeInStorage',
                 DIDRegistryProxyAddress,
                 adminWallet,
-                upgraderRole
+                upgrader
             )
 
             proxy = await DIDRegistryChangeInStorage.at(DIDRegistryProxyAddress)
@@ -161,7 +161,7 @@ contract('DIDRegistry', (accounts) => {
             // should not be able to be called before upgrade is approved
             await assert.isRejected(proxy.timeOfRegister(did))
             // call again after approved
-            await adminWallet.confirmTransaction(txId, { from: approverRole })
+            await adminWallet.confirmTransaction(txId, { from: approver })
             assert.equal(
                 (await proxy.timeOfRegister(did)).toNumber(), 0,
                 'Error calling added storage variable')
@@ -176,14 +176,14 @@ contract('DIDRegistry', (accounts) => {
                 'DIDRegistryChangeInStorageAndLogic',
                 DIDRegistryProxyAddress,
                 adminWallet,
-                upgraderRole
+                upgrader
             )
 
             proxy = await DIDRegistryChangeInStorageAndLogic.at(DIDRegistryProxyAddress)
 
             // should not be able to be called before upgrade is approved
             await assert.isRejected(proxy.timeOfRegister(did))
-            await adminWallet.confirmTransaction(txId, { from: approverRole })
+            await adminWallet.confirmTransaction(txId, { from: approver })
 
             // Approve and call again
             assert.equal((await proxy.timeOfRegister(did)).toNumber(),
@@ -220,14 +220,14 @@ contract('DIDRegistry', (accounts) => {
                 'DIDRegistryExtraFunctionality',
                 DIDRegistryProxyAddress,
                 adminWallet,
-                upgraderRole
+                upgrader
             )
 
             proxy = await DIDRegistryExtraFunctionality.at(DIDRegistryProxyAddress)
 
             // should not be able to be called before upgrade is approved
             await assert.isRejected(proxy.getNumber())
-            await adminWallet.confirmTransaction(txId, { from: approverRole })
+            await adminWallet.confirmTransaction(txId, { from: approver })
 
             // Approve and call again
             assert.equal((await proxy.getNumber()).toNumber(),
