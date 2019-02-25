@@ -7,7 +7,7 @@ contract TemplateStoreManager is Ownable {
 
     using TemplateStoreLibrary for TemplateStoreLibrary.TemplateList;
 
-    TemplateStoreLibrary.TemplateList private templateList;
+    TemplateStoreLibrary.TemplateList internal templateList;
 
     modifier onlyOwnerOrTemplateOwner(address _id){
         require(
@@ -68,7 +68,11 @@ contract TemplateStoreManager is Ownable {
         blockNumberUpdated = templateList.templates[_id].blockNumberUpdated;
     }
 
-    function getTemplateListSize() external view returns (uint size) {
+    function getTemplateListSize()
+        external
+        view
+        returns (uint size)
+    {
         return templateList.templateIds.length;
     }
 
