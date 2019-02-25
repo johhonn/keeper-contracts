@@ -1,9 +1,9 @@
-/* global artifacts, web3 */
-const { setupWallet } = require('./setupWallet')
+/* global web3 */
+const setupWallets = require('../wallet/setupWallets')
 
 module.exports = (cb) => {
     // Run with npx truffle exec setUpWalletWrapper.js
-    setupWallet(web3, artifacts)
+    setupWallets(web3, false)
         .then(() => cb())
         .catch(err => cb(err))
 }

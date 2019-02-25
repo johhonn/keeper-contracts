@@ -12,6 +12,4 @@ function generateFunctionSignaturesInABI(abi) {
         })
 }
 
-module.exports = {
-    generateFunctionSignaturesInABI
-}
+module.exports = generateFunctionSignaturesInABI
