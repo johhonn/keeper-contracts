@@ -140,7 +140,6 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             expect(eventArgs._conditionId).to.equal(conditionId)
             expect(eventArgs._documentId).to.equal(documentId)
             expect(eventArgs._grantee).to.equal(grantee)
-
         })
     })
 

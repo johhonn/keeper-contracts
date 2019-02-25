@@ -168,8 +168,6 @@ contract('EscrowAccessSecretStoreTemplate', (accounts) => {
                 .to.deep.equal(agreement.conditionIds)
             expect(storedAgreement.lastUpdatedBy)
                 .to.equal(templateId)
-
         })
-
     })
 })

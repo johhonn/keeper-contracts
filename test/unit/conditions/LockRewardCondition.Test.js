@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, contract, describe, it */
+/* global artifacts, contract, describe, it, expect */
 
 const chai = require('chai')
 const { assert } = chai
@@ -14,6 +14,7 @@ const LockRewardCondition = artifacts.require('LockRewardCondition')
 
 const constants = require('../../helpers/constants.js')
 const getBalance = require('../../helpers/getBalance.js')
+const testUtils = require('../../helpers/utils.js')
 
 contract('LockRewardCondition', (accounts) => {
     async function setupTest({
@@ -132,7 +133,6 @@ contract('LockRewardCondition', (accounts) => {
             expect(eventArgs._conditionId).to.equal(conditionId)
             expect(eventArgs._rewardAddress).to.equal(rewardAddress)
             expect(eventArgs._amount).to.equal(amount)
-
         })
     })
 

@@ -27,7 +27,7 @@ const utils = {
         return txReceipt.logs.filter((log) => {
             return log.event === eventName
         })[0].args
-    },
+    }
 
 }
 

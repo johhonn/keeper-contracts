@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, contract, describe, it */
+/* global artifacts, contract, describe, it, expect */
 
 const chai = require('chai')
 const { assert } = chai
@@ -15,6 +15,7 @@ const EscrowReward = artifacts.require('EscrowReward')
 
 const constants = require('../../../helpers/constants.js')
 const getBalance = require('../../../helpers/getBalance.js')
+const testUtils = require('../../helpers/utils.js')
 
 contract('EscrowReward constructor', (accounts) => {
     async function setupTest({
