@@ -1,6 +1,8 @@
 const web3 = require('web3')
 
-function generateFunctionSignaturesInABI(abi) {
+function generateFunctionSignaturesInABI(
+    abi
+) {
     abi
         .filter((abiEntry) => abiEntry.type === 'function')
         .forEach((abiEntry) => {

@@ -1,23 +1,22 @@
-const fs = require('fs')
-
 const generateFunctionSignaturesInABI = require('./generateFunctionSignaturesInABI')
 
-const buildDir = './build/contracts/'
+const buildDir = `${__dirname}/../../../../build/contracts/`
 
 function createArtifact(
     contractName,
-    address,
+    proxyAddress,
     version
 ) {
-    /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-    const contract = JSON.parse(fs.readFileSync(`${buildDir}${contractName}.json`, 'utf-8').toString())
+    /* eslint-disable-next-line security/detect-non-literal-require */
+    const contract = require(`${buildDir}${contractName}.json`)
 
+    // create function signatures in ABI
     generateFunctionSignaturesInABI(contract.abi)
 
     return {
         abi: contract.abi,
         bytecode: contract.bytecode,
-        address,
+        address: proxyAddress,
         version
     }
 }

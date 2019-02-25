@@ -9,7 +9,10 @@ const dailiyLimitInEther = 5
 
 const walletPath = `${__dirname}/../../../wallets.json`
 
-async function setupWallets(web3, force) {
+async function setupWallets(
+    web3,
+    force
+) {
     if (!force && fs.existsSync(walletPath)) {
         console.log('wallets.json already exists')
         return JSON.parse(fs.readFileSync(walletPath, 'utf-8').toString())
@@ -33,8 +36,9 @@ async function setupWallets(web3, force) {
 
     // create account list for MultiSig
     const multiSigAccounts = accounts.slice(1, accountAmount)
+    const multiSigAccountsString = JSON.stringify(multiSigAccounts, null, 2)
 
-    console.log(`Using multisig owners:\n ${JSON.stringify(multiSigAccounts, null, 2)}`)
+    console.log(`Using multisig owners:\n ${multiSigAccountsString}`)
 
     const walletParameters = [
         multiSigAccounts,

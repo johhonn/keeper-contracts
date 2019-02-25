@@ -3,7 +3,10 @@ const contract = require('truffle-contract')
 
 const walletPath = `${__dirname}/../../../wallets.json`
 
-async function loadWallet(web3, walletName) {
+async function loadWallet(
+    web3,
+    walletName
+) {
     console.log(`Loading ${walletName} wallet`)
     /* eslint-disable-next-line security/detect-non-literal-fs-filename */
     const wallets = require(walletPath)

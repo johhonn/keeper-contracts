@@ -7,7 +7,11 @@ function zosCreate(
     contract,
     args
 ) {
-    return execSync(`npx zos create ${contract} --init initialize --args ${args.join(',')} ${flags}`).toString().trim()
+    const initializerConfiguration = args ? `--init initialize --args ${args.join(',')}` : ''
+
+    return execSync(`npx zos create ${contract} ${initializerConfiguration} ${flags}`)
+        .toString()
+        .trim()
 }
 
 async function initializeContracts(
@@ -37,7 +41,10 @@ async function initializeContracts(
     if (contracts.indexOf('OceanToken') > -1) {
         addressBook['OceanToken'] = zosCreate(
             'OceanToken',
-            [roles.owner, roles.initialMinter]
+            [
+                roles.owner,
+                roles.initialMinter
+            ]
         )
     }
 
@@ -52,8 +59,7 @@ async function initializeContracts(
 
     if (contracts.indexOf('ConditionStoreManager') > -1) {
         addressBook['ConditionStoreManager'] = zosCreate(
-            'ConditionStoreManager',
-            []
+            'ConditionStoreManager'
         )
     }
 
@@ -68,13 +74,19 @@ async function initializeContracts(
         if (contracts.indexOf('SignCondition') > -1) {
             addressBook['SignCondition'] = zosCreate(
                 'SignCondition',
-                [roles.owner, addressBook['ConditionStoreManager']]
+                [
+                    roles.owner,
+                    addressBook['ConditionStoreManager']
+                ]
             )
         }
         if (contracts.indexOf('HashLockCondition') > -1) {
             addressBook['HashLockCondition'] = zosCreate(
                 'HashLockCondition',
-                [roles.owner, addressBook['ConditionStoreManager']]
+                [
+                    roles.owner,
+                    addressBook['ConditionStoreManager']
+                ]
             )
         }
     }
@@ -160,9 +172,10 @@ async function initializeContracts(
      */
 
     // TODO: @sebastian - please check
-    if (addressBook['AgreementStoreManager']) {
+    if (addressBook['ConditionStoreManager'] &&
+        addressBook['AgreementStoreManager']) {
         const ConditionStoreManager = artifacts.require('ConditionStoreManager')
-        const conditionStoreManager = await ConditionStoreManager.at(addressBook['AgreementStoreManager'])
+        const conditionStoreManager = await ConditionStoreManager.at(addressBook['ConditionStoreManager'])
         await conditionStoreManager.initialize(
             roles.owner,
             addressBook['AgreementStoreManager'],

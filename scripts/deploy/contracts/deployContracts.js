@@ -3,7 +3,7 @@ const { execSync } = require('child_process')
 const pkg = require('../../../package.json')
 
 const exportArtifacts = require('./artifacts/exportArtifacts')
-const updateArtifacts = require('./artifacts/updateArtifacts')
+const updateArtifact = require('./artifacts/updateArtifact')
 const setupWallets = require('../wallet/setupWallets')
 const loadWallet = require('../wallet/loadWallet')
 const initializeContracts = require('./initializeContracts')
@@ -20,6 +20,8 @@ const NETWORK = process.env.NETWORK || 'development'
 // load current version from package
 const VERSION = `v${pkg.version}`
 const TIMEOUT = 36000
+
+const artifactsDir = `${__dirname}/../../../artifacts/`
 
 // List of contracts
 const contractNames = [
@@ -91,7 +93,11 @@ async function deployContracts(
         // push them using zos
         execSync(`npx zos push --skip-compile -v`)
 
-        const addressBook = await initializeContracts(artifacts, contracts, roles)
+        const addressBook = await initializeContracts(
+            artifacts,
+            contracts,
+            roles
+        )
 
         exportArtifacts(NETWORK, VERSION)
 
@@ -101,9 +107,12 @@ async function deployContracts(
         execSync(`npx zos push --force --skip-compile -v`)
 
         for (const contractName of contracts) {
-            const { newContractName, oldContractName } = contractName.split(':')
+            const [ newContractName, oldContractName ] = contractName.split(':')
 
-            const { address } = require(`${__dirname}/../../../artifacts/${oldContractName}.${NETWORK.toLowerCase()}.json`)
+            /* eslint-disable-next-line security/detect-non-literal-require */
+            const artifact = require(`${artifactsDir}${oldContractName}.${NETWORK.toLowerCase()}.json`)
+            const { address } = artifact
+
             await requestContractUpgrade(
                 oldContractName,
                 newContractName,
@@ -112,7 +121,11 @@ async function deployContracts(
                 roles.upgrader
             )
 
-            updateArtifacts(oldContractName, newContractName, VERSION)
+            updateArtifact(
+                oldContractName,
+                newContractName,
+                VERSION
+            )
         }
     }
 }
