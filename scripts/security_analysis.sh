@@ -28,8 +28,19 @@ users:
     token: ${KUBE_TOKEN}
 EOF
 
-export subfilename=${TRAVIS_BRANCH//\//-}
-export subfilename=${subfilename//_/-}
+subfilename=${TRAVIS_BRANCH//\//-}
+subfilename=${subfilename//_/-}
+subfilename=${subfilename,,}
+mythril_name="mythril-${subfilename}"
+mythril_name=${mythril_name:0:62}
+while [[ "${mythril_name}" =~ [0-9]$ ]]; do
+  mythril_name=${mythril_name::-1}
+done
+securify_name="securify-${subfilename}"
+securify_name=${securify_name:0:62}
+while [[ "${securify_name}" =~ [0-9]$ ]]; do
+  securify_name=${securify_name::-1}
+done
 
 # Check if there is jobs already running for this branch
 if ! kubectl get pods -l analysis=mythril,branch=${subfilename} 2>&1 | grep -q Running; then
@@ -37,7 +48,7 @@ if ! kubectl get pods -l analysis=mythril,branch=${subfilename} 2>&1 | grep -q R
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: mythril-analysis-${subfilename}
+  name: ${mythril_name}
   namespace: ${KUBE_NAMESPACE}
   labels:
     analysis: mythril
@@ -78,7 +89,7 @@ if ! kubectl get pods -l analysis=securify,branch=${subfilename} 2>&1 | grep -q 
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: securify-analysis-${subfilename}
+  name: ${securify_name}
   namespace: ${KUBE_NAMESPACE}
   labels:
     analysis: securify
