@@ -132,7 +132,7 @@ contract('LockRewardCondition', (accounts) => {
             expect(eventArgs._agreementId).to.equal(nonce)
             expect(eventArgs._conditionId).to.equal(conditionId)
             expect(eventArgs._rewardAddress).to.equal(rewardAddress)
-            expect(eventArgs._amount).to.equal(amount)
+            expect(eventArgs._amount.toNumber()).to.equal(amount)
         })
     })
 

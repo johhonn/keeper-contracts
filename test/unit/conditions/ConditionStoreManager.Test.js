@@ -487,7 +487,7 @@ contract('ConditionStoreManager', (accounts) => {
             const eventArgs = testUtils.getEventArgsFromTx(result, 'ConditionUpdated')
             expect(eventArgs._id).to.equal(conditionId)
             expect(eventArgs._typeRef).to.equal(conditionType)
-            expect(eventArgs._state).to.equal(constants.condition.state.fulfilled)
+            expect(eventArgs._state.toNumber()).to.equal(constants.condition.state.fulfilled)
         })
     })
 
