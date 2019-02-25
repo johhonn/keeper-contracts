@@ -27,18 +27,14 @@ const flags = verbose ? '-v' : '-s'
 // List of contracts
 const contractNames = [
     'ConditionStoreManager',
+    'AgreementStoreManager',
+    'TemplateStoreManager',
     'SignCondition',
     'HashLockCondition',
     'OceanToken',
     'Dispenser',
     'LockRewardCondition',
     'DIDRegistry'
-//    'ServiceExecutionAgreement',
-//    'LockRewardCondition'
-//    'AccessConditions',
-//    'FitchainConditions',
-//    'ComputeConditions',
-//    'PaymentConditions',
 ]
 
 async function getAddressForImplementation(contractName) {
@@ -138,8 +134,11 @@ async function deploy(contracts, roles) {
     // instance=MyContract.at(proxyAddress)
 
     let conditionStoreManagerAddress,
+        templateStoreManagerAddress,
+        agreementStoreManagerAddress,
         oceanTokenAddress,
         dispenserAddress,
+        didRegistryAddress,
         contractAddress
 
     // v0.7
@@ -148,7 +147,7 @@ async function deploy(contracts, roles) {
     }
 
     if (contracts.indexOf('DIDRegistry') > -1) {
-        contractAddress = execSync(`npx zos create DIDRegistry --init initialize --args ${roles.owner} ${flags}`).toString().trim()
+        contractAddress = didRegistryAddress = execSync(`npx zos create DIDRegistry --init initialize --args ${roles.owner} ${flags}`).toString().trim()
     }
 
     if (contracts.indexOf('OceanToken') > -1) {
@@ -172,6 +171,18 @@ async function deploy(contracts, roles) {
         }
         if (contracts.indexOf('LockRewardCondition') > -1) {
             contractAddress = execSync(`npx zos create LockRewardCondition --init initialize --args ${conditionStoreManagerAddress},${oceanTokenAddress} ${flags}`).toString().trim()
+        }
+    }
+
+    if (contracts.indexOf('TemplateStoreManager') > -1) {
+        contractAddress = templateStoreManagerAddress = execSync(`npx zos create TemplateStoreManager --init initialize --args ${roles.owner} -v`).toString().trim()
+    }
+
+    if (conditionStoreManagerAddress &&
+        templateStoreManagerAddress &&
+        didRegistryAddress) {
+        if (contracts.indexOf('AgreementStoreManager') > -1) {
+            contractAddress = agreementStoreManagerAddress = execSync(`npx zos create AgreementStoreManager --init initialize --args ${roles.owner},${conditionStoreManagerAddress},${templateStoreManagerAddress},${didRegistryAddress} -v`).toString().trim()
         }
     }
     /*
@@ -212,7 +223,15 @@ async function deploy(contracts, roles) {
     // exportArtifacts(name, 'Library')
 
     console.log(contractAddress)
-    return { contractAddress, oceanTokenAddress, dispenserAddress, conditionStoreManagerAddress }
+    return {
+        contractAddress,
+        oceanTokenAddress,
+        dispenserAddress,
+        didRegistryAddress,
+        conditionStoreManagerAddress,
+        templateStoreManagerAddress,
+        agreementStoreManagerAddress
+    }
 }
 
 module.exports = deployContracts

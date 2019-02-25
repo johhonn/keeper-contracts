@@ -232,12 +232,11 @@ async function deploy(contracts, roles) {
     }
 
     if (agreementStoreManagerAddress &&
-        didRegistryAddress &&
         accessSecretStoreConditionAddress &&
         lockRewardConditionAddress &&
         escrowRewardAddress) {
         if (contracts.indexOf('EscrowAccessSecretStoreTemplate') > -1) {
-            execSync(`npx zos create EscrowAccessSecretStoreTemplate --init initialize --args ${roles.owner},${agreementStoreManagerAddress},${didRegistryAddress},${accessSecretStoreConditionAddress},${lockRewardConditionAddress},${escrowRewardAddress} -v`)
+            execSync(`npx zos create EscrowAccessSecretStoreTemplate --init initialize --args ${roles.owner},${agreementStoreManagerAddress},${accessSecretStoreConditionAddress},${lockRewardConditionAddress},${escrowRewardAddress} -v`)
         }
     }
 
