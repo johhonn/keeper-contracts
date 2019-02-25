@@ -15,7 +15,7 @@ const EscrowReward = artifacts.require('EscrowReward')
 
 const constants = require('../../../helpers/constants.js')
 const getBalance = require('../../../helpers/getBalance.js')
-const testUtils = require('../../helpers/utils.js')
+const testUtils = require('../../../helpers/utils.js')
 
 contract('EscrowReward constructor', (accounts) => {
     async function setupTest({
@@ -173,12 +173,12 @@ contract('EscrowReward constructor', (accounts) => {
                 constants.condition.state.fulfilled
             )
 
-            testUtils.assertEmitted(result, 1, 'EscrowRewardFulfilled')
-            const eventArgs = testUtils.getEventArgsFromTx(result, 'EscrowRewardFulfilled')
+            testUtils.assertEmitted(result, 1, 'Fulfilled')
+            const eventArgs = testUtils.getEventArgsFromTx(result, 'Fulfilled')
             expect(eventArgs._agreementId).to.equal(nonce)
             expect(eventArgs._conditionId).to.equal(conditionId)
             expect(eventArgs._receiver).to.equal(receiver)
-            expect(eventArgs._amount).to.equal(amount)
+            expect(eventArgs._amount.toNumber()).to.equal(amount)
 
             assert.strictEqual(await getBalance(oceanToken, escrowReward.address), 0)
             assert.strictEqual(await getBalance(oceanToken, receiver), amount)
