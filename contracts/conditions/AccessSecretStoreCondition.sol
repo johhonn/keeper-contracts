@@ -62,7 +62,7 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
 
         bytes32 _id = generateId(
             _agreementId,
-                hashValues(_documentId, _grantee)
+            hashValues(_documentId, _grantee)
         );
         ConditionStoreLibrary.ConditionState state = super.fulfill(
             _id,

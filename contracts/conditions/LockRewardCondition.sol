@@ -60,7 +60,7 @@ contract LockRewardCondition is Condition {
 
         bytes32 _id = generateId(
             _agreementId,
-                hashValues(_rewardAddress, _amount)
+            hashValues(_rewardAddress, _amount)
         );
         ConditionStoreLibrary.ConditionState state = super.fulfill(
             _id,
