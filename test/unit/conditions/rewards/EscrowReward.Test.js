@@ -159,7 +159,7 @@ contract('EscrowReward constructor', (accounts) => {
             assert.strictEqual(await getBalance(oceanToken, lockRewardCondition.address), 0)
             assert.strictEqual(await getBalance(oceanToken, escrowReward.address), amount)
 
-            await escrowReward.fulfill(
+            const result = await escrowReward.fulfill(
                 nonce,
                 amount,
                 receiver,
@@ -171,6 +171,13 @@ contract('EscrowReward constructor', (accounts) => {
                 (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
                 constants.condition.state.fulfilled
             )
+
+            testUtils.assertEmitted(result, 1, 'EscrowRewardFulfilled')
+            const eventArgs = testUtils.getEventArgsFromTx(result, 'EscrowRewardFulfilled')
+            expect(eventArgs._agreementId).to.equal(nonce)
+            expect(eventArgs._conditionId).to.equal(conditionId)
+            expect(eventArgs._receiver).to.equal(receiver)
+            expect(eventArgs._amount).to.equal(amount)
 
             assert.strictEqual(await getBalance(oceanToken, escrowReward.address), 0)
             assert.strictEqual(await getBalance(oceanToken, receiver), amount)

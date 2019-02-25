@@ -5,19 +5,6 @@ library ConditionStoreLibrary {
 
     enum ConditionState { Uninitialized, Unfulfilled, Fulfilled, Aborted }
 
-    event ConditionCreated(
-        bytes32 indexed _id,
-        address indexed _typeRef,
-        address indexed _who
-    );
-
-    event ConditionUpdated(
-        bytes32 indexed _id,
-        address indexed _typeRef,
-        address indexed _who,
-        ConditionStoreLibrary.ConditionState _state
-    );
-
     struct Condition {
         address typeRef;
         ConditionState state;
@@ -49,12 +36,6 @@ library ConditionStoreLibrary {
             blockNumberUpdated: block.number
         });
         _self.conditionIds.push(_id);
-
-        emit ConditionCreated(
-            _id,
-            _typeRef,
-            msg.sender
-        );
 
         return _self.conditionIds.length;
     }

@@ -10,7 +10,7 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
 
     AgreementStoreManager private agreementStoreManager;
 
-    event AccessGranted(
+    event AccessSecretStoreFulfilled(
         bytes32 indexed _agreementId,
         bytes32 indexed _conditionId,
         bytes32 indexed _documentId,
@@ -65,7 +65,7 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
             ConditionStoreLibrary.ConditionState.Fulfilled
         );
 
-        emit AccessGranted(
+        emit AccessSecretStoreFulfilled(
             _agreementId,
             _id,
             _documentId,

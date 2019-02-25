@@ -107,6 +107,12 @@ contract ConditionStoreManager is Ownable, Common {
 
         uint listSize = conditionList.create(_id, _typeRef);
 
+        emit ConditionCreated(
+            _id,
+            _typeRef,
+            msg.sender
+        );
+
         return listSize;
     }
 

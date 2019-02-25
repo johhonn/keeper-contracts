@@ -7,7 +7,7 @@ contract LockRewardCondition is Condition {
 
     OceanToken private token;
 
-    event PaymentLocked(
+    event LockRewardFulfilled(
         bytes32 indexed _agreementId,
         bytes32 _conditionId,
         address _rewardAddress,
@@ -64,7 +64,7 @@ contract LockRewardCondition is Condition {
             ConditionStoreLibrary.ConditionState.Fulfilled
         );
 
-        emit PaymentLocked(
+        emit LockRewardFulfilled(
             _agreementId,
             _id,
             _rewardAddress,

@@ -16,21 +16,6 @@ Members:
 * mapping(bytes32 => struct ConditionStoreLibrary.Condition) conditions
 * bytes32[] conditionIds
 
-## Events
-
-###  ConditionCreated
-Parameters:
-* bytes32 _id
-* address _typeRef
-* address _who
-
-###  ConditionUpdated
-Parameters:
-* bytes32 _id
-* address _typeRef
-* address _who
-* enum ConditionStoreLibrary.ConditionState _state
-
 ## Functions
 
 ### internal create

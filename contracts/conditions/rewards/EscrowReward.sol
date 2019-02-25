@@ -5,14 +5,7 @@ import '../ConditionStoreLibrary.sol';
 
 contract EscrowReward is Reward {
 
-    event PaymentReleased(
-        bytes32 indexed _agreementId,
-        bytes32 _conditionId,
-        address _receiver,
-        uint256 _amount
-    );
-
-    event PaymentRefund(
+    event EscrowRewardFulfilled(
         bytes32 indexed _agreementId,
         bytes32 _conditionId,
         address _receiver,
@@ -94,26 +87,26 @@ contract EscrowReward is Reward {
         ConditionStoreLibrary.ConditionState state =
             conditionStoreManager.getConditionState(_releaseCondition);
 
+        address escrowReceiver = address(0x0);
         if (state == ConditionStoreLibrary.ConditionState.Fulfilled)
         {
+            escrowReceiver = _receiver;
             state = _transferAndFulfill(id, _receiver, _amount);
-            emit PaymentReleased(
-                _agreementId,
-                id,
-                _receiver,
-                _amount
-            );
-
         } else if (state == ConditionStoreLibrary.ConditionState.Aborted)
         {
+            escrowReceiver = _sender;
             state = _transferAndFulfill(id, _sender, _amount);
-            emit PaymentRefund(
-                _agreementId,
-                id,
-                _sender,
-                _amount
-            );
+        } else
+        {
+            return conditionStoreManager.getConditionState(id);
         }
+
+        emit EscrowRewardFulfilled(
+            _agreementId,
+            id,
+            escrowReceiver,
+            _amount
+        );
 
         return state;
     }
