@@ -127,8 +127,8 @@ contract('LockRewardCondition', (accounts) => {
             let rewardBalance = await getBalance(oceanToken, rewardAddress)
             assert.strictEqual(rewardBalance, amount)
 
-            testUtils.assertEmitted(result, 1, 'LockRewardFulfilled')
-            const eventArgs = testUtils.getEventArgsFromTx(result, 'LockRewardFulfilled')
+            testUtils.assertEmitted(result, 1, 'Fulfilled')
+            const eventArgs = testUtils.getEventArgsFromTx(result, 'Fulfilled')
             expect(eventArgs._agreementId).to.equal(nonce)
             expect(eventArgs._conditionId).to.equal(conditionId)
             expect(eventArgs._rewardAddress).to.equal(rewardAddress)

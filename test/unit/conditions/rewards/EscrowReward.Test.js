@@ -173,8 +173,8 @@ contract('EscrowReward constructor', (accounts) => {
                 constants.condition.state.fulfilled
             )
 
-            testUtils.assertEmitted(result, 1, 'EscrowRewardFulfilled')
-            const eventArgs = testUtils.getEventArgsFromTx(result, 'EscrowRewardFulfilled')
+            testUtils.assertEmitted(result, 1, 'Fulfilled')
+            const eventArgs = testUtils.getEventArgsFromTx(result, 'Fulfilled')
             expect(eventArgs._agreementId).to.equal(nonce)
             expect(eventArgs._conditionId).to.equal(conditionId)
             expect(eventArgs._receiver).to.equal(receiver)

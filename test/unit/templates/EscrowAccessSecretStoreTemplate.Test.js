@@ -133,8 +133,8 @@ contract('EscrowAccessSecretStoreTemplate', (accounts) => {
         })
     })
 
-    describe('create agreement `AgreementInitialized` event', () => {
-        it('create agreement should emit `AgreementInitialized` event', async () => {
+    describe('create agreement `AgreementCreated` event', () => {
+        it('create agreement should emit `AgreementCreated` event', async () => {
             const {
                 didRegistry,
                 agreementStoreManager,
@@ -155,9 +155,9 @@ contract('EscrowAccessSecretStoreTemplate', (accounts) => {
 
             const result = await escrowAccessSecretStoreTemplate.createAgreement(agreementId, ...Object.values(agreement))
 
-            testUtils.assertEmitted(result, 1, 'AgreementInitialized')
+            testUtils.assertEmitted(result, 1, 'AgreementCreated')
 
-            const eventArgs = testUtils.getEventArgsFromTx(result, 'AgreementInitialized')
+            const eventArgs = testUtils.getEventArgsFromTx(result, 'AgreementCreated')
             expect(eventArgs._agreementId).to.equal(agreementId)
             expect(eventArgs._did).to.equal(constants.did[0])
             expect(eventArgs._accessProvider).to.equal(accounts[0])
