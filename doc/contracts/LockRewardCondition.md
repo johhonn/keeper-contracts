@@ -6,6 +6,15 @@
 
 ### private token
 
+## Events
+
+### Fulfilled
+Parameters:
+* bytes32 _agreementId
+* address _rewardAddress
+* bytes32 _conditionId
+* uint256 _amount
+
 ## Functions
 
 ### public initialize

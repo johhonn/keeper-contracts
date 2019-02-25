@@ -18,8 +18,8 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
     event AgreementCreated(
         bytes32 indexed _agreementId,
         bytes32 indexed _did,
-        address indexed _accessProvider,
         address indexed _accessConsumer,
+        address _accessProvider,
         uint[]  _timeLocks,
         uint[]  _timeOuts
     );
@@ -105,8 +105,8 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
         emit AgreementCreated(
             _id,
             _did,
-            agreementData.agreementDataItems[_id].accessProvider,
             agreementData.agreementDataItems[_id].accessConsumer,
+            agreementData.agreementDataItems[_id].accessProvider,
             _timeLocks,
             _timeOuts
         );

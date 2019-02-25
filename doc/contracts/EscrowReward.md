@@ -1,6 +1,14 @@
 
 # contract: EscrowReward
 
+## Events
+
+### Fulfilled
+Parameters:
+* bytes32 _agreementId
+* address _receiver
+* bytes32 _conditionId
+* uint256 _amount
 
 ## Functions
 

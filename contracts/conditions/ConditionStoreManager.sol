@@ -24,8 +24,8 @@ contract ConditionStoreManager is Ownable, Common {
     event ConditionUpdated(
         bytes32 indexed _id,
         address indexed _typeRef,
-        address indexed _who,
-        ConditionStoreLibrary.ConditionState _state
+        ConditionStoreLibrary.ConditionState indexed _state,
+        address indexed _who
     );
 
     modifier onlyCreateRole(){
@@ -140,9 +140,9 @@ contract ConditionStoreManager is Ownable, Common {
 
         emit ConditionUpdated(
             _id,
-            _self.conditions[_id].typeRef,
-            msg.sender,
-            _newState
+            conditionList.conditions[_id].typeRef,
+            _newState,
+            msg.sender
         );
 
         return state;

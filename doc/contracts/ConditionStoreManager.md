@@ -30,8 +30,8 @@ Parameters:
 Parameters:
 * bytes32 _id
 * address _typeRef
-* address _who
 * enum ConditionStoreLibrary.ConditionState _state
+* address _who
 
 ## Functions
 

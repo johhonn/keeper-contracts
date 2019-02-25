@@ -5,10 +5,10 @@ import '../ConditionStoreLibrary.sol';
 
 contract EscrowReward is Reward {
 
-    event EscrowRewardFulfilled(
+    event Fulfilled(
         bytes32 indexed _agreementId,
+        address indexed _receiver,
         bytes32 _conditionId,
-        address _receiver,
         uint256 _amount
     );
 
@@ -101,10 +101,10 @@ contract EscrowReward is Reward {
             return conditionStoreManager.getConditionState(id);
         }
 
-        emit EscrowRewardFulfilled(
+        emit Fulfilled(
             _agreementId,
-            id,
             escrowReceiver,
+            id,
             _amount
         );
 

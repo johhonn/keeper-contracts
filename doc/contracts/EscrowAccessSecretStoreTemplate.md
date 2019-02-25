@@ -25,13 +25,12 @@ Members:
 
 ## Events
 
-###  AgreementInitialized
+###  AgreementCreated
 Parameters:
 * bytes32   _agreementId
 * bytes32   _did
-* address   _accessProvider
 * address   _accessConsumer
-* bytes32[] _conditionIds
+* address   _accessProvider
 * uint[]    _timeLocks
 * uint[]    _timeOuts
 

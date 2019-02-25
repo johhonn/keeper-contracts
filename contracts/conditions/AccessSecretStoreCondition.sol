@@ -10,11 +10,11 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
 
     AgreementStoreManager private agreementStoreManager;
 
-    event AccessSecretStoreFulfilled(
+    event Fulfilled(
         bytes32 indexed _agreementId,
-        bytes32 indexed _conditionId,
         bytes32 indexed _documentId,
-        address _grantee
+        address indexed _grantee,
+        bytes32 _conditionId
     );
 
     function initialize(
@@ -65,11 +65,11 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
             ConditionStoreLibrary.ConditionState.Fulfilled
         );
 
-        emit AccessSecretStoreFulfilled(
+        emit Fulfilled(
             _agreementId,
-            _id,
             _documentId,
-            _grantee
+            _grantee,
+            _id
         );
 
         return state;
