@@ -58,7 +58,10 @@ contract LockRewardCondition is Condition {
             'Could not transfer token'
         );
 
-        bytes32 _id = generateId(_agreementId, hashValues(_rewardAddress, _amount));
+        bytes32 _id = generateId(
+            _agreementId,
+                hashValues(_rewardAddress, _amount)
+        );
         ConditionStoreLibrary.ConditionState state = super.fulfill(
             _id,
             ConditionStoreLibrary.ConditionState.Fulfilled

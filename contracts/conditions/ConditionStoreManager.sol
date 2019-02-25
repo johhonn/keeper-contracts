@@ -25,7 +25,7 @@ contract ConditionStoreManager is Ownable, Common {
         bytes32 indexed _id,
         address indexed _typeRef,
         ConditionStoreLibrary.ConditionState indexed _state,
-        address indexed _who
+        address _who
     );
 
     modifier onlyCreateRole(){
@@ -136,7 +136,8 @@ contract ConditionStoreManager is Ownable, Common {
         if (isConditionTimedOut(_id))
             updateState = ConditionStoreLibrary.ConditionState.Aborted;
 
-        ConditionStoreLibrary.ConditionState state = conditionList.updateState(_id, updateState);
+        ConditionStoreLibrary.ConditionState state =
+            conditionList.updateState(_id, updateState);
 
         emit ConditionUpdated(
             _id,
