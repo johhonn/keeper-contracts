@@ -9,10 +9,12 @@ const constants = require('../helpers/constants.js')
 const testUtils = require('../helpers/utils.js')
 const web3 = testUtils.getWeb3()
 
-const setupWallets = require('../../scripts/deploy/wallet/setupWallets')
-const loadWallet = require('../../scripts/deploy/wallet/loadWallet')
-const requestContractUpgrade = require('../../scripts/deploy/contracts/requestContractUpgrades')
-const deployContracts = require('../../scripts/deploy/contracts/deployContracts')
+const {
+    setupWallets,
+    loadWallet,
+    requestContractUpgrade,
+    deployContracts
+} = require('../../scripts/deploy/deploymentHandler')
 
 const DIDRegistry = artifacts.require('DIDRegistry')
 const DIDRegistryChangeFunctionSignature = artifacts.require('DIDRegistryChangeFunctionSignature')
