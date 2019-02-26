@@ -9,7 +9,7 @@ contract TemplateStoreChangeFunctionSignature is TemplateStoreManager {
         returns (uint size)
     {
         require(
-            msg.sender == _sender,
+            _id == _sender,
             'Invalid sender address'
         );
         return templateList.propose(_id);
