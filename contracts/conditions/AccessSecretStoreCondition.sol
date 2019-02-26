@@ -10,6 +10,13 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
 
     AgreementStoreManager private agreementStoreManager;
 
+    event Fulfilled(
+        bytes32 indexed _agreementId,
+        bytes32 indexed _documentId,
+        address indexed _grantee,
+        bytes32 _conditionId
+    );
+
     function initialize(
         address _owner,
         address _conditionStoreManagerAddress,
@@ -47,14 +54,29 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         returns (ConditionStoreLibrary.ConditionState)
     {
         require(
-            msg.sender == agreementStoreManager.getAgreementDIDOwner(_agreementId),
+            msg.sender ==
+            agreementStoreManager.getAgreementDIDOwner(_agreementId),
             'Invalid UpdateRole'
         );
         documentPermissions[_documentId][_grantee] = true;
-        return super.fulfill(
-            generateId(_agreementId, hashValues(_documentId, _grantee)),
+
+        bytes32 _id = generateId(
+            _agreementId,
+            hashValues(_documentId, _grantee)
+        );
+        ConditionStoreLibrary.ConditionState state = super.fulfill(
+            _id,
             ConditionStoreLibrary.ConditionState.Fulfilled
         );
+
+        emit Fulfilled(
+            _agreementId,
+            _documentId,
+            _grantee,
+            _id
+        );
+
+        return state;
     }
 
     /**

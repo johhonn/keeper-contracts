@@ -30,10 +30,17 @@ EOF
 
 subfilename=${TRAVIS_BRANCH//\//-}
 subfilename=${subfilename//_/-}
+subfilename=${subfilename,,}
 mythril_name="mythril-${subfilename}"
 mythril_name=${mythril_name:0:62}
+while [[ "${mythril_name}" =~ [0-9]$ ]]; do
+  mythril_name=${mythril_name::-1}
+done
 securify_name="securify-${subfilename}"
 securify_name=${securify_name:0:62}
+while [[ "${securify_name}" =~ [0-9]$ ]]; do
+  securify_name=${securify_name::-1}
+done
 
 # Check if there is jobs already running for this branch
 if ! kubectl get pods -l analysis=mythril,branch=${subfilename} 2>&1 | grep -q Running; then
