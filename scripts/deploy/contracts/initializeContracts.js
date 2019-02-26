@@ -1,23 +1,11 @@
 /* eslint-disable no-console */
-const { execSync } = require('child_process')
-const verbose = true
-const flags = verbose ? '-v' : '-s'
-
-function zosCreate(
-    contract,
-    args
-) {
-    const initializerConfiguration = args ? `--init initialize --args ${args.join(',')}` : ''
-
-    return execSync(`npx zos create ${contract} ${initializerConfiguration} ${flags}`)
-        .toString()
-        .trim()
-}
+const zosCreate = require('./zos/create')
 
 async function initializeContracts(
     artifacts,
     contracts,
-    roles
+    roles,
+    stfu = false
 ) {
     // Deploy all implementations in the specified network.
     // NOTE: Creates another zos.<network_name>.json file, specific to the network used,
@@ -34,7 +22,8 @@ async function initializeContracts(
     if (contracts.indexOf('DIDRegistry') > -1) {
         addressBook['DIDRegistry'] = zosCreate(
             'DIDRegistry',
-            [roles.owner]
+            [roles.ownerWallet],
+            stfu
         )
     }
 
@@ -42,9 +31,10 @@ async function initializeContracts(
         addressBook['OceanToken'] = zosCreate(
             'OceanToken',
             [
-                roles.owner,
+                roles.ownerWallet,
                 roles.initialMinter
-            ]
+            ],
+            stfu
         )
     }
 
@@ -52,21 +42,28 @@ async function initializeContracts(
         if (contracts.indexOf('Dispenser') > -1) {
             addressBook['Dispenser'] = zosCreate(
                 'Dispenser',
-                [addressBook['OceanToken'], roles.owner]
+                [
+                    addressBook['OceanToken'],
+                    roles.ownerWallet
+                ],
+                stfu
             )
         }
     }
 
     if (contracts.indexOf('ConditionStoreManager') > -1) {
         addressBook['ConditionStoreManager'] = zosCreate(
-            'ConditionStoreManager'
+            'ConditionStoreManager',
+            null,
+            stfu
         )
     }
 
     if (contracts.indexOf('TemplateStoreManager') > -1) {
         addressBook['TemplateStoreManager'] = zosCreate(
             'TemplateStoreManager',
-            [roles.owner]
+            [roles.ownerWallet],
+            stfu
         )
     }
 
@@ -75,18 +72,20 @@ async function initializeContracts(
             addressBook['SignCondition'] = zosCreate(
                 'SignCondition',
                 [
-                    roles.owner,
+                    roles.ownerWallet,
                     addressBook['ConditionStoreManager']
-                ]
+                ],
+                stfu
             )
         }
         if (contracts.indexOf('HashLockCondition') > -1) {
             addressBook['HashLockCondition'] = zosCreate(
                 'HashLockCondition',
                 [
-                    roles.owner,
+                    roles.ownerWallet,
                     addressBook['ConditionStoreManager']
-                ]
+                ],
+                stfu
             )
         }
     }
@@ -98,11 +97,12 @@ async function initializeContracts(
             addressBook['AgreementStoreManager'] = zosCreate(
                 'AgreementStoreManager',
                 [
-                    roles.owner,
+                    roles.ownerWallet,
                     addressBook['ConditionStoreManager'],
                     addressBook['TemplateStoreManager'],
                     addressBook['DIDRegistry']
-                ]
+                ],
+                stfu
             )
         }
     }
@@ -113,20 +113,22 @@ async function initializeContracts(
             addressBook['LockRewardCondition'] = zosCreate(
                 'LockRewardCondition',
                 [
-                    roles.owner,
+                    roles.ownerWallet,
                     addressBook['ConditionStoreManager'],
                     addressBook['OceanToken']
-                ]
+                ],
+                stfu
             )
         }
         if (contracts.indexOf('EscrowReward') > -1) {
             addressBook['EscrowReward'] = zosCreate(
                 'EscrowReward',
                 [
-                    roles.owner,
+                    roles.ownerWallet,
                     addressBook['ConditionStoreManager'],
                     addressBook['OceanToken']
-                ]
+                ],
+                stfu
             )
         }
     }
@@ -137,10 +139,11 @@ async function initializeContracts(
             addressBook['AccessSecretStoreCondition'] = zosCreate(
                 'AccessSecretStoreCondition',
                 [
-                    roles.owner,
+                    roles.ownerWallet,
                     addressBook['ConditionStoreManager'],
                     addressBook['AgreementStoreManager']
-                ]
+                ],
+                stfu
             )
         }
     }
@@ -154,13 +157,14 @@ async function initializeContracts(
             addressBook['EscrowAccessSecretStoreTemplate'] = zosCreate(
                 'EscrowAccessSecretStoreTemplate',
                 [
-                    roles.owner,
+                    roles.ownerWallet,
                     addressBook['AgreementStoreManager'],
                     addressBook['DIDRegistry'],
                     addressBook['AccessSecretStoreCondition'],
                     addressBook['LockRewardCondition'],
                     addressBook['EscrowReward']
-                ]
+                ],
+                stfu
             )
         }
     }
@@ -177,7 +181,7 @@ async function initializeContracts(
         const ConditionStoreManager = artifacts.require('ConditionStoreManager')
         const conditionStoreManager = await ConditionStoreManager.at(addressBook['ConditionStoreManager'])
         await conditionStoreManager.initialize(
-            roles.owner,
+            roles.ownerWallet,
             addressBook['AgreementStoreManager'],
             { from: roles.upgrader })
     }
@@ -187,24 +191,19 @@ async function initializeContracts(
         const oceanToken = await OceanToken.at(addressBook['OceanToken'])
 
         if (addressBook['Dispenser']) {
-            console.log(`adding dispenser as a minter ${addressBook['Dispenser']} from ${roles.initialMinter}`)
+            if (!stfu) {
+                console.log(`adding dispenser as a minter ${addressBook['Dispenser']} from ${roles.initialMinter}`)
+            }
+
             await oceanToken.addMinter(
                 addressBook['Dispenser'],
                 { from: roles.initialMinter })
         }
 
-        console.log(`Renouncing initialMinter as a minter from ${roles.initialMinter}`)
+        if (!stfu) {
+            console.log(`Renouncing initialMinter as a minter from ${roles.initialMinter}`)
+        }
         await oceanToken.renounceMinter({ from: roles.initialMinter })
-    }
-
-    /*
-     * -----------------------------------------------------------------------
-     * Change admin privileges to multisig
-     * -----------------------------------------------------------------------
-     */
-    console.log(`Setting zos-admin to MultiSigWallet ${roles.admin}`)
-    for (const contract of contracts) {
-        execSync(`npx zos set-admin ${contract} ${roles.admin} --yes`)
     }
 
     return addressBook

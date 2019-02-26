@@ -2,6 +2,9 @@
 const fs = require('fs')
 const contract = require('truffle-contract')
 
+const MultiSigWalletWithDailyLimit =
+    contract(require('@oceanprotocol/multisigwallet/build/contracts/MultiSigWalletWithDailyLimit.json'))
+
 // MultiSig Configuration
 const accountAmount = 4
 const threshold = 2
@@ -11,17 +14,21 @@ const walletPath = `${__dirname}/../../../wallets.json`
 
 async function setupWallets(
     web3,
-    force
+    force,
+    stfu = false
 ) {
+    /* eslint-disable-next-line security/detect-non-literal-fs-filename */
     if (!force && fs.existsSync(walletPath)) {
-        console.log('wallets.json already exists')
+        if (!stfu) {
+            console.log('wallets.json already exists')
+        }
+        /* eslint-disable-next-line security/detect-non-literal-fs-filename */
         return JSON.parse(fs.readFileSync(walletPath, 'utf-8').toString())
     }
 
-    console.log('Setting up MultiSigWallets')
-
-    const MultiSigWalletWithDailyLimit =
-        contract(require('@oceanprotocol/multisigwallet/build/contracts/MultiSigWalletWithDailyLimit.json'))
+    if (!stfu) {
+        console.log('Setting up MultiSigWallets')
+    }
 
     await MultiSigWalletWithDailyLimit.setProvider(web3.currentProvider)
 
@@ -32,13 +39,15 @@ async function setupWallets(
         throw new Error('Unable to create wallet, too few accounts on this node.')
     }
 
-    const deployerRole = accounts[0]
+    const deployer = accounts[0]
 
     // create account list for MultiSig
     const multiSigAccounts = accounts.slice(1, accountAmount)
     const multiSigAccountsString = JSON.stringify(multiSigAccounts, null, 2)
 
-    console.log(`Using multisig owners:\n ${multiSigAccountsString}`)
+    if (!stfu) {
+        console.log(`Using multisig owners:\n ${multiSigAccountsString}`)
+    }
 
     const walletParameters = [
         multiSigAccounts,
@@ -47,7 +56,7 @@ async function setupWallets(
     ]
 
     const txParameters = {
-        from: deployerRole
+        from: deployer
     }
 
     // deploy wallets to the blockchain
@@ -70,9 +79,13 @@ async function setupWallets(
     }]
 
     const walletsString = JSON.stringify(wallets, null, 4)
-    console.log(`Wallets created:\n ${walletsString}`)
+
+    if (!stfu) {
+        console.log(`Wallets created:\n ${walletsString}`)
+    }
 
     // write to file
+    /* eslint-disable-next-line security/detect-non-literal-fs-filename */
     fs.writeFileSync(
         walletPath,
         walletsString,

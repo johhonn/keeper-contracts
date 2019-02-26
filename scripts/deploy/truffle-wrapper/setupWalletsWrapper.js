@@ -3,7 +3,11 @@ const setupWallets = require('../wallet/setupWallets')
 
 module.exports = (cb) => {
     // Run with npx truffle exec setUpWalletWrapper.js
-    setupWallets(web3, false)
+    setupWallets(
+        web3,
+        false,
+        false
+    )
         .then(() => cb())
         .catch(err => cb(err))
 }

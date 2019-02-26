@@ -1,13 +1,11 @@
 /* eslint-disable no-console */
-const { execSync } = require('child_process')
 const pkg = require('../../../package.json')
 
-const exportArtifacts = require('./artifacts/exportArtifacts')
-const updateArtifact = require('./artifacts/updateArtifact')
-const setupWallets = require('../wallet/setupWallets')
-const loadWallet = require('../wallet/loadWallet')
+const zosInit = require('./zos/init')
+const zosRegisterContracts = require('./zos/registerContracts')
 const initializeContracts = require('./initializeContracts')
-const requestContractUpgrade = require('./requestContractUpgrades')
+const zosSetAdmin = require('./zos/setAdmin')
+const exportArtifacts = require('./artifacts/exportArtifacts')
 
 /*
  *-----------------------------------------------------------------------
@@ -19,9 +17,6 @@ const requestContractUpgrade = require('./requestContractUpgrades')
 const NETWORK = process.env.NETWORK || 'development'
 // load current version from package
 const VERSION = `v${pkg.version}`
-const TIMEOUT = 36000
-
-const artifactsDir = `${__dirname}/../../../artifacts/`
 
 // List of contracts
 const contractNames = [
@@ -42,92 +37,45 @@ const contractNames = [
 async function deployContracts(
     web3,
     artifacts,
-    operation = 'deploy',
-    contracts
+    contracts,
+    stfu = false
 ) {
     contracts = !contracts || contracts.length === 0 ? contractNames : contracts
 
-    /*
-     * -----------------------------------------------------------------------
-     * Script setup
-     * -----------------------------------------------------------------------
-     */
-    // Clean ups
-    execSync('rm -f ./zos.* ./.zos.*', { stdio: 'ignore' })
+    const roles = await zosInit(
+        web3,
+        pkg.name,
+        NETWORK,
+        VERSION,
+        stfu
+    )
 
-    // get ethereum accounts
-    const accounts = await web3.eth.getAccounts()
+    await zosRegisterContracts(
+        contracts,
+        false,
+        stfu
+    )
 
-    await setupWallets(web3, false)
+    const addressBook = await initializeContracts(
+        artifacts,
+        contracts,
+        roles,
+        stfu
+    )
 
-    // Get wallet objects
-    const adminWallet = await loadWallet(web3, 'upgrader') // zos admin MultiSig
-    const ownerWallet = await loadWallet(web3, 'owner') // contract admin
+    await zosSetAdmin(
+        contracts,
+        roles,
+        stfu
+    )
 
-    // build roles
-    const roles = {
-        deployer: accounts[0],
-        upgrader: accounts[1],
-        initialMinter: accounts[2],
-        owner: ownerWallet.address,
-        admin: adminWallet.address
-    }
+    await exportArtifacts(
+        NETWORK,
+        VERSION,
+        stfu
+    )
 
-    // Set zos session (network, admin, timeout)
-    execSync(`npx zos session --network ${NETWORK} --from ${roles.deployer} --expires ${TIMEOUT}`)
-
-    /*
-     * -----------------------------------------------------------------------
-     * Project setup using zOS
-     * -----------------------------------------------------------------------
-     */
-
-    // Initialize project zOS project
-    // NOTE: Creates a zos.json file that keeps track of the project's details
-    execSync(`npx zos init ${pkg.name} ${VERSION} -v`)
-
-    // Register contracts in the project as an upgradeable contract.
-    execSync(`npx zos add ${contracts.join(' ')} --skip-compile -v`)
-
-    if (operation === 'deploy') {
-        // push them using zos
-        execSync(`npx zos push --skip-compile -v`)
-
-        const addressBook = await initializeContracts(
-            artifacts,
-            contracts,
-            roles
-        )
-
-        exportArtifacts(NETWORK, VERSION)
-
-        return addressBook
-    } else if (operation === 'upgrade') {
-        // push them using zos and force
-        execSync(`npx zos push --force --skip-compile -v`)
-
-        for (const contractName of contracts) {
-            const [ newContractName, oldContractName ] = contractName.split(':')
-
-            /* eslint-disable-next-line security/detect-non-literal-require */
-            const artifact = require(`${artifactsDir}${oldContractName}.${NETWORK.toLowerCase()}.json`)
-            const { address } = artifact
-
-            await requestContractUpgrade(
-                oldContractName,
-                newContractName,
-                address,
-                adminWallet,
-                roles.upgrader
-            )
-
-            updateArtifact(
-                oldContractName,
-                newContractName,
-                VERSION
-            )
-        }
-    }
+    return addressBook
 }
 
 module.exports = deployContracts

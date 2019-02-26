@@ -1,24 +1,27 @@
+/* eslint-disable no-console */
 const fs = require('fs')
 
 const createArtifact = require('./createArtifact')
-const getZOSMigration = require('../getZOSMigration')
+const zosGetMigrations = require('../zos/getMigrations')
 
 const artifactsDir = `${__dirname}/../../../../artifacts/`
 const network = process.env.NETWORK || 'development'
 
-function updateArtifact(
+async function updateArtifact(
     oldContractName,
     newContractName,
-    version
+    version,
+    stfu = false
 ) {
-    const { contracts } = getZOSMigration()
+    const { contracts } = zosGetMigrations()
 
     if (!(oldContractName in contracts)) {
         throw new Error('Contract was not handled by zos.')
     }
 
-    /* eslint-disable-next-line no-console */
-    console.log(`Updating artifact: ${oldContractName} with the ABI of ${newContractName}`)
+    if (!stfu) {
+        console.log(`Updating artifact: ${oldContractName} with the ABI of ${newContractName}`)
+    }
 
     const artifactFileName = `${oldContractName}.${network.toLowerCase()}.json`
 

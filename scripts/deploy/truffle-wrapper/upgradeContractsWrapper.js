@@ -1,13 +1,12 @@
-/* global artifacts, web3 */
+/* global web3 */
 const { argv } = require('yargs')
-const deployContracts = require('../contracts/deployContracts')
+const upgradeContracts = require('../contracts/upgradeContracts')
 
 module.exports = (cb) => {
     const parameters = argv._
     const contracts = parameters.splice(2)
-    deployContracts(
+    upgradeContracts(
         web3,
-        artifacts,
         contracts,
         false
     )

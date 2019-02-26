@@ -1,11 +1,9 @@
-const setupWallets = require('./wallet/setupWallets')
-const loadWallet = require('./wallet/loadWallet')
-const requestContractUpgrade = require('./contracts/requestContractUpgrades')
+const confirmUpgrade = require('./wallet/confirmUpgrade')
+const upgradeContracts = require('./contracts/upgradeContracts')
 const deployContracts = require('./contracts/deployContracts')
 
 module.exports = {
-    setupWallets,
-    loadWallet,
-    requestContractUpgrade,
-    deployContracts
+    upgradeContracts,
+    deployContracts,
+    confirmUpgrade
 }

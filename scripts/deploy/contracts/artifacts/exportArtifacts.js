@@ -2,26 +2,31 @@
 const fs = require('fs')
 
 const createArtifact = require('./createArtifact')
-const getZOSMigration = require('../getZOSMigration')
+const zosGetMigrations = require('../zos/getMigrations')
 
 const artifactsDir = `${__dirname}/../../../../artifacts/`
 const zosPath = `${__dirname}/../../../../zos.json`
 
-function exportArtifacts(
+async function exportArtifacts(
     network,
-    version
+    version,
+    stfu = false
 ) {
     /* eslint-disable-next-line security/detect-non-literal-require */
     const { name } = require(zosPath)
 
-    console.log(`Exporting: ${name}`)
+    if (!stfu) {
+        console.log(`Exporting: ${name}`)
+    }
 
     // load migrations from zos
-    const { contracts, proxies } = getZOSMigration()
+    const { contracts, proxies } = zosGetMigrations()
     const contractNames = Object.keys(contracts)
 
     contractNames.forEach((contractName) => {
-        console.log(`Exporting artifact: ${contractName}.${network}.json`)
+        if (!stfu) {
+            console.log(`Exporting artifact: ${contractName}.${network}.json`)
+        }
 
         // get proxy address from zos proxies
         const proxyAddress = proxies[`${name}/${contractName}`][0].address
@@ -42,11 +47,14 @@ function exportArtifacts(
         /* eslint-disable-next-line security/detect-non-literal-fs-filename */
         fs.writeFileSync(`${artifactsDir}${filename}`, artifactString)
 
-        console.log(`Exported artifact: ${artifact.version} of ${contractName} at ${artifact.address}`)
+        if (!stfu) {
+            console.log(`Exported artifact: ${artifact.version} of ${contractName} at ${artifact.address}`)
+        }
     })
 
-    /* eslint-disable-next-line no-console */
-    console.log(name, version, network)
+    if (!stfu) {
+        console.log(name, version, network)
+    }
 }
 
 module.exports = exportArtifacts

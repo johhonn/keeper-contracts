@@ -7,19 +7,36 @@ async function requestContractUpgrade(
     oldContractName,
     newContractName,
     proxyAddress,
-    adminWallet,
-    upgraderRole
+    upgraderWallet,
+    roles,
+    stfu = false
 ) {
-    console.log(`Upgrading contract: ${oldContractName} with ${newContractName}`)
+    if (!stfu) {
+        console.log(`Upgrading contract: ${oldContractName} with ${newContractName}`)
+    }
+
     const implementationAddress = getAddressForImplementation(oldContractName)
-    const upgradeCallData = encodeCall('upgradeTo', ['address'], [implementationAddress])
+
+    const upgradeCallData = encodeCall(
+        'upgradeTo',
+        ['address'],
+        [implementationAddress]
+    )
+
     const args = [
         proxyAddress,
         0, // value in ether
         upgradeCallData
     ]
-    const tx = await adminWallet.submitTransaction(...args, { from: upgraderRole })
-    console.log(`Upgraded contract: ${oldContractName}`)
+
+    const tx = await upgraderWallet.submitTransaction(...args, {
+        from: roles.upgrader
+    })
+
+    if (!stfu) {
+        console.log(`Upgraded contract: ${oldContractName}`)
+    }
+
     return tx.logs[0].args.transactionId.toNumber()
 }
 
