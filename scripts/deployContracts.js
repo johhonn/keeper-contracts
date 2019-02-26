@@ -234,9 +234,10 @@ async function deploy(contracts, roles) {
     if (agreementStoreManagerAddress &&
         accessSecretStoreConditionAddress &&
         lockRewardConditionAddress &&
-        escrowRewardAddress) {
+        escrowRewardAddress &&
+        didRegistryAddress) {
         if (contracts.indexOf('EscrowAccessSecretStoreTemplate') > -1) {
-            execSync(`npx zos create EscrowAccessSecretStoreTemplate --init initialize --args ${roles.owner},${agreementStoreManagerAddress},${accessSecretStoreConditionAddress},${lockRewardConditionAddress},${escrowRewardAddress} -v`)
+            execSync(`npx zos create EscrowAccessSecretStoreTemplate --init initialize --args ${roles.owner},${agreementStoreManagerAddress},${didRegistryAddress},${accessSecretStoreConditionAddress},${lockRewardConditionAddress},${escrowRewardAddress} -v`)
         }
     }
 
@@ -247,27 +248,27 @@ async function deploy(contracts, roles) {
      */
 
     // TODO: @sebastian - please check
-    if (agreementStoreManagerAddress) {
-        const conditionStoreManager = await ConditionStoreManager.at(conditionStoreManagerAddress)
-        await conditionStoreManager.initialize(
-            roles.owner,
-            agreementStoreManagerAddress,
-            { from: roles.upgrader })
-    }
-
-    if (oceanTokenAddress) {
-        const oceanToken = await OceanToken.at(oceanTokenAddress)
-
-        if (dispenserAddress) {
-            console.log(`adding dispenser as a minter ${dispenserAddress} from ${roles.initialMinter}`)
-            await oceanToken.addMinter(
-                dispenserAddress,
-                { from: roles.initialMinter })
-        }
-
-        console.log(`Renouncing initialMinter as a minter from ${roles.initialMinter}`)
-        await oceanToken.renounceMinter({ from: roles.initialMinter })
-    }
+//    if (agreementStoreManagerAddress) {
+//        const conditionStoreManager = await ConditionStoreManager.at(conditionStoreManagerAddress)
+//        await conditionStoreManager.initialize(
+//            roles.owner,
+//            agreementStoreManagerAddress,
+//            { from: roles.upgrader })
+//    }
+//
+//    if (oceanTokenAddress) {
+//        const oceanToken = await OceanToken.at(oceanTokenAddress)
+//
+//        if (dispenserAddress) {
+//            console.log(`adding dispenser as a minter ${dispenserAddress} from ${roles.initialMinter}`)
+//            await oceanToken.addMinter(
+//                dispenserAddress,
+//                { from: roles.initialMinter })
+//        }
+//
+//        console.log(`Renouncing initialMinter as a minter from ${roles.initialMinter}`)
+//        await oceanToken.renounceMinter({ from: roles.initialMinter })
+//    }
 
     /*
      * -----------------------------------------------------------------------
