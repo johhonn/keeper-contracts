@@ -128,11 +128,18 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
                 { from: templateId }
             )
 
-            await accessSecretStoreCondition.fulfill(nonce, documentId, grantee)
+            const result = await accessSecretStoreCondition.fulfill(nonce, documentId, grantee)
 
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
                 constants.condition.state.fulfilled)
+
+            testUtils.assertEmitted(result, 1, 'Fulfilled')
+            const eventArgs = testUtils.getEventArgsFromTx(result, 'Fulfilled')
+            expect(eventArgs._agreementId).to.equal(agreementId)
+            expect(eventArgs._conditionId).to.equal(conditionId)
+            expect(eventArgs._documentId).to.equal(documentId)
+            expect(eventArgs._grantee).to.equal(grantee)
         })
     })
 

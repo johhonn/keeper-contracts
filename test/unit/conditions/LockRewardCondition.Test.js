@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, contract, describe, it */
+/* global artifacts, contract, describe, it, expect */
 
 const chai = require('chai')
 const { assert } = chai
@@ -14,6 +14,7 @@ const LockRewardCondition = artifacts.require('LockRewardCondition')
 
 const constants = require('../../helpers/constants.js')
 const getBalance = require('../../helpers/getBalance.js')
+const testUtils = require('../../helpers/utils.js')
 
 contract('LockRewardCondition', (accounts) => {
     async function setupTest({
@@ -120,11 +121,18 @@ contract('LockRewardCondition', (accounts) => {
                 amount,
                 { from: sender })
 
-            await lockRewardCondition.fulfill(nonce, rewardAddress, amount)
+            const result = await lockRewardCondition.fulfill(nonce, rewardAddress, amount)
             let { state } = await conditionStoreManager.getCondition(conditionId)
             assert.strictEqual(state.toNumber(), constants.condition.state.fulfilled)
             let rewardBalance = await getBalance(oceanToken, rewardAddress)
             assert.strictEqual(rewardBalance, amount)
+
+            testUtils.assertEmitted(result, 1, 'Fulfilled')
+            const eventArgs = testUtils.getEventArgsFromTx(result, 'Fulfilled')
+            expect(eventArgs._agreementId).to.equal(nonce)
+            expect(eventArgs._conditionId).to.equal(conditionId)
+            expect(eventArgs._rewardAddress).to.equal(rewardAddress)
+            expect(eventArgs._amount.toNumber()).to.equal(amount)
         })
     })
 

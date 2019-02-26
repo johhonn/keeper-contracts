@@ -18,6 +18,21 @@
 Parameters:
 * bytes32 _id
 
+## Events
+
+###  ConditionCreated
+Parameters:
+* bytes32 _id
+* address _typeRef
+* address _who
+
+###  ConditionUpdated
+Parameters:
+* bytes32 _id
+* address _typeRef
+* enum ConditionStoreLibrary.ConditionState _state
+* address _who
+
 ## Functions
 
 ### public initialize
