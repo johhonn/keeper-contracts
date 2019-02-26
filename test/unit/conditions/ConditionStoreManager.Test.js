@@ -15,6 +15,7 @@ const ConditionStoreManager = artifacts.require('ConditionStoreManager')
 
 const constants = require('../../helpers/constants.js')
 const increaseTime = require('../../helpers/increaseTime.js')
+const testUtils = require('../../helpers/utils.js')
 
 contract('ConditionStoreManager', (accounts) => {
     async function setupTest({
@@ -260,6 +261,17 @@ contract('ConditionStoreManager', (accounts) => {
                 constants.error.idAlreadyExists
             )
         })
+
+        it('create condition should emit ConditionCreated event', async () => {
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest()
+
+            // conditionId should exist after create
+            const result = await conditionStoreManager.createCondition(conditionId, conditionType)
+            testUtils.assertEmitted(result, 1, 'ConditionCreated')
+            const eventArgs = testUtils.getEventArgsFromTx(result, 'ConditionCreated')
+            expect(eventArgs._id).to.equal(conditionId)
+            expect(eventArgs._typeRef).to.equal(conditionType)
+        })
     })
 
     describe('get conditions', () => {
@@ -460,6 +472,22 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionStoreManager.updateConditionState(conditionId, newState),
                 constants.acl.error.invalidUpdateRole
             )
+        })
+
+        it('update condition should emit ConditionUpdated event', async () => {
+            const { conditionStoreManager, conditionId, conditionType } = await setupTest({ conditionType: accounts[0] })
+            await conditionStoreManager.createCondition(conditionId, conditionType)
+            let newState = constants.condition.state.fulfilled
+            const result = await conditionStoreManager.updateConditionState(conditionId, newState)
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
+                constants.condition.state.fulfilled)
+
+            testUtils.assertEmitted(result, 1, 'ConditionUpdated')
+            const eventArgs = testUtils.getEventArgsFromTx(result, 'ConditionUpdated')
+            expect(eventArgs._id).to.equal(conditionId)
+            expect(eventArgs._typeRef).to.equal(conditionType)
+            expect(eventArgs._state.toNumber()).to.equal(constants.condition.state.fulfilled)
         })
     })
 

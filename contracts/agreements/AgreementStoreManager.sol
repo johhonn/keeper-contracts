@@ -34,13 +34,6 @@ contract AgreementStoreManager is Ownable {
     TemplateStoreManager internal templateStoreManager;
     DIDRegistry internal didRegistry;
 
-    event AgreementCreated(
-        bytes32 indexed _agreementId,
-        bytes32 indexed _did,
-        address indexed _sender,
-        address _templateId
-    );
-
     /**
      * @dev AgreementStoreManager Initializer
      *      Initialize Ownable. Only on contract creation.
@@ -129,13 +122,6 @@ contract AgreementStoreManager is Ownable {
             _did,
             msg.sender,
             _conditionIds
-        );
-
-        emit AgreementCreated(
-            _id,
-            _did,
-            msg.sender,
-            msg.sender
         );
 
         return getAgreementListSize();
