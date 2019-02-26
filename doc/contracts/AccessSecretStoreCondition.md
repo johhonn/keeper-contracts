@@ -8,6 +8,15 @@
 
 ### private agreementStoreManager
 
+## Events
+
+### Fulfilled
+Parameters:
+* bytes32 _agreementId
+* bytes32 _documentId
+* address _grantee
+* bytes32 _conditionId
+
 ## Functions
 
 ### public initialize

@@ -11,6 +11,7 @@ const EscrowAccessSecretStoreTemplate = artifacts.require('EscrowAccessSecretSto
 
 const constants = require('../../helpers/constants.js')
 const deployManagers = require('../../helpers/deployManagers.js')
+const testUtils = require('../../helpers/utils')
 
 contract('EscrowAccessSecretStoreTemplate', (accounts) => {
     async function setupTest({
@@ -129,6 +130,44 @@ contract('EscrowAccessSecretStoreTemplate', (accounts) => {
                 expect(storedCondition.timeOut.toNumber()).to.equal(agreement.timeOuts[i])
                 i++
             }
+        })
+    })
+
+    describe('create agreement `AgreementCreated` event', () => {
+        it('create agreement should emit `AgreementCreated` event', async () => {
+            const {
+                didRegistry,
+                agreementStoreManager,
+                templateStoreManager,
+                escrowAccessSecretStoreTemplate,
+                owner
+            } = await setupTest()
+
+            const { agreementId, agreement } = await prepareAgreement()
+
+            // register DID
+            await didRegistry.registerAttribute(agreement.did, constants.bytes32.one, constants.registry.url)
+
+            // propose and approve template
+            const templateId = escrowAccessSecretStoreTemplate.address
+            await templateStoreManager.proposeTemplate(templateId)
+            await templateStoreManager.approveTemplate(templateId, { from: owner })
+
+            const result = await escrowAccessSecretStoreTemplate.createAgreement(agreementId, ...Object.values(agreement))
+
+            testUtils.assertEmitted(result, 1, 'AgreementCreated')
+
+            const eventArgs = testUtils.getEventArgsFromTx(result, 'AgreementCreated')
+            expect(eventArgs._agreementId).to.equal(agreementId)
+            expect(eventArgs._did).to.equal(constants.did[0])
+            expect(eventArgs._accessProvider).to.equal(accounts[0])
+            expect(eventArgs._accessConsumer).to.equal(agreement.accessConsumer)
+
+            const storedAgreement = await agreementStoreManager.getAgreement(agreementId)
+            expect(storedAgreement.conditionIds)
+                .to.deep.equal(agreement.conditionIds)
+            expect(storedAgreement.lastUpdatedBy)
+                .to.equal(templateId)
         })
     })
 })

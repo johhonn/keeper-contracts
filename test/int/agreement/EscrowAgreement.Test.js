@@ -205,6 +205,15 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
                 (await conditionStoreManager.getConditionState(agreement.conditionIds[1])).toNumber(),
                 constants.condition.state.fulfilled)
 
+            // No update since access is not fulfilled yet
+            // refund
+            const result = await escrowReward.fulfill(agreementId, escrowAmount, receiver, sender, agreement.conditionIds[1], agreement.conditionIds[0])
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(agreement.conditionIds[2])).toNumber(),
+                constants.condition.state.unfulfilled
+            )
+            assert.strictEqual(result.logs.length, 0)
+
             // wait: for time out
             await increaseTime(timeOutAccess)
 
