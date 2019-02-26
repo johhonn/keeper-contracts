@@ -103,7 +103,7 @@ contract('EscrowReward constructor', (accounts) => {
                     sender,
                     lockConditionId,
                     releaseConditionId),
-                constants.condition.reward.escrowReward.error.lockConditionNeedsToBeFulfilled
+                constants.condition.reward.escrowReward.error.lockConditionIdDoesNotMatch
             )
         })
     })
@@ -222,7 +222,7 @@ contract('EscrowReward constructor', (accounts) => {
                 escrowReward.address)
 
             /* simulate a real environment by giving the EscrowReward contract a bunch of tokens: */
-            await oceanToken.mint(escrowReward.address, 100, {from: owner})
+            await oceanToken.mint(escrowReward.address, 100, { from: owner })
 
             const lockConditionId = conditionLockId
             const releaseConditionId = conditionLockId
@@ -241,9 +241,9 @@ contract('EscrowReward constructor', (accounts) => {
 
             /* attacker creates escrowRewardBalance/amount bogus conditions to claim the locked reward: */
 
-            for (let i=0; i<escrowRewardBalance / amount; ++i) {
+            for (let i = 0; i < escrowRewardBalance / amount; ++i) {
                 let nonce = (3 + i).toString(16)
-                while (nonce.length < 32*2) {
+                while (nonce.length < 32 * 2) {
                     nonce = '0' + nonce
                 }
                 const attackNonce = '0x' + nonce
@@ -260,13 +260,16 @@ contract('EscrowReward constructor', (accounts) => {
                     escrowReward.address)
 
                 /* attacker tries to claim the escrow before the legitimate users: */
-                await escrowReward.fulfill(
-                    attackNonce,
-                    amount,
-                    attacker,
-                    attacker,
-                    lockConditionId,
-                    releaseConditionId)
+                await assert.isRejected(
+                    escrowReward.fulfill(
+                        attackNonce,
+                        amount,
+                        attacker,
+                        attacker,
+                        lockConditionId,
+                        releaseConditionId),
+                    constants.condition.reward.escrowReward.error.lockConditionIdDoesNotMatch
+                )
             }
 
             /* make sure the EscrowReward contract didn't get drained */

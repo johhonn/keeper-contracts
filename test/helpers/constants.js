@@ -63,7 +63,8 @@ let constants = {
         reward: {
             escrowReward: {
                 error: {
-                    lockConditionNeedsToBeFulfilled: 'LockCondition needs to be Fulfilled'
+                    lockConditionNeedsToBeFulfilled: 'LockCondition needs to be Fulfilled',
+                    lockConditionIdDoesNotMatch: 'LockCondition ID does not match'
                 }
             }
         }
