@@ -11,8 +11,8 @@ const { exportArtifacts, updateArtifacts } = require('./exportArtifacts')
 const { setupWallet } = require('./setupWallet')
 const pkg = require('../package.json')
 
-const OceanToken = artifacts.require('OceanToken')
-const ConditionStoreManager = artifacts.require('ConditionStoreManager')
+// const OceanToken = artifacts.require('OceanToken')
+// const ConditionStoreManager = artifacts.require('ConditionStoreManager')
 
 process.chdir('../')
 
@@ -167,7 +167,7 @@ async function deploy(contracts, roles) {
     let didRegistryAddress,
         conditionStoreManagerAddress,
         oceanTokenAddress,
-        dispenserAddress,
+        // dispenserAddress,
         templateStoreManagerAddress,
         agreementStoreManagerAddress,
         lockRewardConditionAddress,
@@ -185,7 +185,7 @@ async function deploy(contracts, roles) {
 
     if (oceanTokenAddress) {
         if (contracts.indexOf('Dispenser') > -1) {
-            dispenserAddress = execSync(`npx zos create Dispenser --init initialize --args ${oceanTokenAddress},${roles.owner} -v`).toString().trim()
+            execSync(`npx zos create Dispenser --init initialize --args ${oceanTokenAddress},${roles.owner} -v`).toString().trim()
         }
     }
 
@@ -248,27 +248,27 @@ async function deploy(contracts, roles) {
      */
 
     // TODO: @sebastian - please check
-//    if (agreementStoreManagerAddress) {
-//        const conditionStoreManager = await ConditionStoreManager.at(conditionStoreManagerAddress)
-//        await conditionStoreManager.initialize(
-//            roles.owner,
-//            agreementStoreManagerAddress,
-//            { from: roles.upgrader })
-//    }
-//
-//    if (oceanTokenAddress) {
-//        const oceanToken = await OceanToken.at(oceanTokenAddress)
-//
-//        if (dispenserAddress) {
-//            console.log(`adding dispenser as a minter ${dispenserAddress} from ${roles.initialMinter}`)
-//            await oceanToken.addMinter(
-//                dispenserAddress,
-//                { from: roles.initialMinter })
-//        }
-//
-//        console.log(`Renouncing initialMinter as a minter from ${roles.initialMinter}`)
-//        await oceanToken.renounceMinter({ from: roles.initialMinter })
-//    }
+    //    if (agreementStoreManagerAddress) {
+    //        const conditionStoreManager = await ConditionStoreManager.at(conditionStoreManagerAddress)
+    //        await conditionStoreManager.initialize(
+    //            roles.owner,
+    //            agreementStoreManagerAddress,
+    //            { from: roles.upgrader })
+    //    }
+    //
+    //    if (oceanTokenAddress) {
+    //        const oceanToken = await OceanToken.at(oceanTokenAddress)
+    //
+    //        if (dispenserAddress) {
+    //            console.log(`adding dispenser as a minter ${dispenserAddress} from ${roles.initialMinter}`)
+    //            await oceanToken.addMinter(
+    //                dispenserAddress,
+    //                { from: roles.initialMinter })
+    //        }
+    //
+    //        console.log(`Renouncing initialMinter as a minter from ${roles.initialMinter}`)
+    //        await oceanToken.renounceMinter({ from: roles.initialMinter })
+    //    }
 
     /*
      * -----------------------------------------------------------------------
