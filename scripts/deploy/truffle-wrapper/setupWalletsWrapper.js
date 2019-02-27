@@ -6,7 +6,7 @@ module.exports = (cb) => {
     setupWallets(
         web3,
         false,
-        false
+        true
     )
         .then(() => cb())
         .catch(err => cb(err))
