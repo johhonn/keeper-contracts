@@ -133,7 +133,8 @@ contract('DIDRegistry', (accounts) => {
 
             // update checksum & value
             const newValue = 'https://exmaple.net/did/ocean/test-attr-example.txt'
-            await didRegistry.registerAttribute(did, checksum, newValue)
+            const newChecksum = testUtils.generateId()
+            await didRegistry.registerAttribute(did, newChecksum, newValue)
             const didRegistryListSizeAfter = (await didRegistry.getDIDRegistrySize()).toNumber()
 
             assert.equal(
