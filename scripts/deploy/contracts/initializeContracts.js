@@ -182,8 +182,8 @@ async function initializeContracts(
         const conditionStoreManager = await ConditionStoreManager.at(addressBook['ConditionStoreManager'])
         await conditionStoreManager.initialize(
             roles.ownerWallet,
-            addressBook['AgreementStoreManager'],
             { from: roles.upgrader })
+        //TODO: delegate createRole to addressBook['AgreementStoreManager']
     }
 
     if (addressBook['OceanToken']) {
