@@ -183,7 +183,7 @@ async function initializeContracts(
         await conditionStoreManager.initialize(
             roles.ownerWallet,
             { from: roles.upgrader })
-        //TODO: delegate createRole to addressBook['AgreementStoreManager']
+        // TODO: delegate createRole to addressBook['AgreementStoreManager']
     }
 
     if (addressBook['OceanToken']) {

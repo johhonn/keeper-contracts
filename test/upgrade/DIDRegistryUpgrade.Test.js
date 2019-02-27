@@ -111,162 +111,162 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('Should be possible to change function signature', async () => {
-//            await setupTest()
+            await setupTest()
 
-//            // Upgrade to new version
-//            const taskBook = await upgradeContracts(
-//                web3,
-//                ['DIDRegistryChangeFunctionSignature:DIDRegistry'],
-//                !verbose
-//            )
-//
-//            await confirmUpgrade(
-//                web3,
-//                taskBook['DIDRegistry'],
-//                approver,
-//                !verbose
-//            )
-//
-//            const DIDRegistryChangeFunctionSignatureInstance =
-//                await DIDRegistryChangeFunctionSignature.at(DIDRegistryProxyAddress)
-//
-//            // check functionality works
-//            const newDid = constants.did[1]
-//            const newChecksum = testUtils.generateId()
-//            const newValue = 'https://example.com/newdid/ocean/test.txt'
-//
-//            // TODO: @ahmed - should revert
-//            await DIDRegistryChangeFunctionSignatureInstance.registerAttribute(
-//                newDid, newChecksum, newValue,
-//                { from: didOwner }
-//            )
-//
-//            // act
-//            const result = await DIDRegistryChangeFunctionSignatureInstance.registerAttribute(
-//                newChecksum, newDid, newValue,
-//                { from: didOwner }
-//            )
-//
-//            // eval
-//            testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
-//
-//            const payload = result.logs[0].args
-//
-//            assert.strictEqual(newDid, payload._did)
-//            assert.strictEqual(didOwner, payload._owner)
-//            assert.strictEqual(newChecksum, payload._checksum)
-//            assert.strictEqual(newValue, payload._value)
+            // Upgrade to new version
+            const taskBook = await upgradeContracts(
+                web3,
+                ['DIDRegistryChangeFunctionSignature:DIDRegistry'],
+                !verbose
+            )
+
+            await confirmUpgrade(
+                web3,
+                taskBook['DIDRegistry'],
+                approver,
+                !verbose
+            )
+
+            const DIDRegistryChangeFunctionSignatureInstance =
+                            await DIDRegistryChangeFunctionSignature.at(DIDRegistryProxyAddress)
+
+            // check functionality works
+            const newDid = constants.did[1]
+            const newChecksum = testUtils.generateId()
+            const newValue = 'https://example.com/newdid/ocean/test.txt'
+
+            // TODO: @ahmed - should revert
+            await DIDRegistryChangeFunctionSignatureInstance.registerAttribute(
+                newDid, newChecksum, newValue,
+                { from: didOwner }
+            )
+
+            // act
+            const result = await DIDRegistryChangeFunctionSignatureInstance.registerAttribute(
+                newChecksum, newDid, newValue,
+                { from: didOwner }
+            )
+
+            // eval
+            testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
+
+            const payload = result.logs[0].args
+
+            assert.strictEqual(newDid, payload._did)
+            assert.strictEqual(didOwner, payload._owner)
+            assert.strictEqual(newChecksum, payload._checksum)
+            assert.strictEqual(newValue, payload._value)
         })
 
         it('Should be possible to append storage variables ', async () => {
-//            let { did } = await setupTest()
-//
-//            // Upgrade to new version
-//            const taskBook = await upgradeContracts(
-//                web3,
-//                ['DIDRegistryChangeInStorage:DIDRegistry'],
-//                !verbose
-//            )
-//
-//            const DIDRegistryChangeInStorageInstance =
-//                await DIDRegistryChangeInStorage.at(DIDRegistryProxyAddress)
-//
-//            // should not be able to be called before upgrade is approved
-//            await assert.isRejected(DIDRegistryChangeInStorageInstance.timeOfRegister(did))
-//
-//            // call again after approved
-//            await confirmUpgrade(
-//                web3,
-//                taskBook['DIDRegistry'],
-//                approver,
-//                !verbose
-//            )
-//
-//            assert.equal(
-//                (await DIDRegistryChangeInStorageInstance.timeOfRegister(did)).toNumber(), 0,
-//                'Error calling added storage variable')
+            let { did } = await setupTest()
+
+            // Upgrade to new version
+            const taskBook = await upgradeContracts(
+                web3,
+                ['DIDRegistryChangeInStorage:DIDRegistry'],
+                !verbose
+            )
+
+            const DIDRegistryChangeInStorageInstance =
+                            await DIDRegistryChangeInStorage.at(DIDRegistryProxyAddress)
+
+            // should not be able to be called before upgrade is approved
+            await assert.isRejected(DIDRegistryChangeInStorageInstance.timeOfRegister(did))
+
+            // call again after approved
+            await confirmUpgrade(
+                web3,
+                taskBook['DIDRegistry'],
+                approver,
+                !verbose
+            )
+
+            assert.equal(
+                (await DIDRegistryChangeInStorageInstance.timeOfRegister(did)).toNumber(), 0,
+                'Error calling added storage variable')
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
             let { did } = await setupTest()
 
-//            // Upgrade to new version
-//            const taskBook = await upgradeContracts(
-//                web3,
-//                ['DIDRegistryChangeInStorageAndLogic:DIDRegistry'],
-//                !verbose
-//            )
-//
-//            const DIDRegistryChangeInStorageAndLogicInstance =
-//                await DIDRegistryChangeInStorageAndLogic.at(DIDRegistryProxyAddress)
-//
-//            // should not be able to be called before upgrade is approved
-//            await assert.isRejected(DIDRegistryChangeInStorageAndLogicInstance.timeOfRegister(did))
-//
-//            await confirmUpgrade(
-//                web3,
-//                taskBook['DIDRegistry'],
-//                approver,
-//                !verbose
-//            )
-//
-//            // Approve and call again
-//            assert.equal(
-//                (await DIDRegistryChangeInStorageAndLogicInstance.timeOfRegister(did)).toNumber(),
-//                0, 'Error calling added storage variable'
-//            )
-//
-//            // check functionality works
-//            const newDid = constants.did[1]
-//            const newChecksum = testUtils.generateId()
-//            const newValue = 'https://example.com/newdid/ocean/test.txt'
-//
-//            // act
-//            const result = await DIDRegistryChangeInStorageAndLogicInstance.registerAttribute(
-//                newChecksum, newDid, newValue,
-//                { from: didOwner }
-//            )
-//
-//            // eval
-//            testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
-//
-//            const payload = result.logs[0].args
-//            assert.strictEqual(newDid, payload._did)
-//            assert.strictEqual(didOwner, payload._owner)
-//            assert.strictEqual(newChecksum, payload._checksum)
-//            assert.strictEqual(newValue, payload._value)
-//
-//            assert.equal(
-//                (await DIDRegistryChangeInStorageAndLogicInstance.timeOfRegister(did)).toNumber(), 0,
-//                'Error calling added storage variable')
+            // Upgrade to new version
+            const taskBook = await upgradeContracts(
+                web3,
+                ['DIDRegistryChangeInStorageAndLogic:DIDRegistry'],
+                !verbose
+            )
+
+            const DIDRegistryChangeInStorageAndLogicInstance =
+                            await DIDRegistryChangeInStorageAndLogic.at(DIDRegistryProxyAddress)
+
+            // should not be able to be called before upgrade is approved
+            await assert.isRejected(DIDRegistryChangeInStorageAndLogicInstance.timeOfRegister(did))
+
+            await confirmUpgrade(
+                web3,
+                taskBook['DIDRegistry'],
+                approver,
+                !verbose
+            )
+
+            // Approve and call again
+            assert.equal(
+                (await DIDRegistryChangeInStorageAndLogicInstance.timeOfRegister(did)).toNumber(),
+                0, 'Error calling added storage variable'
+            )
+
+            // check functionality works
+            const newDid = constants.did[1]
+            const newChecksum = testUtils.generateId()
+            const newValue = 'https://example.com/newdid/ocean/test.txt'
+
+            // act
+            const result = await DIDRegistryChangeInStorageAndLogicInstance.registerAttribute(
+                newChecksum, newDid, newValue,
+                { from: didOwner }
+            )
+
+            // eval
+            testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
+
+            const payload = result.logs[0].args
+            assert.strictEqual(newDid, payload._did)
+            assert.strictEqual(didOwner, payload._owner)
+            assert.strictEqual(newChecksum, payload._checksum)
+            assert.strictEqual(newValue, payload._value)
+
+            assert.equal(
+                (await DIDRegistryChangeInStorageAndLogicInstance.timeOfRegister(did)).toNumber(), 0,
+                'Error calling added storage variable')
         })
 
         it('Should be able to call new method added after upgrade is approved', async () => {
-//            await setupTest()
-//
-//            // Upgrade to new version
-//            const taskBook = await upgradeContracts(
-//                web3,
-//                ['DIDRegistryExtraFunctionality:DIDRegistry'],
-//                !verbose
-//            )
-//
-//            const DIDRegistryExtraFunctionalityInstance =
-//                await DIDRegistryExtraFunctionality.at(DIDRegistryProxyAddress)
-//
-//            // should not be able to be called before upgrade is approved
-//            await assert.isRejected(DIDRegistryExtraFunctionalityInstance.getNumber())
-//
-//            await confirmUpgrade(
-//                web3,
-//                taskBook['DIDRegistry'],
-//                approver,
-//                !verbose
-//            )
-//
-//            // Approve and call again
-//            assert.equal((await DIDRegistryExtraFunctionalityInstance.getNumber()).toNumber(),
-//                42, 'Error calling getNumber')
+            await setupTest()
+
+            // Upgrade to new version
+            const taskBook = await upgradeContracts(
+                web3,
+                ['DIDRegistryExtraFunctionality:DIDRegistry'],
+                !verbose
+            )
+
+            const DIDRegistryExtraFunctionalityInstance =
+                            await DIDRegistryExtraFunctionality.at(DIDRegistryProxyAddress)
+
+            // should not be able to be called before upgrade is approved
+            await assert.isRejected(DIDRegistryExtraFunctionalityInstance.getNumber())
+
+            await confirmUpgrade(
+                web3,
+                taskBook['DIDRegistry'],
+                approver,
+                !verbose
+            )
+
+            // Approve and call again
+            assert.equal((await DIDRegistryExtraFunctionalityInstance.getNumber()).toNumber(),
+                42, 'Error calling getNumber')
         })
     })
 })
