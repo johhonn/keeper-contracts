@@ -35,14 +35,15 @@ library DIDRegistryLibrary {
         external
         returns (uint size)
     {
-        address owner = _self.didRegisters[_did].owner;
-        if (owner == address(0x0)) owner = msg.sender;
-
-        if(_self.didRegisters[_did].owner == address(0))
+        address didOwner = _self.didRegisters[_did].owner;
+        if (didOwner == address(0))
+        {
+            didOwner = msg.sender;
             _self.didRegisterIds.push(_did);
+        }
 
         _self.didRegisters[_did] = DIDRegister({
-            owner: owner,
+            owner: didOwner,
             lastChecksum: _checksum,
             lastUpdatedBy: msg.sender,
             blockNumberUpdated: block.number
