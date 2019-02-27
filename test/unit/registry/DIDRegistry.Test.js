@@ -142,6 +142,16 @@ contract('DIDRegistry', (accounts) => {
                 didRegistryListSizeAfter,
                 'Indicating invalid DID duplicate handling'
             )
+
+            // registering new DID
+            const newDid = constants.did[1]
+            await didRegistry.registerAttribute(newDid, checksum, value)
+            // assert
+            assert.equal(
+                (await didRegistry.getDIDRegistrySize()).toNumber(),
+                2,
+                'Indicating invalid DID duplicate handling'
+            )
         })
     })
 })
