@@ -74,8 +74,29 @@ contract EscrowReward is Reward {
                 _releaseCondition
             )
         );
+        address lockConditionTypeRef;
+        ConditionStoreLibrary.ConditionState lockConditionState;
+        (lockConditionTypeRef,lockConditionState,,,,,) = conditionStoreManager
+            .getCondition(_lockCondition);
+
+        bytes32 generatedLockConditionId = keccak256(
+            abi.encodePacked(
+                _agreementId,
+                lockConditionTypeRef,
+                keccak256(
+                    abi.encodePacked(
+                        address(this),
+                        _amount
+                    )
+                )
+            )
+        );
         require(
-            conditionStoreManager.getConditionState(_lockCondition) ==
+            generatedLockConditionId == _lockCondition,
+            'LockCondition ID does not match'
+        );
+        require(
+            lockConditionState ==
             ConditionStoreLibrary.ConditionState.Fulfilled,
             'LockCondition needs to be Fulfilled'
         );
