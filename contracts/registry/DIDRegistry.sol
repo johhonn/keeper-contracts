@@ -119,7 +119,7 @@ contract DIDRegistry is Ownable {
      * @return the length of the DID registry.
      */
     function getDIDRegistrySize()
-        internal
+        public
         view
         returns (uint size)
     {

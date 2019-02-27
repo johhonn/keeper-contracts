@@ -123,5 +123,24 @@ contract('DIDRegistry', (accounts) => {
                 constants.registry.error.invalidValueSize
             )
         })
+        it('Should DID registry handle DID duplicates consistently', async () => {
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            await didRegistry.registerAttribute(did, checksum, value)
+            const didRegistryListSizeBefore = (await didRegistry.getDIDRegistrySize()).toNumber()
+
+            // update checksum & value
+            const newValue = 'https://exmaple.net/did/ocean/test-attr-example.txt'
+            await didRegistry.registerAttribute(did, checksum, newValue)
+            const didRegistryListSizeAfter = (await didRegistry.getDIDRegistrySize()).toNumber()
+
+            assert.equal(
+                didRegistryListSizeBefore,
+                didRegistryListSizeAfter,
+                'Indicating invalid DID duplicate handling'
+            )
+        })
     })
 })
