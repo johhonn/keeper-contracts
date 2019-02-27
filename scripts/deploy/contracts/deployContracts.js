@@ -38,7 +38,7 @@ async function deployContracts(
     web3,
     artifacts,
     contracts,
-    stfu = false
+    verbose = true
 ) {
     contracts = !contracts || contracts.length === 0 ? contractNames : contracts
 
@@ -47,32 +47,32 @@ async function deployContracts(
         pkg.name,
         NETWORK,
         VERSION,
-        stfu
+        verbose
     )
 
     await zosRegisterContracts(
         contracts,
         false,
-        stfu
+        verbose
     )
 
     const addressBook = await initializeContracts(
         artifacts,
         contracts,
         roles,
-        stfu
+        verbose
     )
 
     await zosSetAdmin(
         contracts,
         roles,
-        stfu
+        verbose
     )
 
     await exportArtifacts(
         NETWORK,
         VERSION,
-        stfu
+        verbose
     )
 
     return addressBook

@@ -1,25 +1,24 @@
 /* eslint-disable no-console */
 const loadWallet = require('./loadWallet')
+const confirmTransaction = require('./confirmTransaction')
 
 async function confirmUpgrade(
     web3,
     transactionId,
     approver,
-    stfu = false
+    verbose = true
 ) {
     const upgraderWallet = await loadWallet(
         web3,
         'upgrader',
-        stfu
+        verbose
     )
 
-    if (!stfu) {
-        console.log(`Confirming transactionId '${transactionId}' from '${approver}'`)
-    }
-
-    await upgraderWallet.confirmTransaction(
+    await confirmTransaction(
+        upgraderWallet,
         transactionId,
-        { from: approver }
+        approver,
+        verbose
     )
 }
 

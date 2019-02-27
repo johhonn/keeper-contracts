@@ -8,9 +8,9 @@ const walletPath = `${__dirname}/../../../wallets.json`
 async function loadWallet(
     web3,
     walletName,
-    stfu = false
+    verbose = true
 ) {
-    if (!stfu) {
+    if (verbose) {
         console.log(`Loading '${walletName}' wallet`)
     }
     /* eslint-disable-next-line security/detect-non-literal-require */
@@ -18,7 +18,7 @@ async function loadWallet(
     const walletAddress = wallets.find((wallet) => wallet.name === walletName).address
     MultiSigWalletWithDailyLimit.setProvider(web3.currentProvider)
     const wallet = await MultiSigWalletWithDailyLimit.at(walletAddress)
-    if (!stfu) {
+    if (verbose) {
         console.log(`Loaded '${walletName}' wallet at '${wallet.address}'`)
     }
     return wallet

@@ -5,9 +5,9 @@ const { execSync } = require('child_process')
 async function registerContracts(
     contracts,
     force,
-    stfu = false
+    verbose = true
 ) {
-    const flags = stfu ? '-s' : '-v'
+    const flags = verbose ? '-v' : '-s'
 
     execSync(`npx zos add ${contracts.join(' ')} --skip-compile ${flags}`)
 

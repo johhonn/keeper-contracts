@@ -15,18 +15,18 @@ const walletPath = `${__dirname}/../../../wallets.json`
 async function setupWallets(
     web3,
     force,
-    stfu = false
+    verbose = true
 ) {
     /* eslint-disable-next-line security/detect-non-literal-fs-filename */
     if (!force && fs.existsSync(walletPath)) {
-        if (!stfu) {
+        if (verbose) {
             console.log('wallets.json already exists')
         }
         /* eslint-disable-next-line security/detect-non-literal-fs-filename */
         return JSON.parse(fs.readFileSync(walletPath, 'utf-8').toString())
     }
 
-    if (!stfu) {
+    if (verbose) {
         console.log('Setting up MultiSigWallets')
     }
 
@@ -45,7 +45,7 @@ async function setupWallets(
     const multiSigAccounts = accounts.slice(1, accountAmount)
     const multiSigAccountsString = JSON.stringify(multiSigAccounts, null, 2)
 
-    if (!stfu) {
+    if (verbose) {
         console.log(`Using multisig owners:\n ${multiSigAccountsString}`)
     }
 
@@ -80,7 +80,7 @@ async function setupWallets(
 
     const walletsString = JSON.stringify(wallets, null, 4)
 
-    if (!stfu) {
+    if (verbose) {
         console.log(`Wallets created:\n ${walletsString}`)
     }
 

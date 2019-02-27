@@ -8,12 +8,12 @@ const zosPath = `${__dirname}/../../../../zos.json`
 async function exportArtifacts(
     network,
     version,
-    stfu = false
+    verbose = true
 ) {
     /* eslint-disable-next-line security/detect-non-literal-require */
     const { name } = require(zosPath)
 
-    if (!stfu) {
+    if (verbose) {
         console.log(`Exporting: ${name}`)
     }
 
@@ -22,7 +22,7 @@ async function exportArtifacts(
     const contractNames = Object.keys(contracts)
 
     contractNames.forEach((contractName) => {
-        if (!stfu) {
+        if (verbose) {
             console.log(`Exporting artifact: ${contractName}.${network}.json`)
         }
 
@@ -36,7 +36,7 @@ async function exportArtifacts(
             version
         )
 
-        if (!stfu) {
+        if (verbose) {
             console.log(`Exported contract artifact: ${artifact.version} of ${contractName} at ${artifact.address}`)
         }
     })
@@ -44,7 +44,7 @@ async function exportArtifacts(
     const solidityLibNames = Object.keys(solidityLibs)
 
     solidityLibNames.forEach((solidityLibName) => {
-        if (!stfu) {
+        if (verbose) {
             console.log(`Exporting library: ${solidityLibName}.${network}.json`)
         }
 
@@ -55,12 +55,12 @@ async function exportArtifacts(
             version
         )
 
-        if (!stfu) {
+        if (verbose) {
             console.log(`Exported library artifact: ${artifact.version} of ${solidityLibName} at ${artifact.address}`)
         }
     })
 
-    if (!stfu) {
+    if (verbose) {
         console.log(name, version, network)
     }
 }

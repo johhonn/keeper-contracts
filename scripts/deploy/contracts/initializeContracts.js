@@ -5,7 +5,7 @@ async function initializeContracts(
     artifacts,
     contracts,
     roles,
-    stfu = false
+    verbose = true
 ) {
     // Deploy all implementations in the specified network.
     // NOTE: Creates another zos.<network_name>.json file, specific to the network used,
@@ -23,7 +23,7 @@ async function initializeContracts(
         addressBook['DIDRegistry'] = zosCreate(
             'DIDRegistry',
             [roles.ownerWallet],
-            stfu
+            verbose
         )
     }
 
@@ -34,7 +34,7 @@ async function initializeContracts(
                 roles.ownerWallet,
                 roles.initialMinter
             ],
-            stfu
+            verbose
         )
     }
 
@@ -46,7 +46,7 @@ async function initializeContracts(
                     addressBook['OceanToken'],
                     roles.ownerWallet
                 ],
-                stfu
+                verbose
             )
         }
     }
@@ -55,7 +55,7 @@ async function initializeContracts(
         addressBook['ConditionStoreManager'] = zosCreate(
             'ConditionStoreManager',
             null,
-            stfu
+            verbose
         )
     }
 
@@ -63,7 +63,7 @@ async function initializeContracts(
         addressBook['TemplateStoreManager'] = zosCreate(
             'TemplateStoreManager',
             [roles.ownerWallet],
-            stfu
+            verbose
         )
     }
 
@@ -75,7 +75,7 @@ async function initializeContracts(
                     roles.ownerWallet,
                     addressBook['ConditionStoreManager']
                 ],
-                stfu
+                verbose
             )
         }
         if (contracts.indexOf('HashLockCondition') > -1) {
@@ -85,7 +85,7 @@ async function initializeContracts(
                     roles.ownerWallet,
                     addressBook['ConditionStoreManager']
                 ],
-                stfu
+                verbose
             )
         }
     }
@@ -102,7 +102,7 @@ async function initializeContracts(
                     addressBook['TemplateStoreManager'],
                     addressBook['DIDRegistry']
                 ],
-                stfu
+                verbose
             )
         }
     }
@@ -117,7 +117,7 @@ async function initializeContracts(
                     addressBook['ConditionStoreManager'],
                     addressBook['OceanToken']
                 ],
-                stfu
+                verbose
             )
         }
         if (contracts.indexOf('EscrowReward') > -1) {
@@ -128,7 +128,7 @@ async function initializeContracts(
                     addressBook['ConditionStoreManager'],
                     addressBook['OceanToken']
                 ],
-                stfu
+                verbose
             )
         }
     }
@@ -143,7 +143,7 @@ async function initializeContracts(
                     addressBook['ConditionStoreManager'],
                     addressBook['AgreementStoreManager']
                 ],
-                stfu
+                verbose
             )
         }
     }
@@ -164,7 +164,7 @@ async function initializeContracts(
                     addressBook['LockRewardCondition'],
                     addressBook['EscrowReward']
                 ],
-                stfu
+                verbose
             )
         }
     }
@@ -191,7 +191,7 @@ async function initializeContracts(
         const oceanToken = await OceanToken.at(addressBook['OceanToken'])
 
         if (addressBook['Dispenser']) {
-            if (!stfu) {
+            if (!verbose) {
                 console.log(`adding dispenser as a minter ${addressBook['Dispenser']} from ${roles.initialMinter}`)
             }
 
@@ -200,7 +200,7 @@ async function initializeContracts(
                 { from: roles.initialMinter })
         }
 
-        if (!stfu) {
+        if (!verbose) {
             console.log(`Renouncing initialMinter as a minter from ${roles.initialMinter}`)
         }
         await oceanToken.renounceMinter({ from: roles.initialMinter })

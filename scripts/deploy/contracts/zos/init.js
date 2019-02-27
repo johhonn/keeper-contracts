@@ -12,9 +12,9 @@ async function init(
     projectName,
     network,
     version,
-    stfu = false
+    verbose = true
 ) {
-    const flags = stfu ? '-s' : '-v'
+    const flags = verbose ? '-v' : '-s'
 
     /*
      * -----------------------------------------------------------------------
@@ -30,7 +30,7 @@ async function init(
     await setupWallets(
         web3,
         false,
-        stfu
+        verbose
     )
 
     // Get wallet objects
@@ -38,13 +38,13 @@ async function init(
     const upgraderWallet = await loadWallet(
         web3,
         'upgrader',
-        stfu
+        verbose
     )
     // contract admin
     const ownerWallet = await loadWallet(
         web3,
         'owner',
-        stfu
+        verbose
     )
 
     // build roles

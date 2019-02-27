@@ -23,7 +23,7 @@ const artifactsDir = `${__dirname}/../../../artifacts/`
 async function upgradeContracts(
     web3,
     contracts,
-    stfu = false
+    verbose = true
 ) {
     // init zos
 
@@ -32,20 +32,20 @@ async function upgradeContracts(
         pkg.name,
         NETWORK,
         VERSION,
-        stfu
+        verbose
     )
 
     // register contract upgrades in zos, force it
     await zosRegisterContracts(
         contracts,
         true,
-        stfu
+        verbose
     )
 
     const upgraderWallet = await loadWallet(
         web3,
         'upgrader',
-        stfu
+        verbose
     )
 
     const taskBook = {}
@@ -65,14 +65,14 @@ async function upgradeContracts(
             address,
             upgraderWallet,
             roles,
-            stfu
+            verbose
         )
 
         await updateArtifact(
             oldContractName,
             newContractName,
             VERSION,
-            stfu
+            verbose
         )
     }
 

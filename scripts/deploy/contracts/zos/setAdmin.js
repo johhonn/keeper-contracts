@@ -5,16 +5,16 @@ const { execSync } = require('child_process')
 async function setAdmin(
     contracts,
     roles,
-    stfu = false
+    verbose = true
 ) {
-    const flags = stfu ? '-s' : '-v'
+    const flags = verbose ? '-v' : '-s'
 
     /*
     * -----------------------------------------------------------------------
     * Change admin privileges to multisig
     * -----------------------------------------------------------------------
     */
-    if (!stfu) {
+    if (verbose) {
         console.log(`Setting zos-admin to MultiSigWallet ${roles.upgraderWallet}`)
     }
 

@@ -11,7 +11,7 @@ async function updateArtifact(
     oldContractName,
     newContractName,
     version,
-    stfu = false
+    verbose = true
 ) {
     const { contracts } = zosGetMigrations()
 
@@ -19,7 +19,7 @@ async function updateArtifact(
         throw new Error('Contract was not handled by zos.')
     }
 
-    if (!stfu) {
+    if (verbose) {
         console.log(`Updating artifact: ${oldContractName} with the ABI of ${newContractName}`)
     }
 

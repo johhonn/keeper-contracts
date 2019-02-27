@@ -9,9 +9,9 @@ async function requestContractUpgrade(
     proxyAddress,
     upgraderWallet,
     roles,
-    stfu = false
+    verbose = true
 ) {
-    if (!stfu) {
+    if (verbose) {
         console.log(`Upgrading contract: ${oldContractName} with ${newContractName}`)
     }
 
@@ -29,11 +29,12 @@ async function requestContractUpgrade(
         upgradeCallData
     ]
 
-    const tx = await upgraderWallet.submitTransaction(...args, {
-        from: roles.upgrader
-    })
+    const tx = await upgraderWallet.submitTransaction(
+        ...args,
+        { from: roles.upgrader }
+    )
 
-    if (!stfu) {
+    if (verbose) {
         console.log(`Upgraded contract: ${oldContractName}`)
     }
 
