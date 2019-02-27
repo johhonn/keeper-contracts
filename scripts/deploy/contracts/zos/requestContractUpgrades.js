@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
-const { encodeCall } = require('zos-lib')
-
 const getAddressForImplementation = require('./getAddressForImplementation')
+const submitTransaction = require('../../wallet/submitTransaction')
 
 async function requestContractUpgrade(
     oldContractName,
@@ -17,28 +16,23 @@ async function requestContractUpgrade(
 
     const implementationAddress = getAddressForImplementation(oldContractName)
 
-    const upgradeCallData = encodeCall(
-        'upgradeTo',
-        ['address'],
-        [implementationAddress]
-    )
-
-    const args = [
+    const transactionId = await submitTransaction(
+        upgraderWallet,
         proxyAddress,
-        0, // value in ether
-        upgradeCallData
-    ]
-
-    const tx = await upgraderWallet.submitTransaction(
-        ...args,
-        { from: roles.upgrader }
+        [
+            'upgradeTo',
+            ['address'],
+            [implementationAddress]
+        ],
+        roles.upgrader,
+        verbose
     )
 
     if (verbose) {
         console.log(`Upgraded contract: ${oldContractName}`)
     }
 
-    return tx.logs[0].args.transactionId.toNumber()
+    return transactionId
 }
 
 module.exports = requestContractUpgrade

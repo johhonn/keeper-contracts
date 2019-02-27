@@ -42,6 +42,14 @@ async function deployContracts(
 ) {
     contracts = !contracts || contracts.length === 0 ? contractNames : contracts
 
+    if (contracts.find((contract) => contract.indexOf(':') > -1)) {
+        throw new Error(`Bad input please use 'ContractName'`)
+    }
+
+    if (verbose) {
+        console.log(`Deploying contracts: '${contracts.join(', ')}'`)
+    }
+
     const roles = await zosInit(
         web3,
         pkg.name,

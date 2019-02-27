@@ -191,7 +191,7 @@ async function initializeContracts(
         const oceanToken = await OceanToken.at(addressBook['OceanToken'])
 
         if (addressBook['Dispenser']) {
-            if (!verbose) {
+            if (verbose) {
                 console.log(`adding dispenser as a minter ${addressBook['Dispenser']} from ${roles.initialMinter}`)
             }
 
@@ -200,7 +200,7 @@ async function initializeContracts(
                 { from: roles.initialMinter })
         }
 
-        if (!verbose) {
+        if (verbose) {
             console.log(`Renouncing initialMinter as a minter from ${roles.initialMinter}`)
         }
         await oceanToken.renounceMinter({ from: roles.initialMinter })

@@ -25,8 +25,15 @@ async function upgradeContracts(
     contracts,
     verbose = true
 ) {
-    // init zos
+    if (contracts.find((contract) => contract.indexOf(':') === -1)) {
+        throw new Error(`Bad input please use 'NewContract:OldContract'`)
+    }
 
+    if (verbose) {
+        console.log(`Upgrading contracts: '${contracts.join(', ')}'`)
+    }
+
+    // init zos
     const roles = await zosInit(
         web3,
         pkg.name,
@@ -73,6 +80,12 @@ async function upgradeContracts(
             newContractName,
             VERSION,
             verbose
+        )
+    }
+
+    if (verbose) {
+        console.log(
+            `Tasks created: \n${JSON.stringify(taskBook, null, 2)}\nplease approve them in the wallet: '${upgraderWallet.address}'`
         )
     }
 
