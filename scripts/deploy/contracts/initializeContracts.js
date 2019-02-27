@@ -54,7 +54,7 @@ async function initializeContracts(
     if (contracts.indexOf('ConditionStoreManager') > -1) {
         addressBook['ConditionStoreManager'] = zosCreate(
             'ConditionStoreManager',
-            null,
+            [roles.ownerWallet],
             verbose
         )
     }
@@ -178,12 +178,11 @@ async function initializeContracts(
     // TODO: @sebastian - please check
     if (addressBook['ConditionStoreManager'] &&
         addressBook['AgreementStoreManager']) {
+        /*
         const ConditionStoreManager = artifacts.require('ConditionStoreManager')
         const conditionStoreManager = await ConditionStoreManager.at(addressBook['ConditionStoreManager'])
-        await conditionStoreManager.initialize(
-            roles.ownerWallet,
-            { from: roles.upgrader })
         // TODO: delegate createRole to addressBook['AgreementStoreManager']
+        */
     }
 
     if (addressBook['OceanToken']) {
@@ -197,7 +196,8 @@ async function initializeContracts(
 
             await oceanToken.addMinter(
                 addressBook['Dispenser'],
-                { from: roles.initialMinter })
+                { from: roles.initialMinter }
+            )
         }
 
         if (verbose) {
