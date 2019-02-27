@@ -33,12 +33,12 @@ subfilename=${subfilename//_/-}
 subfilename=${subfilename,,}
 mythril_name="mythril-${subfilename}"
 mythril_name=${mythril_name:0:62}
-while [[ "${mythril_name}" =~ [0-9]$ ]]; do
+while [[ "${mythril_name}" =~ [-_.]$ ]]; do
   mythril_name=${mythril_name::-1}
 done
 securify_name="securify-${subfilename}"
 securify_name=${securify_name:0:62}
-while [[ "${securify_name}" =~ [0-9]$ ]]; do
+while [[ "${securify_name}" =~ [-_.]$ ]]; do
   securify_name=${securify_name::-1}
 done
 

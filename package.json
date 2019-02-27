@@ -1,6 +1,6 @@
 {
   "name": "@oceanprotocol/keeper-contracts",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Integration of TCRs, CPM and Ocean Tokens in Solidity",
   "bugs": {
     "url": "https://github.com/oceanprotocol/keeper-contracts/issues"
@@ -79,7 +79,7 @@
     "web3": "1.0.0-beta.37",
     "web3-provider-engine": "^14.1.0",
     "websocket": "^1.0.28",
-    "zos": "~2.2.0",
-    "zos-lib": "~2.2.0"
+    "zos": "~2.2.1",
+    "zos-lib": "~2.2.1"
   }
 }
