@@ -3,12 +3,12 @@ const generateFunctionSignaturesInABI = require('./generateFunctionSignaturesInA
 const buildDir = `${__dirname}/../../../../build/contracts/`
 
 function createArtifact(
-    contractName,
-    proxyAddress,
+    name,
+    address,
     version
 ) {
     /* eslint-disable-next-line security/detect-non-literal-require */
-    const contract = require(`${buildDir}${contractName}.json`)
+    const contract = require(`${buildDir}${name}.json`)
 
     // create function signatures in ABI
     generateFunctionSignaturesInABI(contract.abi)
@@ -16,7 +16,7 @@ function createArtifact(
     return {
         abi: contract.abi,
         bytecode: contract.bytecode,
-        address: proxyAddress,
+        address,
         version
     }
 }

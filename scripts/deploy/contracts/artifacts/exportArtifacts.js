@@ -1,10 +1,8 @@
 /* eslint-disable no-console */
-const fs = require('fs')
+const writeArtifact = require('./writeArtifact')
 
-const createArtifact = require('./createArtifact')
 const zosGetMigrations = require('../zos/getMigrations')
 
-const artifactsDir = `${__dirname}/../../../../artifacts/`
 const zosPath = `${__dirname}/../../../../zos.json`
 
 async function exportArtifacts(
@@ -20,7 +18,7 @@ async function exportArtifacts(
     }
 
     // load migrations from zos
-    const { contracts, proxies } = zosGetMigrations()
+    const { contracts, proxies, solidityLibs } = zosGetMigrations()
     const contractNames = Object.keys(contracts)
 
     contractNames.forEach((contractName) => {
@@ -31,24 +29,34 @@ async function exportArtifacts(
         // get proxy address from zos proxies
         const proxyAddress = proxies[`${name}/${contractName}`][0].address
 
-        // create the artifact
-        const artifact = createArtifact(
+        const artifact = writeArtifact(
+            network,
             contractName,
             proxyAddress,
             version
         )
 
-        // set filename
-        const filename = `${contractName}.${network.toLowerCase()}.json`
+        if (!stfu) {
+            console.log(`Exported contract artifact: ${artifact.version} of ${contractName} at ${artifact.address}`)
+        }
+    })
 
-        // write artifact
-        const artifactString = JSON.stringify(artifact, null, 2)
+    const solidityLibNames = Object.keys(solidityLibs)
 
-        /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-        fs.writeFileSync(`${artifactsDir}${filename}`, artifactString)
+    solidityLibNames.forEach((solidityLibName) => {
+        if (!stfu) {
+            console.log(`Exporting library: ${solidityLibName}.${network}.json`)
+        }
+
+        const artifact = writeArtifact(
+            network,
+            solidityLibName,
+            solidityLibs[solidityLibName].address,
+            version
+        )
 
         if (!stfu) {
-            console.log(`Exported artifact: ${artifact.version} of ${contractName} at ${artifact.address}`)
+            console.log(`Exported library artifact: ${artifact.version} of ${solidityLibName} at ${artifact.address}`)
         }
     })
 
