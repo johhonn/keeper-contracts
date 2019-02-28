@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 /* global artifacts, contract, describe, it, beforeEach */
 const chai = require('chai')
-const Math = require('mathjs');
+const Math = require('mathjs')
 const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
