@@ -1,9 +1,7 @@
 /* eslint-disable no-console */
-/* eslint-disable-next-line security/detect-child-process */
-const { execSync } = require('child_process')
-
 const pkg = require('../../../package.json')
 
+const zosCleanup = require('./zos/cleanup')
 const zosInit = require('./zos/init')
 const zosRegisterContracts = require('./zos/registerContracts')
 const initializeContracts = require('./initializeContracts')
@@ -49,7 +47,11 @@ async function deployContracts(
         throw new Error(`Bad input please use 'ContractName'`)
     }
 
-    execSync('rm -f ./zos.*', { stdio: 'ignore' })
+    await zosCleanup(
+        web3,
+        true,
+        verbose
+    )
 
     if (verbose) {
         console.log(`Deploying contracts: '${contracts.join(', ')}'`)

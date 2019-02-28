@@ -1,9 +1,8 @@
 /* eslint-disable no-console */
-/* eslint-disable-next-line security/detect-child-process */
-const { execSync } = require('child_process')
 
 const pkg = require('../../../package.json')
 
+const zosCleanup = require('./zos/cleanup')
 const zosInit = require('./zos/init')
 const zosRegisterContracts = require('./zos/registerContracts')
 const zosRequestContractUpgrade = require('./zos/requestContractUpgrades')
@@ -36,7 +35,11 @@ async function upgradeContracts(
         console.log(`Upgrading contracts: '${contracts.join(', ')}'`)
     }
 
-    execSync('rm -f ./zos.json', { stdio: 'ignore' })
+    await zosCleanup(
+        web3,
+        false,
+        verbose
+    )
 
     // init zos
     const roles = await zosInit(
