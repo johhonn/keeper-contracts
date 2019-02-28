@@ -16,14 +16,6 @@ async function init(
 ) {
     const flags = verbose ? '-v' : '-s'
 
-    /*
-     * -----------------------------------------------------------------------
-     * Script setup
-     * -----------------------------------------------------------------------
-     */
-    // Clean ups
-    execSync('rm -f ./zos.* ./.zos.*', { stdio: 'ignore' })
-
     // get ethereum accounts
     const accounts = await web3.eth.getAccounts()
 

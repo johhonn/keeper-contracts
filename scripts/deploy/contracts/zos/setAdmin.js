@@ -15,7 +15,7 @@ async function setAdmin(
     * -----------------------------------------------------------------------
     */
     if (verbose) {
-        console.log(`Setting zos-admin to MultiSigWallet ${roles.upgraderWallet}`)
+        console.log(`Setting zos-admin to MultiSigWallet '${roles.upgraderWallet}'`)
     }
 
     for (const contract of contracts) {

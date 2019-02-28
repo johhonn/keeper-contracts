@@ -1,4 +1,7 @@
 /* eslint-disable no-console */
+/* eslint-disable-next-line security/detect-child-process */
+const { execSync } = require('child_process')
+
 const pkg = require('../../../package.json')
 
 const zosInit = require('./zos/init')
@@ -32,6 +35,8 @@ async function upgradeContracts(
     if (verbose) {
         console.log(`Upgrading contracts: '${contracts.join(', ')}'`)
     }
+
+    execSync('rm -f ./zos.json', { stdio: 'ignore' })
 
     // init zos
     const roles = await zosInit(

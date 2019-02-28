@@ -1,4 +1,7 @@
 /* eslint-disable no-console */
+/* eslint-disable-next-line security/detect-child-process */
+const { execSync } = require('child_process')
+
 const pkg = require('../../../package.json')
 
 const zosInit = require('./zos/init')
@@ -45,6 +48,8 @@ async function deployContracts(
     if (contracts.find((contract) => contract.indexOf(':') > -1)) {
         throw new Error(`Bad input please use 'ContractName'`)
     }
+
+    execSync('rm -f ./zos.*', { stdio: 'ignore' })
 
     if (verbose) {
         console.log(`Deploying contracts: '${contracts.join(', ')}'`)
