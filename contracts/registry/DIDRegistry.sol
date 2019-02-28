@@ -95,11 +95,32 @@ contract DIDRegistry is Ownable {
 
     /**
      * @param _did refers to decentralized identifier (a bytes32 length ID).
+     * @return the address of the DID owner.
+     */
+    function getDIDRegister(bytes32 _did)
+        public
+        view
+        returns (
+            address owner,
+            bytes32 lastChecksum,
+            address lastUpdatedBy,
+            uint256 blockNumberUpdated
+        )
+    {
+        owner = didRegisterList.didRegisters[_did].owner;
+        lastChecksum = didRegisterList.didRegisters[_did].lastChecksum;
+        lastUpdatedBy = didRegisterList.didRegisters[_did].lastUpdatedBy;
+        blockNumberUpdated = didRegisterList.didRegisters[_did].blockNumberUpdated;
+    }
+
+    /**
+     * @param _did refers to decentralized identifier (a bytes32 length ID).
      * @return last modified (update) block number of a DID.
      */
     function getBlockNumberUpdated(bytes32 _did)
-        external view
-        returns(uint updateAt)
+        public
+        view
+        returns(uint256 blockNumberUpdated)
     {
         return didRegisterList.didRegisters[_did].blockNumberUpdated;
     }
@@ -109,7 +130,8 @@ contract DIDRegistry is Ownable {
      * @return the address of the DID owner.
      */
     function getDIDOwner(bytes32 _did)
-        external view
+        public
+        view
         returns(address didOwner)
     {
         return didRegisterList.didRegisters[_did].owner;
@@ -124,5 +146,16 @@ contract DIDRegistry is Ownable {
         returns (uint size)
     {
         return didRegisterList.didRegisterIds.length;
+    }
+
+    /**
+     * @return the length of the DID registry.
+     */
+    function getDIDRegisterIds()
+        public
+        view
+        returns (bytes32[] memory)
+    {
+        return didRegisterList.didRegisterIds;
     }
 }
