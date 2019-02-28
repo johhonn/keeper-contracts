@@ -5,14 +5,13 @@ const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
-const { encodeCall } = require('zos-lib')
-
 const testUtils = require('../helpers/utils')
 
 const {
     upgradeContracts,
     deployContracts,
     confirmUpgrade,
+    submitTransaction,
     confirmTransaction,
     loadWallet
 } = require('../../scripts/deploy/deploymentHandler')
@@ -26,32 +25,14 @@ const DispenserExtraFunctionality = artifacts.require('DispenserExtraFunctionali
 const DispenserWithBug = artifacts.require('DispenserWithBug')
 
 contract('Dispenser', (accounts) => {
-    let OceanTokenAddress,
-        DispenserAddress,
-        ownerWallet
+    let ownerWallet,
+        OceanTokenAddress,
+        DispenserAddress
 
     const requester = accounts[2]
     const approver = accounts[3]
 
     const verbose = true
-
-    beforeEach('Load wallet each time', async function() {
-        const addressBook = await deployContracts(
-            web3,
-            artifacts,
-            [
-                'OceanToken',
-                'Dispenser'
-            ]
-        )
-        OceanTokenAddress = addressBook['OceanToken']
-        DispenserAddress = addressBook['Dispenser']
-
-        ownerWallet = await loadWallet(
-            web3,
-            'owner'
-        )
-    })
 
     async function setupTest({
         requestedAmount = 200
@@ -63,56 +44,70 @@ contract('Dispenser', (accounts) => {
         return {
             dispenser,
             oceanToken,
-            DispenserAddress,
-            OceanTokenAddress,
             requestedAmount
         }
     }
 
     describe('Test upgradability for Dispenser', () => {
-        it('Should be possible to fix/add a bug', async () => {
-            let { dispenser, DispenserAddress } = await setupTest()
+        beforeEach('Load wallet each time', async function() {
+            const addressBook = await deployContracts(
+                web3,
+                artifacts,
+                [
+                    'Dispenser',
+                    'OceanToken'
+                ],
+                verbose
+            )
+            OceanTokenAddress = addressBook['OceanToken']
+            DispenserAddress = addressBook['Dispenser']
+
+            ownerWallet = await loadWallet(
+                web3,
+                'owner',
+                verbose
+            )
+        })
+
+        xit('Should be possible to fix/add a bug', async () => {
+            let { DispenserAddress } = await setupTest()
 
             const taskBook = await upgradeContracts(
                 web3,
                 ['DispenserWithBug:Dispenser'],
-                true
+                verbose
             )
 
             await confirmUpgrade(
                 web3,
                 taskBook['Dispenser'],
-                approver
-            )
-
-            dispenser = await DispenserWithBug.at(DispenserAddress)
-
-            // set Max Amount
-            const SetMaxAmount = encodeCall(
-                'setMaxAmount',
-                ['uint256'],
-                [256]
-            )
-
-            const args = [
-                DispenserAddress,
-                0,
-                SetMaxAmount
-            ]
-
-            const tx = await ownerWallet.submitTransaction(
-                ...args,
-                { from: requester }
-            )
-
-            await confirmTransaction(
-                ownerWallet,
-                tx.logs[0].args.transactionId.toNumber(),
                 approver,
                 verbose
             )
 
-            const newMaxAmount = await dispenser.getMaxAmount()
+            const DispenserWithBugInstance = await DispenserWithBug.at(DispenserAddress)
+
+            // set Max Amount
+            const transactionId = await submitTransaction(
+                ownerWallet,
+                DispenserAddress,
+                [
+                    'setMaxAmount',
+                    ['uint256'],
+                    [256]
+                ],
+                requester,
+                verbose
+            )
+
+            await confirmTransaction(
+                ownerWallet,
+                transactionId,
+                approver,
+                verbose
+            )
+
+            const newMaxAmount = await DispenserWithBugInstance.getMaxAmount({ from: approver })
 
             // assert
             assert.strictEqual(
@@ -134,7 +129,8 @@ contract('Dispenser', (accounts) => {
             await confirmUpgrade(
                 web3,
                 taskBook['Dispenser'],
-                approver
+                approver,
+                verbose
             )
 
             const dispenser = await DispenserChangeFunctionSignature.at(DispenserAddress)
@@ -206,12 +202,13 @@ contract('Dispenser', (accounts) => {
             testUtils.assertEmitted(result, 1, 'DispenserChangeFunctionSignatureEvent')
         })
 
-        xit('Should be able to call new method added after upgrade is approved', async () => {
-            let { DispenserAddress } = await setupTest()
+        it('Should be able to call new method added after upgrade is approved', async () => {
+            await setupTest()
 
             const taskBook = await upgradeContracts(
                 web3,
-                ['DispenserExtraFunctionality:Dispenser']
+                ['DispenserExtraFunctionality:Dispenser'],
+                verbose
             )
 
             // act
@@ -221,11 +218,12 @@ contract('Dispenser', (accounts) => {
                 approver
             )
 
-            const dispenser = await DispenserExtraFunctionality.at(DispenserAddress)
+            const DispenserExtraFunctionalityInstance =
+                await DispenserExtraFunctionality.at(DispenserAddress)
 
             // assert
             assert.strictEqual(
-                await dispenser.dummyFunction(),
+                await DispenserExtraFunctionalityInstance.dummyFunction(),
                 true,
                 'failed to inject a new method!'
             )
