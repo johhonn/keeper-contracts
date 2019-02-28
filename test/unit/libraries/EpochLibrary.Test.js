@@ -39,5 +39,14 @@ contract('EpochLibrary', (accounts) => {
                 epochLibraryProxy.create(testUtils.generateId(), 10, 15)
             )
         })
+        it('should not allow Epochs mutability', async () => {
+            const Id = testUtils.generateId()
+            await epochLibraryProxy.create(Id, 10, 15)
+            // assert
+            await assert.isRejected(
+                epochLibraryProxy.create(Id, 12, 15),
+                'Id already exists'
+            )
+        })
     })
 })

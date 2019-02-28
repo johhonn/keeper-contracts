@@ -32,6 +32,10 @@ library EpochLibrary {
         internal
         returns (uint size)
     {
+        require(
+            _self.epochs[_id].blockNumber == 0,
+            'Id already exists'
+        );
         if(_timeOut > 0 && _timeLock > 0){
             require(
                 _timeLock < _timeOut,
