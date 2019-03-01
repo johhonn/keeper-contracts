@@ -3,7 +3,8 @@ pragma solidity 0.5.3;
 // Contain upgraded version of the contracts for test
 import '../../agreements/AgreementStoreManager.sol';
 
-contract AgreementStoreChangeInStorage is AgreementStoreManager {
+
+contract AgreementStoreManagerChangeInStorage is AgreementStoreManager {
 
     // New variables should be added after the last variable
     // Old variables should be kept even if unused

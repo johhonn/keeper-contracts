@@ -4,7 +4,7 @@ pragma solidity 0.5.3;
 import '../../agreements/AgreementStoreManager.sol';
 
 
-contract AgreementStoreExtraFunctionality is AgreementStoreManager {
+contract AgreementStoreManagerExtraFunctionality is AgreementStoreManager {
     //returns a boolean
     function dummyFunction()
         public pure

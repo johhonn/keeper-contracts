@@ -2,8 +2,10 @@ pragma solidity 0.5.3;
 
 import '../../agreements/AgreementStoreManager.sol';
 
-contract AgreementStoreChangeFunctionSignature is AgreementStoreManager {
 
+contract AgreementStoreManagerChangeFunctionSignature is
+    AgreementStoreManager
+{
     function createAgreement(
         bytes32 _id,
         bytes32 _did,
