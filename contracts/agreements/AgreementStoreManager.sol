@@ -49,7 +49,7 @@ contract AgreementStoreManager is Ownable {
         address _didRegistryAddress
     )
         public
-        initializer()
+        initializer
     {
         require(
             _owner != address(0) &&

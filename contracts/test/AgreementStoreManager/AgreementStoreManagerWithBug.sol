@@ -3,7 +3,7 @@ pragma solidity 0.5.3;
 import '../../agreements/AgreementStoreManager.sol';
 
 
-contract AgreementStoreManagerManagerWithBug is AgreementStoreManager {
+contract AgreementStoreManagerWithBug is AgreementStoreManager {
     function getAgreementListSize()
         public
         view
