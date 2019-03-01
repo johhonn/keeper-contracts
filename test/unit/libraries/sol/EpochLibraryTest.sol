@@ -8,17 +8,15 @@ contract EpochLibraryTest{
 
     EpochLibrary.EpochList private epochList;
 
-    uint256 bigNumberDoesNotFail;
+    uint256 maxBigNumberDoesNotFail;
 
     function beforeEach() public {
-        // deducting 9935 (because we expecting to addition to the block.number)
-        // the maximum unit256 number is 2^256 - 1 = 115792089237316195423570985008687907853269984665640564039457584007913129639935
-        bigNumberDoesNotFail = 115792089237316195423570985008687907853269984665640564039457584007913129630000;
+        maxBigNumberDoesNotFail = 115792089237316195423570985008687907853269984665640564039457584007913129639935 - block.number -1;
     }
 
     function testBigNumberShouldNotFail() public {
         require(
-            epochList.create(keccak256(abi.encodePacked(block.number)),0, bigNumberDoesNotFail) == 1,
+            epochList.create(keccak256(abi.encodePacked(block.number)),0, maxBigNumberDoesNotFail) == 1,
             'Indicating BigNumber!'
         );
     }
