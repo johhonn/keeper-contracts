@@ -5,6 +5,7 @@ const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
+const Common = artifacts.require('Common')
 const DIDRegistryLibrary = artifacts.require('DIDRegistryLibrary')
 const DIDRegistry = artifacts.require('DIDRegistry')
 const testUtils = require('../../helpers/utils.js')
@@ -19,8 +20,9 @@ contract('DIDRegistry', (accounts) => {
         const didRegistry = await DIDRegistry.new()
 
         await didRegistry.initialize(owner)
-
+        const common = await Common.new()
         return {
+            common,
             didRegistry,
             owner
         }
@@ -151,6 +153,40 @@ contract('DIDRegistry', (accounts) => {
                 (await didRegistry.getDIDRegistrySize()).toNumber(),
                 2,
                 'Indicating invalid DID duplicate handling'
+            )
+        })
+    })
+    describe('get DIDRegister', () => {
+        it('successful register should DIDRegister', async () => {
+            const { common, didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            const blockNumber = await common.getCurrentBlockNumber()
+            await didRegistry.registerAttribute(did, checksum, value)
+            const storedDIDRegister = await didRegistry.getDIDRegister(did)
+            assert.strictEqual(
+                storedDIDRegister.owner,
+                accounts[0]
+            )
+            assert.strictEqual(
+                storedDIDRegister.lastChecksum,
+                checksum
+            )
+            assert.strictEqual(
+                storedDIDRegister.lastUpdatedBy,
+                accounts[0]
+            )
+            assert.strictEqual(
+                storedDIDRegister.blockNumberUpdated.toNumber(),
+                blockNumber.toNumber()
+            )
+
+            const getDIDRegisterIds = await didRegistry.getDIDRegisterIds()
+            assert.lengthOf(getDIDRegisterIds, 1)
+            assert.strictEqual(
+                getDIDRegisterIds[0],
+                did
             )
         })
     })
