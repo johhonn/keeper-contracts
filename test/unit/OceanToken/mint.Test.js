@@ -15,9 +15,9 @@ contract('OceanToken', (accounts) => {
     const minter = accounts[1]
     const someone = accounts[2]
 
-    const cap = 1410000000
+    const cap = BN('1410000000')
     const decimals = 18
-    const totalSupply = BN(cap * 10 ** decimals)
+    const totalSupply = cap.multipliedBy(BN(10 ** decimals))
 
     beforeEach('initialize token before each test', async () => {
         oceanToken = await OceanToken.new()
