@@ -16,6 +16,10 @@ async function requestContractUpgrade(
 
     const implementationAddress = getAddressForImplementation(oldContractName)
 
+    if (verbose) {
+        console.log(`Upgrading proxy: ${proxyAddress} with implementation: ${implementationAddress}`)
+    }
+
     const transactionId = await submitTransaction(
         upgraderWallet,
         proxyAddress,
