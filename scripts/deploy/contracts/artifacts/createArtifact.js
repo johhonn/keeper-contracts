@@ -11,7 +11,9 @@ function createArtifact(
     const contract = require(`${buildDir}${name}.json`)
 
     // create function signatures in ABI
-    generateFunctionSignaturesInABI(contract.abi)
+    generateFunctionSignaturesInABI(
+        contract.abi
+    )
 
     return {
         abi: contract.abi,
