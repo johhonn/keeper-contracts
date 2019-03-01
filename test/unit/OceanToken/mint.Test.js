@@ -43,10 +43,16 @@ contract('OceanToken', (accounts) => {
             await oceanToken.mint(owner, totalSupply.toFixed(), { from: minter })
         })
 
-        it('Should fail to mint more than max value', async () => {
+        it('Should fail to mint more when max value has already been minted', async () => {
             await oceanToken.mint(owner, totalSupply.toFixed(), { from: minter })
             await assert.isRejected(
                 oceanToken.mint(owner, 1, { from: minter })
+            )
+        })
+
+        it('Should fail to mint more than max value', async () => {
+            await assert.isRejected(
+                oceanToken.mint(owner, totalSupply.plus(1).toFixed(), { from: minter })
             )
         })
 
