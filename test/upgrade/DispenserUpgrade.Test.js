@@ -32,7 +32,7 @@ contract('Dispenser', (accounts) => {
     const requester = accounts[2]
     const approver = accounts[3]
 
-    const verbose = true
+    const verbose = false
 
     async function setupTest({
         requestedAmount = 200
@@ -69,8 +69,8 @@ contract('Dispenser', (accounts) => {
             )
         })
 
-        xit('Should be possible to fix/add a bug', async () => {
-            let { DispenserAddress } = await setupTest()
+        it('Should be possible to fix/add a bug', async () => {
+            await setupTest()
 
             const taskBook = await upgradeContracts(
                 web3,
@@ -84,8 +84,6 @@ contract('Dispenser', (accounts) => {
                 approver,
                 verbose
             )
-
-            const DispenserWithBugInstance = await DispenserWithBug.at(DispenserAddress)
 
             // set Max Amount
             const transactionId = await submitTransaction(
@@ -107,6 +105,8 @@ contract('Dispenser', (accounts) => {
                 verbose
             )
 
+            const DispenserWithBugInstance = await DispenserWithBug.at(DispenserAddress)
+
             const newMaxAmount = await DispenserWithBugInstance.getMaxAmount({ from: approver })
 
             // assert
@@ -117,12 +117,13 @@ contract('Dispenser', (accounts) => {
             )
         })
 
-        xit('Should be possible to change function signature', async () => {
-            let { DispenserAddress, requestedAmount } = await setupTest()
+        it('Should be possible to change function signature', async () => {
+            let { requestedAmount } = await setupTest()
 
             const taskBook = await upgradeContracts(
                 web3,
-                ['DispenserChangeFunctionSignature:Dispenser']
+                ['DispenserChangeFunctionSignature:Dispenser'],
+                verbose
             )
 
             // act
@@ -133,33 +134,40 @@ contract('Dispenser', (accounts) => {
                 verbose
             )
 
-            const dispenser = await DispenserChangeFunctionSignature.at(DispenserAddress)
+            const DispenserChangeFunctionSignatureInstance =
+                await DispenserChangeFunctionSignature.at(DispenserAddress)
 
             // assert
-            const result = await dispenser.setMinPeriod(
-                requestedAmount,
-                accounts[1]
-            )
+            const result =
+                await DispenserChangeFunctionSignatureInstance.setMinPeriod(
+                    requestedAmount,
+                    accounts[1]
+                )
 
             testUtils.assertEmitted(result, 1, 'DispenserChangeFunctionSignatureEvent')
         })
 
-        xit('Should be possible to append storage variable(s) ', async () => {
-            let { DispenserAddress } = await setupTest()
+        it('Should be possible to append storage variable(s) ', async () => {
+            await setupTest()
 
             const taskBook = await upgradeContracts(
                 web3,
-                ['DispenserChangeInStorage:Dispenser']
+                ['DispenserChangeInStorage:Dispenser'],
+                verbose
             )
 
             // act
             await confirmUpgrade(
                 web3,
                 taskBook['Dispenser'],
-                approver
+                approver,
+                verbose
             )
-            const dispenser = await DispenserChangeInStorage.at(DispenserAddress)
-            const totalUnMintedAmount = await dispenser.totalUnMintedAmount()
+            const DispenserChangeInStorageInstance =
+                await DispenserChangeInStorage.at(DispenserAddress)
+
+            const totalUnMintedAmount =
+                await DispenserChangeInStorageInstance.totalUnMintedAmount()
 
             // assert
             assert.strictEqual(
@@ -169,24 +177,28 @@ contract('Dispenser', (accounts) => {
             )
         })
 
-        xit('Should be possible to append storage variables and change logic', async () => {
-            let { DispenserAddress, requestedAmount } = await setupTest()
+        it('Should be possible to append storage variables and change logic', async () => {
+            let { requestedAmount } = await setupTest()
 
             const taskBook = await upgradeContracts(
                 web3,
-                ['DispenserChangeInStorageAndLogic:Dispenser']
+                ['DispenserChangeInStorageAndLogic:Dispenser'],
+                verbose
             )
 
             // act
             await confirmUpgrade(
                 web3,
                 taskBook['Dispenser'],
-                approver
+                approver,
+                verbose
             )
 
-            const dispenser = await DispenserChangeInStorageAndLogic.at(DispenserAddress)
+            const DispenserChangeInStorageAndLogicInstance =
+                await DispenserChangeInStorageAndLogic.at(DispenserAddress)
 
-            const totalUnMintedAmount = await dispenser.totalUnMintedAmount()
+            const totalUnMintedAmount =
+                await DispenserChangeInStorageAndLogicInstance.totalUnMintedAmount()
 
             // assert
             assert.strictEqual(
@@ -194,7 +206,7 @@ contract('Dispenser', (accounts) => {
                 web3.utils.toBN(0).toString(),
                 'totalUnMintedAmount storage variable does not exists'
             )
-            const result = await dispenser.setMinPeriod(
+            const result = await DispenserChangeInStorageAndLogicInstance.setMinPeriod(
                 requestedAmount,
                 accounts[1]
             )
@@ -215,7 +227,8 @@ contract('Dispenser', (accounts) => {
             await confirmUpgrade(
                 web3,
                 taskBook['Dispenser'],
-                approver
+                approver,
+                verbose
             )
 
             const DispenserExtraFunctionalityInstance =
