@@ -1,7 +1,10 @@
 const contract = require('truffle-contract')
 
+const MultiSigWalletWithDailyLimitArtifact =
+    require('@oceanprotocol/multisigwallet/build/contracts/MultiSigWalletWithDailyLimit.json')
+
 const MultiSigWalletWithDailyLimit =
-    contract(require('@oceanprotocol/multisigwallet/build/contracts/MultiSigWalletWithDailyLimit.json'))
+    contract(MultiSigWalletWithDailyLimitArtifact)
 
 async function loadMultiSigWallet(
     web3
