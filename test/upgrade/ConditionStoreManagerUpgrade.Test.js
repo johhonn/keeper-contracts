@@ -226,7 +226,6 @@ contract('ConditionStoreManager', (accounts) => {
 
         it('Should be able to call new method added after upgrade is approved', async () => {
             await setupTest()
-
             const taskBook = await upgradeContracts(
                 web3,
                 ['ConditionStoreExtraFunctionality:ConditionStoreManager'],
@@ -235,7 +234,7 @@ contract('ConditionStoreManager', (accounts) => {
             // init
             await confirmUpgrade(
                 web3,
-                taskBook['taskBook'],
+                taskBook['ConditionStoreManager'],
                 approver,
                 verbose
             )
