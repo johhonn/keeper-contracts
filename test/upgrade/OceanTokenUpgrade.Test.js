@@ -4,6 +4,7 @@ const chai = require('chai')
 const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
+
 const Web3 = require('web3')
 const deploy = require('../helpers/zos/deploy')
 const upgrade = require('../helpers/zos/upgrade')
@@ -11,6 +12,7 @@ const loadWallet = require('../helpers/wallet/loadWallet')
 const createWallet = require('../helpers/wallet/createWallet')
 
 const OceanToken = artifacts.require('OceanToken')
+
 const OceanTokenChangeInStorage = artifacts.require('OceanTokenChangeInStorage')
 const OceanTokenChangeInStorageAndLogic = artifacts.require('OceanTokenChangeInStorageAndLogic')
 const OceanTokenExtraFunctionality = artifacts.require('OceanTokenExtraFunctionality')

@@ -61,7 +61,7 @@ contract('DIDRegistry', (accounts) => {
                 web3,
                 artifacts,
                 ['DIDRegistry'],
-                !verbose
+                verbose
             )
             DIDRegistryProxyAddress = addressBook['DIDRegistry']
         })
@@ -73,14 +73,14 @@ contract('DIDRegistry', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['DIDRegistryWithBug:DIDRegistry'],
-                !verbose
+                verbose
             )
 
             await confirmUpgrade(
                 web3,
                 taskBook['DIDRegistry'],
                 approver,
-                !verbose
+                verbose
             )
 
             const DIDRegistryWithBugInstance = await DIDRegistryWithBug.at(DIDRegistryProxyAddress)
@@ -117,14 +117,14 @@ contract('DIDRegistry', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['DIDRegistryChangeFunctionSignature:DIDRegistry'],
-                !verbose
+                verbose
             )
 
             await confirmUpgrade(
                 web3,
                 taskBook['DIDRegistry'],
                 approver,
-                !verbose
+                verbose
             )
 
             const DIDRegistryChangeFunctionSignatureInstance =
@@ -165,7 +165,7 @@ contract('DIDRegistry', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['DIDRegistryChangeInStorage:DIDRegistry'],
-                !verbose
+                verbose
             )
 
             const DIDRegistryChangeInStorageInstance =
@@ -179,7 +179,7 @@ contract('DIDRegistry', (accounts) => {
                 web3,
                 taskBook['DIDRegistry'],
                 approver,
-                !verbose
+                verbose
             )
 
             assert.equal(
@@ -194,7 +194,7 @@ contract('DIDRegistry', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['DIDRegistryChangeInStorageAndLogic:DIDRegistry'],
-                !verbose
+                verbose
             )
 
             const DIDRegistryChangeInStorageAndLogicInstance =
@@ -207,7 +207,7 @@ contract('DIDRegistry', (accounts) => {
                 web3,
                 taskBook['DIDRegistry'],
                 approver,
-                !verbose
+                verbose
             )
 
             // Approve and call again
@@ -248,7 +248,7 @@ contract('DIDRegistry', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['DIDRegistryExtraFunctionality:DIDRegistry'],
-                !verbose
+                verbose
             )
 
             const DIDRegistryExtraFunctionalityInstance =
@@ -261,7 +261,7 @@ contract('DIDRegistry', (accounts) => {
                 web3,
                 taskBook['DIDRegistry'],
                 approver,
-                !verbose
+                verbose
             )
 
             // Approve and call again
