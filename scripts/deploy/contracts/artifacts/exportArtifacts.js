@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
+const fs = require('fs')
 const writeArtifact = require('./writeArtifact')
-
 const zosGetMigrations = require('../zos/getMigrations')
 
 const zosPath = `${__dirname}/../../../../zos.json`
@@ -10,8 +10,8 @@ async function exportArtifacts(
     version,
     verbose = true
 ) {
-    /* eslint-disable-next-line security/detect-non-literal-require */
-    const { name } = require(zosPath)
+    /* eslint-disable-next-line security/detect-non-literal-fs-filename */
+    const { name } = JSON.parse(fs.readFileSync(zosPath, 'utf8'))
 
     if (verbose) {
         console.log(`Exporting: ${name}`)

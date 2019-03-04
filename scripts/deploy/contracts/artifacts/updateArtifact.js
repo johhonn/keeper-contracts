@@ -25,8 +25,8 @@ async function updateArtifact(
 
     const artifactFileName = `${oldContractName}.${network.toLowerCase()}.json`
 
-    /* eslint-disable-next-line security/detect-non-literal-require */
-    const oldArtifact = require(`${artifactsDir}${artifactFileName}`)
+    /* eslint-disable-next-line security/detect-non-literal-fs-filename */
+    const oldArtifact = JSON.parse(fs.readFileSync(`${artifactsDir}${artifactFileName}`, 'utf8'))
     const { address } = oldArtifact
 
     // create a new artifact with the new content

@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-
+const fs = require('fs')
 const pkg = require('../../../package.json')
 
 const zosCleanup = require('./zos/cleanup')
@@ -68,8 +68,13 @@ async function upgradeContracts(
     for (const contractName of contracts) {
         const [newContractName, oldContractName] = contractName.split(':')
 
-        /* eslint-disable-next-line security/detect-non-literal-require */
-        const artifact = require(`${artifactsDir}${oldContractName}.${NETWORK.toLowerCase()}.json`)
+        const artifact = JSON.parse(
+            /* eslint-disable-next-line security/detect-non-literal-fs-filename */
+            fs.readFileSync(
+                `${artifactsDir}${oldContractName}.${NETWORK.toLowerCase()}.json`,
+                'utf8'
+            )
+        )
 
         // get proxy address of current implementation
         const { address } = artifact
