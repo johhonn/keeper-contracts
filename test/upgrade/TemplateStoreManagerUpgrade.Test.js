@@ -20,7 +20,7 @@ const TemplateStoreExtraFunctionality = artifacts.require('TemplateStoreExtraFun
 const TemplateStoreWithBug = artifacts.require('TemplateStoreWithBug')
 
 contract('TemplateStoreManager', (accounts) => {
-   let templateStoreManagerAddress
+    let templateStoreManagerAddress
 
     const verbose = false
     const approver = accounts[3]
