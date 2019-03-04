@@ -1,17 +1,23 @@
 /* eslint-env mocha */
-/* global artifacts, contract, describe, it, beforeEach */
+/* global artifacts, web3, contract, describe, it, beforeEach */
 const chai = require('chai')
 const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
-const { encodeCall } = require('zos-lib')
-const deploy = require('../helpers/zos/deploy')
-const upgrade = require('../helpers/zos/upgrade')
-const loadWallet = require('../helpers/wallet/loadWallet')
-const createWallet = require('../helpers/wallet/createWallet')
+
 const constants = require('../helpers/constants.js')
 
+const {
+    upgradeContracts,
+    deployContracts,
+    confirmUpgrade,
+    loadWallet,
+    submitTransaction,
+    confirmTransaction
+} = require('../../scripts/deploy/deploymentHandler')
+
 const ConditionStoreManager = artifacts.require('ConditionStoreManager')
+
 const ConditionStoreChangeFunctionSignature = artifacts.require('ConditionStoreChangeFunctionSignature')
 const ConditionStoreChangeInStorage = artifacts.require('ConditionStoreChangeInStorage')
 const ConditionStoreChangeInStorageAndLogic = artifacts.require('ConditionStoreChangeInStorageAndLogic')
@@ -19,167 +25,229 @@ const ConditionStoreExtraFunctionality = artifacts.require('ConditionStoreExtraF
 const ConditionStoreWithBug = artifacts.require('ConditionStoreWithBug')
 
 contract('ConditionStoreManager', (accounts) => {
-    let adminWallet,
-        owner,
-        addresses,
-        conditionStoreManager
+    let ownerWallet,
+        conditionStoreManagerAddress
+
+    const verbose = false
+    const upgrader = accounts[1]
+    const approver = accounts[2]
 
     beforeEach('Load wallet each time', async function() {
-        await createWallet(true)
-        adminWallet = await loadWallet('upgrader') // zos admin MultiSig
-        owner = await loadWallet('owner')
-        addresses = await deploy('deploy', ['ConditionStoreManager'])
+        const addressBook = await deployContracts(
+            web3,
+            artifacts,
+            ['ConditionStoreManager'],
+            verbose
+        )
+
+        ownerWallet = await loadWallet(
+            web3,
+            'owner',
+            verbose
+        )
+
+        conditionStoreManagerAddress = addressBook['ConditionStoreManager']
     })
 
     async function setupTest({
-        contractAddress = null,
         conditionId = constants.bytes32.one,
         conditionType = constants.address.dummy
     } = {}) {
-        conditionStoreManager = await ConditionStoreManager.at(contractAddress)
+        const conditionStoreManager = await ConditionStoreManager.at(conditionStoreManagerAddress)
         return { conditionStoreManager, conditionId, conditionType }
     }
 
     describe('Test upgradability for ConditionStoreManager', () => {
         it('Should be possible to fix/add a bug', async () => {
-            let { conditionId } = await setupTest({ contractAddress: addresses.contractAddress })
+            let { conditionId } = await setupTest()
 
-            const upgradeTxId = await upgrade(
-                'ConditionStoreManager',
-                'ConditionStoreWithBug',
-                addresses.contractAddress,
-                adminWallet,
-                accounts[0]
+            const taskBook = await upgradeContracts(
+                web3,
+                ['ConditionStoreWithBug:ConditionStoreManager'],
+                verbose
             )
-            await adminWallet.confirmTransaction(upgradeTxId, { from: accounts[1] })
-            const upgradedConditionStoreManager = await ConditionStoreWithBug.at(addresses.contractAddress)
+            await confirmUpgrade(
+                web3,
+                taskBook['ConditionStoreManager'],
+                approver,
+                verbose
+            )
+
+            const ConditionStoreWithBugInstance =
+                await ConditionStoreWithBug.at(conditionStoreManagerAddress)
 
             // assert
             assert.strictEqual(
-                (await upgradedConditionStoreManager.getConditionState(conditionId)).toNumber(),
+                (await ConditionStoreWithBugInstance.getConditionState(conditionId)).toNumber(),
                 constants.condition.state.fulfilled,
                 'condition should be fulfilled (according to bug)'
             )
         })
 
         it('Should be possible to change function signature', async () => {
-            let { conditionId, conditionType } = await setupTest({ contractAddress: addresses.contractAddress })
+            let { conditionId, conditionType } = await setupTest()
 
-            const upgradeTxId = await upgrade(
-                'ConditionStoreManager',
-                'ConditionStoreChangeFunctionSignature',
-                addresses.contractAddress,
-                adminWallet,
-                accounts[0]
+            const taskBook = await upgradeContracts(
+                web3,
+                ['ConditionStoreChangeFunctionSignature:ConditionStoreManager'],
+                verbose
             )
+
             // init
-            await adminWallet.confirmTransaction(upgradeTxId, { from: accounts[1] })
-            const upgradedConditionStoreManager = await ConditionStoreChangeFunctionSignature.at(addresses.contractAddress)
-
-            // delegate
-            const DelegateCreateRole = encodeCall(
-                'delegateCreateRole',
-                ['address'],
-                [accounts[0]]
+            await confirmUpgrade(
+                web3,
+                taskBook['ConditionStoreManager'],
+                approver,
+                verbose
             )
-            const args = [
-                addresses.contractAddress,
-                0,
-                DelegateCreateRole
-            ]
 
-            const tx = await owner.submitTransaction(...args, { from: accounts[1] })
-            await owner.confirmTransaction(tx.logs[0].args.transactionId.toNumber(), { from: accounts[2] })
+            const ConditionStoreChangeFunctionSignatureInstance =
+                await ConditionStoreChangeFunctionSignature.at(conditionStoreManagerAddress)
+
+            // call delegateCreateRole over multi sig wallet
+            const txId = await submitTransaction(
+                ownerWallet,
+                conditionStoreManagerAddress,
+                [
+                    'delegateCreateRole',
+                    ['address'],
+                    [accounts[0]]
+                ],
+                upgrader,
+                verbose
+            )
+
+            await confirmTransaction(
+                ownerWallet,
+                txId,
+                approver,
+                verbose
+            )
 
             // assert
             assert.strictEqual(
-                await upgradedConditionStoreManager.getCreateRole(),
+                await ConditionStoreChangeFunctionSignatureInstance.getCreateRole(),
                 accounts[0],
                 'Invalid create role!'
             )
 
-            await upgradedConditionStoreManager.createCondition(conditionId, conditionType, accounts[0], { from: accounts[0] })
+            await ConditionStoreChangeFunctionSignatureInstance.createCondition(
+                conditionId,
+                conditionType,
+                accounts[0],
+                { from: accounts[0] }
+            )
 
             // assert
             assert.strictEqual(
-                (await upgradedConditionStoreManager.getConditionState(conditionId)).toNumber(),
+                (await ConditionStoreChangeFunctionSignatureInstance.getConditionState(conditionId)).toNumber(),
                 constants.condition.state.unfulfilled,
                 'condition should be unfulfilled'
             )
         })
 
         it('Should be possible to append storage variable(s) ', async () => {
-            await setupTest({ contractAddress: addresses.contractAddress })
+            await setupTest()
 
-            const upgradeTxId = await upgrade(
-                'ConditionStoreManager',
-                'ConditionStoreChangeInStorage',
-                addresses.contractAddress,
-                adminWallet,
-                accounts[0]
+            const taskBook = await upgradeContracts(
+                web3,
+                ['ConditionStoreChangeInStorage:ConditionStoreManager'],
+                verbose
             )
+
             // init
-            await adminWallet.confirmTransaction(upgradeTxId, { from: accounts[1] })
-            const upgradedConditionStoreManager = await ConditionStoreChangeInStorage.at(addresses.contractAddress)
-            assert.strictEqual((await upgradedConditionStoreManager.conditionCount()).toNumber(), 0)
+            await confirmUpgrade(
+                web3,
+                taskBook['ConditionStoreManager'],
+                approver,
+                verbose
+            )
+
+            const ConditionStoreChangeInStorageInstance =
+                await ConditionStoreChangeInStorage.at(conditionStoreManagerAddress)
+
+            assert.strictEqual((await ConditionStoreChangeInStorageInstance.conditionCount()).toNumber(), 0)
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
-            let { conditionId, conditionType } = await setupTest({ contractAddress: addresses.contractAddress })
+            let { conditionId, conditionType } = await setupTest()
 
-            const upgradeTxId = await upgrade(
-                'ConditionStoreManager',
-                'ConditionStoreChangeInStorageAndLogic',
-                addresses.contractAddress,
-                adminWallet,
-                accounts[0]
+            const taskBook = await upgradeContracts(
+                web3,
+                ['ConditionStoreChangeInStorageAndLogic:ConditionStoreManager'],
+                verbose
             )
+
             // init
-            await adminWallet.confirmTransaction(upgradeTxId, { from: accounts[1] })
-            const upgradedConditionStoreManager = await ConditionStoreChangeInStorageAndLogic.at(addresses.contractAddress)
-
-            // delegate
-            const DelegateCreateRole = encodeCall(
-                'delegateCreateRole',
-                ['address'],
-                [accounts[0]]
+            await confirmUpgrade(
+                web3,
+                taskBook['ConditionStoreManager'],
+                approver,
+                verbose
             )
-            const args = [
-                addresses.contractAddress,
-                0,
-                DelegateCreateRole
-            ]
 
-            const tx = await owner.submitTransaction(...args, { from: accounts[1] })
-            await owner.confirmTransaction(tx.logs[0].args.transactionId.toNumber(), { from: accounts[2] })
+            const ConditionStoreChangeInStorageAndLogicInstance =
+                await ConditionStoreChangeInStorageAndLogic.at(conditionStoreManagerAddress)
 
-            assert.strictEqual((await upgradedConditionStoreManager.conditionCount()).toNumber(), 0)
+            const txId = await submitTransaction(
+                ownerWallet,
+                conditionStoreManagerAddress,
+                [
+                    'delegateCreateRole',
+                    ['address'],
+                    [accounts[0]]
+                ],
+                upgrader,
+                verbose
+            )
 
-            await upgradedConditionStoreManager.createCondition(conditionId, conditionType, accounts[0], { from: accounts[0] })
+            await confirmTransaction(
+                ownerWallet,
+                txId,
+                approver,
+                verbose
+            )
+
+            assert.strictEqual((await ConditionStoreChangeInStorageAndLogicInstance.conditionCount()).toNumber(), 0)
+
+            await ConditionStoreChangeInStorageAndLogicInstance.createCondition(
+                conditionId,
+                conditionType,
+                accounts[0],
+                { from: accounts[0] }
+            )
 
             assert.strictEqual(
-                (await upgradedConditionStoreManager.getConditionState(conditionId)).toNumber(),
+                (await ConditionStoreChangeInStorageAndLogicInstance.getConditionState(conditionId)).toNumber(),
                 constants.condition.state.unfulfilled,
                 'condition should be unfulfilled'
             )
         })
 
         it('Should be able to call new method added after upgrade is approved', async () => {
-            await setupTest({ contractAddress: addresses.contractAddress })
-            const upgradeTxId = await upgrade(
-                'ConditionStoreManager',
-                'ConditionStoreExtraFunctionality',
-                addresses.contractAddress,
-                adminWallet,
-                accounts[0]
+            await setupTest()
+
+            const taskBook = await upgradeContracts(
+                web3,
+                ['ConditionStoreExtraFunctionality:ConditionStoreManager'],
+                verbose
             )
             // init
-            await adminWallet.confirmTransaction(upgradeTxId, { from: accounts[1] })
-            const upgradedConditionStoreManager = await ConditionStoreExtraFunctionality.at(addresses.contractAddress)
+            await confirmUpgrade(
+                web3,
+                taskBook['taskBook'],
+                approver,
+                verbose
+            )
+
+            const ConditionStoreExtraFunctionalityInstance =
+                await ConditionStoreExtraFunctionality.at(conditionStoreManagerAddress)
+
             // asset
             assert.strictEqual(
-                await upgradedConditionStoreManager.dummyFunction(),
-                true)
+                await ConditionStoreExtraFunctionalityInstance.dummyFunction(),
+                true
+            )
         })
     })
 })

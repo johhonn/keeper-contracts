@@ -56,9 +56,9 @@ contract('OceanToken', (accounts) => {
                 verbose
             )
             // act
-            const oceanTokenInstance = await OceanTokenChangeInStorage.at(OceanTokenAddress)
+            const OceanTokenChangeInStorageInstance = await OceanTokenChangeInStorage.at(OceanTokenAddress)
 
-            const mintCount = await oceanTokenInstance.mintCount()
+            const mintCount = await OceanTokenChangeInStorageInstance.mintCount()
 
             // assert
             assert.strictEqual(
@@ -82,9 +82,9 @@ contract('OceanToken', (accounts) => {
                 verbose
             )
 
-            const oceanTokenInstance = await OceanTokenChangeInStorageAndLogic.at(OceanTokenAddress)
+            const OceanTokenChangeInStorageAndLogicInstance = await OceanTokenChangeInStorageAndLogic.at(OceanTokenAddress)
             // act
-            const mintCountBefore = await oceanTokenInstance.mintCount()
+            const mintCountBefore = await OceanTokenChangeInStorageAndLogicInstance.mintCount()
 
             // assert
             assert.strictEqual(
@@ -94,8 +94,8 @@ contract('OceanToken', (accounts) => {
             )
 
             // act
-            await oceanTokenInstance.incrementMintCount({ from: accounts[3] })
-            const mintCountAfter = await oceanTokenInstance.mintCount()
+            await OceanTokenChangeInStorageAndLogicInstance.incrementMintCount({ from: accounts[3] })
+            const mintCountAfter = await OceanTokenChangeInStorageAndLogicInstance.mintCount()
             // assert
             assert.strictEqual(
                 mintCountAfter.toString(),
@@ -119,11 +119,11 @@ contract('OceanToken', (accounts) => {
             )
 
             // act
-            const oceanTokenInstance = await OceanTokenExtraFunctionality.at(OceanTokenAddress)
+            const OceanTokenExtraFunctionalityInstance = await OceanTokenExtraFunctionality.at(OceanTokenAddress)
 
             // assert
             assert.strictEqual(
-                await oceanTokenInstance.dummyFunction(),
+                await OceanTokenExtraFunctionalityInstance.dummyFunction(),
                 true,
                 'failed to inject a new method!'
             )
