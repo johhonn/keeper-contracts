@@ -1,9 +1,6 @@
 /* eslint-disable no-console */
 const fs = require('fs')
-const contract = require('truffle-contract')
-
-const MultiSigWalletWithDailyLimit =
-    contract(require('@oceanprotocol/multisigwallet/build/contracts/MultiSigWalletWithDailyLimit.json'))
+const loadMultiSigWallet = require('./loadMultiSigWallet')
 
 // MultiSig Configuration
 const accountAmount = 4
@@ -22,15 +19,16 @@ async function setupWallets(
         if (verbose) {
             console.log('wallets.json already exists')
         }
-        /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-        return JSON.parse(fs.readFileSync(walletPath, 'utf-8').toString())
+
+        return JSON.parse(
+            /* eslint-disable-next-line security/detect-non-literal-fs-filename */
+            fs.readFileSync(walletPath, 'utf-8').toString()
+        )
     }
 
     if (verbose) {
         console.log('Setting up MultiSigWallets')
     }
-
-    await MultiSigWalletWithDailyLimit.setProvider(web3.currentProvider)
 
     // get accounts from web3
     const accounts = await web3.eth.getAccounts()
@@ -59,6 +57,8 @@ async function setupWallets(
         from: deployer
     }
 
+    const MultiSigWalletWithDailyLimit = await loadMultiSigWallet(web3)
+
     // deploy wallets to the blockchain
     const upgraderWallet = await MultiSigWalletWithDailyLimit.new(
         ...walletParameters,
@@ -86,16 +86,7 @@ async function setupWallets(
 
     // write to file
     /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-    fs.writeFileSync(
-        walletPath,
-        walletsString,
-        'utf8', (err) => {
-            if (err) {
-                console.error('Error writing file:', err)
-                return null
-            }
-            console.log('Wallets file has been created')
-        })
+    fs.writeFileSync(walletPath, walletsString, 'utf8')
 
     return wallets
 }

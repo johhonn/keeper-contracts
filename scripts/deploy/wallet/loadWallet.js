@@ -1,28 +1,47 @@
 /* eslint-disable no-console */
 const fs = require('fs')
-const contract = require('truffle-contract')
-
-const MultiSigWalletWithDailyLimit =
-    contract(require('@oceanprotocol/multisigwallet/build/contracts/MultiSigWalletWithDailyLimit.json'))
+const loadMultiSigWallet = require('./loadMultiSigWallet')
 
 const walletPath = `${__dirname}/../../../wallets.json`
 
+const loadedWallets = {}
+
 async function loadWallet(
     web3,
-    walletName,
+    name,
     verbose = true
 ) {
     if (verbose) {
-        console.log(`Loading '${walletName}' wallet`)
+        console.log(`Loading '${name}' wallet`)
     }
-    /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-    const wallets = JSON.parse(fs.readFileSync(walletPath, 'utf8'))
-    const walletAddress = wallets.find((wallet) => wallet.name === walletName).address
-    MultiSigWalletWithDailyLimit.setProvider(web3.currentProvider)
-    const wallet = await MultiSigWalletWithDailyLimit.at(walletAddress)
+
+    // read wallets from disk
+    const wallets = JSON.parse(
+        /* eslint-disable-next-line security/detect-non-literal-fs-filename */
+        fs.readFileSync(walletPath, 'utf8')
+    )
+
+    // find the correct wallet
+    const walletAddress = wallets.find((wallet) => wallet.name === name).address
+
     if (verbose) {
-        console.log(`Loaded '${walletName}' wallet at '${wallet.address}'`)
+        console.log(`Loading '${name}' wallet at '${walletAddress}'`)
     }
+
+    if (!loadedWallets[name]) {
+        // load wallet object
+        const MultiSigWalletWithDailyLimit = await loadMultiSigWallet(web3)
+
+        // load the wallet onchain
+        loadedWallets[name] = await MultiSigWalletWithDailyLimit.at(walletAddress)
+    }
+
+    const wallet = loadedWallets[name]
+
+    if (verbose) {
+        console.log(`Loaded '${name}' wallet at '${wallet}'`)
+    }
+
     return wallet
 }
 
