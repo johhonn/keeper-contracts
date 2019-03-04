@@ -26,25 +26,10 @@ const AgreementStoreManagerExtraFunctionality =
 const AgreementStoreManagerWithBug = artifacts.require('AgreementStoreManagerWithBug')
 
 contract('AgreementStoreManager', (accounts) => {
-    let addressBook,
-        agreementStoreManager
+    let agreementStoreManagerAddress
 
-    const verbose = true
-    const approver = accounts[2]
-
-    beforeEach('Load wallet each time', async function() {
-        addressBook = await deployContracts(
-            web3,
-            artifacts,
-            [
-                'DIDRegistry',
-                'ConditionStoreManager',
-                'TemplateStoreManager',
-                'AgreementStoreManager'
-            ],
-            verbose
-        )
-    })
+    const verbose = false
+    const approver = accounts[3]
 
     async function setupTest({
         agreementId = constants.bytes32.one,
@@ -54,9 +39,8 @@ contract('AgreementStoreManager', (accounts) => {
         timeLocks = [0],
         timeOuts = [2]
     } = {}) {
-        agreementStoreManager = await AgreementStoreManager.at(addressBook['AgreementStoreManager'])
+        await AgreementStoreManager.at(agreementStoreManagerAddress)
         return {
-            agreementStoreManager,
             did,
             agreementId,
             conditionIds,
@@ -67,7 +51,24 @@ contract('AgreementStoreManager', (accounts) => {
     }
 
     describe('Test upgradability for AgreementStoreManager', () => {
-        xit('Should be possible to fix/add a bug', async () => {
+        beforeEach('Load wallet each time', async function() {
+            const addressBook = await deployContracts(
+                web3,
+                artifacts,
+                [
+                    'DIDRegistry',
+                    'ConditionStoreManager',
+                    'TemplateStoreManager',
+                    'AgreementStoreManager'
+                ],
+                verbose
+            )
+
+            agreementStoreManagerAddress = addressBook['AgreementStoreManager']
+            assert(agreementStoreManagerAddress)
+        })
+
+        it('Should be possible to fix/add a bug', async () => {
             await setupTest()
 
             const taskBook = await upgradeContracts(
@@ -83,7 +84,7 @@ contract('AgreementStoreManager', (accounts) => {
                 verbose
             )
             const AgreementStoreManagerWithBugInstance =
-                await AgreementStoreManagerWithBug.at(addressBook['AgreementStoreManager'])
+                await AgreementStoreManagerWithBug.at(agreementStoreManagerAddress)
 
             assert.strictEqual(
                 (await AgreementStoreManagerWithBugInstance.getAgreementListSize()).toNumber(),
@@ -117,7 +118,7 @@ contract('AgreementStoreManager', (accounts) => {
             )
 
             const AgreementStoreManagerChangeFunctionSignatureInstance =
-                await AgreementStoreManagerChangeFunctionSignature.at(addressBook['AgreementStoreManager'])
+                await AgreementStoreManagerChangeFunctionSignature.at(agreementStoreManagerAddress)
 
             await assert.isRejected(
                 AgreementStoreManagerChangeFunctionSignatureInstance.createAgreement(
@@ -134,7 +135,7 @@ contract('AgreementStoreManager', (accounts) => {
             )
         })
 
-        xit('Should be possible to append storage variable(s) ', async () => {
+        it('Should be possible to append storage variable(s) ', async () => {
             await setupTest()
 
             const taskBook = await upgradeContracts(
@@ -150,18 +151,18 @@ contract('AgreementStoreManager', (accounts) => {
                 verbose
             )
 
-            const upgradedAgreementStoreManager =
-                await AgreementStoreManagerChangeInStorage.at(addressBook['AgreementStoreManager'])
+            const AgreementStoreManagerChangeInStorageInstance =
+                await AgreementStoreManagerChangeInStorage.at(agreementStoreManagerAddress)
 
             // act & assert
             assert.strictEqual(
-                (await upgradedAgreementStoreManager.AgreementCount()).toNumber(),
+                (await AgreementStoreManagerChangeInStorageInstance.AgreementCount()).toNumber(),
                 0,
                 'Invalid change in storage'
             )
         })
 
-        xit('Should be possible to append storage variables and change logic', async () => {
+        it('Should be possible to append storage variables and change logic', async () => {
             let {
                 did,
                 agreementId,
@@ -180,15 +181,16 @@ contract('AgreementStoreManager', (accounts) => {
             await confirmUpgrade(
                 web3,
                 taskBook['AgreementStoreManager'],
-                approver
+                approver,
+                verbose
             )
 
-            const upgradedAgreementStoreManager =
-                await AgreementStoreManagerChangeInStorageAndLogic.at(addressBook['AgreementStoreManager'])
+            const AgreementStoreManagerChangeInStorageAndLogicInstance =
+                await AgreementStoreManagerChangeInStorageAndLogic.at(agreementStoreManagerAddress)
 
             // act & assert
             await assert.isRejected(
-                upgradedAgreementStoreManager.createAgreement(
+                AgreementStoreManagerChangeInStorageAndLogicInstance.createAgreement(
                     agreementId,
                     did,
                     conditionTypes,
@@ -202,18 +204,18 @@ contract('AgreementStoreManager', (accounts) => {
             )
 
             assert.strictEqual(
-                (await upgradedAgreementStoreManager.AgreementCount()).toNumber(),
+                (await AgreementStoreManagerChangeInStorageAndLogicInstance.AgreementCount()).toNumber(),
                 0,
                 'Invalid change in storage'
             )
         })
 
-        xit('Should be able to call new method added after upgrade is approved', async () => {
+        it('Should be able to call new method added after upgrade is approved', async () => {
             await setupTest()
 
             const taskBook = await upgradeContracts(
                 web3,
-                ['AgreementStoreExtraFunctionality:AgreementStoreManager'],
+                ['AgreementStoreManagerExtraFunctionality:AgreementStoreManager'],
                 verbose
             )
 
@@ -225,7 +227,7 @@ contract('AgreementStoreManager', (accounts) => {
             )
 
             const AgreementStoreExtraFunctionalityInstance =
-                await AgreementStoreManagerExtraFunctionality.at(addressBook['AgreementStoreManager'])
+                await AgreementStoreManagerExtraFunctionality.at(agreementStoreManagerAddress)
 
             // act & assert
             assert.strictEqual(
