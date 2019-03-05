@@ -1,7 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
 /* global artifacts, contract, describe, it, expect */
-
 const chai = require('chai')
 const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
@@ -175,7 +174,11 @@ contract('ConditionStoreManager', (accounts) => {
 
     describe('create conditions', () => {
         it('createRole should create', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest()
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest()
 
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
@@ -184,7 +187,11 @@ contract('ConditionStoreManager', (accounts) => {
 
             // conditionId should exist after create
             // await conditionStoreManager.createCondition(conditionId, conditionType, { from: createRole })
-            await conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole })
+            await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType,
+                { from: createRole }
+            )
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
                 constants.condition.state.unfulfilled)
@@ -192,8 +199,17 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('createRole should create with zero timeout and timelock', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest()
-            await conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole })
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest()
+
+            await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType,
+                { from: createRole }
+            )
 
             // conditionId should exist after create
             let {
@@ -213,7 +229,7 @@ contract('ConditionStoreManager', (accounts) => {
             let conditionTimeLock = 1
             let conditionTimeOut = 10
 
-            await conditionStoreManager.createCondition(
+            await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
                 conditionType,
                 conditionTimeLock,
@@ -245,7 +261,11 @@ contract('ConditionStoreManager', (accounts) => {
             } = await setupTest({ createRole: accounts[1] })
 
             await assert.isRejected(
-                conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole }),
+                conditionStoreManager.methods['createCondition(bytes32,address)'](
+                    conditionId,
+                    conditionType,
+                    { from: createRole }
+                ),
                 constants.acl.error.invalidCreateRole
             )
         })
@@ -259,7 +279,11 @@ contract('ConditionStoreManager', (accounts) => {
             } = await setupTest({ conditionType: constants.address.zero })
 
             await assert.isRejected(
-                conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole }),
+                conditionStoreManager.methods['createCondition(bytes32,address)'](
+                    conditionId,
+                    conditionType,
+                    { from: createRole }
+                ),
                 constants.address.error.invalidAddress0x0
             )
         })
@@ -272,10 +296,18 @@ contract('ConditionStoreManager', (accounts) => {
                 createRole
             } = await setupTest({ conditionType: accounts[0] })
 
-            await conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole })
+            await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType,
+                { from: createRole }
+            )
 
             await assert.isRejected(
-                conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole }),
+                conditionStoreManager.methods['createCondition(bytes32,address)'](
+                    conditionId,
+                    conditionType,
+                    { from: createRole }
+                ),
                 constants.error.idAlreadyExists
             )
         })
@@ -284,7 +316,10 @@ contract('ConditionStoreManager', (accounts) => {
             const { conditionStoreManager, conditionId, conditionType } = await setupTest()
 
             // conditionId should exist after create
-            const result = await conditionStoreManager.createCondition(conditionId, conditionType)
+            const result = await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType
+            )
             testUtils.assertEmitted(result, 1, 'ConditionCreated')
             const eventArgs = testUtils.getEventArgsFromTx(result, 'ConditionCreated')
             expect(eventArgs._id).to.equal(conditionId)
@@ -305,7 +340,11 @@ contract('ConditionStoreManager', (accounts) => {
             const blockNumber = await common.getCurrentBlockNumber()
             // returns true on create
             // await conditionStoreManager.createCondition(conditionId, conditionType, { from: createRole })
-            await conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole })
+            await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType,
+                { from: createRole }
+            )
             let {
                 typeRef,
                 state,
@@ -351,7 +390,11 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionType,
                 createRole
             } = await setupTest({ conditionType: accounts[0] })
-            await conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole })
+            await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType,
+                { from: createRole }
+            )
             let newState = constants.condition.state.fulfilled
             await conditionStoreManager.updateConditionState(conditionId, newState)
             assert.strictEqual(
@@ -366,7 +409,11 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionType,
                 createRole
             } = await setupTest({ conditionType: accounts[0] })
-            await conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole })
+            await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType,
+                { from: createRole }
+            )
 
             let newState = constants.condition.state.aborted
             await conditionStoreManager.updateConditionState(conditionId, newState)
@@ -376,8 +423,17 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('correct role should not transition from unfulfilled to uninitialized', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest({ conditionType: accounts[0] })
-            await conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole })
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest({ conditionType: accounts[0] })
+
+            await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType,
+                { from: createRole }
+            )
 
             let newState = constants.condition.state.uninitialized
             await assert.isRejected(
@@ -387,8 +443,17 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('correct role should not transition from unfulfilled to unfulfilled', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest({ conditionType: accounts[0] })
-            await conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole })
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest({ conditionType: accounts[0] })
+
+            await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType,
+                { from: createRole }
+            )
 
             let newState = constants.condition.state.unfulfilled
             await assert.isRejected(
@@ -398,8 +463,17 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('correct role should not transition from fulfilled to unfulfilled', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest({ conditionType: accounts[0] })
-            await conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole })
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest({ conditionType: accounts[0] })
+
+            await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType,
+                { from: createRole }
+            )
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
             await assert.isRejected(
@@ -409,8 +483,17 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('correct role should not transition from fulfilled to unfulfilled', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest({ conditionType: accounts[0] })
-            await conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole })
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest({ conditionType: accounts[0] })
+
+            await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType,
+                { from: createRole }
+            )
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
             await assert.isRejected(
@@ -420,8 +503,17 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('correct role should not transition from aborted to unfulfilled', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest({ conditionType: accounts[0] })
-            await conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole })
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest({ conditionType: accounts[0] })
+
+            await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType,
+                { from: createRole }
+            )
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
             await assert.isRejected(
@@ -431,8 +523,17 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('correct role should not transition from fulfilled to uninitialized', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest({ conditionType: accounts[0] })
-            await conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole })
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest({ conditionType: accounts[0] })
+
+            await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType,
+                { from: createRole }
+            )
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
             await assert.isRejected(
@@ -442,8 +543,17 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('correct role should not transition from aborted to uninitialized', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest({ conditionType: accounts[0] })
-            await conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole })
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest({ conditionType: accounts[0] })
+
+            await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType,
+                { from: createRole }
+            )
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
             await assert.isRejected(
@@ -453,8 +563,17 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('correct role should not transition from fulfilled to aborted', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest({ conditionType: accounts[0] })
-            await conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole })
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest({ conditionType: accounts[0] })
+
+            await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType,
+                { from: createRole }
+            )
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
             await assert.isRejected(
@@ -464,8 +583,17 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('correct role should not transition from aborted to fulfilled', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest({ conditionType: accounts[0] })
-            await conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole })
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest({ conditionType: accounts[0] })
+
+            await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType,
+                { from: createRole }
+            )
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
             await assert.isRejected(
@@ -475,8 +603,16 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('correct role should not transition from fulfilled to fulfilled', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest({ conditionType: accounts[0] })
-            await conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole })
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest({ conditionType: accounts[0] })
+
+            await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType,
+                { from: createRole })
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
             await assert.isRejected(
@@ -486,8 +622,17 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('correct role should not transition from aborted to aborted', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest({ conditionType: accounts[0] })
-            await conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole })
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest({ conditionType: accounts[0] })
+
+            await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType,
+                { from: createRole }
+            )
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
             await assert.isRejected(
@@ -497,8 +642,17 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('wrong role should not update', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest()
-            await conditionStoreManager.methods['createCondition(bytes32,address)'](conditionId, conditionType, { from: createRole })
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest()
+
+            await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType,
+                { from: createRole }
+            )
 
             let newState = constants.condition.state.fulfilled
             await assert.isRejected(
@@ -508,10 +662,19 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('update condition should emit ConditionUpdated event', async () => {
-            const { conditionStoreManager, conditionId, conditionType } = await setupTest({ conditionType: accounts[0] })
-            await conditionStoreManager.createCondition(conditionId, conditionType)
-            let newState = constants.condition.state.fulfilled
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType } = await setupTest({ conditionType: accounts[0] })
+
+            await conditionStoreManager.methods['createCondition(bytes32,address)'](
+                conditionId,
+                conditionType
+            )
+
+            const newState = constants.condition.state.fulfilled
             const result = await conditionStoreManager.updateConditionState(conditionId, newState)
+
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
                 constants.condition.state.fulfilled)
@@ -526,11 +689,16 @@ contract('ConditionStoreManager', (accounts) => {
 
     describe('time locked conditions', () => {
         it('zero time lock should not time lock', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest({ conditionType: accounts[0] })
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest({ conditionType: accounts[0] })
+
             let conditionTimeLock = 0
             let conditionTimeOut = 0
 
-            await conditionStoreManager.createCondition(
+            await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
                 conditionType,
                 conditionTimeLock,
@@ -543,11 +711,16 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('nonzero time lock should time lock', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest({ conditionType: accounts[0] })
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest({ conditionType: accounts[0] })
+
             let conditionTimeLock = 10
             let conditionTimeOut = 0
 
-            await conditionStoreManager.createCondition(
+            await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
                 conditionType,
                 conditionTimeLock,
@@ -560,17 +733,25 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('nonzero time lock should not update', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest({ conditionType: accounts[0] })
-            let conditionTimeLock = 10
-            let conditionTimeOut = 0
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest({ conditionType: accounts[0] })
 
-            await conditionStoreManager.createCondition(
+            const conditionTimeLock = 10
+            const conditionTimeOut = 0
+
+            await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
                 conditionType,
                 conditionTimeLock,
                 conditionTimeOut
-                , { from: createRole })
-            let newState = constants.condition.state.fulfilled
+                , { from: createRole }
+            )
+
+            const newState = constants.condition.state.fulfilled
+
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, newState),
                 constants.condition.epoch.error.isTimeLocked
@@ -578,21 +759,30 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('nonzero time lock should update after timeLock expires', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest({ conditionType: accounts[0] })
-            let conditionTimeLock = 3
-            let conditionTimeOut = 0
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest({ conditionType: accounts[0] })
 
-            await conditionStoreManager.createCondition(
+            const conditionTimeLock = 3
+            const conditionTimeOut = 0
+
+            await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
                 conditionType,
                 conditionTimeLock,
                 conditionTimeOut,
-                { from: createRole })
-            let newState = constants.condition.state.fulfilled
+                { from: createRole }
+            )
+
+            const newState = constants.condition.state.fulfilled
+
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, newState),
                 constants.condition.epoch.error.isTimeLocked
             )
+
             // waited for a block
             await increaseTime(2)
 
@@ -605,16 +795,23 @@ contract('ConditionStoreManager', (accounts) => {
 
     describe('timeout conditions', () => {
         it('zero time out should not time out', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest({ conditionType: accounts[0] })
-            let conditionTimeLock = 0
-            let conditionTimeOut = 0
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest({ conditionType: accounts[0] })
 
-            await conditionStoreManager.createCondition(
+            const conditionTimeLock = 0
+            const conditionTimeOut = 0
+
+            await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
                 conditionType,
                 conditionTimeLock,
                 conditionTimeOut
-                , { from: createRole })
+                , { from: createRole }
+            )
+
             assert.strictEqual(
                 await conditionStoreManager.isConditionTimedOut(conditionId),
                 false
@@ -622,21 +819,28 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('nonzero time out should time out', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest({ conditionType: accounts[0] })
-            let conditionTimeLock = 0
-            let conditionTimeOut = 1
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest({ conditionType: accounts[0] })
 
-            await conditionStoreManager.createCondition(
+            const conditionTimeLock = 0
+            const conditionTimeOut = 1
+
+            await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
                 conditionType,
                 conditionTimeLock,
-                conditionTimeOut
-                , { from: createRole })
+                conditionTimeOut,
+                { from: createRole }
+            )
 
             assert.strictEqual(
                 await conditionStoreManager.isConditionTimedOut(conditionId),
                 false
             )
+
             // wait for a block
             await increaseTime(1)
 
@@ -647,41 +851,57 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('nonzero time out should not abort after time out', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest({ conditionType: accounts[0] })
-            let conditionTimeLock = 0
-            let conditionTimeOut = 1
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest({ conditionType: accounts[0] })
 
-            await conditionStoreManager.createCondition(
+            const conditionTimeLock = 0
+            const conditionTimeOut = 1
+
+            await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
                 conditionType,
                 conditionTimeLock,
-                conditionTimeOut
-                , { from: createRole })
+                conditionTimeOut,
+                { from: createRole }
+            )
 
             // wait for a block
             await increaseTime(1)
 
-            let newState = constants.condition.state.fulfilled
+            const newState = constants.condition.state.fulfilled
+
             await conditionStoreManager.updateConditionState(conditionId, newState)
+
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
                 constants.condition.state.aborted)
         })
 
         it('nonzero time lock should update before time out', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest({ conditionType: accounts[0] })
-            let conditionTimeLock = 0
-            let conditionTimeOut = 1
+            const {
+                conditionStoreManager,
+                conditionId,
+                conditionType,
+                createRole } = await setupTest({ conditionType: accounts[0] })
 
-            await conditionStoreManager.createCondition(
+            const conditionTimeLock = 0
+            const conditionTimeOut = 1
+
+            await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
                 conditionType,
                 conditionTimeLock,
-                conditionTimeOut
-                , { from: createRole })
+                conditionTimeOut,
+                { from: createRole }
+            )
 
-            let newState = constants.condition.state.fulfilled
+            const newState = constants.condition.state.fulfilled
+
             await conditionStoreManager.updateConditionState(conditionId, newState)
+
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
                 constants.condition.state.fulfilled)
@@ -695,15 +915,16 @@ contract('ConditionStoreManager', (accounts) => {
                 createRole
             } = await setupTest()
 
-            let conditionTimeLock = 0
-            let conditionTimeOut = 1
+            const conditionTimeLock = 0
+            const conditionTimeOut = 1
 
-            await conditionStoreManager.createCondition(
+            await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
                 hashLockCondition.address,
                 conditionTimeLock,
-                conditionTimeOut
-                , { from: createRole })
+                conditionTimeOut,
+                { from: createRole }
+            )
 
             // wait for a block
             await increaseTime(1)
@@ -725,12 +946,13 @@ contract('ConditionStoreManager', (accounts) => {
             let conditionTimeLock = 0
             let conditionTimeOut = 10
 
-            await conditionStoreManager.createCondition(
+            await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
                 hashLockCondition.address,
                 conditionTimeLock,
                 conditionTimeOut,
-                { from: createRole })
+                { from: createRole }
+            )
 
             // wait for a block
             await increaseTime(1)
