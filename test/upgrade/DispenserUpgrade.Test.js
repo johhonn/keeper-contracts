@@ -32,7 +32,7 @@ contract('Dispenser', (accounts) => {
     const requester = accounts[2]
     const approver = accounts[3]
 
-    const verbose = false
+    const verbose = true
 
     async function setupTest({
         requestedAmount = 200

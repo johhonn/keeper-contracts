@@ -28,7 +28,7 @@ contract('ConditionStoreManager', (accounts) => {
     let ownerWallet,
         conditionStoreManagerAddress
 
-    const verbose = false
+    const verbose = true
     const upgrader = accounts[1]
     const approver = accounts[2]
 
