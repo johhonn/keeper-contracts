@@ -25,7 +25,7 @@ matrix:
 
 before_install:
     - npm install -g npm
-    - npm install -g ganache-cli@~6.3.0 release-it greenkeeper-lockfile codacy-coverage surya@0.2.7
+    - npm install -g ganache-cli@~6.3.0 greenkeeper-lockfile codacy-coverage
     - pyenv global system 3.6.7
     - |
         if [ "${DEPLOY_PACKAGE}" = "true" ] && [ ! -z "${TRAVIS_TAG}" ]; then
