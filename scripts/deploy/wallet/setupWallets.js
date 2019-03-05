@@ -20,10 +20,10 @@ async function setupWallets(
             console.log('wallets.json already exists')
         }
 
-        return JSON.parse(
-            /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-            fs.readFileSync(walletPath, 'utf-8').toString()
-        )
+        /* eslint-disable-next-line security/detect-non-literal-fs-filename */
+        const walletsString = fs.readFileSync(walletPath, 'utf8').toString()
+
+        return JSON.parse(walletsString)
     }
 
     if (verbose) {
