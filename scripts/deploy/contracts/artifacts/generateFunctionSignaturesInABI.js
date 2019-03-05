@@ -12,6 +12,8 @@ function generateFunctionSignaturesInABI(
             const signatureHash = web3.utils.sha3(signature)
             abiEntry.signature = signatureHash.substring(0, 10)
         })
+
+    return abi
 }
 
 module.exports = generateFunctionSignaturesInABI
