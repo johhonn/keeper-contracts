@@ -39,7 +39,7 @@ async function loadWallet(
     const wallet = loadedWallets[name]
 
     if (verbose) {
-        console.log(`Loaded '${name}' wallet at '${wallet}'`)
+        console.log(`Loaded '${name}' wallet at '${wallet.address}'`)
     }
 
     return wallet
