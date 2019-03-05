@@ -10,10 +10,11 @@ function createArtifact(
     version
 ) {
     /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-    const contract = JSON.parse(fs.readFileSync(`${buildDir}${name}.json`, 'utf8'))
+    const contractString = fs.readFileSync(`${buildDir}${name}.json`, 'utf8').toString()
+    const contract = JSON.parse(contractString)
 
     // create function signatures in ABI
-    generateFunctionSignaturesInABI(
+    contract.abi = generateFunctionSignaturesInABI(
         contract.abi
     )
 
