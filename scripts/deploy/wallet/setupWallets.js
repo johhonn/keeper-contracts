@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
 const fs = require('fs')
+const path = require('path')
+
 const loadMultiSigWallet = require('./loadMultiSigWallet')
 
 // MultiSig Configuration
@@ -7,7 +9,8 @@ const accountAmount = 4
 const threshold = 2
 const dailiyLimitInEther = 5
 
-const walletPath = `${__dirname}/../../../wallets.json`
+const walletPathBase = `${__dirname}/../../../wallets.json`
+const walletPath = path.resolve(walletPathBase)
 
 async function setupWallets(
     web3,
@@ -17,7 +20,7 @@ async function setupWallets(
     /* eslint-disable-next-line security/detect-non-literal-fs-filename */
     if (!force && fs.existsSync(walletPath)) {
         if (verbose) {
-            console.log('wallets.json already exists')
+            console.log(`wallets.json already exists at ${walletPath}. Loading it.`)
         }
 
         /* eslint-disable-next-line security/detect-non-literal-fs-filename */
@@ -80,13 +83,13 @@ async function setupWallets(
 
     const walletsString = JSON.stringify(wallets, null, 4)
 
-    if (verbose) {
-        console.log(`Wallets created:\n ${walletsString}`)
-    }
-
     // write to file
     /* eslint-disable-next-line security/detect-non-literal-fs-filename */
     fs.writeFileSync(walletPath, walletsString, 'utf8')
+
+    if (verbose) {
+        console.log(`Wallets created:\n ${walletsString} \nat ${walletPath}`)
+    }
 
     return wallets
 }

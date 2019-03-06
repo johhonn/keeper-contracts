@@ -12,6 +12,7 @@ async function init(
     projectName,
     network,
     version,
+    forceWalletCreation = false,
     verbose = true
 ) {
     const flags = verbose ? '-v' : '-s'
@@ -21,7 +22,7 @@ async function init(
 
     await setupWallets(
         web3,
-        false,
+        forceWalletCreation,
         verbose
     )
 

@@ -39,6 +39,7 @@ async function deployContracts(
     web3,
     artifacts,
     contracts,
+    forceWalletCreation = false,
     verbose = true
 ) {
     contracts = !contracts || contracts.length === 0 ? contractNames : contracts
@@ -62,6 +63,7 @@ async function deployContracts(
         pkg.name,
         NETWORK,
         VERSION,
+        forceWalletCreation,
         verbose
     )
 

@@ -47,6 +47,7 @@ async function upgradeContracts(
         pkg.name,
         NETWORK,
         VERSION,
+        false,
         verbose
     )
 
