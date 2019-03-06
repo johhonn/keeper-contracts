@@ -5,9 +5,9 @@ const createArtifact = require('./createArtifact')
 const artifactsDir = `${__dirname}/../../../../artifacts/`
 
 function writeArtifact(
-    network,
     name,
     address,
+    networkName,
     version
 ) {
     // create the artifact
@@ -18,7 +18,7 @@ function writeArtifact(
     )
 
     // set filename
-    const filename = `${name}.${network.toLowerCase()}.json`
+    const filename = `${name}.${networkName.toLowerCase()}.json`
 
     // write artifact
     const artifactString = JSON.stringify(artifact, null, 2)

@@ -7,13 +7,14 @@ const zosGetMigrations = require('../zos/getMigrations')
 const artifactsDir = `${__dirname}/../../../../artifacts/`
 const network = process.env.NETWORK || 'development'
 
-async function updateArtifact(
+function updateArtifact(
     oldContractName,
     newContractName,
     version,
+    networkId,
     verbose = true
 ) {
-    const { contracts } = zosGetMigrations()
+    const { contracts } = zosGetMigrations(networkId)
 
     if (!(oldContractName in contracts)) {
         throw new Error('Contract was not handled by zos.')
@@ -26,7 +27,9 @@ async function updateArtifact(
     const artifactFileName = `${oldContractName}.${network.toLowerCase()}.json`
 
     /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-    const oldArtifact = JSON.parse(fs.readFileSync(`${artifactsDir}${artifactFileName}`, 'utf8'))
+    const oldArtofactString = fs.readFileSync(`${artifactsDir}${artifactFileName}`, 'utf8').toString()
+    const oldArtifact = JSON.parse(oldArtofactString)
+
     const { address } = oldArtifact
 
     // create a new artifact with the new content

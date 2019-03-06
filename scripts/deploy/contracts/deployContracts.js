@@ -90,8 +90,11 @@ async function deployContracts(
         verbose
     )
 
+    const networkId = await web3.eth.net.getId()
+
     await exportArtifacts(
         NETWORK,
+        networkId,
         VERSION,
         verbose
     )

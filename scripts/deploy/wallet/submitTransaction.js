@@ -3,20 +3,22 @@ const { encodeCall } = require('zos-lib')
 
 async function submitTransaction(
     wallet,
-    address,
+    contractAddress,
     calldata,
     requester,
     verbose = true
 ) {
     if (verbose) {
-        console.log(`Submitting transaction against: '${address}' with account: '${requester}'`)
+        console.log(`Submitting transaction against contract: '${contractAddress}' via '${wallet.address}' from account: '${requester}'`)
     }
 
     const CallData = encodeCall(...calldata)
 
     const args = [
-        address,
+        // contract to call
+        contractAddress,
         0, // value in ether
+        // transaction to invoke on target contract
         CallData
     ]
 

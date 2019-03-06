@@ -1,9 +1,10 @@
 const zosGetMigrations = require('./getMigrations')
 
 function getAddressForImplementation(
-    contractName
+    contractName,
+    networkId
 ) {
-    const { contracts } = zosGetMigrations()
+    const { contracts } = zosGetMigrations(networkId)
     const implementation = contracts && contracts[contractName]
     return implementation.address
 }

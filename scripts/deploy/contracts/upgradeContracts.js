@@ -67,14 +67,15 @@ async function upgradeContracts(
 
     for (const contractName of contracts) {
         const [newContractName, oldContractName] = contractName.split(':')
+        const networkId = await web3.eth.net.getId()
 
-        const artifact = JSON.parse(
-            /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-            fs.readFileSync(
-                `${artifactsDir}${oldContractName}.${NETWORK.toLowerCase()}.json`,
-                'utf8'
-            )
-        )
+        /* eslint-disable-next-line security/detect-non-literal-fs-filename */
+        const artifactString = fs.readFileSync(
+            `${artifactsDir}${oldContractName}.${NETWORK.toLowerCase()}.json`,
+            'utf8'
+        ).toString()
+
+        const artifact = JSON.parse(artifactString)
 
         // get proxy address of current implementation
         const { address } = artifact
@@ -85,13 +86,15 @@ async function upgradeContracts(
             address,
             upgraderWallet,
             roles,
+            networkId,
             verbose
         )
 
-        await updateArtifact(
+        updateArtifact(
             oldContractName,
             newContractName,
             VERSION,
+            networkId,
             verbose
         )
     }

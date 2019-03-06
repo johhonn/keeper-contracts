@@ -8,13 +8,17 @@ async function requestContractUpgrade(
     proxyAddress,
     upgraderWallet,
     roles,
+    networkId,
     verbose = true
 ) {
     if (verbose) {
         console.log(`Upgrading contract: ${oldContractName} with ${newContractName}`)
     }
 
-    const implementationAddress = getAddressForImplementation(oldContractName)
+    const implementationAddress = getAddressForImplementation(
+        oldContractName,
+        networkId
+    )
 
     if (verbose) {
         console.log(`Upgrading proxy: ${proxyAddress} with implementation: ${implementationAddress}`)
