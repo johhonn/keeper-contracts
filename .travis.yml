@@ -64,6 +64,7 @@ script:
     - npm run test:cover
     - npm run report-coverage
     - npm run test:upgrade
+    - npm run test:echidna
     - npm run compile
     - npm run deploy
     - git status
