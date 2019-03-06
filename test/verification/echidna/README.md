@@ -6,4 +6,4 @@ Before starting, make sure you have the latest revision of [Echidna](https://git
 
 ## Run 
 
-To run the full suite of scripts, execute `start.sh`.
+To run the full suite of scripts, execute `echidna.sh`.

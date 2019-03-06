@@ -1,7 +1,7 @@
-
+pragma solidity 0.5.0;
 import '../../../contracts/OceanToken.sol';
 
-contract TEST is OceanToken() {
+contract OceanTokenTest is OceanToken {
 
   address testerAddr = address(0x1);
   address otherAddr = address(0x2);
