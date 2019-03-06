@@ -7,7 +7,7 @@ contract('OceanToken', (accounts) => {
 
     const owner = accounts[0]
     const minter = accounts[1]
-    const someone = accounts[1]
+    const someone = accounts[2]
 
     describe('initialize', () => {
         beforeEach('create tokens before each test', async () => {
