@@ -43,7 +43,6 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             deployer,
             owner
         ))
-
         accessSecretStoreCondition = await AccessSecretStoreCondition.new()
         await accessSecretStoreCondition.initialize(
             owner,

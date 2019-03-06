@@ -9,7 +9,8 @@ contract ConditionStoreWithBug is ConditionStoreManager {
         returns (ConditionStoreLibrary.ConditionState)
     {
         // adding Bug here: shouldn't return fulfilled
-        if(uint(conditionList.conditions[_id].state) >= 0 )
+        if(conditionList.conditions[_id].state ==
+           ConditionStoreLibrary.ConditionState.Uninitialized)
             return ConditionStoreLibrary.ConditionState.Fulfilled;
         return ConditionStoreLibrary.ConditionState.Fulfilled;
     }
