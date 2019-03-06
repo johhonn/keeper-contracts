@@ -4,7 +4,7 @@ const loadMultiSigWallet = require('./loadMultiSigWallet')
 
 const walletPath = `${__dirname}/../../../wallets.json`
 
-const loadedWallets = {}
+let MultiSigWalletWithDailyLimit
 
 async function loadWallet(
     web3,
@@ -28,15 +28,13 @@ async function loadWallet(
         console.log(`Loading '${name}' wallet at '${walletAddress}'`)
     }
 
-    if (!loadedWallets[name]) {
+    if (!MultiSigWalletWithDailyLimit) {
         // load wallet object
-        const MultiSigWalletWithDailyLimit = await loadMultiSigWallet(web3)
-
-        // load the wallet onchain
-        loadedWallets[name] = await MultiSigWalletWithDailyLimit.at(walletAddress)
+        MultiSigWalletWithDailyLimit = await loadMultiSigWallet(web3)
     }
 
-    const wallet = loadedWallets[name]
+    // load the wallet onchain
+    const wallet = await MultiSigWalletWithDailyLimit.at(walletAddress)
 
     if (verbose) {
         console.log(`Loaded '${name}' wallet at '${wallet.address}'`)
