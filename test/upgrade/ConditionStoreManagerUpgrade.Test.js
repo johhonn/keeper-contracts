@@ -28,7 +28,7 @@ contract('ConditionStoreManager', (accounts) => {
     let ownerWallet,
         conditionStoreManagerAddress
 
-    const verbose = true
+    const verbose = false
     const upgrader = accounts[1]
     const approver = accounts[2]
 
@@ -37,6 +37,7 @@ contract('ConditionStoreManager', (accounts) => {
             web3,
             artifacts,
             ['ConditionStoreManager'],
+            true,
             verbose
         )
 

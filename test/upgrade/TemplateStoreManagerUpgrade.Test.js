@@ -22,7 +22,7 @@ const TemplateStoreWithBug = artifacts.require('TemplateStoreWithBug')
 contract('TemplateStoreManager', (accounts) => {
     let templateStoreManagerAddress
 
-    const verbose = true
+    const verbose = false
     const approver = accounts[3]
 
     async function setupTest({
@@ -44,6 +44,7 @@ contract('TemplateStoreManager', (accounts) => {
                 [
                     'TemplateStoreManager'
                 ],
+                true,
                 verbose
             )
 

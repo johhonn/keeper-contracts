@@ -15,6 +15,7 @@ const {
 } = require('../../scripts/deploy/deploymentHandler')
 
 const DIDRegistry = artifacts.require('DIDRegistry')
+
 const DIDRegistryChangeFunctionSignature = artifacts.require('DIDRegistryChangeFunctionSignature')
 const DIDRegistryChangeInStorage = artifacts.require('DIDRegistryChangeInStorage')
 const DIDRegistryChangeInStorageAndLogic = artifacts.require('DIDRegistryChangeInStorageAndLogic')
@@ -28,7 +29,7 @@ contract('DIDRegistry', (accounts) => {
     const didOwner = accounts[5]
     const approver = accounts[2]
 
-    const verbose = true
+    const verbose = false
 
     async function setupTest({
         did = constants.did[0],
@@ -61,6 +62,7 @@ contract('DIDRegistry', (accounts) => {
                 web3,
                 artifacts,
                 ['DIDRegistry'],
+                true,
                 verbose
             )
             DIDRegistryProxyAddress = addressBook['DIDRegistry']
@@ -83,9 +85,13 @@ contract('DIDRegistry', (accounts) => {
                 verbose
             )
 
-            const DIDRegistryWithBugInstance = await DIDRegistryWithBug.at(DIDRegistryProxyAddress)
+            const DIDRegistryWithBugInstance =
+                await DIDRegistryWithBug.at(DIDRegistryProxyAddress)
 
-            assert.strictEqual(await DIDRegistryWithBugInstance.getDIDOwner(did), didOwner)
+            assert.strictEqual(
+                await DIDRegistryWithBugInstance.getDIDOwner(did),
+                didOwner
+            )
 
             // check functionality works
             const newDid = constants.did[1]

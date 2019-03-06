@@ -20,7 +20,7 @@ const OceanTokenExtraFunctionality = artifacts.require('OceanTokenExtraFunctiona
 contract('OceanToken', (accounts) => {
     let OceanTokenAddress
 
-    const verbose = true
+    const verbose = false
     const approver = accounts[3]
 
     async function setupTest() {
@@ -35,6 +35,7 @@ contract('OceanToken', (accounts) => {
                 [
                     'OceanToken'
                 ],
+                true,
                 verbose
             )
 

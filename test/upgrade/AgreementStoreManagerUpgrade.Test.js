@@ -28,7 +28,7 @@ const AgreementStoreManagerWithBug = artifacts.require('AgreementStoreManagerWit
 contract('AgreementStoreManager', (accounts) => {
     let agreementStoreManagerAddress
 
-    const verbose = true
+    const verbose = false
     const approver = accounts[3]
 
     async function setupTest({
@@ -61,6 +61,7 @@ contract('AgreementStoreManager', (accounts) => {
                     'TemplateStoreManager',
                     'AgreementStoreManager'
                 ],
+                true,
                 verbose
             )
 

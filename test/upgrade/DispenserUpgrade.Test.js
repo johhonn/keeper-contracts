@@ -18,6 +18,7 @@ const {
 
 const OceanToken = artifacts.require('OceanToken')
 const Dispenser = artifacts.require('Dispenser')
+
 const DispenserChangeFunctionSignature = artifacts.require('DispenserChangeFunctionSignature')
 const DispenserChangeInStorage = artifacts.require('DispenserChangeInStorage')
 const DispenserChangeInStorageAndLogic = artifacts.require('DispenserChangeInStorageAndLogic')
@@ -32,7 +33,7 @@ contract('Dispenser', (accounts) => {
     const requester = accounts[2]
     const approver = accounts[3]
 
-    const verbose = true
+    const verbose = false
 
     async function setupTest({
         requestedAmount = 200
@@ -57,6 +58,7 @@ contract('Dispenser', (accounts) => {
                     'Dispenser',
                     'OceanToken'
                 ],
+                true,
                 verbose
             )
             OceanTokenAddress = addressBook['OceanToken']
