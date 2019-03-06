@@ -32,6 +32,17 @@ library EpochLibrary {
         internal
         returns (uint size)
     {
+        require(
+            _self.epochs[_id].blockNumber == 0,
+            'Id already exists'
+        );
+
+        require(
+            _timeLock.add(block.number) >= block.number &&
+            _timeOut.add(block.number) >= block.number,
+            'Indicating integer overflow/underflow'
+        );
+
         if(_timeOut > 0 && _timeLock > 0){
             require(
                 _timeLock < _timeOut,
