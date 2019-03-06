@@ -119,7 +119,7 @@ async function deployContracts(operation = 'deploy', contracts) {
         deployer: accounts[0],
         upgrader: accounts[1],
         initialMinter: accounts[2],
-        owner: ownerWallet.address,
+        owner: process.env.OWNER_ROLE_ADDRESS || ownerWallet.address,
         admin: adminWallet.address
     }
 
