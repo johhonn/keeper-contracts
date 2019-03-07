@@ -216,6 +216,7 @@ async function initializeContracts(
         if (verbose) {
             console.log(`Renouncing deployer as initial minter from ${roles.deployer}`)
         }
+
         await oceanToken.renounceMinter({ from: roles.deployer })
     }
 
