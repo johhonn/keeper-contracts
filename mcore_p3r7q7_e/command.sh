@@ -1,1 +1,0 @@
-./test/verification/manticore/AgreementStoreManager.initialize.py
