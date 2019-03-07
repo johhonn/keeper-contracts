@@ -1,0 +1,7 @@
+[+] Created owner account "owner_account"
+Traceback (most recent call last):
+  File "/Users/ahmed/Desktop/code/ocean/merge/security-issues/verification/keeper-contracts/test/verification/manticore/DIDRegistry.initialize.py", line 28, in <module>
+    library_account, contract_account = create_did_registry(m, owner_account, DID_REGISTRY_LIBRARY_JSON_PATH, DID_REGISTRY_JSON_PATH)
+  File "/Users/ahmed/Desktop/code/ocean/merge/security-issues/verification/keeper-contracts/test/verification/manticore/creation.py", line 5, in create_did_registry
+    library_account = m.json_create_contract(library_json, owner=owner_account, name='did_registry_library_account')
+AttributeError: 'ManticoreEVM' object has no attribute 'json_create_contract'

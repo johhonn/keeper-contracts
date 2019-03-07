@@ -1,0 +1,7 @@
+[+] Created owner account "owner_account"
+Traceback (most recent call last):
+  File "/Users/ahmed/Desktop/code/ocean/merge/security-issues/verification/keeper-contracts/test/verification/manticore/ConditionStoreManager.initialize.py", line 29, in <module>
+    _, contract_account = create_condition_store_manager(m, owner_account, EPOCH_LIBRARY_JSON_PATH, CONDITION_STORE_MANAGER_JSON_PATH)
+  File "/Users/ahmed/Desktop/code/ocean/merge/security-issues/verification/keeper-contracts/test/verification/manticore/creation.py", line 20, in create_condition_store_manager
+    library_account = m.json_create_contract(library_json, owner=owner_account, name='epoch_library_account')
+AttributeError: 'ManticoreEVM' object has no attribute 'json_create_contract'

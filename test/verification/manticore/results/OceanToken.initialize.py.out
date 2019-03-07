@@ -1,0 +1,6 @@
+[+] Created owner account "owner_account"
+[+] Created minter account "minter_account"
+Traceback (most recent call last):
+  File "/Users/ahmed/Desktop/code/ocean/merge/security-issues/verification/keeper-contracts/test/verification/manticore/OceanToken.initialize.py", line 31, in <module>
+    contract_account = m.json_create_contract(contract_json, owner=owner_account, name='contract_account')
+AttributeError: 'ManticoreEVM' object has no attribute 'json_create_contract'
