@@ -31,7 +31,7 @@ async function initializeContracts(
             'OceanToken',
             [
                 roles.ownerWallet,
-                roles.initialMinter
+                roles.deployer
             ],
             verbose
         )
@@ -53,7 +53,7 @@ async function initializeContracts(
     if (contracts.indexOf('ConditionStoreManager') > -1) {
         addressBook['ConditionStoreManager'] = zosCreate(
             'ConditionStoreManager',
-            [roles.ownerWallet],
+            [roles.deployer],
             verbose
         )
     }
@@ -173,15 +173,29 @@ async function initializeContracts(
      * setup deployed contracts
      * -----------------------------------------------------------------------
      */
-
-    // TODO: @sebastian - please check
     if (addressBook['ConditionStoreManager'] &&
         addressBook['AgreementStoreManager']) {
-        /*
         const ConditionStoreManager = artifacts.require('ConditionStoreManager')
-        const conditionStoreManager = await ConditionStoreManager.at(addressBook['ConditionStoreManager'])
-        // TODO: delegate createRole to addressBook['AgreementStoreManager']
-        */
+        const conditionStoreManagerInstance =
+            await ConditionStoreManager.at(addressBook['ConditionStoreManager'])
+
+        if (verbose) {
+            console.log(`Delegating create role to ${addressBook['AgreementStoreManager']}`)
+        }
+
+        await conditionStoreManagerInstance.delegateCreateRole(
+            addressBook['AgreementStoreManager'],
+            { from: roles.deployer }
+        )
+
+        if (verbose) {
+            console.log(`Transferring ownership from ${roles.deployer} to ${roles.ownerWallet}`)
+        }
+
+        await conditionStoreManagerInstance.transferOwnership(
+            roles.ownerWallet,
+            { from: roles.deployer }
+        )
     }
 
     if (addressBook['OceanToken']) {
@@ -190,19 +204,19 @@ async function initializeContracts(
 
         if (addressBook['Dispenser']) {
             if (verbose) {
-                console.log(`adding dispenser as a minter ${addressBook['Dispenser']} from ${roles.initialMinter}`)
+                console.log(`adding dispenser as a minter ${addressBook['Dispenser']} from ${roles.deployer}`)
             }
 
             await oceanToken.addMinter(
                 addressBook['Dispenser'],
-                { from: roles.initialMinter }
+                { from: roles.deployer }
             )
         }
 
         if (verbose) {
-            console.log(`Renouncing initialMinter as a minter from ${roles.initialMinter}`)
+            console.log(`Renouncing deployer as initial minter from ${roles.deployer}`)
         }
-        await oceanToken.renounceMinter({ from: roles.initialMinter })
+        await oceanToken.renounceMinter({ from: roles.deployer })
     }
 
     return addressBook
