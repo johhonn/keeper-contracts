@@ -6,6 +6,7 @@ const setupWallets = require('../../wallet/setupWallets')
 const loadWallet = require('../../wallet/loadWallet')
 
 const TIMEOUT = 36000
+const bypassMultisigWallets = process.env.KEEPER_BYPASS_MULTISIG_WALLETS || false
 
 async function init(
     web3,
@@ -20,33 +21,47 @@ async function init(
     // get ethereum accounts
     const accounts = await web3.eth.getAccounts()
 
-    await setupWallets(
-        web3,
-        forceWalletCreation,
-        verbose
-    )
+    let upgraderWalletAddress,
+        ownerWalletAddress
 
-    // Get wallet objects
-    // zos admin MultiSig
-    const upgraderWallet = await loadWallet(
-        web3,
-        'upgrader',
-        verbose
-    )
-    // contract admin
-    const ownerWallet = await loadWallet(
-        web3,
-        'owner',
-        verbose
-    )
+    if (bypassMultisigWallets) {
+        console.log(`========================================================================`)
+        console.log(`WARNING: You are bypassing assigning multi sig wallets to the contracts!`)
+        console.log(`Be aware that this is a security risk! i hope you know what you are doing.`)
+        console.log(`========================================================================`)
+    } else {
+        await setupWallets(
+            web3,
+            forceWalletCreation,
+            verbose
+        )
+
+        // Get wallet objects
+        // zos admin MultiSig
+        const upgraderWallet = await loadWallet(
+            web3,
+            'upgrader',
+            verbose
+        )
+        upgraderWalletAddress = upgraderWallet.address
+
+        // contract admin
+        const ownerWallet = await loadWallet(
+            web3,
+            'owner',
+            verbose
+        )
+
+        ownerWalletAddress = ownerWallet.address
+    }
 
     // build roles
     const roles = {
         deployer: accounts[0],
         upgrader: accounts[1],
         initialMinter: accounts[2],
-        ownerWallet: ownerWallet.address,
-        upgraderWallet: upgraderWallet.address
+        ownerWallet: bypassMultisigWallets ? accounts[3] : ownerWalletAddress,
+        upgraderWallet: bypassMultisigWallets ? accounts[4] : upgraderWalletAddress
     }
 
     // Set zos session (network, admin, timeout)

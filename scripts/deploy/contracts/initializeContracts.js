@@ -18,14 +18,6 @@ async function initializeContracts(
 
     const addressBook = {}
 
-    if (contracts.indexOf('StorageContract') > -1) {
-        addressBook['StorageContract'] = zosCreate(
-            'StorageContract',
-            null,
-            verbose
-        )
-    }
-
     if (contracts.indexOf('DIDRegistry') > -1) {
         addressBook['DIDRegistry'] = zosCreate(
             'DIDRegistry',
