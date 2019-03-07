@@ -1,0 +1,6 @@
+[+] Created owner account "owner_account"
+[+] Created creator account "creator_owner_account"
+[+] Created contract /src/build/contracts/EpochLibrary.json
+[+] Created contract /src/build/contracts/ConditionStoreManager.json
+[+] Initialized contract /build/contracts/ConditionStoreManager.json
+[+] Created condition owner account "condition_owner_account"

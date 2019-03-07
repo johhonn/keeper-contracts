@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 DIR="$(cd "$(dirname "$0")" && pwd)"
 ulimit -s 65532
 TESTS="AgreementStoreManager.initialize.py ConditionStoreManager.Unfulfilled.py LockRewardCondition.initialize.py TemplateStoreManager.initialize.py \

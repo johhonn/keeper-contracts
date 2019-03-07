@@ -1,0 +1,8 @@
+[+] Created owner account "owner_account"
+[+] Created minter account "minter_account"
+[+] Created contract /build/contracts/OceanToken.json
+[+] Initialized contract /build/contracts/OceanToken.json with symbolic parameters
+Traceback (most recent call last):
+  File "/src/test/verification/manticore/OceanToken.initialize.py", line 43, in <module>
+    assert(len(running_states) == 1)
+AssertionError
