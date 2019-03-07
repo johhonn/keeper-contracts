@@ -59,9 +59,8 @@ async function init(
     const roles = {
         deployer: accounts[0],
         upgrader: accounts[1],
-        initialMinter: accounts[2],
-        ownerWallet: bypassMultisigWallets ? accounts[3] : ownerWalletAddress,
-        upgraderWallet: bypassMultisigWallets ? accounts[4] : upgraderWalletAddress
+        ownerWallet: bypassMultisigWallets ? accounts[2] : ownerWalletAddress,
+        upgraderWallet: bypassMultisigWallets ? accounts[3] : upgraderWalletAddress
     }
 
     // Set zos session (network, admin, timeout)
