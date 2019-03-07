@@ -72,7 +72,9 @@ contract ConditionStoreManager is Ownable, Common {
         return createRole;
     }
 
-    function delegateCreateRole(address delegatee)
+    function delegateCreateRole(
+        address delegatee
+    )
         external
         onlyOwner()
     {
