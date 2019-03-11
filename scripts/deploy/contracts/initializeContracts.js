@@ -61,7 +61,7 @@ async function initializeContracts(
     if (contracts.indexOf('TemplateStoreManager') > -1) {
         addressBook['TemplateStoreManager'] = zosCreate(
             'TemplateStoreManager',
-            [roles.ownerWallet],
+            [roles.deployer],
             verbose
         )
     }
@@ -173,26 +173,55 @@ async function initializeContracts(
      * setup deployed contracts
      * -----------------------------------------------------------------------
      */
-    if (addressBook['ConditionStoreManager'] &&
-        addressBook['AgreementStoreManager']) {
-        const ConditionStoreManager = artifacts.require('ConditionStoreManager')
-        const conditionStoreManagerInstance =
-            await ConditionStoreManager.at(addressBook['ConditionStoreManager'])
+    if (addressBook['TemplateStoreManager']) {
+        const TemplateStoreManager =
+            artifacts.require('TemplateStoreManager')
+        const TemplateStoreManagerInstance =
+            await TemplateStoreManager.at(addressBook['TemplateStoreManager'])
 
-        if (verbose) {
-            console.log(`Delegating create role to ${addressBook['AgreementStoreManager']}`)
+        if (addressBook['EscrowAccessSecretStoreTemplate']) {
+            await TemplateStoreManagerInstance.proposeTemplate(
+                addressBook['EscrowAccessSecretStoreTemplate'],
+                { from: roles.deployer }
+            )
+
+            await TemplateStoreManagerInstance.approveTemplate(
+                addressBook['EscrowAccessSecretStoreTemplate'],
+                { from: roles.deployer }
+            )
         }
 
-        await conditionStoreManagerInstance.delegateCreateRole(
-            addressBook['AgreementStoreManager'],
+        if (verbose) {
+            console.log(`TemplateStoreManager transferring ownership from ${roles.deployer} to ${roles.ownerWallet}`)
+        }
+
+        await TemplateStoreManagerInstance.transferOwnership(
+            roles.ownerWallet,
             { from: roles.deployer }
         )
+    }
 
-        if (verbose) {
-            console.log(`Transferring ownership from ${roles.deployer} to ${roles.ownerWallet}`)
+    if (addressBook['ConditionStoreManager']) {
+        const ConditionStoreManager = artifacts.require('ConditionStoreManager')
+        const ConditionStoreManagerInstance =
+            await ConditionStoreManager.at(addressBook['ConditionStoreManager'])
+
+        if (addressBook['AgreementStoreManager']) {
+            if (verbose) {
+                console.log(`Delegating create role to ${addressBook['AgreementStoreManager']}`)
+            }
+
+            await ConditionStoreManagerInstance.delegateCreateRole(
+                addressBook['AgreementStoreManager'],
+                { from: roles.deployer }
+            )
         }
 
-        await conditionStoreManagerInstance.transferOwnership(
+        if (verbose) {
+            console.log(`ConditionStoreManager transferring ownership from ${roles.deployer} to ${roles.ownerWallet}`)
+        }
+
+        await ConditionStoreManagerInstance.transferOwnership(
             roles.ownerWallet,
             { from: roles.deployer }
         )
