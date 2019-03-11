@@ -125,35 +125,37 @@ npm run upgrade <DEPLOYED_CONTRACT>:<NEW_CONTRACT>
 
 #### Nile Testnet
 
-Follow the steps for local deployment. Make sure that the address `0x90eE7A30339D05E07d9c6e65747132933ff6e624` is having enough (~1) Ether.
+Follow the steps for local deployment. Make sure that the address [`0x90eE7A30339D05E07d9c6e65747132933ff6e624`](https://submarine.dev-ocean.com/address/0x90ee7a30339d05e07d9c6e65747132933ff6e624) is having enough (~1) Ether.
 
 ```bash
 export NMEMORIC=<your nile nmemoric>
 npm run deploy:nile
 ```
 
-The transaction should show up on the account: `0x90eE7A30339D05E07d9c6e65747132933ff6e624`
+The transaction should show up on the account: [`0x90eE7A30339D05E07d9c6e65747132933ff6e624`](https://submarine.dev-ocean.com/address/0x90ee7a30339d05e07d9c6e65747132933ff6e624/transactions)
 
 The contract addresses deployed on Ocean Nile testnet:
 
 | Contract                          | Version | Address                                      |
 |-----------------------------------|---------|----------------------------------------------|
-| AccessSecretStoreCondition        | v0.7.0  | `0x146becf5607b4daea1be310781ee20a84d232541` |
-| AgreementStoreManager             | v0.7.0  | `0x3ec8be9fb4c3b5840650f6deab7e537917ba2243` |
-| ConditionStoreManager             | v0.7.0  | `0x4ca8a132f33989358d0a3042cd5394b57b820931` |
-| DIDRegistry                       | v0.7.0  | `0xa1f09400b6959c3de6a32a58e625858ae0370401` |
-| Dispenser                         | v0.7.0  | `0x3ebd0ab62a354bd3baeeed7345cf369ec7a1f2c5` |
-| EscrowAccessSecretStoreTemplate   | v0.7.0  | `0x743e848db40fb8a3cd996970feeabee0bfd0d2b6` |
-| EscrowReward                      | v0.7.0  | `0xc3ba87cb998d2d529c3ad97aa18a16468764e108` |
-| HashLockCondition                 | v0.7.0  | `0xe7ee67fc1b3009a04d89401eaa8356d6f6e407af` |
-| LockRewardCondition               | v0.7.0  | `0x918eb48009ccc25dbd6b4a6812cc5a859036df7e` |
-| OceanToken                        | v0.7.0  | `0x1e8a47dc8af56d48a2a6a3c9335537778adca420` |
-| SignCondition                     | v0.7.0  | `0x70f90441db73675436c60cdd5b0beb8d14aee01f` |
-| TemplateStoreManager              | v0.7.0  | `0x2778ae1d2e5a0af155b073d7de259f82f7d8f88f` |
+| AccessSecretStoreCondition        | v0.8.2  | `0x3195fCEb1F95006C77dBD957690224e047a1EdD9` |
+| AgreementStoreManager             | v0.8.2  | `0xa2c2F2B55b9bCd36c014e0900875c662737f1731` |
+| ConditionStoreManager             | v0.8.2  | `0x1b8c05c40B888aCe1050bb761eFF1E8cFAEafF04` |
+| DIDRegistry                       | v0.8.2  | `0xeB56578EA25e3DbbA73136Cc250354Ed849dCcf3` |
+| DIDRegistryLibrary                | v0.8.2  | `0x87361F953C48459465530d0a4F8D22a010E90895` |
+| Dispenser                         | v0.8.2  | `0x97eA790cA2997C53030c9Cc9bC1f430AE4771714` |
+| EpochLibrary                      | v0.8.2  | `0xC4f818e2818C294A59D3A4E55544549f7cF5Ef0D` |
+| EscrowAccessSecretStoreTemplate   | v0.8.2  | `0x7A2f22E8449d971Dcd4dB18FB8552F4d6512a551` |
+| EscrowReward                      | v0.8.2  | `0x4b3102679A3EBBF0010D50F8271F0A0Ab07c5Bdc` |
+| HashLockCondition                 | v0.8.2  | `0xB241dB858e4390679AC10e8Ed2bCf15621C3f865` |
+| LockRewardCondition               | v0.8.2  | `0x39BF3F8Bc807Ff7F7fE2C859074efaA25b052010` |
+| OceanToken                        | v0.8.2  | `0x03A84EBA0A08403b57c465Ba4d5fF694574eFE70` |
+| SignCondition                     | v0.8.2  | `0xA4917d03cf75d25247ce34C4Ec4397CE78820788` |
+| TemplateStoreManager              | v0.8.2  | `0x545E17Ec84209245CCC8c6F0bF6a1AD4a1dF2CcD` |
 
 #### Kovan Testnet
 
-Follow the steps for local deployment. Make sure that the address [0x2c0d5f47374b130ee398f4c34dbe8168824a8616](https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616) is having enough (~1) Ether.
+Follow the steps for local deployment. Make sure that the address [`0x2c0d5f47374b130ee398f4c34dbe8168824a8616`](https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616) is having enough (~1) Ether.
 
 If you managed to deploy the contracts locally do:
 
@@ -163,7 +165,7 @@ export NMEMORIC=<your kovan nmemoric>
 npm run deploy:kovan
 ```
 
-The transaction should show up on: `https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616`
+The transaction should show up on: [`0x2c0d5f47374b130ee398f4c34dbe8168824a8616`](https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616)
 
 The contract addresses deployed on Kovan testnet:
 

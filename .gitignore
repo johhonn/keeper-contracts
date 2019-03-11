@@ -12,11 +12,13 @@ target/
 .python-version
 artifacts/*.development.json
 .eggs/
-zos.dev-*
+zos.dev-*.json
+!zos.dev-8995.json
 .zos.session
 .zos.lock
 zos.json
 wallets.json
+!wallets_nile.json
 mythrilReport.md
 securifyReport.txt
 KeeperContracts.png
