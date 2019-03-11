@@ -9,7 +9,7 @@ module.exports = (cb) => {
         web3,
         artifacts,
         contracts,
-        true
+        false
     )
         .then(() => cb())
         .catch(err => cb(err))
