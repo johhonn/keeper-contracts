@@ -27,6 +27,7 @@
     "test:fast": "truffle test $(find ./test/unit/ -name '*.js') $(find ./test/int/ -name '*.js')",
     "test:upgrade": "truffle test $(find ./test/upgrade/ -name '*.js')",
     "test:cover": "export NETWORK='coverage' && solidity-coverage",
+    "test:echidna": "./test/verification/echidna/echidna.sh",
     "report-coverage": "cat ./coverage/lcov.info | codacy-coverage --token b95545c0da4b45848cc5eef363c2711e  --prefix ./",
     "release": "./bumpversion.sh patch",
     "clean": "rm -rf ./build/ ./artifacts/*.development.json ./coverage/ ./coverageEnv/ ./coverage.json ./.zos.session ./wallets.json",
