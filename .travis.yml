@@ -27,6 +27,7 @@ before_install:
     - npm install -g npm
     - npm install -g ganache-cli@~6.1.8 release-it greenkeeper-lockfile codacy-coverage surya@0.2.7
     - pyenv global system 3.6.7
+    - docker pull oceanprotocol/echidna:sloc-5.3
     - |
         if [ "${TRAVIS_BRANCH}" = "develop" ]; then
             sudo apt-get -y install python3-apt dot2tex
@@ -63,6 +64,7 @@ script:
     - npm run test:cover
     - npm run report-coverage
     - npm run test:upgrade
+    - npm run test:echidna
     - npm run compile
     - npm run deploy
     - git status
