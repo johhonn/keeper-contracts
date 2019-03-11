@@ -29,6 +29,7 @@
     "test:upgrade": "npm run clean && npm run compile && truffle test $(find ./test/upgrade/ -name '*.js')",
     "test:cover": "export NETWORK='coverage' && solidity-coverage",
     "test:echidna": "./test/verification/echidna/echidna.sh",
+    "test:manticore":"./test/verification/manticore/run.sh",
     "report-coverage": "cat ./coverage/lcov.info | codacy-coverage --token b95545c0da4b45848cc5eef363c2711e  --prefix ./",
     "release": "./bumpversion.sh patch",
     "clean": "rm -rf ./build/ ./artifacts/*.development.json ./coverage/ ./coverageEnv/ ./coverage.json ./zos.* ./.zos.session ./wallets.json",

@@ -4,7 +4,7 @@
 [+] Created contract /src/build/contracts/ConditionStoreManager.json
 [+] Initialized contract /build/contracts/ConditionStoreManager.json
 [+] Created condition owner account "condition_owner_account"
-2019-03-07 19:37:16,554: [3359] m.c.executor:[31mERROR:[0m Exception: 
+2019-03-11 09:12:31,669: [3355] m.c.executor:[31mERROR:[0m Exception: 
 Traceback (most recent call last):
   File "/usr/local/lib/python3.6/dist-packages/manticore-0.2.4-py3.6.egg/manticore/core/executor.py", line 454, in run
     if not current_state.execute():
@@ -23,4 +23,4 @@ Traceback (most recent call last):
 manticore.exceptions.SolverError
 
 [+] Created attacker account "attacker_account"
-[+] Look for results in /mcore_0ig_bi65
+[+] Look for results in /mcore_0i5n436r
