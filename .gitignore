@@ -1,24 +1,36 @@
-build/
+# JetBrains tools
 .idea/
+
+# Development
+artifacts/*.development.json
+artifacts/*.spree.json
+
+# Build / Travis
+build/
 node_modules/
-.DS_Store
-installed_contracts/
-coverage*
 dist
+coverage*
+ganache-cli.log
+
+# Mac / Apple
+.DS_Store
+
+$ Python related
 keeper_contracts.egg-info
 venv
-ganache-cli.log
 target/
 .python-version
-artifacts/*.development.json
 .eggs/
+
+# ZeppelinOS related
 zos.dev-*.json
 !zos.dev-8995.json
 .zos.session
 .zos.lock
 zos.json
 wallets.json
-!wallets_nile.json
+
+# Security report files
 mythrilReport.md
 securifyReport.txt
 KeeperContracts.png
