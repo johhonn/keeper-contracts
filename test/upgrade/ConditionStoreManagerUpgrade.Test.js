@@ -10,7 +10,10 @@ const constants = require('../helpers/constants.js')
 const {
     upgradeContracts,
     deployContracts,
-    confirmUpgrade
+    confirmUpgrade,
+    loadWallet,
+    submitTransaction,
+    confirmTransaction
 } = require('../../scripts/deploy/deploymentHandler')
 
 const ConditionStoreManager = artifacts.require('ConditionStoreManager')
@@ -22,11 +25,12 @@ const ConditionStoreExtraFunctionality = artifacts.require('ConditionStoreExtraF
 const ConditionStoreWithBug = artifacts.require('ConditionStoreWithBug')
 
 contract('ConditionStoreManager', (accounts) => {
-    let conditionStoreManagerAddress
+    let conditionStoreManagerAddress,
+        ownerWallet
 
     const verbose = false
 
-    const deployer = accounts[0]
+    const upgrader = accounts[1]
     const approver = accounts[2]
     const conditionCreater = accounts[5]
 
@@ -36,6 +40,12 @@ contract('ConditionStoreManager', (accounts) => {
             artifacts,
             ['ConditionStoreManager'],
             true,
+            verbose
+        )
+
+        ownerWallet = await loadWallet(
+            web3,
+            'owner',
             verbose
         )
 
@@ -98,9 +108,24 @@ contract('ConditionStoreManager', (accounts) => {
             const ConditionStoreChangeFunctionSignatureInstance =
                 await ConditionStoreChangeFunctionSignature.at(conditionStoreManagerAddress)
 
-            await ConditionStoreChangeFunctionSignatureInstance.delegateCreateRole(
-                conditionCreater,
-                { from: deployer }
+            // call delegateCreateRole over multi sig wallet
+            const txId = await submitTransaction(
+                ownerWallet,
+                conditionStoreManagerAddress,
+                [
+                    'delegateCreateRole',
+                    ['address'],
+                    [conditionCreater]
+                ],
+                upgrader,
+                verbose
+            )
+
+            await confirmTransaction(
+                ownerWallet,
+                txId,
+                approver,
+                verbose
             )
 
             // assert
@@ -171,9 +196,23 @@ contract('ConditionStoreManager', (accounts) => {
             const ConditionStoreChangeInStorageAndLogicInstance =
                 await ConditionStoreChangeInStorageAndLogic.at(conditionStoreManagerAddress)
 
-            await ConditionStoreChangeInStorageAndLogicInstance.delegateCreateRole(
-                conditionCreater,
-                { from: deployer }
+            const txId = await submitTransaction(
+                ownerWallet,
+                conditionStoreManagerAddress,
+                [
+                    'delegateCreateRole',
+                    ['address'],
+                    [conditionCreater]
+                ],
+                upgrader,
+                verbose
+            )
+
+            await confirmTransaction(
+                ownerWallet,
+                txId,
+                approver,
+                verbose
             )
 
             assert.strictEqual(
