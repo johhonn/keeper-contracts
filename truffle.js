@@ -5,32 +5,32 @@ const rpcHost = process.env.KEEPER_RPC_HOST
 const rpcPort = process.env.KEEPER_RPC_PORT
 const url = process.env.KEEPER_RPC_URL
 
-const walletIndex = 0
-const walletAccounts = 5
+const hdWalletStartIndex = 0
+const hdWalletAccounts = 5
 
-let wallet
+let hdWalletProvider
 
 const setupWallet = (
     nmemoric,
     url,
     useNonceTracker
 ) => {
-    if (!wallet) {
-        wallet = new HDWalletProvider(
+    if (!hdWalletProvider) {
+        hdWalletProvider = new HDWalletProvider(
             nmemoric,
             url,
-            walletIndex,
-            walletAccounts)
+            hdWalletStartIndex,
+            hdWalletAccounts)
         if (useNonceTracker) {
             /*
              * This is only required if you connect to infura or nile nodes
              * For details see:
              * https://ethereum.stackexchange.com/questions/44349/truffle-infura-on-mainnet-nonce-too-low-error/50038#50038
              */
-            wallet.engine.addProvider(new NonceTrackerSubprovider())
+            hdWalletProvider.engine.addProvider(new NonceTrackerSubprovider())
         }
     }
-    return wallet
+    return hdWalletProvider
 }
 
 module.exports = {
