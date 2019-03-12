@@ -24,7 +24,10 @@ async function setupWallets(
         }
 
         /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-        const walletsString = fs.readFileSync(walletPath, 'utf8').toString()
+        const walletsString = fs.readFileSync(
+            walletPath,
+            'utf8'
+        ).toString()
 
         return JSON.parse(walletsString)
     }
