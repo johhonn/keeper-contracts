@@ -5,6 +5,7 @@ const zosCleanup = require('./zos/cleanup')
 const zosInit = require('./zos/init')
 const zosRegisterContracts = require('./zos/registerContracts')
 const initializeContracts = require('./initializeContracts')
+const setupContracts = require('./setupContracts')
 const zosSetAdmin = require('./zos/setAdmin')
 const exportArtifacts = require('./artifacts/exportArtifacts')
 
@@ -74,8 +75,14 @@ async function deployContracts(
     )
 
     const addressBook = await initializeContracts(
-        artifacts,
         contracts,
+        roles,
+        verbose
+    )
+
+    await setupContracts(
+        artifacts,
+        addressBook,
         roles,
         verbose
     )
