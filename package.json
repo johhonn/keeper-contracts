@@ -30,7 +30,7 @@
     "test:echidna": "./test/verification/echidna/echidna.sh",
     "report-coverage": "cat ./coverage/lcov.info | codacy-coverage --token b95545c0da4b45848cc5eef363c2711e  --prefix ./",
     "release": "./bumpversion.sh patch",
-    "clean": "rm -rf ./build/ ./artifacts/*.development.json ./coverage/ ./coverageEnv/ ./coverage.json ./zos.json ./.zos.session ./wallets.json",
+    "clean": "rm -rf ./build/ ./artifacts/*.development.json ./coverage/ ./coverageEnv/ ./coverage.json ./zos.json ./zos.dev-8996.json ./.zos.session ./wallets.json",
     "lint": "npm run lint:eslint && npm run lint:ethlint",
     "lint:eslint": "eslint --ignore-pattern '/coverage/' .",
     "lint:ethlint": "solium -d ./contracts/",
