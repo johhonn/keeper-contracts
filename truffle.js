@@ -59,7 +59,7 @@ module.exports = {
                 url || `http://localhost:8545`,
                 false
             ),
-            network_id: 0x2324,
+            network_id: 0x2324, // 8996
             gas: 60000000,
             gasPrice: 10000,
             from: '0xe2DD09d719Da89e5a3D0F2549c7E24566e947260'
@@ -71,7 +71,7 @@ module.exports = {
                 url || `https://nile.dev-ocean.com`,
                 true
             ),
-            network_id: 0x2323,
+            network_id: 0x2323, // 8995
             gas: 6000000,
             gasPrice: 10000,
             from: '0x90eE7A30339D05E07d9c6e65747132933ff6e624'
@@ -83,7 +83,7 @@ module.exports = {
                 url || `https://kovan.infura.io/v2/${process.env.INFURA_TOKEN}`,
                 true
             ),
-            network_id: '42',
+            network_id: 0x2A, // 42
             from: '0x2c0D5F47374b130EE398F4C34DBE8168824A8616'
         }
     },
