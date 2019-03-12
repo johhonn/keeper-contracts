@@ -30,6 +30,10 @@ contract('EscrowReward constructor', (accounts) => {
         const conditionStoreManager = await ConditionStoreManager.new()
         await conditionStoreManager.initialize(
             owner,
+            { from: owner }
+        )
+
+        await conditionStoreManager.delegateCreateRole(
             createRole,
             { from: owner }
         )
