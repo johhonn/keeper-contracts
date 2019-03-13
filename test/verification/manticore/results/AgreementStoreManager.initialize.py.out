@@ -2,6 +2,6 @@
 [+] Created creator account  creator_account
 [+] Created contract /src/build/contracts/AgreementStoreManager.json
 [+] Created creator account  creator_owner_account
-Running states:  [<manticore.ethereum.state.State object at 0x7f6159264588>]
+Running states:  [<manticore.ethereum.state.State object at 0x7fbbf46e85f8>]
 [+] Created attacker owner account  attacker_account
-[+] Look for results in  /mcore_k7jt346m
+[+] Look for results in  /mcore_5rukc738
