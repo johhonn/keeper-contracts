@@ -41,7 +41,6 @@ if __name__ == '__main__':
     symbolic_value_2 = m.make_symbolic_value()
 
     contract_account.createCondition("condition1", condition_owner_account, symbolic_value_1, symbolic_value_2, signature='(bytes32,address,uint256,uint256)', caller=creator_account, value=0)
-
     running_states = list(m.running_states) 
     if not (len(running_states) > 0):
         raise AssertionError()
