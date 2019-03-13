@@ -15,6 +15,15 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
 
     AgreementData internal agreementData;
 
+    event AgreementCreated(
+        bytes32 indexed _agreementId,
+        bytes32 indexed _did,
+        address indexed _accessConsumer,
+        address _accessProvider,
+        uint[]  _timeLocks,
+        uint[]  _timeOuts
+    );
+
     struct AgreementDataModel {
         address accessConsumer;
         address accessProvider;
@@ -92,6 +101,16 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
         agreementData.agreementDataItems[_id]
             .accessProvider = didRegistry.getDIDOwner(_did);
         agreementData.agreementIds.push(_id);
+
+        emit AgreementCreated(
+            _id,
+            _did,
+            agreementData.agreementDataItems[_id].accessConsumer,
+            agreementData.agreementDataItems[_id].accessProvider,
+            _timeLocks,
+            _timeOuts
+        );
+
         return agreementData.agreementIds.length;
     }
 

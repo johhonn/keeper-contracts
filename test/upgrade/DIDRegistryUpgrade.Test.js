@@ -1,5 +1,5 @@
 /* eslint-env mocha */
-/* global artifacts, contract, describe, it, beforeEach */
+/* global artifacts, web3, contract, describe, it, beforeEach */
 const chai = require('chai')
 const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
@@ -7,12 +7,15 @@ chai.use(chaiAsPromised)
 
 const constants = require('../helpers/constants.js')
 const testUtils = require('../helpers/utils.js')
-const deploy = require('../helpers/zos/deploy')
-const upgrade = require('../helpers/zos/upgrade')
-const loadWallet = require('../helpers/wallet/loadWallet')
-const createWallet = require('../helpers/wallet/createWallet')
+
+const {
+    upgradeContracts,
+    deployContracts,
+    confirmUpgrade
+} = require('../../scripts/deploy/deploymentHandler')
 
 const DIDRegistry = artifacts.require('DIDRegistry')
+
 const DIDRegistryChangeFunctionSignature = artifacts.require('DIDRegistryChangeFunctionSignature')
 const DIDRegistryChangeInStorage = artifacts.require('DIDRegistryChangeInStorage')
 const DIDRegistryChangeInStorageAndLogic = artifacts.require('DIDRegistryChangeInStorageAndLogic')
@@ -20,89 +23,118 @@ const DIDRegistryExtraFunctionality = artifacts.require('DIDRegistryExtraFunctio
 const DIDRegistryWithBug = artifacts.require('DIDRegistryWithBug')
 
 contract('DIDRegistry', (accounts) => {
-    let adminWallet,
-        proxyAddress,
-        addresses
+    let DIDRegistryProxyAddress
 
-    beforeEach('Load wallet each time', async function() {
-        await createWallet(true)
-        adminWallet = await loadWallet('upgrader') // zos admin MultiSig
-        addresses = await deploy('deploy', ['DIDRegistry'])
-        proxyAddress = addresses.contractAddress
-    })
+    // define the roles
+    const didOwner = accounts[5]
+    const approver = accounts[2]
+
+    const verbose = false
 
     async function setupTest({
         did = constants.did[0],
-        owner = accounts[0],
         checksum = testUtils.generateId(),
         value = 'https://example.com/did/ocean/test-attr-example.txt'
     } = {}) {
-        const proxy = await DIDRegistry.at(proxyAddress)
+        const DIDRegistryInstance = await DIDRegistry.at(DIDRegistryProxyAddress)
 
-        let result = await proxy.registerAttribute(
-            did, checksum, value
+        let result = await DIDRegistryInstance.registerAttribute(
+            did, checksum, value,
+            { from: didOwner }
         )
         // some quick checks
 
         testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
         let payload = result.logs[0].args
+
         assert.strictEqual(did, payload._did)
-        assert.strictEqual(accounts[0], payload._owner)
+        assert.strictEqual(didOwner, payload._owner)
         assert.strictEqual(checksum, payload._checksum)
         assert.strictEqual(value, payload._value)
 
-        return { proxy, did, checksum, value }
+        return { did, checksum, value }
     }
 
     describe('Test upgradability for DIDRegistry', () => {
-        it('Should be possible to fix/add a bug', async () => {
-            let { proxy, did } = await setupTest()
-            // Upgrade to new version
-            const txId = await upgrade(
-                'DIDRegistry',
-                'DIDRegistryWithBug',
-                proxyAddress,
-                adminWallet,
-                accounts[0]
+        beforeEach('Load wallet each time', async () => {
+            const addressBook = await deployContracts(
+                web3,
+                artifacts,
+                ['DIDRegistry'],
+                true,
+                verbose
             )
-            await adminWallet.confirmTransaction(txId, { from: accounts[1] })
-            proxy = await DIDRegistryWithBug.at(proxyAddress)
+            DIDRegistryProxyAddress = addressBook['DIDRegistry']
+        })
 
-            assert.strictEqual(await proxy.getDIDOwner(did), accounts[0])
+        it('Should be possible to fix/add a bug', async () => {
+            let { did } = await setupTest()
+
+            // Upgrade to new version
+            const taskBook = await upgradeContracts(
+                web3,
+                ['DIDRegistryWithBug:DIDRegistry'],
+                verbose
+            )
+
+            await confirmUpgrade(
+                web3,
+                taskBook['DIDRegistry'],
+                approver,
+                verbose
+            )
+
+            const DIDRegistryWithBugInstance =
+                await DIDRegistryWithBug.at(DIDRegistryProxyAddress)
+
+            assert.strictEqual(
+                await DIDRegistryWithBugInstance.getDIDOwner(did),
+                didOwner
+            )
 
             // check functionality works
             const newDid = constants.did[1]
             const newChecksum = testUtils.generateId()
             const newValue = 'https://example.com/newdid/ocean/test.txt'
-            const result = await proxy.registerAttribute(newChecksum, newDid, newValue)
+            const result = await DIDRegistryWithBugInstance.registerAttribute(
+                newChecksum, newDid, newValue,
+                { from: didOwner }
+            )
 
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             const payload = result.logs[0].args
-            assert.strictEqual(newDid, payload._did)
-            assert.strictEqual(accounts[0], payload._owner)
+            assert.strictEqual(newDid, payload._did, 'did is not as expected')
+            assert.strictEqual(didOwner, payload._owner, 'owner is not as expected')
             assert.strictEqual(newChecksum, payload._checksum)
             assert.strictEqual(newValue, payload._value)
 
             // test for bug
             assert.equal(
-                (await proxy.getBlockNumberUpdated(newDid)).toNumber(), 42,
+                (await DIDRegistryWithBugInstance.getBlockNumberUpdated(newDid)).toNumber(), 42,
                 'getUpdatedAt value is not 42 (according to bug)')
         })
 
         it('Should be possible to change function signature', async () => {
-            let { proxy } = await setupTest()
+            await setupTest()
+
             // Upgrade to new version
-            const txId = await upgrade(
-                'DIDRegistry',
-                'DIDRegistryChangeFunctionSignature',
-                proxyAddress,
-                adminWallet,
-                accounts[0]
+            const taskBook = await upgradeContracts(
+                web3,
+                ['DIDRegistryChangeFunctionSignature:DIDRegistry'],
+                verbose
             )
-            await adminWallet.confirmTransaction(txId, { from: accounts[1] })
-            proxy = await DIDRegistryChangeFunctionSignature.at(proxyAddress)
+
+            await confirmUpgrade(
+                web3,
+                taskBook['DIDRegistry'],
+                approver,
+                verbose
+            )
+
+            const DIDRegistryChangeFunctionSignatureInstance =
+                            await DIDRegistryChangeFunctionSignature.at(DIDRegistryProxyAddress)
 
             // check functionality works
             const newDid = constants.did[1]
@@ -110,63 +142,85 @@ contract('DIDRegistry', (accounts) => {
             const newValue = 'https://example.com/newdid/ocean/test.txt'
 
             // TODO: @ahmed - should revert
-            await proxy.registerAttribute(newDid, newChecksum, newValue)
+            await DIDRegistryChangeFunctionSignatureInstance.registerAttribute(
+                newDid, newChecksum, newValue,
+                { from: didOwner }
+            )
 
             // act
-            const result = await proxy.registerAttribute(newChecksum, newDid, newValue)
+            const result = await DIDRegistryChangeFunctionSignatureInstance.registerAttribute(
+                newChecksum, newDid, newValue,
+                { from: didOwner }
+            )
 
             // eval
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             const payload = result.logs[0].args
+
             assert.strictEqual(newDid, payload._did)
-            assert.strictEqual(accounts[0], payload._owner)
+            assert.strictEqual(didOwner, payload._owner)
             assert.strictEqual(newChecksum, payload._checksum)
             assert.strictEqual(newValue, payload._value)
         })
 
         it('Should be possible to append storage variables ', async () => {
-            let { proxy, did } = await setupTest()
+            let { did } = await setupTest()
+
             // Upgrade to new version
-            const txId = await upgrade(
-                'DIDRegistry',
-                'DIDRegistryChangeInStorage',
-                proxyAddress,
-                adminWallet,
-                accounts[0]
+            const taskBook = await upgradeContracts(
+                web3,
+                ['DIDRegistryChangeInStorage:DIDRegistry'],
+                verbose
             )
 
-            proxy = await DIDRegistryChangeInStorage.at(proxyAddress)
+            const DIDRegistryChangeInStorageInstance =
+                            await DIDRegistryChangeInStorage.at(DIDRegistryProxyAddress)
 
             // should not be able to be called before upgrade is approved
-            await testUtils.assertRevert(proxy.timeOfRegister(did))
+            await assert.isRejected(DIDRegistryChangeInStorageInstance.timeOfRegister(did))
+
             // call again after approved
-            await adminWallet.confirmTransaction(txId, { from: accounts[1] })
+            await confirmUpgrade(
+                web3,
+                taskBook['DIDRegistry'],
+                approver,
+                verbose
+            )
+
             assert.equal(
-                (await proxy.timeOfRegister(did)).toNumber(), 0,
+                (await DIDRegistryChangeInStorageInstance.timeOfRegister(did)).toNumber(), 0,
                 'Error calling added storage variable')
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
-            let { proxy, did } = await setupTest()
+            let { did } = await setupTest()
+
             // Upgrade to new version
-            const txId = await upgrade(
-                'DIDRegistry',
-                'DIDRegistryChangeInStorageAndLogic',
-                proxyAddress,
-                adminWallet,
-                accounts[0]
+            const taskBook = await upgradeContracts(
+                web3,
+                ['DIDRegistryChangeInStorageAndLogic:DIDRegistry'],
+                verbose
             )
 
-            proxy = await DIDRegistryChangeInStorageAndLogic.at(proxyAddress)
+            const DIDRegistryChangeInStorageAndLogicInstance =
+                            await DIDRegistryChangeInStorageAndLogic.at(DIDRegistryProxyAddress)
 
             // should not be able to be called before upgrade is approved
-            await testUtils.assertRevert(proxy.timeOfRegister(did))
-            await adminWallet.confirmTransaction(txId, { from: accounts[1] })
+            await assert.isRejected(DIDRegistryChangeInStorageAndLogicInstance.timeOfRegister(did))
+
+            await confirmUpgrade(
+                web3,
+                taskBook['DIDRegistry'],
+                approver,
+                verbose
+            )
 
             // Approve and call again
-            assert.equal((await proxy.timeOfRegister(did)).toNumber(),
-                0, 'Error calling added storage variable')
+            assert.equal(
+                (await DIDRegistryChangeInStorageAndLogicInstance.timeOfRegister(did)).toNumber(),
+                0, 'Error calling added storage variable'
+            )
 
             // check functionality works
             const newDid = constants.did[1]
@@ -174,41 +228,50 @@ contract('DIDRegistry', (accounts) => {
             const newValue = 'https://example.com/newdid/ocean/test.txt'
 
             // act
-            const result = await proxy.registerAttribute(newChecksum, newDid, newValue)
+            const result = await DIDRegistryChangeInStorageAndLogicInstance.registerAttribute(
+                newChecksum, newDid, newValue,
+                { from: didOwner }
+            )
 
             // eval
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             const payload = result.logs[0].args
             assert.strictEqual(newDid, payload._did)
-            assert.strictEqual(accounts[0], payload._owner)
+            assert.strictEqual(didOwner, payload._owner)
             assert.strictEqual(newChecksum, payload._checksum)
             assert.strictEqual(newValue, payload._value)
 
             assert.equal(
-                (await proxy.timeOfRegister(did)).toNumber(), 0,
+                (await DIDRegistryChangeInStorageAndLogicInstance.timeOfRegister(did)).toNumber(), 0,
                 'Error calling added storage variable')
         })
 
         it('Should be able to call new method added after upgrade is approved', async () => {
-            let { proxy } = await setupTest()
+            await setupTest()
+
             // Upgrade to new version
-            const txId = await upgrade(
-                'DIDRegistry',
-                'DIDRegistryExtraFunctionality',
-                proxyAddress,
-                adminWallet,
-                accounts[0]
+            const taskBook = await upgradeContracts(
+                web3,
+                ['DIDRegistryExtraFunctionality:DIDRegistry'],
+                verbose
             )
 
-            proxy = await DIDRegistryExtraFunctionality.at(proxyAddress)
+            const DIDRegistryExtraFunctionalityInstance =
+                            await DIDRegistryExtraFunctionality.at(DIDRegistryProxyAddress)
 
             // should not be able to be called before upgrade is approved
-            await testUtils.assertRevert(proxy.getNumber())
-            await adminWallet.confirmTransaction(txId, { from: accounts[1] })
+            await assert.isRejected(DIDRegistryExtraFunctionalityInstance.getNumber())
+
+            await confirmUpgrade(
+                web3,
+                taskBook['DIDRegistry'],
+                approver,
+                verbose
+            )
 
             // Approve and call again
-            assert.equal((await proxy.getNumber()).toNumber(),
+            assert.equal((await DIDRegistryExtraFunctionalityInstance.getNumber()).toNumber(),
                 42, 'Error calling getNumber')
         })
     })

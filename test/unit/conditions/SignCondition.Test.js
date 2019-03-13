@@ -26,8 +26,12 @@ contract('SignCondition constructor', (accounts) => {
         const conditionStoreManager = await ConditionStoreManager.new()
         await conditionStoreManager.initialize(
             owner,
-            createRole,
             { from: accounts[0] }
+        )
+
+        await conditionStoreManager.delegateCreateRole(
+            createRole,
+            { from: owner }
         )
 
         const signCondition = await SignCondition.new()

@@ -26,7 +26,7 @@ contract HashLockCondition is Condition {
         pure
         returns (bytes32)
     {
-        return hashValues(abi.encodePacked(_preimage));
+        return keccak256(abi.encodePacked(_preimage));
     }
 
     function hashValues(string memory _preimage)
@@ -34,7 +34,7 @@ contract HashLockCondition is Condition {
         pure
         returns (bytes32)
     {
-        return hashValues(abi.encodePacked(_preimage));
+        return keccak256(abi.encodePacked(_preimage));
     }
 
     function hashValues(bytes32 _preimage)
@@ -43,15 +43,7 @@ contract HashLockCondition is Condition {
         returns
         (bytes32)
     {
-        return hashValues(abi.encodePacked(_preimage));
-    }
-
-    function hashValues(bytes memory _preimage)
-        public
-        pure
-        returns (bytes32)
-    {
-        return keccak256(_preimage);
+        return keccak256(abi.encodePacked(_preimage));
     }
 
     function fulfill(

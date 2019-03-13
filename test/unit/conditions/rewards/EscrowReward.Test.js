@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, contract, describe, it */
+/* global artifacts, contract, describe, it, expect */
 
 const chai = require('chai')
 const { assert } = chai
@@ -14,6 +14,8 @@ const LockRewardCondition = artifacts.require('LockRewardCondition')
 const EscrowReward = artifacts.require('EscrowReward')
 
 const constants = require('../../../helpers/constants.js')
+const getBalance = require('../../../helpers/getBalance.js')
+const testUtils = require('../../../helpers/utils.js')
 
 contract('EscrowReward constructor', (accounts) => {
     async function setupTest({
@@ -28,6 +30,10 @@ contract('EscrowReward constructor', (accounts) => {
         const conditionStoreManager = await ConditionStoreManager.new()
         await conditionStoreManager.initialize(
             owner,
+            { from: owner }
+        )
+
+        await conditionStoreManager.delegateCreateRole(
             createRole,
             { from: owner }
         )
@@ -101,7 +107,7 @@ contract('EscrowReward constructor', (accounts) => {
                     sender,
                     lockConditionId,
                     releaseConditionId),
-                constants.condition.reward.escrowReward.error.lockConditionNeedsToBeFulfilled
+                constants.condition.reward.escrowReward.error.lockConditionIdDoesNotMatch
             )
         })
     })
@@ -155,7 +161,10 @@ contract('EscrowReward constructor', (accounts) => {
 
             await lockRewardCondition.fulfill(nonce, escrowReward.address, amount)
 
-            await escrowReward.fulfill(
+            assert.strictEqual(await getBalance(oceanToken, lockRewardCondition.address), 0)
+            assert.strictEqual(await getBalance(oceanToken, escrowReward.address), amount)
+
+            const result = await escrowReward.fulfill(
                 nonce,
                 amount,
                 receiver,
@@ -167,9 +176,111 @@ contract('EscrowReward constructor', (accounts) => {
                 (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
                 constants.condition.state.fulfilled
             )
+
+            testUtils.assertEmitted(result, 1, 'Fulfilled')
+            const eventArgs = testUtils.getEventArgsFromTx(result, 'Fulfilled')
+            expect(eventArgs._agreementId).to.equal(nonce)
+            expect(eventArgs._conditionId).to.equal(conditionId)
+            expect(eventArgs._receiver).to.equal(receiver)
+            expect(eventArgs._amount.toNumber()).to.equal(amount)
+
+            assert.strictEqual(await getBalance(oceanToken, escrowReward.address), 0)
+            assert.strictEqual(await getBalance(oceanToken, receiver), amount)
+
+            await oceanToken.mint(sender, amount, { from: owner })
+            await oceanToken.approve(escrowReward.address, amount, { from: sender })
+            await oceanToken.transfer(escrowReward.address, amount, { from: sender })
+
+            assert.strictEqual(await getBalance(oceanToken, escrowReward.address), amount)
+            await assert.isRejected(
+                escrowReward.fulfill(nonce, amount, receiver, sender, lockConditionId, releaseConditionId),
+                constants.condition.state.error.invalidStateTransition
+            )
         })
     })
 
-    describe('fail to fulfill existing condition', () => {
+    describe('only fulfill conditions once', () => {
+        it('do not allow rewards to be fulfilled twice', async () => {
+            const {
+                escrowReward,
+                lockRewardCondition,
+                oceanToken,
+                conditionStoreManager,
+                owner
+            } = await setupTest()
+
+            const nonce1 = constants.bytes32.one
+            const sender = accounts[0]
+            const attacker = accounts[2]
+            const amount = 10
+
+            const hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
+            const conditionLockId = await lockRewardCondition.generateId(nonce1, hashValuesLock)
+
+            await conditionStoreManager.createCondition(
+                conditionLockId,
+                lockRewardCondition.address)
+
+            await conditionStoreManager.createCondition(
+                constants.bytes32.one,
+                escrowReward.address)
+
+            /* simulate a real environment by giving the EscrowReward contract a bunch of tokens: */
+            await oceanToken.mint(escrowReward.address, 100, { from: owner })
+
+            const lockConditionId = conditionLockId
+            const releaseConditionId = conditionLockId
+
+            /* fulfill the lock condition */
+
+            await oceanToken.mint(sender, amount, { from: owner })
+            await oceanToken.approve(
+                lockRewardCondition.address,
+                amount,
+                { from: sender })
+
+            await lockRewardCondition.fulfill(nonce1, escrowReward.address, amount)
+
+            const escrowRewardBalance = 110
+
+            /* attacker creates escrowRewardBalance/amount bogus conditions to claim the locked reward: */
+
+            for (let i = 0; i < escrowRewardBalance / amount; ++i) {
+                let nonce = (3 + i).toString(16)
+                while (nonce.length < 32 * 2) {
+                    nonce = '0' + nonce
+                }
+                const attackNonce = '0x' + nonce
+                const attackerHashValues = await escrowReward.hashValues(
+                    amount,
+                    attacker,
+                    attacker,
+                    lockConditionId,
+                    releaseConditionId)
+                const attackerConditionId = await escrowReward.generateId(attackNonce, attackerHashValues)
+
+                await conditionStoreManager.createCondition(
+                    attackerConditionId,
+                    escrowReward.address)
+
+                /* attacker tries to claim the escrow before the legitimate users: */
+                await assert.isRejected(
+                    escrowReward.fulfill(
+                        attackNonce,
+                        amount,
+                        attacker,
+                        attacker,
+                        lockConditionId,
+                        releaseConditionId),
+                    constants.condition.reward.escrowReward.error.lockConditionIdDoesNotMatch
+                )
+            }
+
+            /* make sure the EscrowReward contract didn't get drained */
+            assert.notStrictEqual(
+                (await oceanToken.balanceOf(escrowReward.address)).toNumber(),
+                0
+            )
+        })
     })
 })

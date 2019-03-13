@@ -41,12 +41,12 @@ securify_name=${securify_name:0:62}
 while [[ "${securify_name}" =~ [-_.]$ ]]; do
   securify_name=${securify_name::-1}
 done
+
 manticore_name="manticore-${subfilename}"
 manticore_name=${manticore_name:0:62}
 while [[ "${manticore_name}" =~ [-_.]$ ]]; do
   manticore_name=${manticore_name::-1}
 done
-
 
 # Check if there is jobs already running for this branch
 if ! kubectl get pods -l analysis=mythril,branch=${subfilename} 2>&1 | grep -q Running; then

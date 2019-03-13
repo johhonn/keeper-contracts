@@ -39,7 +39,6 @@ const deployManagers = async function(deployer, owner) {
     )
 
     await conditionStoreManager.initialize(
-        owner,
         agreementStoreManager.address,
         { from: deployer }
     )
