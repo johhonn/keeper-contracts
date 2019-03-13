@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
 /* global web3 */
 const contract = require('truffle-contract')
+const BN = require('bignumber.js')
+
 const network = process.env.NETWORK || 'development'
 const oceanTokenArtifact = require(`../../artifacts/OceanToken.${network}.json`)
 const OceanToken = contract({ abi: oceanTokenArtifact.abi })
@@ -10,9 +12,11 @@ async function calculate(
 ) {
     OceanToken.setProvider(web3.currentProvider)
     const OceanTokenInstance = await OceanToken.at(oceanTokenArtifact.address)
-    const vodka = amount * 10 ** await OceanTokenInstance.decimals()
+    const decimals = await OceanTokenInstance.decimals()
+    const scale = BN(10).exponentiatedBy(decimals)
+    const vodka = BN(amount).multipliedBy(scale)
 
-    console.log(`${amount} OceanToken is ${vodka} Vodka`)
+    console.log(`${amount} OceanToken is ${vodka.toFixed()} Vodka`)
 }
 
 module.exports = (cb) => {
