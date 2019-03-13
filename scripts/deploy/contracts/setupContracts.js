@@ -19,7 +19,9 @@ async function setupContracts(
 
         if (addressBook['EscrowAccessSecretStoreTemplate']) {
             if (verbose) {
-                console.log(`Proposing template ${addressBook['EscrowAccessSecretStoreTemplate']} from ${roles.deployer}`)
+                console.log(
+                    `Proposing template ${addressBook['EscrowAccessSecretStoreTemplate']} from ${roles.deployer}`
+                )
             }
 
             await TemplateStoreManagerInstance.proposeTemplate(
@@ -28,7 +30,9 @@ async function setupContracts(
             )
 
             if (verbose) {
-                console.log(`Approving template ${addressBook['EscrowAccessSecretStoreTemplate']} from ${roles.deployer}`)
+                console.log(
+                    `Approving template ${addressBook['EscrowAccessSecretStoreTemplate']} from ${roles.deployer}`
+                )
             }
 
             await TemplateStoreManagerInstance.approveTemplate(
@@ -38,7 +42,9 @@ async function setupContracts(
         }
 
         if (verbose) {
-            console.log(`TemplateStoreManager transferring ownership from ${roles.deployer} to ${roles.ownerWallet}`)
+            console.log(
+                `TemplateStoreManager transferring ownership from ${roles.deployer} to ${roles.ownerWallet}`
+            )
         }
 
         await TemplateStoreManagerInstance.transferOwnership(
@@ -54,7 +60,9 @@ async function setupContracts(
 
         if (addressBook['AgreementStoreManager']) {
             if (verbose) {
-                console.log(`Delegating create role to ${addressBook['AgreementStoreManager']}`)
+                console.log(
+                    `Delegating create role to ${addressBook['AgreementStoreManager']}`
+                )
             }
 
             await ConditionStoreManagerInstance.delegateCreateRole(
@@ -64,7 +72,9 @@ async function setupContracts(
         }
 
         if (verbose) {
-            console.log(`ConditionStoreManager transferring ownership from ${roles.deployer} to ${roles.ownerWallet}`)
+            console.log(
+                `ConditionStoreManager transferring ownership from ${roles.deployer} to ${roles.ownerWallet}`
+            )
         }
 
         await ConditionStoreManagerInstance.transferOwnership(
@@ -79,7 +89,9 @@ async function setupContracts(
 
         if (addressBook['Dispenser']) {
             if (verbose) {
-                console.log(`adding dispenser as a minter ${addressBook['Dispenser']} from ${roles.deployer}`)
+                console.log(
+                    `adding dispenser as a minter ${addressBook['Dispenser']} from ${roles.deployer}`
+                )
             }
 
             await oceanToken.addMinter(
@@ -89,7 +101,9 @@ async function setupContracts(
         }
 
         if (verbose) {
-            console.log(`Renouncing deployer as initial minter from ${roles.deployer}`)
+            console.log(
+                `Renouncing deployer as initial minter from ${roles.deployer}`
+            )
         }
 
         await oceanToken.renounceMinter({ from: roles.deployer })
