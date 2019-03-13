@@ -43,12 +43,17 @@ if __name__ == '__main__':
     # At this point, it should not revert, unless one of these addresses is 0x0.
 
     running_states = list(m.running_states)
-    assert(len(running_states) == 1)
+    if not (len(running_states) == 1):
+        raise AssertionError()
 
-    assert(not m.generate_testcase(running_states[0], '', only_if=(symbolic_address_1 == 0)))
-    assert(not m.generate_testcase(running_states[0], '', only_if=(symbolic_address_2 == 0)))
-    assert(not m.generate_testcase(running_states[0], '', only_if=(symbolic_address_3 == 0)))
-    assert(not m.generate_testcase(running_states[0], '', only_if=(symbolic_address_4 == 0)))
+    if (m.generate_testcase(running_states[0], '', only_if=(symbolic_address_1 == 0)))
+        raise AssertionError()
+    if ( m.generate_testcase(running_states[0], '', only_if=(symbolic_address_2 == 0)))
+        raise AssertionError()
+    if (m.generate_testcase(running_states[0], '', only_if=(symbolic_address_3 == 0)))
+        raise AssertionError()
+    if (m.generate_testcase(running_states[0], '', only_if=(symbolic_address_4 == 0)))
+        raise AssertionError()
 
     #print("[+] First symbolic transaction")
     #symbolic_data = m.make_symbolic_buffer(320)
@@ -80,7 +85,8 @@ if __name__ == '__main__':
 
     # At this point, all the transactions should revert.
     running_states = list(m.running_states)
-    assert(len(running_states) == 0)
+    if not (len(running_states) == 0)
+        raise AssertionError()
 
     m.finalize()
     print(f"[+] Look for results in {m.workspace}")
