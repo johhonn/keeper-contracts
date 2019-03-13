@@ -1,11 +1,25 @@
 /* eslint-disable no-console */
 
 async function setupContracts(
+    web3,
     artifacts,
     addressBook,
     roles,
     verbose = true
 ) {
+    /*
+     * -----------------------------------------------------------------------
+     * Reset deployer account, because it will be left in a strange state
+     * sometimes by zeppelin os
+     * -----------------------------------------------------------------------
+     */
+    await web3.eth.sendTransaction({
+        from: roles.deployer,
+        to: roles.deployer,
+        value: 0,
+        nonce: await web3.eth.getTransactionCount(roles.deployer)
+    })
+
     /*
      * -----------------------------------------------------------------------
      * setup deployed contracts

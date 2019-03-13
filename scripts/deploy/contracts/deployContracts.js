@@ -87,6 +87,7 @@ async function deployContracts(
     }
 
     await setupContracts(
+        web3,
         artifacts,
         addressBook,
         roles,
