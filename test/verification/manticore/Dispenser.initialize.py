@@ -33,13 +33,13 @@ contract Token {
 '''
 
 token_owner_account = m.create_account(balance=1000, name='token_owner_account')
-print(f'[+] Created token owner account "{token_owner_account.name_}"')
+print(f'[+] Created token owner account ',token_owner_account.name_)
 
 symbolic_value = m.make_symbolic_value(name="VALUE1")
 token_account = m.solidity_create_contract(token_contract, owner=token_owner_account, name='token_account', args=[symbolic_value])
 
 owner_account = m.create_account(balance=1000, name='owner_account')
-print(f'[+] Created owner account "{owner_account.name_}"')
+print(f'[+] Created owner account ',owner_account.name_)
 
 with open(DISPENSER_JSON_PATH) as f:
     contract_json = f.read()
@@ -80,5 +80,5 @@ contract_account.initialize(token_account.address, symbolic_address_1, caller=ow
 # At this point, all the transactions should revert.
 
 m.finalize()
-print(f"[+] Look for results in {m.workspace}")
+print(f"[+] Look for results in ",m.workspace)
 
