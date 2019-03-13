@@ -1,8 +1,0 @@
-/src/build/contracts/EscrowReward.json
-[+] Created owner account "owner_account"
-[+] Created contract /build/contracts/EscrowReward.json
-[+] Initialized contract /build/contracts/EscrowReward.json with symbolic parameters
-Traceback (most recent call last):
-  File "/src/test/verification/manticore/EscrowReward.initialize.py", line 43, in <module>
-    assert(not m.generate_testcase(running_states[0], '', only_if=(symbolic_address_1 == 0)))
-AssertionError

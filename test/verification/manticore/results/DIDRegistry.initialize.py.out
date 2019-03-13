@@ -1,7 +1,0 @@
-[+] Created owner account "owner_account"
-[+] Created contract /src/build/contracts/DIDRegistryLibrary.json
-[+] Created contract /src/build/contracts/DIDRegistry.json
-Traceback (most recent call last):
-  File "/src/test/verification/manticore/DIDRegistry.initialize.py", line 37, in <module>
-    assert(not m.generate_testcase(running_states[0], '', only_if=(symbolic_address_1 == 0)))
-AssertionError
