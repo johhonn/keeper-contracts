@@ -22,7 +22,7 @@ if __name__ == '__main__':
     m = ManticoreEVM()
 
     owner_account = m.create_account(balance=1000, name='owner_account')
-    print(f'[+] Created owner account "{owner_account.name_}"')
+    print(f'[+] Created owner account ', owner_account.name_)
 
     contract_account = create_template_store_manager(m, owner_account, TEMPLATE_STORE_MANAGER_JSON_PATH)
     symbolic_address_1 = m.make_symbolic_value()
@@ -32,10 +32,10 @@ if __name__ == '__main__':
     # At this point, it should not revert, unless one of these addresses is 0x0.
     running_states = list(m.running_states)
 
-    assert(len(running_states) == 1)
-    assert(not m.generate_testcase(running_states[0], '',
-        only_if=(symbolic_address_1 == 0)
-    ))
+    if not (len(running_states) == 1):
+        raise AssertionError()
+    if m.generate_testcase(running_states[0], '', only_if=(symbolic_address_1 == 0)):
+        raise AssertionError()
 
     #print("[+] First symbolic transaction")
     #symbolic_data = m.make_symbolic_buffer(320)
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     #                value=0 )
 
     attacker_account = m.create_account(balance=1000, name='attacker_account')
-    print(f'[+] Created attacker account "{attacker_account.name_}"')
+    print(f'[+] Created attacker account ', attacker_account.name_)
 
     symbolic_address_1 = m.make_symbolic_value()
 
@@ -64,8 +64,9 @@ if __name__ == '__main__':
 
     # At this point, all the transactions should revert.
     running_states = list(m.running_states)
-    assert(len(running_states) == 0)
+    if not (len(running_states) == 0):
+        raise AssertionError()
 
 
     m.finalize()
-    print(f"[+] Look for results in {m.workspace}")
+    print(f"[+] Look for results in ", m.workspace)

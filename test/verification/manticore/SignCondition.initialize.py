@@ -20,7 +20,7 @@ Please do so before running the Manticore tests.
 m = ManticoreEVM()
 
 owner_account = m.create_account(balance=1000, name='owner_account')
-print(f'[+] Created owner account ,'owner_account.name_)
+print(f'[+] Created owner account ', owner_account.name_)
 
 with open(SIGNCONDITION_JSON_PATH) as f:
     contract_json = f.read()

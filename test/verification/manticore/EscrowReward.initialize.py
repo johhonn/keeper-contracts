@@ -2,7 +2,6 @@ import os
 import sys
 
 from manticore.ethereum import ManticoreEVM
-from manticore.core.smtlib import Operators
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 ROOT_DIR = os.path.abspath(os.path.join(os.path.join(SCRIPT_DIR, os.pardir, os.pardir, os.pardir)))
@@ -21,7 +20,7 @@ Please do so before running the Manticore tests.
 m = ManticoreEVM()
 
 owner_account = m.create_account(balance=1000, name='owner_account')
-print(f'[+] Created owner account ',owner_account.name_)
+print(f'[+] Created owner account ', owner_account.name_)
 
 with open(ESCROWREWARD_JSON_PATH) as f:
     contract_json = f.read()
