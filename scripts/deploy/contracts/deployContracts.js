@@ -80,18 +80,18 @@ async function deployContracts(
         verbose
     )
 
+    if (verbose) {
+        console.log(
+            `Contracts deployed to the proxies: \n${JSON.stringify(addressBook, null, 2)}`
+        )
+    }
+
     await setupContracts(
         artifacts,
         addressBook,
         roles,
         verbose
     )
-
-    if (verbose) {
-        console.log(
-            `Contracts deployed to the proxies: \n${JSON.stringify(addressBook, null, 2)}`
-        )
-    }
 
     await zosSetAdmin(
         contracts,
