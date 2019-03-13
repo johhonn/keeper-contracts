@@ -1,6 +1,6 @@
 {
   "name": "@oceanprotocol/keeper-contracts",
-  "version": "0.8.3",
+  "version": "0.8.5",
   "description": "Integration of TCRs, CPM and Ocean Tokens in Solidity",
   "bugs": {
     "url": "https://github.com/oceanprotocol/keeper-contracts/issues"
@@ -30,7 +30,7 @@
     "test:echidna": "./test/verification/echidna/echidna.sh",
     "report-coverage": "cat ./coverage/lcov.info | codacy-coverage --token b95545c0da4b45848cc5eef363c2711e  --prefix ./",
     "release": "./bumpversion.sh patch",
-    "clean": "rm -rf ./build/ ./artifacts/*.development.json ./coverage/ ./coverageEnv/ ./coverage.json ./.zos.session ./wallets.json",
+    "clean": "rm -rf ./build/ ./artifacts/*.development.json ./coverage/ ./coverageEnv/ ./coverage.json ./zos.json ./zos.dev-8996.json ./.zos.session ./wallets.json",
     "lint": "npm run lint:eslint && npm run lint:ethlint",
     "lint:eslint": "eslint --ignore-pattern '/coverage/' .",
     "lint:ethlint": "solium -d ./contracts/",
@@ -75,11 +75,11 @@
     "solidity-coverage": "^0.5.11",
     "solium": "^1.2.3",
     "solium-plugin-security": "^0.1.1",
-    "truffle": "^5.0.7",
-    "truffle-contract": "^4.0.8",
-    "truffle-hdwallet-provider": "^1.0.5",
+    "truffle": "~5.0.7",
+    "truffle-contract": "~4.0.8",
+    "truffle-hdwallet-provider": "~1.0.5",
     "web3": "1.0.0-beta.37",
-    "web3-provider-engine": "^14.1.0",
+    "web3-provider-engine": "~14.2.0",
     "websocket": "^1.0.28",
     "zos": "~2.2.1",
     "zos-lib": "~2.2.1"

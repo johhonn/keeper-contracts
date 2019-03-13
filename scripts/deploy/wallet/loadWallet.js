@@ -1,8 +1,11 @@
 /* eslint-disable no-console */
 const fs = require('fs')
+const path = require('path')
+
 const loadMultiSigWallet = require('./loadMultiSigWallet')
 
 const walletPath = `${__dirname}/../../../wallets.json`
+const resolvedWalletPath = path.resolve(walletPath)
 
 let MultiSigWalletWithDailyLimit
 
@@ -18,7 +21,10 @@ async function loadWallet(
     // read wallets from disk
     const wallets = JSON.parse(
         /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-        fs.readFileSync(walletPath, 'utf8')
+        fs.readFileSync(
+            resolvedWalletPath,
+            'utf8'
+        ).toString()
     )
 
     // find the correct wallet

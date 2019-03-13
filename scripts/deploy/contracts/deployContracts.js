@@ -5,6 +5,7 @@ const zosCleanup = require('./zos/cleanup')
 const zosInit = require('./zos/init')
 const zosRegisterContracts = require('./zos/registerContracts')
 const initializeContracts = require('./initializeContracts')
+const setupContracts = require('./setupContracts')
 const zosSetAdmin = require('./zos/setAdmin')
 const exportArtifacts = require('./artifacts/exportArtifacts')
 
@@ -74,7 +75,6 @@ async function deployContracts(
     )
 
     const addressBook = await initializeContracts(
-        artifacts,
         contracts,
         roles,
         verbose
@@ -85,6 +85,14 @@ async function deployContracts(
             `Contracts deployed to the proxies: \n${JSON.stringify(addressBook, null, 2)}`
         )
     }
+
+    await setupContracts(
+        web3,
+        artifacts,
+        addressBook,
+        roles,
+        verbose
+    )
 
     await zosSetAdmin(
         contracts,

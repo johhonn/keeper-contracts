@@ -21,6 +21,8 @@ async function setAdmin(
     for (const contract of contracts) {
         execSync(`npx zos set-admin ${contract} ${roles.upgraderWallet} --yes ${flags}`)
     }
+
+    execSync(`npx zos session --close ${flags}`)
 }
 
 module.exports = setAdmin
