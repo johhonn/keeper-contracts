@@ -8,7 +8,7 @@
 
 ## Events
 
-### Fulfilled
+###  Fulfilled
 Parameters:
 * bytes32 _agreementId
 * address _rewardAddress
@@ -17,7 +17,7 @@ Parameters:
 
 ## Functions
 
-### public initialize
+### external initialize
 Parameters:
 * address _owner
 * address _conditionStoreManagerAddress
@@ -28,7 +28,7 @@ Parameters:
 * address _rewardAddress
 * uint256 _amount
 
-### public fulfill
+### external fulfill
 Parameters:
 * bytes32 _agreementId
 * address _rewardAddress

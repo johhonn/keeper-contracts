@@ -16,6 +16,15 @@ Members:
 * mapping(bytes32 => struct ConditionStoreLibrary.Condition) conditions
 * bytes32[] conditionIds
 
+## Enums
+
+###  ConditionState
+Members:
+*  Uninitialized
+*  Unfulfilled
+*  Fulfilled
+*  Aborted
+
 ## Functions
 
 ### internal create

@@ -9,7 +9,7 @@ Documentation:
 
 ## Functions
 
-### public getCurrentBlockNumber
+### external getCurrentBlockNumber
 
 Documentation:
 

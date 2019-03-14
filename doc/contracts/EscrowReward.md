@@ -1,9 +1,10 @@
 
 # contract: EscrowReward
 
+
 ## Events
 
-### Fulfilled
+###  Fulfilled
 Parameters:
 * bytes32 _agreementId
 * address _receiver
@@ -12,7 +13,7 @@ Parameters:
 
 ## Functions
 
-### public initialize
+### external initialize
 Parameters:
 * address _owner
 * address _conditionStoreManagerAddress
@@ -26,7 +27,7 @@ Parameters:
 * bytes32 _lockCondition
 * bytes32 _releaseCondition
 
-### public fulfill
+### external fulfill
 Parameters:
 * bytes32 _agreementId
 * uint256 _amount

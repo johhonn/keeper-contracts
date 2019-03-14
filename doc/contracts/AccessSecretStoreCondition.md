@@ -10,7 +10,7 @@
 
 ## Events
 
-### Fulfilled
+###  Fulfilled
 Parameters:
 * bytes32 _agreementId
 * bytes32 _documentId
@@ -19,7 +19,7 @@ Parameters:
 
 ## Functions
 
-### public initialize
+### external initialize
 Parameters:
 * address _owner
 * address _conditionStoreManagerAddress
@@ -36,7 +36,7 @@ Parameters:
 * bytes32 _documentId
 * address _grantee
 
-### public checkPermissions
+### external checkPermissions
 
 Documentation:
 
