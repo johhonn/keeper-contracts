@@ -1,7 +1,0 @@
-[+] Created owner account  owner_account
-[+] Created creator account  creator_account
-[+] Created contract /src/build/contracts/AgreementStoreManager.json
-[+] Created creator account  creator_owner_account
-Running states:  [<manticore.ethereum.state.State object at 0x7eff3e9355f8>]
-[+] Created attacker owner account  attacker_account
-[+] Look for results in  /mcore_miosuga4

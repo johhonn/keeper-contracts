@@ -1,9 +1,0 @@
-/src/build/contracts/HashLockCondition.json
-[+] Created owner account  owner_account
-[+] Created minter account  minter_account
-[+] Created contract  /build/contracts/HashLockCondition.json
-[+] Initialized contract  /build/contracts/HashLockCondition.json with symbolic parameters
-Traceback (most recent call last):
-  File "/src/test/verification/manticore/HashLockCondition.initialize.py", line 43, in <module>
-    assert(not m.generate_testcase(running_states[0], '', only_if=(symbolic_address_1 == 0)))
-AssertionError

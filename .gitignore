@@ -1,6 +1,7 @@
 # JetBrains tools
 .idea/
-
+# Symbolic Execution Results
+./test/verification/manticore/results/
 # Development
 artifacts/*.development.json
 artifacts/*.spree.json

@@ -1,4 +1,0 @@
-  File "/src/test/verification/manticore/EscrowReward.initialize.py", line 36
-    print(f'[+] Initialized contract ', ESCROWREWARD_JSON_PATH[len(ROOT_DIR):]} with symbolic parameters)
-                                                                              ^
-SyntaxError: invalid syntax
