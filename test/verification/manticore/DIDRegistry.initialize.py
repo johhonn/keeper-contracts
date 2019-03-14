@@ -32,23 +32,22 @@ if __name__ == '__main__':
 
     # At this point, it should not revert, unless one of these addresses is 0x0.
 
-    running_states = list(m.running_states) 
+    running_states = list(m.running_states)
     if not (len(running_states) == 1):
         raise AssertionError()
     if m.generate_testcase(running_states[0], '', only_if=(symbolic_address_1 == 0)):
         raise AssertionError()
 
     #print("[+] First symbolic transaction")
-    #symbolic_data = m.make_symbolic_buffer(320) 
+    #symbolic_data = m.make_symbolic_buffer(320)
     #symbolic_address = m.make_symbolic_value(name="ADDRESS1")
     #symbolic_caller = m.make_symbolic_value(name="CALLER1")
     #m.transaction(caller=symbolic_caller,
     #                address=symbolic_address,
     #                data=symbolic_data,
     #                value=0 )
-
     #print("[+] Second symbolic transaction")
-    #symbolic_data = m.make_symbolic_buffer(320) 
+    #symbolic_data = m.make_symbolic_buffer(320)
     #symbolic_address = m.make_symbolic_value(name="ADDRESS2")
     #symbolic_caller = m.make_symbolic_value(name="CALLER2")
     #m.transaction(caller=symbolic_caller,

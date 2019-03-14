@@ -41,12 +41,10 @@ if __name__ == '__main__':
     contract_account.initialize(symbolic_address_1, symbolic_address_2, symbolic_address_3, symbolic_address_4, caller=owner_account, value=0, signature='(address,address,address,address)')
 
     # At this point, it should not revert, unless one of these addresses is 0x0.
-
     running_states = list(m.running_states)
     print ("Running states: ", running_states)
     if not (len(running_states) == 1):
         raise AssertionError()
-
     if (m.generate_testcase(running_states[0], '', only_if=(symbolic_address_1 == 0))):
         raise AssertionError()
     if ( m.generate_testcase(running_states[0], '', only_if=(symbolic_address_2 == 0))):

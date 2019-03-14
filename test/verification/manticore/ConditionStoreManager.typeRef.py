@@ -40,7 +40,7 @@ if __name__ == '__main__':
     symbolic_value_2 = m.make_symbolic_value()
 
     contract_account.createCondition("condition1", condition_owner_account, symbolic_value_1, symbolic_value_2, signature='(bytes32,address,uint256,uint256)', caller=creator_account)
-    running_states = list(m.running_states) 
+    running_states = list(m.running_states)
     if not (len(running_states) >= 1):
         raise AssertionError()
  
@@ -52,9 +52,8 @@ if __name__ == '__main__':
     #                address=symbolic_address,
     #                data=symbolic_data,
     #                value=0 )
-
     #print("[+] Second symbolic transaction")
-    #symbolic_data = m.make_symbolic_buffer(320) 
+    #symbolic_data = m.make_symbolic_buffer(320)
     #symbolic_address = m.make_symbolic_value(name="ADDRESS2")
     #symbolic_caller = m.make_symbolic_value(name="CALLER2")
     #m.transaction(caller=symbolic_caller,
@@ -71,7 +70,6 @@ if __name__ == '__main__':
     running_states = list(m.running_states) 
     if not (len(running_states) == 0):
         raise AssertionError()
- 
 
     m.finalize()
     print(f"[+] Look for results in ", m.workspace)

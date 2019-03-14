@@ -1,8 +1,9 @@
 # Symbolic analysis with Manticore
 ## Preliminaries
 
-1. Install Docker Engine
-2. Pull Manticore docker image
+- Install Docker-Engine, find more information [here]()
+- Pull manticore docker image as follows:
+
 ```bash
 $ docker pull oceanprotocol/manticore:solc-0.5.3
 ```
@@ -12,6 +13,7 @@ Keep in mind that symbolic execution can have high requirements of memory and CP
 ## Run
 
 ```bash
+$ cd ../../../ 
 $ npm run test:manticore
 ```
 
