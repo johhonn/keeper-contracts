@@ -44,7 +44,7 @@ contract_account.initialize(
     signature='(address,address)'
 )
 
-running_states = list(m.running_states)  
+running_states = list(m.running_states)
 if not (len(running_states) == 1):
     raise AssertionError()
 if m.generate_testcase(running_states[0], '', only_if=(symbolic_address_1 == 0)):
@@ -91,4 +91,3 @@ if not (len(list(m.running_states)) == 0):
 
 m.finalize()
 print(f"[+] Look for results in ", m.workspace)
-
