@@ -52,7 +52,7 @@ contract_account.initialize(token_account.address, symbolic_address_1, caller=ow
 # At this point, it should not revert, unless one of these addresses is 0x0.
 
 #print("[+] First symbolic transaction")
-#symbolic_data = m.make_symbolic_buffer(320) 
+#symbolic_data = m.make_symbolic_buffer(320)
 #symbolic_address = m.make_symbolic_value(name="ADDRESS1")
 #symbolic_caller = m.make_symbolic_value(name="CALLER1")
 #m.transaction(caller=symbolic_caller,
