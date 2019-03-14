@@ -25,14 +25,24 @@ print(f'[+] Created owner account ', owner_account.name_)
 with open(SIGNCONDITION_JSON_PATH) as f:
     contract_json = f.read()
 
-contract_account = m.json_create_contract(contract_json, owner=owner_account, name='contract_account')
-print(f'[+] Created contract ',SIGNCONDITION_JSON_PATH[len(ROOT_DIR):])
+contract_account = m.json_create_contract(
+    contract_json,
+    owner=owner_account,
+    name='contract_account'
+)
+print(f'[+] Created contract ', SIGNCONDITION_JSON_PATH[len(ROOT_DIR):])
 
 symbolic_address_1 = m.make_symbolic_value()
 symbolic_address_2 = m.make_symbolic_value()
 
 print(f'[+] Initialized contract ', SIGNCONDITION_JSON_PATH[len(ROOT_DIR):], ' with symbolic parameters')
-contract_account.initialize(symbolic_address_1, symbolic_address_2, caller=owner_account, value=0, signature='(address,address)')
+contract_account.initialize(
+    symbolic_address_1,
+    symbolic_address_2,
+    caller=owner_account,
+    value=0,
+    signature='(address,address)'
+)
 
 running_states = list(m.running_states)  
 if not (len(running_states) == 1):
@@ -68,7 +78,12 @@ symbolic_address_2 = m.make_symbolic_value()
 attacker_account = m.create_account(balance=1000, name='attacker_account')
 print(f'[+] Created attacker account ', attacker_account.name_)
 
-contract_account.initialize(symbolic_address_1, symbolic_address_2, caller=attacker_account, value=0, signature='(address,address)')
+contract_account.initialize(
+    symbolic_address_1,
+    symbolic_address_2,
+    caller=attacker_account,
+    value=0, signature='(address,address)'
+)
 
 # At this point, all the transactions should revert.
 if not (len(list(m.running_states)) == 0):

@@ -35,13 +35,21 @@ symbolic_address_1 = m.make_symbolic_value()
 symbolic_address_2 = m.make_symbolic_value()
 
 print(f'[+] Initialized contract ', HASHLOCKCONDITION_JSON_PATH[len(ROOT_DIR):], 'with symbolic parameters')
-contract_account.initialize(symbolic_address_1, symbolic_address_2, caller=owner_account, value=0, signature='(address,address)')
+contract_account.initialize(
+    symbolic_address_1,
+    symbolic_address_2,
+    caller=owner_account,
+    value=0,
+    signature='(address,address)'
+)
 
-
-running_states = list(m.running_states)  
-assert(len(running_states) == 1)
-assert(not m.generate_testcase(running_states[0], '', only_if=(symbolic_address_1 == 0)))
-assert(not m.generate_testcase(running_states[0], '', only_if=(symbolic_address_2 == 0)))
+running_states = list(m.running_states)
+if not (len(running_states) == 1):
+    raise AssertionError()
+if m.generate_testcase(running_states[0], '', only_if=(symbolic_address_1 == 0)):
+    raise AssertionError()
+if m.generate_testcase(running_states[0], '', only_if=(symbolic_address_2 == 0)):
+    raise AssertionError()
 
 # At this point, it should not revert, unless one of these addresses is 0x0.
 
@@ -69,7 +77,13 @@ symbolic_address_2 = m.make_symbolic_value()
 attacker_account = m.create_account(balance=1000, name='attacker_account')
 print(f'[+] Created attacker account ', attacker_account.name_)
 
-contract_account.initialize(symbolic_address_1, symbolic_address_2, caller=attacker_account, value=0, signature='(address,address)')
+contract_account.initialize(
+    symbolic_address_1,
+    symbolic_address_2,
+    caller=attacker_account,
+    value=0,
+    signature='(address,address)'
+)
 
 # At this point, all the transactions should revert.
 if not (len(list(m.running_states)) == 0):
