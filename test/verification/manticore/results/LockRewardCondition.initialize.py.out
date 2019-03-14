@@ -1,0 +1,8 @@
+/src/build/contracts/LockRewardCondition.json
+[+] Created owner account  owner_account
+[+] Created contract  /build/contracts/LockRewardCondition.json
+[+] Initialized contract  /build/contracts/LockRewardCondition.json with symbolic parameters
+Traceback (most recent call last):
+  File "/src/test/verification/manticore/LockRewardCondition.initialize.py", line 42, in <module>
+    raise AssertionError()
+AssertionError

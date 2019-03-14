@@ -34,12 +34,13 @@ print(f'[+] Created contract ', OCEANTOKEN_JSON_PATH[len(ROOT_DIR):])
 symbolic_address_1 = m.make_symbolic_value()
 symbolic_address_2 = m.make_symbolic_value()
 
-print(f'[+] Initialized contract ', OCEANTOKEN_JSON_PATH[len(ROOT_DIR):]} with symbolic parameters)
+print(f'[+] Initialized contract ', OCEANTOKEN_JSON_PATH[len(ROOT_DIR):], 'with symbolic parameters')
 contract_account.initialize(symbolic_address_1, symbolic_address_2, caller=owner_account, value=0, signature='(address,address)')
 
 # At this point, it should not revert, unless one of these addresses is 0x0.
 
 running_states = list(m.running_states)
+
 if not (len(running_states) == 1):
     raise AssertionError()
 

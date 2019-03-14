@@ -1,0 +1,8 @@
+/src/build/contracts/SignCondition.json
+[+] Created owner account  owner_account
+[+] Created contract  /build/contracts/SignCondition.json
+[+] Initialized contract  /build/contracts/SignCondition.json  with symbolic parameters
+Traceback (most recent call last):
+  File "/src/test/verification/manticore/SignCondition.initialize.py", line 41, in <module>
+    raise AssertionError()
+AssertionError

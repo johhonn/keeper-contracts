@@ -33,7 +33,7 @@ symbolic_address_1 = m.make_symbolic_value()
 symbolic_address_2 = m.make_symbolic_value()
 symbolic_address_3 = m.make_symbolic_value()
 
-print(f'[+] Initialized contract ', ESCROWREWARD_JSON_PATH[len(ROOT_DIR):]} with symbolic parameters)
+print(f'[+] Initialized contract ', ESCROWREWARD_JSON_PATH[len(ROOT_DIR):], 'with symbolic parameters')
 contract_account.initialize(symbolic_address_1, symbolic_address_2, symbolic_address_3, caller=owner_account, value=0, signature='(address,address,address)')
 
 running_states = list(m.running_states)

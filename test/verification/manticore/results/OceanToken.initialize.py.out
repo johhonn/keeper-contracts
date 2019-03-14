@@ -1,0 +1,4 @@
+  File "/src/test/verification/manticore/OceanToken.initialize.py", line 37
+    print(f'[+] Initialized contract ', OCEANTOKEN_JSON_PATH[len(ROOT_DIR):]} with symbolic parameters)
+                                                                            ^
+SyntaxError: invalid syntax
