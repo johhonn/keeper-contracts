@@ -62,7 +62,7 @@ if __name__ == '__main__':
     contract_account.initialize(symbolic_address_1, caller=attacker_account, value=0)
 
     # At this point, all the transactions should revert.
-    running_states = list(m.running_states) 
+    running_states = list(m.running_states)
     if not (len(running_states) == 0):
         raise AssertionError()
 

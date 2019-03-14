@@ -43,9 +43,8 @@ if __name__ == '__main__':
     running_states = list(m.running_states)
     if not (len(running_states) >= 1):
         raise AssertionError()
- 
     #print("[+] First symbolic transaction")
-    #symbolic_data = m.make_symbolic_buffer(320) 
+    #symbolic_data = m.make_symbolic_buffer(320)
     #symbolic_address = m.make_symbolic_value(name="ADDRESS1")
     #symbolic_caller = m.make_symbolic_value(name="CALLER1")
     #m.transaction(caller=symbolic_caller,
@@ -67,7 +66,7 @@ if __name__ == '__main__':
     symbolic_value_1 = m.make_symbolic_value()
     contract_account.updateConditionState("condition1", symbolic_value_1, caller=attacker_account)
 
-    running_states = list(m.running_states) 
+    running_states = list(m.running_states)
     if not (len(running_states) == 0):
         raise AssertionError()
 

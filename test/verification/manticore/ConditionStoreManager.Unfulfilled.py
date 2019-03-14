@@ -71,7 +71,7 @@ if __name__ == '__main__':
     symbolic_value_1 = m.make_symbolic_value()
     contract_account.updateConditionState("condition1", symbolic_value_1, caller=attacker_account)
 
-    running_states = list(m.running_states) 
+    running_states = list(m.running_states)
     if not (len(running_states) == 0):
         raise AssertionError()
 

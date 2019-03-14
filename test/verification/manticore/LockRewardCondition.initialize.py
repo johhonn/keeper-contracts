@@ -35,7 +35,7 @@ symbolic_address_3 = m.make_symbolic_value()
 print(f'[+] Initialized contract ', LOCKREWARDCONDITION_JSON_PATH[len(ROOT_DIR):], 'with symbolic parameters')
 contract_account.initialize(symbolic_address_1, symbolic_address_2, symbolic_address_3, caller=owner_account, value=0, signature='(address,address,address)')
 
-running_states = list(m.running_states)  
+running_states = list(m.running_states)
 if not(len(running_states) == 1):
     raise AssertionError()
 if m.generate_testcase(running_states[0], '', only_if=(symbolic_address_1 == 0)):

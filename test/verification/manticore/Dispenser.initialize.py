@@ -61,7 +61,7 @@ contract_account.initialize(token_account.address, symbolic_address_1, caller=ow
 #                value=0 )
 
 #print("[+] Second symbolic transaction")
-#symbolic_data = m.make_symbolic_buffer(320) 
+#symbolic_data = m.make_symbolic_buffer(320)
 #symbolic_address = m.make_symbolic_value(name="ADDRESS2")
 #symbolic_caller = m.make_symbolic_value(name="CALLER2")
 #m.transaction(caller=symbolic_caller,
