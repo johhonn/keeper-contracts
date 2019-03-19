@@ -519,7 +519,7 @@ contract('ConditionStoreManager', (accounts) => {
                 { from: createRole }
             )
 
-            await conditionStoreManager.delegteUpdateRole(
+            await conditionStoreManager.delegateUpdateRole(
                 conditionId,
                 createRole,
                 { from: owner }
@@ -547,7 +547,7 @@ contract('ConditionStoreManager', (accounts) => {
                 { from: createRole }
             )
 
-            await conditionStoreManager.delegteUpdateRole(
+            await conditionStoreManager.delegateUpdateRole(
                 conditionId,
                 createRole,
                 { from: owner }
@@ -575,7 +575,7 @@ contract('ConditionStoreManager', (accounts) => {
                 { from: createRole }
             )
 
-            await conditionStoreManager.delegteUpdateRole(
+            await conditionStoreManager.delegateUpdateRole(
                 conditionId,
                 createRole,
                 { from: owner }
@@ -603,7 +603,7 @@ contract('ConditionStoreManager', (accounts) => {
                 { from: createRole }
             )
 
-            await conditionStoreManager.delegteUpdateRole(
+            await conditionStoreManager.delegateUpdateRole(
                 conditionId,
                 createRole,
                 { from: owner }
@@ -631,7 +631,7 @@ contract('ConditionStoreManager', (accounts) => {
                 { from: createRole }
             )
 
-            await conditionStoreManager.delegteUpdateRole(
+            await conditionStoreManager.delegateUpdateRole(
                 conditionId,
                 createRole,
                 { from: owner }
@@ -678,7 +678,7 @@ contract('ConditionStoreManager', (accounts) => {
                 { from: createRole }
             )
 
-            await conditionStoreManager.delegteUpdateRole(
+            await conditionStoreManager.delegateUpdateRole(
                 conditionId,
                 createRole,
                 { from: owner }
@@ -706,7 +706,7 @@ contract('ConditionStoreManager', (accounts) => {
                 { from: createRole }
             )
 
-            await conditionStoreManager.delegteUpdateRole(
+            await conditionStoreManager.delegateUpdateRole(
                 conditionId,
                 createRole,
                 { from: owner }
@@ -734,7 +734,7 @@ contract('ConditionStoreManager', (accounts) => {
 
             const newState = constants.condition.state.fulfilled
 
-            await conditionStoreManager.delegteUpdateRole(
+            await conditionStoreManager.delegateUpdateRole(
                 conditionId,
                 createRole,
                 { from: owner }
@@ -821,7 +821,7 @@ contract('ConditionStoreManager', (accounts) => {
 
             const newState = constants.condition.state.fulfilled
 
-            await conditionStoreManager.delegteUpdateRole(
+            await conditionStoreManager.delegateUpdateRole(
                 conditionId,
                 createRole,
                 { from: owner }
@@ -855,7 +855,7 @@ contract('ConditionStoreManager', (accounts) => {
 
             const newState = constants.condition.state.fulfilled
 
-            await conditionStoreManager.delegteUpdateRole(
+            await conditionStoreManager.delegateUpdateRole(
                 conditionId,
                 createRole,
                 { from: owner }
@@ -958,7 +958,7 @@ contract('ConditionStoreManager', (accounts) => {
 
             const newState = constants.condition.state.fulfilled
 
-            await conditionStoreManager.delegteUpdateRole(
+            await conditionStoreManager.delegateUpdateRole(
                 conditionId,
                 createRole,
                 { from: owner }
@@ -993,7 +993,7 @@ contract('ConditionStoreManager', (accounts) => {
 
             const newState = constants.condition.state.fulfilled
 
-            await conditionStoreManager.delegteUpdateRole(
+            await conditionStoreManager.delegateUpdateRole(
                 conditionId,
                 createRole,
                 { from: owner }

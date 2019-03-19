@@ -98,7 +98,7 @@ contract ConditionStoreManager is Ownable, Common {
         createRole = delegatee;
     }
 
-    function delegteUpdateRole(
+    function delegateUpdateRole(
         bytes32 _id,
         address delegatee
     )
