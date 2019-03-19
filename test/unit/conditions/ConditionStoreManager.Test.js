@@ -521,7 +521,7 @@ contract('ConditionStoreManager', (accounts) => {
 
             await conditionStoreManager.delegteUpdateRole(
                 conditionId,
-                accounts[0]
+                createRole,
                 { from: owner }
             );
 
@@ -537,13 +537,21 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionStoreManager,
                 conditionId,
                 hashLockCondition,
-                createRole } = await setupTest({ conditionType: accounts[0] })
+                createRole,
+                owner
+            } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
                 hashLockCondition.address,
                 { from: createRole }
             )
+
+            await conditionStoreManager.delegteUpdateRole(
+                conditionId,
+                createRole,
+                { from: owner }
+            );
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
             await assert.isRejected(
@@ -557,13 +565,21 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionStoreManager,
                 conditionId,
                 hashLockCondition,
-                createRole } = await setupTest({ conditionType: accounts[0] })
+                createRole,
+                owner
+            } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
                 hashLockCondition.address,
                 { from: createRole }
             )
+
+            await conditionStoreManager.delegteUpdateRole(
+                conditionId,
+                createRole,
+                { from: owner }
+            );
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
             await assert.isRejected(
@@ -577,12 +593,20 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionStoreManager,
                 conditionId,
                 hashLockCondition,
-                createRole } = await setupTest({ conditionType: accounts[0] })
+                createRole,
+                owner
+            } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
                 hashLockCondition.address,
                 { from: createRole }
+            )
+
+            await conditionStoreManager.delegteUpdateRole(
+                conditionId,
+                createRole,
+                { from: owner }
             )
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
@@ -597,12 +621,20 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionStoreManager,
                 conditionId,
                 hashLockCondition,
-                createRole } = await setupTest({ conditionType: accounts[0] })
+                createRole,
+                owner
+            } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
                 hashLockCondition.address,
                 { from: createRole }
+            )
+
+            await conditionStoreManager.delegteUpdateRole(
+                conditionId,
+                createRole,
+                { from: owner }
             )
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
@@ -636,12 +668,20 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionStoreManager,
                 conditionId,
                 hashLockCondition,
-                createRole } = await setupTest({ conditionType: accounts[0] })
+                createRole,
+                owner
+            } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
                 hashLockCondition.address,
                 { from: createRole }
+            )
+
+            await conditionStoreManager.delegteUpdateRole(
+                conditionId,
+                createRole,
+                { from: owner }
             )
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
@@ -656,12 +696,20 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionStoreManager,
                 conditionId,
                 hashLockCondition,
-                createRole } = await setupTest()
+                createRole,
+                owner
+            } = await setupTest()
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
                 hashLockCondition.address,
                 { from: createRole }
+            )
+
+            await conditionStoreManager.delegteUpdateRole(
+                conditionId,
+                createRole,
+                { from: owner }
             )
 
             let newState = constants.condition.state.fulfilled
@@ -675,7 +723,9 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                hashLockCondition } = await setupTest({ conditionType: accounts[0] })
+                hashLockCondition,
+                owner
+            } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
@@ -683,6 +733,13 @@ contract('ConditionStoreManager', (accounts) => {
             )
 
             const newState = constants.condition.state.fulfilled
+
+            await conditionStoreManager.delegteUpdateRole(
+                conditionId,
+                createRole,
+                { from: owner }
+            )
+
             const result = await conditionStoreManager.updateConditionState(conditionId, newState)
 
             assert.strictEqual(
@@ -747,7 +804,9 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionStoreManager,
                 conditionId,
                 hashLockCondition,
-                createRole } = await setupTest({ conditionType: accounts[0] })
+                createRole,
+                owner
+            } = await setupTest({ conditionType: accounts[0] })
 
             const conditionTimeLock = 10
             const conditionTimeOut = 0
@@ -762,6 +821,12 @@ contract('ConditionStoreManager', (accounts) => {
 
             const newState = constants.condition.state.fulfilled
 
+            await conditionStoreManager.delegteUpdateRole(
+                conditionId,
+                createRole,
+                { from: owner }
+            )
+
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, newState),
                 constants.condition.epoch.error.isTimeLocked
@@ -773,7 +838,9 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionStoreManager,
                 conditionId,
                 hashLockCondition,
-                createRole } = await setupTest({ conditionType: accounts[0] })
+                createRole,
+                owner
+            } = await setupTest({ conditionType: accounts[0] })
 
             const conditionTimeLock = 3
             const conditionTimeOut = 0
@@ -787,6 +854,12 @@ contract('ConditionStoreManager', (accounts) => {
             )
 
             const newState = constants.condition.state.fulfilled
+
+            await conditionStoreManager.delegteUpdateRole(
+                conditionId,
+                createRole,
+                { from: owner }
+            )
 
             await assert.isRejected(
                 conditionStoreManager.updateConditionState(conditionId, newState),
@@ -865,7 +938,9 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionStoreManager,
                 conditionId,
                 hashLockCondition,
-                createRole } = await setupTest({ conditionType: accounts[0] })
+                createRole,
+                owner
+            } = await setupTest({ conditionType: accounts[0] })
 
             const conditionTimeLock = 0
             const conditionTimeOut = 1
@@ -883,6 +958,12 @@ contract('ConditionStoreManager', (accounts) => {
 
             const newState = constants.condition.state.fulfilled
 
+            await conditionStoreManager.delegteUpdateRole(
+                conditionId,
+                createRole,
+                { from: owner }
+            )
+
             await conditionStoreManager.updateConditionState(conditionId, newState)
 
             assert.strictEqual(
@@ -895,7 +976,9 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionStoreManager,
                 conditionId,
                 hashLockCondition,
-                createRole } = await setupTest({ conditionType: accounts[0] })
+                createRole,
+                owner
+            } = await setupTest({ conditionType: accounts[0] })
 
             const conditionTimeLock = 0
             const conditionTimeOut = 1
@@ -909,6 +992,12 @@ contract('ConditionStoreManager', (accounts) => {
             )
 
             const newState = constants.condition.state.fulfilled
+
+            await conditionStoreManager.delegteUpdateRole(
+                conditionId,
+                createRole,
+                { from: owner }
+            )
 
             await conditionStoreManager.updateConditionState(conditionId, newState)
 
