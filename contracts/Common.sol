@@ -18,4 +18,14 @@ contract Common {
     {
         return block.number;
     }
+
+    function isContract(address addr)
+        public
+        view
+        returns (bool)
+    {
+        uint size;
+        assembly { size := extcodesize(addr) }
+        return size > 0;
+    }
 }

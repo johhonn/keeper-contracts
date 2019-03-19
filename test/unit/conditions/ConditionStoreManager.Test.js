@@ -42,6 +42,8 @@ contract('ConditionStoreManager', (accounts) => {
             { from: owner }
         )
 
+        conditionType = hashLockCondition.address
+
         return {
             common,
             hashLockCondition,
