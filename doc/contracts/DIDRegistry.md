@@ -63,6 +63,17 @@ Parameters:
 * bytes32 _checksum
 * string _value
 
+### public getDIDRegister
+
+Documentation:
+
+```
+@param _did refers to decentralized identifier (a bytes32 length ID).
+@return the address of the DID owner.
+```
+Parameters:
+* bytes32 _did
+
 ### public getBlockNumberUpdated
 
 Documentation:
@@ -86,6 +97,14 @@ Parameters:
 * bytes32 _did
 
 ### public getDIDRegistrySize
+
+Documentation:
+
+```
+@return the length of the DID registry.
+```
+
+### public getDIDRegisterIds
 
 Documentation:
 

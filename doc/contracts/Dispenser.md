@@ -44,7 +44,7 @@ Parameters:
 
 ## Functions
 
-### public initialize
+### external initialize
 
 Documentation:
 
@@ -58,7 +58,7 @@ Parameters:
 * address _oceanTokenAddress
 * address _owner
 
-### public requestTokens
+### external requestTokens
 
 Documentation:
 
@@ -70,7 +70,7 @@ Documentation:
 Parameters:
 * uint256 amount
 
-### public setMinPeriod
+### external setMinPeriod
 
 Documentation:
 
@@ -81,7 +81,7 @@ Documentation:
 Parameters:
 * uint256 period
 
-### public setMaxAmount
+### external setMaxAmount
 
 Documentation:
 
@@ -92,7 +92,7 @@ Documentation:
 Parameters:
 * uint256 amount
 
-### public setMaxMintAmount
+### external setMaxMintAmount
 
 Documentation:
 

@@ -24,7 +24,7 @@ Members:
 
 ## Functions
 
-### public update
+### external update
 
 Documentation:
 

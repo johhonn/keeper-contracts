@@ -11,6 +11,7 @@ class Report {
                 documentation: undefined,
                 variables: [],
                 structs: [],
+                enums: [],
                 events: [],
                 modifiers: [],
                 functions: []
@@ -77,8 +78,11 @@ class Report {
                     case 'Struct':
                         this.report.contract.structs.push(item)
                         break
+                    case 'EnumDefinition':
+                        this.report.contract.enums.push(item)
+                        break
                     default:
-                        console.log('unhandled', node.name)
+                        console.log('unhandled', item.type, node.name)
                         break
                 }
 
@@ -164,6 +168,14 @@ ${this.report.contract.documentation}
 
             for (const struct of this.report.contract.structs) {
                 logItem(struct)
+            }
+        }
+
+        if (this.report.contract.enums.length > 0) {
+            output += '\n## Enums\n'
+
+            for (const enumEntry of this.report.contract.enums) {
+                logItem(enumEntry)
             }
         }
 

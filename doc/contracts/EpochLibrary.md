@@ -33,7 +33,7 @@ Parameters:
 * uint256 _timeLock
 * uint256 _timeOut
 
-### public isTimedOut
+### external isTimedOut
 
 Documentation:
 
@@ -46,7 +46,7 @@ Parameters:
 * struct EpochLibrary.EpochList _self
 * bytes32 _id
 
-### public isTimeLocked
+### external isTimeLocked
 
 Documentation:
 
