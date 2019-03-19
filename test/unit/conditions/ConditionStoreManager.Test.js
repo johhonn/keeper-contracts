@@ -42,8 +42,6 @@ contract('ConditionStoreManager', (accounts) => {
             { from: owner }
         )
 
-        conditionType = hashLockCondition.address
-
         return {
             common,
             hashLockCondition,
@@ -179,7 +177,7 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest()
 
             assert.strictEqual(
@@ -191,7 +189,7 @@ contract('ConditionStoreManager', (accounts) => {
             // await conditionStoreManager.createCondition(conditionId, conditionType, { from: createRole })
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 { from: createRole }
             )
             assert.strictEqual(
@@ -204,12 +202,12 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest()
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 { from: createRole }
             )
 
@@ -220,20 +218,20 @@ contract('ConditionStoreManager', (accounts) => {
                 timeLock,
                 timeOut
             } = await conditionStoreManager.getCondition(conditionId)
-            assert.strictEqual(typeRef, conditionType)
+            assert.strictEqual(typeRef, hashLockCondition.address)
             assert.strictEqual(state.toNumber(), constants.condition.state.unfulfilled)
             assert.strictEqual(timeLock.toNumber(), 0)
             assert.strictEqual(timeOut.toNumber(), 0)
         })
 
         it('createRole should create with nonzero timeout and timelock', async () => {
-            const { conditionStoreManager, conditionId, conditionType, createRole } = await setupTest()
+            const { conditionStoreManager, conditionId, hashLockCondition, createRole } = await setupTest()
             let conditionTimeLock = 1
             let conditionTimeOut = 10
 
             await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 conditionTimeLock,
                 conditionTimeOut,
                 { from: createRole }
@@ -247,7 +245,7 @@ contract('ConditionStoreManager', (accounts) => {
                 blockNumber
             } = await conditionStoreManager.getCondition(conditionId)
 
-            assert.strictEqual(typeRef, conditionType)
+            assert.strictEqual(typeRef, hashLockCondition.address)
             assert.strictEqual(state.toNumber(), constants.condition.state.unfulfilled)
             assert.strictEqual(timeLock.toNumber(), conditionTimeLock)
             assert.strictEqual(timeOut.toNumber(), conditionTimeOut)
@@ -258,14 +256,14 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole
             } = await setupTest({ createRole: accounts[1] })
 
             await assert.isRejected(
                 conditionStoreManager.methods['createCondition(bytes32,address)'](
                     conditionId,
-                    conditionType,
+                    hashLockCondition.address,
                     { from: createRole }
                 ),
                 constants.acl.error.invalidCreateRole
@@ -294,20 +292,21 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
-                createRole
+                hashLockCondition,
+                createRole,
+                epochLibrary
             } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 { from: createRole }
             )
 
             await assert.isRejected(
                 conditionStoreManager.methods['createCondition(bytes32,address)'](
                     conditionId,
-                    conditionType,
+                    hashLockCondition.address,
                     { from: createRole }
                 ),
                 constants.error.idAlreadyExists
@@ -315,17 +314,17 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('create condition should emit ConditionCreated event', async () => {
-            const { conditionStoreManager, conditionId, conditionType } = await setupTest()
+            const { conditionStoreManager, conditionId, hashLockCondition } = await setupTest()
 
             // conditionId should exist after create
             const result = await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType
+                hashLockCondition.address
             )
             testUtils.assertEmitted(result, 1, 'ConditionCreated')
             const eventArgs = testUtils.getEventArgsFromTx(result, 'ConditionCreated')
             expect(eventArgs._id).to.equal(conditionId)
-            expect(eventArgs._typeRef).to.equal(conditionType)
+            expect(eventArgs._typeRef).to.equal(hashLockCondition.address)
         })
     })
 
@@ -335,7 +334,7 @@ contract('ConditionStoreManager', (accounts) => {
                 common,
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole
             } = await setupTest()
 
@@ -344,7 +343,7 @@ contract('ConditionStoreManager', (accounts) => {
             // await conditionStoreManager.createCondition(conditionId, conditionType, { from: createRole })
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 { from: createRole }
             )
             let {
@@ -356,7 +355,7 @@ contract('ConditionStoreManager', (accounts) => {
                 blockNumberUpdated
             } = await conditionStoreManager.getCondition(conditionId)
 
-            assert.strictEqual(typeRef, conditionType)
+            assert.strictEqual(typeRef, hashLockCondition.address)
             assert.strictEqual(state.toNumber(), constants.condition.state.unfulfilled)
             assert.strictEqual(timeLock.toNumber(), 0)
             assert.strictEqual(timeOut.toNumber(), 0)
@@ -389,31 +388,32 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole
             } = await setupTest({ conditionType: accounts[0] })
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 { from: createRole }
             )
             let newState = constants.condition.state.fulfilled
             await conditionStoreManager.updateConditionState(conditionId, newState)
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
-                constants.condition.state.fulfilled)
+                constants.condition.state.fulfilled
+            )
         })
 
         it('correct role should transition from unfulfilled to aborted', async () => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole
             } = await setupTest({ conditionType: accounts[0] })
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 { from: createRole }
             )
 
@@ -428,12 +428,12 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 { from: createRole }
             )
 
@@ -448,12 +448,12 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 { from: createRole }
             )
 
@@ -468,12 +468,12 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 { from: createRole }
             )
 
@@ -488,12 +488,12 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 { from: createRole }
             )
 
@@ -508,14 +508,22 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
-                createRole } = await setupTest({ conditionType: accounts[0] })
+                hashLockCondition,
+                createRole,
+                owner
+            } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 { from: createRole }
             )
+
+            await conditionStoreManager.delegteUpdateRole(
+                conditionId,
+                accounts[0]
+                { from: owner }
+            );
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
             await assert.isRejected(
@@ -528,12 +536,12 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 { from: createRole }
             )
 
@@ -548,12 +556,12 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 { from: createRole }
             )
 
@@ -568,12 +576,12 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 { from: createRole }
             )
 
@@ -588,12 +596,12 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 { from: createRole }
             )
 
@@ -608,12 +616,12 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 { from: createRole })
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.fulfilled)
@@ -627,12 +635,12 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 { from: createRole }
             )
 
@@ -647,12 +655,12 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest()
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 { from: createRole }
             )
 
@@ -667,11 +675,11 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType } = await setupTest({ conditionType: accounts[0] })
+                hashLockCondition } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
-                conditionType
+                hashLockCondition.address
             )
 
             const newState = constants.condition.state.fulfilled
@@ -694,7 +702,7 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest({ conditionType: accounts[0] })
 
             let conditionTimeLock = 0
@@ -702,7 +710,7 @@ contract('ConditionStoreManager', (accounts) => {
 
             await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 conditionTimeLock,
                 conditionTimeOut,
                 { from: createRole })
@@ -716,7 +724,7 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest({ conditionType: accounts[0] })
 
             let conditionTimeLock = 10
@@ -724,7 +732,7 @@ contract('ConditionStoreManager', (accounts) => {
 
             await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 conditionTimeLock,
                 conditionTimeOut,
                 { from: createRole })
@@ -738,7 +746,7 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest({ conditionType: accounts[0] })
 
             const conditionTimeLock = 10
@@ -746,7 +754,7 @@ contract('ConditionStoreManager', (accounts) => {
 
             await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 conditionTimeLock,
                 conditionTimeOut
                 , { from: createRole }
@@ -764,7 +772,7 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest({ conditionType: accounts[0] })
 
             const conditionTimeLock = 3
@@ -772,7 +780,7 @@ contract('ConditionStoreManager', (accounts) => {
 
             await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 conditionTimeLock,
                 conditionTimeOut,
                 { from: createRole }
@@ -800,7 +808,7 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest({ conditionType: accounts[0] })
 
             const conditionTimeLock = 0
@@ -808,7 +816,7 @@ contract('ConditionStoreManager', (accounts) => {
 
             await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 conditionTimeLock,
                 conditionTimeOut
                 , { from: createRole }
@@ -824,7 +832,7 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest({ conditionType: accounts[0] })
 
             const conditionTimeLock = 0
@@ -832,7 +840,7 @@ contract('ConditionStoreManager', (accounts) => {
 
             await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 conditionTimeLock,
                 conditionTimeOut,
                 { from: createRole }
@@ -856,7 +864,7 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest({ conditionType: accounts[0] })
 
             const conditionTimeLock = 0
@@ -864,7 +872,7 @@ contract('ConditionStoreManager', (accounts) => {
 
             await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 conditionTimeLock,
                 conditionTimeOut,
                 { from: createRole }
@@ -886,7 +894,7 @@ contract('ConditionStoreManager', (accounts) => {
             const {
                 conditionStoreManager,
                 conditionId,
-                conditionType,
+                hashLockCondition,
                 createRole } = await setupTest({ conditionType: accounts[0] })
 
             const conditionTimeLock = 0
@@ -894,7 +902,7 @@ contract('ConditionStoreManager', (accounts) => {
 
             await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
-                conditionType,
+                hashLockCondition.address,
                 conditionTimeLock,
                 conditionTimeOut,
                 { from: createRole }

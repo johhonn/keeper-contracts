@@ -26,7 +26,6 @@ contract('HashLockCondition constructor', (accounts) => {
         const conditionStoreManager = await ConditionStoreManager.new()
         await conditionStoreManager.initialize(
             owner,
-
             { from: owner }
         )
 
@@ -41,6 +40,7 @@ contract('HashLockCondition constructor', (accounts) => {
             conditionStoreManager.address,
             { from: owner }
         )
+        conditionType = hashLockCondition.address
         return { hashLockCondition, conditionStoreManager, conditionId, conditionType, owner, createRole }
     }
 
@@ -267,17 +267,23 @@ contract('HashLockCondition constructor', (accounts) => {
         })
 
         it('should fail to fulfill if conditions has different type ref', async () => {
-            const { hashLockCondition, conditionStoreManager } = await setupTest()
+            const { hashLockCondition, conditionStoreManager, createRole } = await setupTest()
 
             let conditionId = await hashLockCondition.generateId(
                 constants.bytes32.one,
                 constants.condition.hashlock.uint.keccak
             )
 
+            await conditionStoreManager.delegateCreateRole(
+                hashLockCondition.address,
+                { from: owner }
+            )
+
             // create a condition of a type different than hashlockcondition
             await conditionStoreManager.createCondition(
                 conditionId,
-                accounts[0])
+                hashLockCondition.address
+            )
 
             // try to fulfill from hashlockcondition
             await assert.isRejected(
