@@ -1,26 +1,22 @@
 /* eslint-disable no-console */
-const fs = require('fs')
-
 const writeArtifact = require('./writeArtifact')
-const zosGetMigrations = require('../zos/getMigrations')
 
-const zosPath = `${__dirname}/../../../../zos.json`
+const zosGetProxyAddress = require('../zos/addresses/getProxyAddress')
+const zosGetMigrations = require('../zos/handlers/getMigrations')
 
 async function exportArtifacts(
+    projectName,
     networkName,
     networkId,
     version,
     verbose = true
 ) {
-    /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-    const { name } = JSON.parse(fs.readFileSync(zosPath, 'utf8'))
-
     if (verbose) {
-        console.log(`Exporting: ${name}`)
+        console.log(`Exporting: ${projectName}`)
     }
 
     // load migrations from zos
-    const { contracts, proxies, solidityLibs } = zosGetMigrations(networkId)
+    const { contracts, solidityLibs } = zosGetMigrations(networkId)
     const contractNames = Object.keys(contracts)
 
     contractNames.forEach((contractName) => {
@@ -29,7 +25,11 @@ async function exportArtifacts(
         }
 
         // get proxy address from zos proxies
-        const proxyAddress = proxies[`${name}/${contractName}`][0].address
+        const proxyAddress = zosGetProxyAddress(
+            projectName,
+            contractName,
+            networkId
+        )
 
         const artifact = writeArtifact(
             contractName,
@@ -63,7 +63,7 @@ async function exportArtifacts(
     })
 
     if (verbose) {
-        console.log(name, version, networkName)
+        console.log(projectName, version, networkName)
     }
 }
 

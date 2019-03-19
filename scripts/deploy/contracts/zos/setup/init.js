@@ -2,8 +2,8 @@
 /* eslint-disable-next-line security/detect-child-process */
 const { execSync } = require('child_process')
 
-const setupWallets = require('../../wallet/setupWallets')
-const loadWallet = require('../../wallet/loadWallet')
+const setupWallets = require('../../../wallet/setupWallets')
+const loadWallet = require('../../../wallet/loadWallet')
 
 const TIMEOUT = 36000
 const bypassMultisigWallets = process.env.KEEPER_BYPASS_MULTISIG_WALLETS || false

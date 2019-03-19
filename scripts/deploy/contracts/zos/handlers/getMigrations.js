@@ -5,8 +5,8 @@ const glob = require('glob')
 function getMigrations(
     networkId
 ) {
-    const searchPath = `${__dirname}/../../../../zos.*${networkId}.json`
-    const resolvedPath = path.resolve(searchPath)
+    const zosSearchPath = `${__dirname}/../../../../../zos.*${networkId}.json`
+    const resolvedPath = path.resolve(zosSearchPath)
 
     const files = glob.sync(
         resolvedPath,

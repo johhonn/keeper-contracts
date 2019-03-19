@@ -2,7 +2,7 @@
 const fs = require('fs')
 
 const createArtifact = require('./createArtifact')
-const zosGetMigrations = require('../zos/getMigrations')
+const zosGetMigrations = require('../zos/handlers/getMigrations')
 
 const artifactsDir = `${__dirname}/../../../../artifacts/`
 const network = process.env.NETWORK || 'development'

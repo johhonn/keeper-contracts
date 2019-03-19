@@ -18,8 +18,8 @@ async function setAdmin(
         console.log(`Setting zos-admin to MultiSigWallet '${roles.upgraderWallet}'`)
     }
 
-    for (const contract of contracts) {
-        execSync(`npx zos set-admin ${contract} ${roles.upgraderWallet} --yes ${flags}`)
+    for (const contractName of contracts) {
+        execSync(`npx zos set-admin ${contractName} ${roles.upgraderWallet} --yes ${flags}`)
     }
 
     execSync(`npx zos session --close ${flags}`)

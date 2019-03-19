@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const zosCreate = require('./zos/create')
+const zosCreate = require('./zos/setup/create')
 
 async function initializeContracts(
     contracts,
