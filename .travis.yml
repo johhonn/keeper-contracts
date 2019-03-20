@@ -61,7 +61,7 @@ script:
     - npm run compile
     - npm run test:upgrade
     - npm run test:echidna
-    - npm run deploy
+    - npm run deploy -- --deeper-clean
     - git status
     - git add package-lock.json
     - git diff-index --quiet HEAD || git commit -m "Travis update"
