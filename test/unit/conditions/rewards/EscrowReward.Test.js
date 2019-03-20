@@ -197,6 +197,132 @@ contract('EscrowReward constructor', (accounts) => {
                 constants.condition.state.error.invalidStateTransition
             )
         })
+        it('should not fulfill in case of null addresses', async () => {
+            const {
+                escrowReward,
+                lockRewardCondition,
+                oceanToken,
+                conditionStoreManager,
+                owner
+            } = await setupTest()
+
+            let nonce = constants.bytes32.one
+            let sender = accounts[0]
+            let receiver = constants.address.zero
+            let amount = 10
+
+            let hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
+            let conditionLockId = await lockRewardCondition.generateId(nonce, hashValuesLock)
+
+            await conditionStoreManager.createCondition(
+                conditionLockId,
+                lockRewardCondition.address)
+
+            let lockConditionId = conditionLockId
+            let releaseConditionId = conditionLockId
+
+            let hashValues = await escrowReward.hashValues(
+                amount,
+                receiver,
+                sender,
+                lockConditionId,
+                releaseConditionId)
+            let conditionId = await escrowReward.generateId(nonce, hashValues)
+
+            await conditionStoreManager.createCondition(
+                constants.bytes32.one,
+                escrowReward.address)
+
+            await conditionStoreManager.createCondition(
+                conditionId,
+                escrowReward.address)
+
+            await oceanToken.mint(sender, amount, { from: owner })
+            await oceanToken.approve(
+                lockRewardCondition.address,
+                amount,
+                { from: sender })
+
+            await lockRewardCondition.fulfill(nonce, escrowReward.address, amount)
+
+            assert.strictEqual(await getBalance(oceanToken, lockRewardCondition.address), 0)
+            assert.strictEqual(await getBalance(oceanToken, escrowReward.address), amount)
+
+            await assert.isRejected(
+                escrowReward.fulfill(
+                    nonce,
+                    amount,
+                    receiver,
+                    sender,
+                    lockConditionId,
+                    releaseConditionId
+                ),
+                'Null address is impossible to fulfill'
+            )
+        })
+        it('should not fulfill if the receiver address is Escrow contract address', async () => {
+            const {
+                escrowReward,
+                lockRewardCondition,
+                oceanToken,
+                conditionStoreManager,
+                owner
+            } = await setupTest()
+
+            let nonce = constants.bytes32.one
+            let sender = accounts[0]
+            let receiver = escrowReward.address
+            let amount = 10
+
+            let hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
+            let conditionLockId = await lockRewardCondition.generateId(nonce, hashValuesLock)
+
+            await conditionStoreManager.createCondition(
+                conditionLockId,
+                lockRewardCondition.address)
+
+            let lockConditionId = conditionLockId
+            let releaseConditionId = conditionLockId
+
+            let hashValues = await escrowReward.hashValues(
+                amount,
+                receiver,
+                sender,
+                lockConditionId,
+                releaseConditionId)
+            let conditionId = await escrowReward.generateId(nonce, hashValues)
+
+            await conditionStoreManager.createCondition(
+                constants.bytes32.one,
+                escrowReward.address)
+
+            await conditionStoreManager.createCondition(
+                conditionId,
+                escrowReward.address)
+
+            await oceanToken.mint(sender, amount, { from: owner })
+            await oceanToken.approve(
+                lockRewardCondition.address,
+                amount,
+                { from: sender })
+
+            await lockRewardCondition.fulfill(nonce, escrowReward.address, amount)
+
+            assert.strictEqual(await getBalance(oceanToken, lockRewardCondition.address), 0)
+            assert.strictEqual(await getBalance(oceanToken, escrowReward.address), amount)
+
+            await assert.isRejected(
+                escrowReward.fulfill(
+                    nonce,
+                    amount,
+                    receiver,
+                    sender,
+                    lockConditionId,
+                    releaseConditionId
+                ),
+                'EscrowReward contract can not be a receiver'
+            )
+        })
     })
 
     describe('only fulfill conditions once', () => {
