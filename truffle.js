@@ -74,6 +74,15 @@ module.exports = {
             ),
             network_id: 0x2A, // 42
             from: '0x2c0D5F47374b130EE398F4C34DBE8168824A8616'
+        },
+        // rinkeby testnet
+        rinkeby: {
+            provider: () => setupWallet(
+                process.env.NMEMORIC,
+                url || `https://rinkeby.infura.io/v2/${process.env.INFURA_TOKEN}`
+            ),
+            network_id: 0x4, // 4
+            from: '0x2C63bf697f74C72CFB727Fb5eB8e6266cE341e13'
         }
     },
     compilers: {
