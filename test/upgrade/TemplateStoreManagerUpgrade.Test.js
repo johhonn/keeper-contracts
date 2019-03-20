@@ -45,6 +45,7 @@ contract('TemplateStoreManager', (accounts) => {
                     'TemplateStoreManager'
                 ],
                 true,
+                true,
                 verbose
             )
 

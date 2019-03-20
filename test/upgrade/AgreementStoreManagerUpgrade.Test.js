@@ -62,6 +62,7 @@ contract('AgreementStoreManager', (accounts) => {
                     'AgreementStoreManager'
                 ],
                 true,
+                true,
                 verbose
             )
 

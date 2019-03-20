@@ -63,6 +63,7 @@ contract('DIDRegistry', (accounts) => {
                 artifacts,
                 ['DIDRegistry'],
                 true,
+                true,
                 verbose
             )
             DIDRegistryProxyAddress = addressBook['DIDRegistry']
