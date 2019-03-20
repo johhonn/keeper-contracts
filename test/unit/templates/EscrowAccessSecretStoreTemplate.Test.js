@@ -26,14 +26,15 @@ contract('EscrowAccessSecretStoreTemplate', (accounts) => {
             templateStoreManager
         } = await deployManagers(deployer, owner)
 
+        const contractType = templateStoreManager.address
         const escrowAccessSecretStoreTemplate = await EscrowAccessSecretStoreTemplate.new({ from: deployer })
         await escrowAccessSecretStoreTemplate.methods['initialize(address,address,address,address,address,address)'](
             owner,
             agreementStoreManager.address,
             didRegistry.address,
-            accounts[0],
-            accounts[0],
-            accounts[0],
+            contractType,
+            contractType,
+            contractType,
             { from: deployer }
         )
 
