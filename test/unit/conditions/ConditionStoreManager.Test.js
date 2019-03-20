@@ -895,7 +895,7 @@ contract('ConditionStoreManager', (accounts) => {
                 owner
             } = await setupTest({ conditionType: accounts[0] })
 
-            const conditionTimeLock = 3
+            const conditionTimeLock = 2
             const conditionTimeOut = 0
 
             await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
