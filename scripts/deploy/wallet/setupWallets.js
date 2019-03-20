@@ -50,6 +50,7 @@ async function setupWallets(
     const multiSigAccountsString = JSON.stringify(multiSigAccounts, null, 2)
 
     if (verbose) {
+        console.log(`Using multisig deployer: ${deployer}`)
         console.log(`Using multisig owners:\n ${multiSigAccountsString}`)
     }
 
