@@ -25,6 +25,7 @@ contract Common {
         returns (bool)
     {
         uint size;
+        /* solium-disable-next-line security/no-inline-assembly */
         assembly { size := extcodesize(addr) }
         return size > 0;
     }

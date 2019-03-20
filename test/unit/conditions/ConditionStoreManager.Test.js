@@ -293,8 +293,7 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionStoreManager,
                 conditionId,
                 hashLockCondition,
-                createRole,
-                epochLibrary
+                createRole
             } = await setupTest({ conditionType: accounts[0] })
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
@@ -629,7 +628,7 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionId,
                 createRole,
                 { from: owner }
-            );
+            )
 
             await conditionStoreManager.updateConditionState(conditionId, constants.condition.state.aborted)
             await assert.isRejected(
@@ -753,8 +752,7 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionStoreManager,
                 conditionId,
                 hashLockCondition,
-                createRole,
-                owner
+                createRole
             } = await setupTest()
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
@@ -762,7 +760,6 @@ contract('ConditionStoreManager', (accounts) => {
                 hashLockCondition.address,
                 { from: createRole }
             )
-
 
             let newState = constants.condition.state.fulfilled
             await assert.isRejected(
