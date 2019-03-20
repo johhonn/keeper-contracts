@@ -73,7 +73,7 @@ async function deployContracts(
 
     if (deployedContracts.length > 0) {
         throw new Error(
-            `Deployment failed! Following contracts are already deployed: ${deployedContracts.join(', ')}`
+            `Deployment failed! Following contracts are already deployed: '${deployedContracts.join(', ')}'`
         )
     }
 
