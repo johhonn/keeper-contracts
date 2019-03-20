@@ -9,9 +9,9 @@ module.exports = (cb) => {
         web3,
         artifacts,
         contracts,
-        false,
-        false,
-        true
+        argv['force-wallet-creation'] || false,
+        argv['deeper-clean'] || false,
+        argv['verbose'] && true
     )
         .then(() => cb())
         .catch(err => cb(err))
