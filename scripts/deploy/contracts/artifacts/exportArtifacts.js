@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 const writeArtifact = require('./writeArtifact')
 
-const zosGetProxyAddress = require('../zos/addresses/getProxyAddress')
+const zosGetProxyAddress = require('../zos/contracts/addresses/getProxyAddress')
 const zosGetMigrations = require('../zos/handlers/getMigrations')
 
 async function exportArtifacts(
@@ -19,13 +19,13 @@ async function exportArtifacts(
     const { contracts, solidityLibs } = zosGetMigrations(networkId)
     const contractNames = Object.keys(contracts)
 
-    contractNames.forEach((contractName) => {
+    for (const contractName of contractNames) {
         if (verbose) {
             console.log(`Exporting artifact: ${contractName}.${networkName}.json`)
         }
 
         // get proxy address from zos proxies
-        const proxyAddress = zosGetProxyAddress(
+        const proxyAddress = await zosGetProxyAddress(
             projectName,
             contractName,
             networkId
@@ -41,11 +41,11 @@ async function exportArtifacts(
         if (verbose) {
             console.log(`Exported contract artifact: ${artifact.version} of ${contractName} at ${artifact.address}`)
         }
-    })
+    }
 
     const solidityLibNames = Object.keys(solidityLibs)
 
-    solidityLibNames.forEach((solidityLibName) => {
+    for (const solidityLibName of solidityLibNames) {
         if (verbose) {
             console.log(`Exporting library: ${solidityLibName}.${networkName}.json`)
         }
@@ -60,7 +60,7 @@ async function exportArtifacts(
         if (verbose) {
             console.log(`Exported library artifact: ${artifact.version} of ${solidityLibName} at ${artifact.address}`)
         }
-    })
+    }
 
     if (verbose) {
         console.log(projectName, version, networkName)

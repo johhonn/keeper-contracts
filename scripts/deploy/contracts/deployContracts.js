@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 const pkg = require('../../../package.json')
 
+const zosGetDeployedContracts = require('./zos/contracts/getDeployedContracts')
 const zosCleanup = require('./zos/setup/cleanup')
 const zosInit = require('./zos/setup/init')
 const zosGetProject = require('./zos/handlers/getProject')
@@ -31,18 +32,24 @@ async function deployContracts(
     artifacts,
     contracts = [],
     forceWalletCreation = false,
+    deeperClean = false,
     verbose = true
 ) {
     contracts = !contracts || contracts.length === 0 ? contractNames : contracts
 
+    const networkId = await web3.eth.net.getId()
+
     await zosCleanup(
-        web3,
+        networkId,
         true,
+        deeperClean,
         verbose
     )
 
     if (verbose) {
-        console.log(`Deploying contracts: '${contracts.join(', ')}'`)
+        console.log(
+            `Deploying contracts: '${contracts.join(', ')}'`
+        )
     }
 
     const roles = await zosInit(
@@ -56,12 +63,22 @@ async function deployContracts(
 
     const { name } = zosGetProject()
 
-    const networkId = await web3.eth.net.getId()
-
-    await zosRegisterContracts(
+    // we can only deploy if none of the contracts is already installed
+    const deployedContracts = await zosGetDeployedContracts(
         name,
         contracts,
         networkId,
+        verbose
+    )
+
+    if (deployedContracts.length > 0) {
+        throw new Error(
+            `Deployment failed! Following contracts are already deployed: ${deployedContracts.join(', ')}`
+        )
+    }
+
+    await zosRegisterContracts(
+        contracts,
         false,
         verbose
     )

@@ -9,12 +9,13 @@ function getMigrations(
     const resolvedPath = path.resolve(zosSearchPath)
 
     const files = glob.sync(
-        resolvedPath,
-        'utf8'
+        resolvedPath
     )
 
     if (files.length < 1) {
-        throw new Error(`Cannot find any file for '${resolvedPath}'`)
+        throw new Error(
+            `Cannot find any file for '${resolvedPath}'`
+        )
     }
 
     const zosFile = files[0]

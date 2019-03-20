@@ -1,4 +1,4 @@
-const zosGetMigrations = require('../handlers/getMigrations')
+const zosGetMigrations = require('../../handlers/getMigrations')
 
 function getImplementationAddress(
     contractName,

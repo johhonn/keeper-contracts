@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const getImplementationAddress = require('../addresses/getImplementationAddress')
+const getImplementationAddress = require('./addresses/getImplementationAddress')
 const submitTransaction = require('../../../wallet/submitTransaction')
 
 async function requestContractUpgrade(

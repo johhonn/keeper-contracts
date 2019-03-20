@@ -1,9 +1,12 @@
 /* eslint-disable no-console */
 const fs = require('fs')
+const path = require('path')
 const pkg = require('../../../package.json')
 
 const zosCleanup = require('./zos/setup/cleanup')
 const zosInit = require('./zos/setup/init')
+const zosGetDeployedContracts = require('./zos/contracts/getDeployedContracts')
+const zosGetProject = require('./zos/handlers/getProject')
 
 const zosRegisterContracts = require('./zos/contracts/registerContracts')
 const zosRequestContractUpgrade = require('./zos/contracts/requestContractUpgrades')
@@ -34,11 +37,16 @@ async function upgradeContracts(
     contracts = !contracts || contracts.length === 0 ? contractNames : contracts
 
     if (verbose) {
-        console.log(`Upgrading contracts: '${contracts.join(', ')}'`)
+        console.log(
+            `Upgrading contracts: '${contracts.join(', ')}'`
+        )
     }
 
+    const networkId = await web3.eth.net.getId()
+
     await zosCleanup(
-        web3,
+        networkId,
+        false,
         false,
         verbose
     )
@@ -52,6 +60,22 @@ async function upgradeContracts(
         false,
         verbose
     )
+
+    const { name } = zosGetProject()
+
+    // we can only upgrade if all of the contracts are already installed
+    const deployedContracts = await zosGetDeployedContracts(
+        name,
+        contracts,
+        networkId,
+        verbose
+    )
+
+    if (deployedContracts.length !== contracts.length) {
+        throw new Error(
+            `Upgrade failed! Expected the contracts '${contracts.join(', ')}' to be deployed but only: '${deployedContracts.join(', ')}' was deployed.`
+        )
+    }
 
     // register contract upgrades in zos, force it
     await zosRegisterContracts(
@@ -70,11 +94,12 @@ async function upgradeContracts(
 
     for (const contractName of contracts) {
         const [newContractName, oldContractName] = contractName.indexOf(':') > -1 ? contractName.split(':') : [contractName, contractName]
-        const networkId = await web3.eth.net.getId()
+
+        const resolvedArtifactsDir = path.resolve(artifactsDir)
 
         /* eslint-disable-next-line security/detect-non-literal-fs-filename */
         const artifactString = fs.readFileSync(
-            `${artifactsDir}${oldContractName}.${NETWORK.toLowerCase()}.json`,
+            `${resolvedArtifactsDir}/${oldContractName}.${NETWORK.toLowerCase()}.json`,
             'utf8'
         ).toString()
 
