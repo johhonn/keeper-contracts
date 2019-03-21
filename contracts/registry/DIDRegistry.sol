@@ -37,6 +37,12 @@ contract DIDRegistry is Ownable {
         uint256 _blockNumberUpdated
     );
 
+    event DIDProviderRemoved(
+        bytes32 _did,
+        address _provider,
+        bool state
+    );
+
     /**
      * @dev DIDRegistry Initializer
      *      Initialize Ownable. Only on contract creation.
@@ -112,6 +118,20 @@ contract DIDRegistry is Ownable {
         );
 
         return getDIDRegistrySize();
+    }
+
+    function removeDIDProvider(
+        bytes32 _did,
+        address _provider
+    )
+        external
+    {
+       bool state = didRegisterList.pop(_did, _provider);
+       emit DIDProviderRemoved(
+            _did,
+            _provider,
+            state
+       );
     }
 
     /**
