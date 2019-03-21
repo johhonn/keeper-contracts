@@ -102,7 +102,7 @@ contract DIDRegistry is Ownable {
         // push providers to storage
         for(uint256 i=0; i < _providers.length; i++){
             assert(
-                didRegisterList.push(_did, _providers[i])
+                didRegisterList.pushProviderToDIDRegistry(_did, _providers[i])
             );
         }
 
@@ -126,12 +126,24 @@ contract DIDRegistry is Ownable {
     )
         external
     {
-       bool state = didRegisterList.pop(_did, _provider);
+       bool state = didRegisterList.popProviderFromDIDRegistry(_did, _provider);
        emit DIDProviderRemoved(
             _did,
             _provider,
             state
        );
+    }
+
+    function isDIDProvider
+    (
+        bytes32 _did,
+        address _provider
+    )
+        external
+        view
+        returns(bool)
+    {
+        return didRegisterList.isDIDProvider(_did, _provider);
     }
 
     /**

@@ -34,7 +34,7 @@ contract DIDRegistryWithBug is DIDRegistry {
         didRegisterList.update(_did, _checksum);
         // push providers to storage
         for(uint256 i=0; i < _providers.length; i++){
-            didRegisterList.push(_did, _providers[i]);
+            didRegisterList.pushProviderToDIDRegistry(_did, _providers[i]);
         }
         // add bug here
         didRegisterList.didRegisters[_did].blockNumberUpdated = 42;

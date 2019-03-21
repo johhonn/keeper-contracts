@@ -63,7 +63,8 @@ library DIDRegistryLibrary {
         return _self.didRegisterIds.length;
     }
 
-    function push(
+    function pushProviderToDIDRegistry
+    (
         DIDRegisterList storage _self,
         bytes32 _did,
         address provider
@@ -80,27 +81,61 @@ library DIDRegistryLibrary {
         return true;
     }
 
-    function pop(
+    function popProviderFromDIDRegistry
+    (
         DIDRegisterList storage _self,
         bytes32 _did,
-        address provider
+        address _provider
     )
         external
         onlyDIDOwner(_self, _did)
         returns(bool)
     {
         require(
-            provider != address(0),
+            _provider != address(0),
             'Invalid asset provider address'
         );
+
+        int256 i = getDIDProviderIndex(_self, _did, _provider);
+        if(i == -1)
+            return false;
+        delete _self.didRegisters[_did].providers[uint256(i)];
+        return true;
+    }
+
+    function isDIDProvider
+    (
+        DIDRegisterList storage _self,
+        bytes32 _did,
+        address _provider
+    )
+        external
+        view
+        returns(bool)
+    {
+        int256 i = getDIDProviderIndex(_self, _did, _provider);
+        if(i == -1)
+            return false;
+        return true;
+    }
+
+    function getDIDProviderIndex
+    (
+        DIDRegisterList storage _self,
+        bytes32 _did,
+        address provider
+    )
+        private
+        view
+        returns(int256 index)
+    {
         for(uint256 i=0; _self.didRegisters[_did].providers.length < i; i++)
         {
             if(provider == _self.didRegisters[_did].providers[i])
             {
-                delete _self.didRegisters[_did].providers[i];
-                return true;
+                index = int(i);
             }
         }
-        return false;
+        index = -1;
     }
 }
