@@ -42,7 +42,6 @@ contract DIDRegistryChangeFunctionSignature is DIDRegistry {
             _did,
             didRegisterList.didRegisters[_did].owner,
             _checksum,
-            _providers,
             _value,
             msg.sender,
             block.number

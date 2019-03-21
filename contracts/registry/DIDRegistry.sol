@@ -12,7 +12,7 @@ import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
  */
 contract DIDRegistry is Ownable {
 
-    uint256 maxProvidersPerDID = 1;
+    uint256 maxProvidersPerDID = 0;
     /**
      * @dev The DIDRegistry Library takes care of the basic storage functions.
      */
@@ -31,7 +31,6 @@ contract DIDRegistry is Ownable {
         bytes32 indexed _did,
         address indexed _owner,
         bytes32 _checksum,
-        address[] indexed _providers,
         string _value,
         address _lastUpdatedBy,
         uint256 _blockNumberUpdated
@@ -54,8 +53,8 @@ contract DIDRegistry is Ownable {
      * @param _owner refers to the owner of the contract.
      */
     function initialize(
-        address _owner,
-        uint256 _maxProvidersPerDID
+        uint256 _maxProvidersPerDID,
+        address _owner
     )
         public
         initializer
@@ -106,9 +105,7 @@ contract DIDRegistry is Ownable {
         didRegisterList.update(_did, _checksum);
         // push providers to storage
         for(uint256 i=0; i < _providers.length; i++){
-            assert(
-                didRegisterList.pushProviderToDIDRegistry(_did, _providers[i])
-            );
+            didRegisterList.pushProviderToDIDRegistry(_did, _providers[i]);
         }
 
         /* emitting _value here to avoid expensive storage */
@@ -116,7 +113,6 @@ contract DIDRegistry is Ownable {
             _did,
             didRegisterList.didRegisters[_did].owner,
             _checksum,
-            _providers,
             _value,
             msg.sender,
             block.number
@@ -131,11 +127,6 @@ contract DIDRegistry is Ownable {
     )
         external
     {
-        require(
-            !isDIDProvider(_did, _provider),
-            'Invalid duplicate asset provider address'
-        );
-
         require(
             didRegisterList.didRegisters[_did].providers.length + 1
             <= maxProvidersPerDID,
