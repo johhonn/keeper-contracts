@@ -51,7 +51,7 @@ contract DIDRegistry is Ownable {
     {
         require(
             maxProvidersPerDID <= _maxProvidersPerDID,
-            'Invalid max number of provider per DID'
+            'Invalid max number of providers per DID'
         );
         Ownable.initialize(_owner);
         maxProvidersPerDID = _maxProvidersPerDID;
@@ -91,7 +91,14 @@ contract DIDRegistry is Ownable {
             bytes(_value).length <= 2048,
             'Invalid value size'
         );
+
         didRegisterList.update(_did, _checksum);
+        // push providers to storage
+        for(uint256 i=0; i < _providers.length; i++){
+            assert(
+                didRegisterList.push(_did, _providers[i])
+            );
+        }
 
         /* emitting _value here to avoid expensive storage */
         emit DIDAttributeRegistered(
@@ -173,4 +180,5 @@ contract DIDRegistry is Ownable {
     {
         return didRegisterList.didRegisterIds;
     }
+
 }

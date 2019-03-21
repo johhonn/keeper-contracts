@@ -13,11 +13,21 @@ library DIDRegistryLibrary {
         bytes32 lastChecksum;
         address lastUpdatedBy;
         uint256 blockNumberUpdated;
+        address [] providers;
     }
 
     struct DIDRegisterList {
         mapping(bytes32 => DIDRegister) didRegisters;
         bytes32[] didRegisterIds;
+    }
+
+    modifier onlyDIDOwner(DIDRegisterList storage _self, bytes32 _did)
+    {
+        require(
+            _self.didRegisters[_did].owner == msg.sender,
+            'Invalid DID owner'
+        );
+        _;
     }
 
    /**
@@ -42,13 +52,55 @@ library DIDRegistryLibrary {
             _self.didRegisterIds.push(_did);
         }
 
-        _self.didRegisters[_did] = DIDRegister({
-            owner: didOwner,
-            lastChecksum: _checksum,
-            lastUpdatedBy: msg.sender,
-            blockNumberUpdated: block.number
-        });
+        _self.didRegisters[_did] = DIDRegister(
+            didOwner,
+            _checksum,
+            msg.sender,
+            block.number,
+            new address [](0)
+        );
 
         return _self.didRegisterIds.length;
+    }
+
+    function push(
+        DIDRegisterList storage _self,
+        bytes32 _did,
+        address provider
+    )
+        external
+        onlyDIDOwner(_self, _did)
+        returns(bool)
+    {
+        require(
+            provider != address(0),
+            'Invalid asset provider address'
+        );
+        _self.didRegisters[_did].providers.push(provider);
+        return true;
+    }
+
+    function pop(
+        DIDRegisterList storage _self,
+        bytes32 _did,
+        address provider
+    )
+        external
+        onlyDIDOwner(_self, _did)
+        returns(bool)
+    {
+        require(
+            provider != address(0),
+            'Invalid asset provider address'
+        );
+        for(uint256 i=0; _self.didRegisters[_did].providers.length < i; i++)
+        {
+            if(provider == _self.didRegisters[_did].providers[i])
+            {
+                delete _self.didRegisters[_did].providers[i];
+                return true;
+            }
+        }
+        return false;
     }
 }
