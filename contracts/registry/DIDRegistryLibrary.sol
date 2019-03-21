@@ -13,7 +13,7 @@ library DIDRegistryLibrary {
         bytes32 lastChecksum;
         address lastUpdatedBy;
         uint256 blockNumberUpdated;
-        address [] providers;
+        address[] providers;
     }
 
     struct DIDRegisterList {
@@ -57,7 +57,7 @@ library DIDRegistryLibrary {
             _checksum,
             msg.sender,
             block.number,
-            new address [](0)
+            new address[](0)
         );
 
         return _self.didRegisterIds.length;

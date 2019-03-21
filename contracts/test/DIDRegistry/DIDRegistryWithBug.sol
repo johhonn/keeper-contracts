@@ -15,7 +15,7 @@ contract DIDRegistryWithBug is DIDRegistry {
     function registerAttribute (
         bytes32 _checksum,
         bytes32 _did,
-        address [] memory _providers,
+        address[] memory _providers,
         string memory _value
     )
         public

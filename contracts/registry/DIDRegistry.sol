@@ -31,7 +31,7 @@ contract DIDRegistry is Ownable {
         bytes32 indexed _did,
         address indexed _owner,
         bytes32 _checksum,
-        address [] indexed _providers,
+        address[] indexed _providers,
         string _value,
         address _lastUpdatedBy,
         uint256 _blockNumberUpdated
@@ -137,7 +137,8 @@ contract DIDRegistry is Ownable {
         );
 
         require(
-            (didRegisterList.didRegisters[_did].providers.length + 1) <= maxProvidersPerDID,
+            didRegisterList.didRegisters[_did].providers.length + 1
+            <= maxProvidersPerDID,
             'Number of providers exceeds the limit'
         );
 
@@ -155,12 +156,14 @@ contract DIDRegistry is Ownable {
     )
         external
     {
-       bool state = didRegisterList.popProviderFromDIDRegistry(_did, _provider);
-       emit DIDProviderRemoved(
+        bool state =
+        didRegisterList.popProviderFromDIDRegistry(_did, _provider);
+
+        emit DIDProviderRemoved(
             _did,
             _provider,
             state
-       );
+        );
     }
 
     function isDIDProvider
