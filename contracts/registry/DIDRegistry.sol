@@ -43,6 +43,11 @@ contract DIDRegistry is Ownable {
         bool state
     );
 
+    event DIDProviderAdded(
+        bytes32 _did,
+        address _provider
+    );
+
     /**
      * @dev DIDRegistry Initializer
      *      Initialize Ownable. Only on contract creation.
@@ -120,6 +125,30 @@ contract DIDRegistry is Ownable {
         return getDIDRegistrySize();
     }
 
+    function addDIDProvider(
+        bytes32 _did,
+        address _provider
+    )
+        external
+    {
+        require(
+            !isDIDProvider(_did, _provider),
+            'Invalid duplicate asset provider address'
+        );
+
+        require(
+            (didRegisterList.didRegisters[_did].providers.length + 1) <= maxProvidersPerDID,
+            'Number of providers exceeds the limit'
+        );
+
+        didRegisterList.pushProviderToDIDRegistry(_did, _provider);
+
+        emit DIDProviderAdded(
+            _did,
+            _provider
+        );
+    }
+
     function removeDIDProvider(
         bytes32 _did,
         address _provider
@@ -139,7 +168,7 @@ contract DIDRegistry is Ownable {
         bytes32 _did,
         address _provider
     )
-        external
+        public
         view
         returns(bool)
     {
