@@ -30,8 +30,8 @@ contract DIDRegistry is Ownable {
     event DIDAttributeRegistered(
         bytes32 indexed _did,
         address indexed _owner,
-        bytes32 indexed _checksum,
-        address [] _providers,
+        bytes32 _checksum,
+        address [] indexed _providers,
         string _value,
         address _lastUpdatedBy,
         uint256 _blockNumberUpdated
