@@ -12,6 +12,7 @@ import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
  */
 contract DIDRegistry is Ownable {
 
+    uint256 maxProvidersPerDID = 1;
     /**
      * @dev The DIDRegistry Library takes care of the basic storage functions.
      */
@@ -30,6 +31,7 @@ contract DIDRegistry is Ownable {
         bytes32 indexed _did,
         address indexed _owner,
         bytes32 indexed _checksum,
+        address [] _providers,
         string _value,
         address _lastUpdatedBy,
         uint256 _blockNumberUpdated
@@ -41,12 +43,18 @@ contract DIDRegistry is Ownable {
      * @param _owner refers to the owner of the contract.
      */
     function initialize(
-        address _owner
+        address _owner,
+        uint256 _maxProvidersPerDID
     )
         public
         initializer
     {
+        require(
+            maxProvidersPerDID <= _maxProvidersPerDID,
+            'Invalid max number of provider per DID'
+        );
         Ownable.initialize(_owner);
+        maxProvidersPerDID = _maxProvidersPerDID;
     }
 
     /**
@@ -63,11 +71,16 @@ contract DIDRegistry is Ownable {
     function registerAttribute (
         bytes32 _did,
         bytes32 _checksum,
+        address[] memory _providers,
         string memory _value
     )
         public
         returns (uint size)
     {
+        require(
+            _providers.length <= maxProvidersPerDID,
+            'Number of providers exceeds the limit'
+        );
         require(
             didRegisterList.didRegisters[_did].owner == address(0x0) ||
             didRegisterList.didRegisters[_did].owner == msg.sender,
@@ -85,6 +98,7 @@ contract DIDRegistry is Ownable {
             _did,
             didRegisterList.didRegisters[_did].owner,
             _checksum,
+            _providers,
             _value,
             msg.sender,
             block.number

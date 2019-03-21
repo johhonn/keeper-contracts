@@ -9,11 +9,16 @@ contract DIDRegistryChangeFunctionSignature is DIDRegistry {
     function registerAttribute (
         bytes32 _checksum,
         bytes32 _did,
+        address [] memory _providers,
         string memory _value
     )
         public
         returns (uint size)
     {
+        require(
+            _providers.length <= maxProvidersPerDID,
+            'Number of providers exceeds the limit'
+        );
         require(
             didRegisterList.didRegisters[_did].owner == address(0x0) ||
             didRegisterList.didRegisters[_did].owner == msg.sender,
@@ -30,6 +35,7 @@ contract DIDRegistryChangeFunctionSignature is DIDRegistry {
             _did,
             didRegisterList.didRegisters[_did].owner,
             _checksum,
+            _providers,
             _value,
             msg.sender,
             block.number

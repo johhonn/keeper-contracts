@@ -15,6 +15,7 @@ contract DIDRegistryWithBug is DIDRegistry {
     function registerAttribute (
         bytes32 _checksum,
         bytes32 _did,
+        address [] memory _providers,
         string memory _value
     )
         public
@@ -37,6 +38,7 @@ contract DIDRegistryWithBug is DIDRegistry {
             _did,
             didRegisterList.didRegisters[_did].owner,
             _checksum,
+            _providers,
             _value,
             msg.sender,
             block.number
