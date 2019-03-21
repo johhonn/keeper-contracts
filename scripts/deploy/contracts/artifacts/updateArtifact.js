@@ -29,11 +29,11 @@ function updateArtifact(
 
     const resolvedArtifactsDir = path.resolve(artifactsDir)
     /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-    const oldArtofactString = fs.readFileSync(
+    const oldArtifactString = fs.readFileSync(
         `${resolvedArtifactsDir}/${artifactFileName}`,
         'utf8'
     ).toString()
-    const oldArtifact = JSON.parse(oldArtofactString)
+    const oldArtifact = JSON.parse(oldArtifactString)
 
     const { address } = oldArtifact
 
