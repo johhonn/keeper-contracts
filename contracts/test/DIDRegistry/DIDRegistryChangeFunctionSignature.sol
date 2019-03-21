@@ -16,10 +16,6 @@ contract DIDRegistryChangeFunctionSignature is DIDRegistry {
         returns (uint size)
     {
         require(
-            _providers.length <= maxProvidersPerDID,
-            'Number of providers exceeds the limit'
-        );
-        require(
             didRegisterList.didRegisters[_did].owner == address(0x0) ||
             didRegisterList.didRegisters[_did].owner == msg.sender,
             'Attributes must be registered by the DID owners.'
@@ -29,7 +25,10 @@ contract DIDRegistryChangeFunctionSignature is DIDRegistry {
             bytes(_value).length <= 2048,
             'Invalid value size'
         );
-
+        require(
+            _providers.length <= maxProvidersPerDID,
+            'Number of providers exceeds the limit'
+        );
 
         didRegisterList.update(_did, _checksum);
 

@@ -85,7 +85,7 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('Should not fail to register the same attribute twice', async () => {
-            const { didRegistry } = await setupTest()
+            const { didRegistry, providers } = await setupTest()
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
@@ -98,7 +98,7 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('Should only allow the owner to set an attribute', async () => {
-            const { didRegistry } = await setupTest()
+            const { didRegistry, providers } = await setupTest()
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
@@ -109,13 +109,13 @@ contract('DIDRegistry', (accounts) => {
             // a different owner can register his own DID
             await assert.isRejected(
                 // must not be able to add attributes to someone else's DID
-                didRegistry.registerAttribute(did, checksum, value, providers, anotherPerson),
+                didRegistry.registerAttribute(did, checksum, providers, value, anotherPerson),
                 constants.registry.error.onlyDIDOwner
             )
         })
 
         it('Should not allow url value gt 2048 bytes long', async () => {
-            const { didRegistry } = await setupTest()
+            const { didRegistry, providers } = await setupTest()
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             // value is about 2049
@@ -127,7 +127,7 @@ contract('DIDRegistry', (accounts) => {
             )
         })
         it('Should DID registry handle DID duplicates consistently', async () => {
-            const { didRegistry } = await setupTest()
+            const { didRegistry, providers } = await setupTest()
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
@@ -159,7 +159,7 @@ contract('DIDRegistry', (accounts) => {
     })
     describe('get DIDRegister', () => {
         it('successful register should DIDRegister', async () => {
-            const { common, didRegistry } = await setupTest()
+            const { common, didRegistry, providers } = await setupTest()
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'

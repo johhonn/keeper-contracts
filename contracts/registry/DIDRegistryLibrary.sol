@@ -77,11 +77,8 @@ library DIDRegistryLibrary {
             provider != address(0),
             'Invalid asset provider address'
         );
-        require(
-            !isDIDProvider(_self, _did, provider),
-            'Invalid duplicate asset provider address'
-        );
-        _self.didRegisters[_did].providers.push(provider);
+        if(!isDIDProvider(_self, _did, provider))
+            _self.didRegisters[_did].providers.push(provider);
         return true;
     }
 
