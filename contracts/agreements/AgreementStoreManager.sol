@@ -155,8 +155,23 @@ contract AgreementStoreManager is Ownable {
     }
 
     /**
+     * @dev get the DID owner for this agreement with _id.
+     * @param _id is the ID of the agreement.
+     * @return the DID owner associated with agreement.did from the DID registry.
+     */
+    function getAgreementDIDOwner(bytes32 _id)
+        external
+        view
+        returns (address didOwner)
+    {
+        bytes32 did = agreementList.agreements[_id].did;
+        return didRegistry.getDIDOwner(did);
+    }
+
+    /**
      * @dev check the DID owner for this agreement with _id.
      * @param _id is the ID of the agreement.
+     * @param _owner is the DID owner
      * @return the DID owner associated with agreement.did from the DID registry.
      */
     function isAgreementDIDOwner(bytes32 _id, address _owner)
