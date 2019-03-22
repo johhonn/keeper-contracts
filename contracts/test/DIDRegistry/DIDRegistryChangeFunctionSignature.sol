@@ -20,6 +20,7 @@ contract DIDRegistryChangeFunctionSignature is DIDRegistry {
             didRegisterList.didRegisters[_did].owner == msg.sender,
             'Attributes must be registered by the DID owners.'
         );
+
         require(
             //TODO: 2048 should be changed in the future
             bytes(_value).length <= 2048,
@@ -29,10 +30,11 @@ contract DIDRegistryChangeFunctionSignature is DIDRegistry {
         didRegisterList.update(_did, _checksum);
 
         // push providers to storage
-        for(uint256 i = 0; i < _providers.length; i++){
+        for(uint256 i = 0; i < _providers.length; i++) {
             didRegisterList.addProvider(_did, _providers[i]);
         }
 
+        /* emitting _value here to avoid expensive storage */
         emit DIDAttributeRegistered(
             _did,
             didRegisterList.didRegisters[_did].owner,
