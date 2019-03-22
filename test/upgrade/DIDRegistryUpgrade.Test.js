@@ -149,7 +149,7 @@ contract('DIDRegistry', (accounts) => {
 
             // act
             const result = await DIDRegistryChangeFunctionSignatureInstance.registerAttribute(
-                newChecksum, newDid, newValue,
+                newChecksum, newDid, [], newValue,
                 { from: didOwner }
             )
 
