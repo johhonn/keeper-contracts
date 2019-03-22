@@ -107,7 +107,7 @@ contract('EscrowAccessSecretStoreTemplate', (accounts) => {
             )
 
             // register DID
-            await didRegistry.registerAttribute(agreement.did, constants.bytes32.one, constants.registry.url)
+            await didRegistry.registerAttribute(agreement.did, constants.bytes32.one, [], constants.registry.url)
 
             await escrowAccessSecretStoreTemplate.createAgreement(agreementId, ...Object.values(agreement))
 
@@ -147,7 +147,7 @@ contract('EscrowAccessSecretStoreTemplate', (accounts) => {
             const { agreementId, agreement } = await prepareAgreement()
 
             // register DID
-            await didRegistry.registerAttribute(agreement.did, constants.bytes32.one, constants.registry.url)
+            await didRegistry.registerAttribute(agreement.did, constants.bytes32.one, [], constants.registry.url)
 
             // propose and approve template
             const templateId = escrowAccessSecretStoreTemplate.address

@@ -33,7 +33,7 @@ module.exports = {
             port: rpcPort || 8545,
             // has to be '*' because this is usually ganache
             network_id: '*',
-            gas: 6000000
+            gas: 6721975
         },
         // local network for generate coverage
         coverage: {

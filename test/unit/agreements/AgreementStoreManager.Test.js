@@ -46,7 +46,7 @@ contract('AgreementStoreManager', (accounts) => {
         ))
         common = await Common.new()
         if (registerDID) {
-            await didRegistry.registerAttribute(did, checksum, value)
+            await didRegistry.registerAttribute(did, checksum, [], value)
         }
 
         return {
