@@ -7,9 +7,9 @@ contract DIDRegistryChangeFunctionSignature is DIDRegistry {
 
     // swap _checksum with _did
     function registerAttribute (
-        bytes32 _checksum,
         bytes32 _did,
         address[] memory _providers,
+        bytes32 _checksum,
         string memory _value
     )
         public
