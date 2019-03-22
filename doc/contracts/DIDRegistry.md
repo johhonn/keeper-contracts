@@ -31,6 +31,23 @@ Parameters:
 * address _lastUpdatedBy
 * uint256 _blockNumberUpdated
 
+###  DIDProviderRemoved
+Parameters:
+* bytes32 _did
+* address _provider
+* bool state
+
+###  DIDProviderAdded
+Parameters:
+* bytes32 _did
+* address _provider
+
+## Modifiers
+
+### internal onlyDIDOwner
+Parameters:
+* bytes32 _did
+
 ## Functions
 
 ### public initialize
@@ -61,7 +78,23 @@ Documentation:
 Parameters:
 * bytes32 _did
 * bytes32 _checksum
+* address[] _providers
 * string _value
+
+### external addDIDProvider
+Parameters:
+* bytes32 _did
+* address _provider
+
+### external removeDIDProvider
+Parameters:
+* bytes32 _did
+* address _provider
+
+### public isDIDProvider
+Parameters:
+* bytes32 _did
+* address _provider
 
 ### public getDIDRegister
 
