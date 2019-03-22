@@ -21,15 +21,6 @@ library DIDRegistryLibrary {
         bytes32[] didRegisterIds;
     }
 
-    modifier onlyDIDOwner(DIDRegisterList storage _self, bytes32 _did)
-    {
-        require(
-            _self.didRegisters[_did].owner == msg.sender,
-            'Invalid DID owner'
-        );
-        _;
-    }
-
    /**
     * @notice update the DID store
     * @dev access modifiers and storage pointer should be implemented in DIDRegistry
@@ -52,44 +43,45 @@ library DIDRegistryLibrary {
             _self.didRegisterIds.push(_did);
         }
 
-        _self.didRegisters[_did] = DIDRegister(
-            didOwner,
-            _checksum,
-            msg.sender,
-            block.number,
-            new address[](0)
-        );
+        _self.didRegisters[_did] = DIDRegister({
+            owner: didOwner,
+            lastChecksum: _checksum,
+            lastUpdatedBy: msg.sender,
+            blockNumberUpdated: block.number,
+            providers: new address[](0)
+        });
 
         return _self.didRegisterIds.length;
     }
 
-    function pushProviderToDIDRegistry
+    function addProvider
     (
         DIDRegisterList storage _self,
         bytes32 _did,
         address provider
     )
-        external
-        onlyDIDOwner(_self, _did)
+        internal
         returns(bool)
     {
         require(
             provider != address(0),
             'Invalid asset provider address'
         );
-        if(!isDIDProvider(_self, _did, provider))
+
+        if(!isProvider(_self, _did, provider)) {
             _self.didRegisters[_did].providers.push(provider);
+        }
+
         return true;
     }
 
-    function popProviderFromDIDRegistry
+    function removeProvider
     (
         DIDRegisterList storage _self,
         bytes32 _did,
         address _provider
     )
-        external
-        onlyDIDOwner(_self, _did)
+        internal
         returns(bool)
     {
         require(
@@ -97,14 +89,18 @@ library DIDRegistryLibrary {
             'Invalid asset provider address'
         );
 
-        int256 i = getDIDProviderIndex(_self, _did, _provider);
-        if(i == -1)
+        int256 i = getProviderIndex(_self, _did, _provider);
+
+        if(i == -1) {
             return false;
+        }
+
         delete _self.didRegisters[_did].providers[uint256(i)];
+
         return true;
     }
 
-    function isDIDProvider
+    function isProvider
     (
         DIDRegisterList storage _self,
         bytes32 _did,
@@ -114,13 +110,16 @@ library DIDRegistryLibrary {
         view
         returns(bool)
     {
-        int256 i = getDIDProviderIndex(_self, _did, _provider);
-        if(i == -1)
+        int256 i = getProviderIndex(_self, _did, _provider);
+
+        if(i == -1) {
             return false;
+        }
+
         return true;
     }
 
-    function getDIDProviderIndex
+    function getProviderIndex
     (
         DIDRegisterList storage _self,
         bytes32 _did,

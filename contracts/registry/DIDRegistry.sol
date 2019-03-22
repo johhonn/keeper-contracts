@@ -12,7 +12,6 @@ import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
  */
 contract DIDRegistry is Ownable {
 
-    uint256 maxProvidersPerDID = 0;
     /**
      * @dev The DIDRegistry Library takes care of the basic storage functions.
      */
@@ -30,7 +29,7 @@ contract DIDRegistry is Ownable {
     event DIDAttributeRegistered(
         bytes32 indexed _did,
         address indexed _owner,
-        bytes32 _checksum,
+        bytes32 indexed _checksum,
         string _value,
         address _lastUpdatedBy,
         uint256 _blockNumberUpdated
@@ -47,24 +46,27 @@ contract DIDRegistry is Ownable {
         address _provider
     );
 
+    modifier onlyDIDOwner(bytes32 _did)
+    {
+        require(
+            msg.sender == didRegisterList.didRegisters[_did].owner,
+            'Invalid DID owner'
+        );
+        _;
+    }
+
     /**
      * @dev DIDRegistry Initializer
      *      Initialize Ownable. Only on contract creation.
      * @param _owner refers to the owner of the contract.
      */
     function initialize(
-        uint256 _maxProvidersPerDID,
         address _owner
     )
         public
         initializer
     {
-        require(
-            maxProvidersPerDID <= _maxProvidersPerDID,
-            'Invalid max number of providers per DID'
-        );
         Ownable.initialize(_owner);
-        maxProvidersPerDID = _maxProvidersPerDID;
     }
 
     /**
@@ -92,20 +94,18 @@ contract DIDRegistry is Ownable {
             didRegisterList.didRegisters[_did].owner == msg.sender,
             'Attributes must be registered by the DID owners.'
         );
+
         require(
             //TODO: 2048 should be changed in the future
             bytes(_value).length <= 2048,
             'Invalid value size'
         );
-        require(
-            _providers.length <= maxProvidersPerDID,
-            'Number of providers exceeds the limit'
-        );
 
         didRegisterList.update(_did, _checksum);
+
         // push providers to storage
-        for(uint256 i=0; i < _providers.length; i++){
-            didRegisterList.pushProviderToDIDRegistry(_did, _providers[i]);
+        for(uint256 i = 0; i < _providers.length; i++) {
+            didRegisterList.addProvider(_did, _providers[i]);
         }
 
         /* emitting _value here to avoid expensive storage */
@@ -126,14 +126,9 @@ contract DIDRegistry is Ownable {
         address _provider
     )
         external
+        onlyDIDOwner(_did)
     {
-        require(
-            didRegisterList.didRegisters[_did].providers.length + 1
-            <= maxProvidersPerDID,
-            'Number of providers exceeds the limit'
-        );
-
-        didRegisterList.pushProviderToDIDRegistry(_did, _provider);
+        didRegisterList.addProvider(_did, _provider);
 
         emit DIDProviderAdded(
             _did,
@@ -146,9 +141,9 @@ contract DIDRegistry is Ownable {
         address _provider
     )
         external
+        onlyDIDOwner(_did)
     {
-        bool state =
-        didRegisterList.popProviderFromDIDRegistry(_did, _provider);
+        bool state = didRegisterList.addProvider(_did, _provider);
 
         emit DIDProviderRemoved(
             _did,
@@ -166,7 +161,7 @@ contract DIDRegistry is Ownable {
         view
         returns(bool)
     {
-        return didRegisterList.isDIDProvider(_did, _provider);
+        return didRegisterList.isProvider(_did, _provider);
     }
 
     /**

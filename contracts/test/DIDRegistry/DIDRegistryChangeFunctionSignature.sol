@@ -25,16 +25,12 @@ contract DIDRegistryChangeFunctionSignature is DIDRegistry {
             bytes(_value).length <= 2048,
             'Invalid value size'
         );
-        require(
-            _providers.length <= maxProvidersPerDID,
-            'Number of providers exceeds the limit'
-        );
 
         didRegisterList.update(_did, _checksum);
 
         // push providers to storage
-        for(uint256 i=0; i < _providers.length; i++){
-            didRegisterList.pushProviderToDIDRegistry(_did, _providers[i]);
+        for(uint256 i = 0; i < _providers.length; i++){
+            didRegisterList.addProvider(_did, _providers[i]);
         }
 
         emit DIDAttributeRegistered(
