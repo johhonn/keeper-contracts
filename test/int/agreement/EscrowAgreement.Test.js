@@ -124,7 +124,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
             const { agreementId, agreement, sender, receiver, escrowAmount, checksum, url } = await prepareEscrowAgreement()
 
             // register DID
-            await didRegistry.registerAttribute(agreement.did, checksum, url, { from: receiver })
+            await didRegistry.registerAttribute(agreement.did, checksum, [], url, { from: receiver })
 
             // create agreement
             await escrowAccessSecretStoreTemplate.createAgreement(agreementId, ...Object.values(agreement))
@@ -190,7 +190,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
             const { agreementId, agreement, sender, receiver, escrowAmount, timeOutAccess, checksum, url } = await prepareEscrowAgreement({ timeOutAccess: 10 })
 
             // register DID
-            await didRegistry.registerAttribute(agreement.did, checksum, url, { from: receiver })
+            await didRegistry.registerAttribute(agreement.did, checksum, [], url, { from: receiver })
 
             // create agreement
             await escrowAccessSecretStoreTemplate.createAgreement(agreementId, ...Object.values(agreement))
@@ -242,7 +242,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
             const { agreementId, agreement, sender, receiver, escrowAmount, timeLockAccess, checksum, url } = await prepareEscrowAgreement({ timeLockAccess: 10 })
 
             // register DID
-            await didRegistry.registerAttribute(agreement.did, checksum, url, { from: receiver })
+            await didRegistry.registerAttribute(agreement.did, checksum, [], url, { from: receiver })
             // fill up wallet
             await oceanToken.mint(sender, escrowAmount, { from: owner })
 
@@ -275,7 +275,15 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
             expect(await accessSecretStoreCondition.checkPermissions(receiver, agreement.did)).to.equal(true)
 
             // execute payment
-            await escrowReward.fulfill(agreementId, escrowAmount, receiver, sender, agreement.conditionIds[1], agreement.conditionIds[0], { from: receiver })
+            await escrowReward.fulfill(
+                agreementId,
+                escrowAmount,
+                receiver,
+                sender,
+                agreement.conditionIds[1],
+                agreement.conditionIds[0],
+                { from: receiver }
+            )
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(agreement.conditionIds[2])).toNumber(),
                 constants.condition.state.fulfilled
@@ -292,7 +300,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
                 const { agreementId, agreement, sender, receiver, escrowAmount, checksum, url } = await prepareEscrowAgreement()
 
                 // register DID
-                await didRegistry.registerAttribute(agreement.did, checksum, url, { from: receiver })
+                await didRegistry.registerAttribute(agreement.did, checksum, [], url, { from: receiver })
 
                 // create agreement
                 await escrowAccessSecretStoreTemplate.createAgreement(agreementId, ...Object.values(agreement))

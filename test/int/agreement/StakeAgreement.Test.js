@@ -120,7 +120,7 @@ contract('Stake Agreement integration test', (accounts) => {
             await oceanToken.mint(alice, stakeAmount, { from: owner })
 
             // register DID
-            await didRegistry.registerAttribute(agreement.did, checksum, url)
+            await didRegistry.registerAttribute(agreement.did, checksum, [], url)
 
             // create agreement: as approved account - not for production ;)
             await agreementStoreManager.createAgreement(agreementId, ...Object.values(agreement))
