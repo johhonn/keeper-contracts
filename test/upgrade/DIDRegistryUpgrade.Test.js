@@ -39,7 +39,7 @@ contract('DIDRegistry', (accounts) => {
         const DIDRegistryInstance = await DIDRegistry.at(DIDRegistryProxyAddress)
 
         let result = await DIDRegistryInstance.registerAttribute(
-            did, checksum, value,
+            did, checksum, [], value,
             { from: didOwner }
         )
         // some quick checks
@@ -98,7 +98,7 @@ contract('DIDRegistry', (accounts) => {
             const newChecksum = testUtils.generateId()
             const newValue = 'https://example.com/newdid/ocean/test.txt'
             const result = await DIDRegistryWithBugInstance.registerAttribute(
-                newChecksum, newDid, newValue,
+                newChecksum, newDid, [], newValue,
                 { from: didOwner }
             )
 
@@ -143,7 +143,7 @@ contract('DIDRegistry', (accounts) => {
 
             // TODO: @ahmed - should revert
             await DIDRegistryChangeFunctionSignatureInstance.registerAttribute(
-                newDid, newChecksum, newValue,
+                newDid, newChecksum, [], newValue,
                 { from: didOwner }
             )
 
@@ -229,7 +229,7 @@ contract('DIDRegistry', (accounts) => {
 
             // act
             const result = await DIDRegistryChangeInStorageAndLogicInstance.registerAttribute(
-                newChecksum, newDid, newValue,
+                newChecksum, newDid, [], newValue,
                 { from: didOwner }
             )
 

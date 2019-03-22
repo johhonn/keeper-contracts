@@ -12,26 +12,24 @@ const testUtils = require('../../helpers/utils.js')
 const constants = require('../../helpers/constants.js')
 
 contract('DIDRegistry', (accounts) => {
-    async function setupTest({
-        owner = accounts[1],
-        providers = [accounts[8], accounts[9]]
-    } = {}) {
+    const owner = accounts[1]
+    const providers = [accounts[8], accounts[9]]
+
+    async function setupTest() {
         const didRegistryLibrary = await DIDRegistryLibrary.new()
         await DIDRegistry.link('DIDRegistryLibrary', didRegistryLibrary.address)
         const didRegistry = await DIDRegistry.new()
-        await didRegistry.initialize(providers.length, owner)
+        await didRegistry.initialize(owner)
         const common = await Common.new()
         return {
             common,
-            didRegistry,
-            owner,
-            providers
+            didRegistry
         }
     }
 
     describe('Register decentralised identifiers with attributes, fetch attributes by DID', () => {
         it('Should discover the attribute after registering it', async () => {
-            const { didRegistry, providers } = await setupTest()
+            const { didRegistry } = await setupTest()
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
@@ -47,7 +45,7 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('Should find the event from the block number', async () => {
-            const { didRegistry, providers } = await setupTest()
+            const { didRegistry } = await setupTest()
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
@@ -85,7 +83,7 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('Should not fail to register the same attribute twice', async () => {
-            const { didRegistry, providers } = await setupTest()
+            const { didRegistry } = await setupTest()
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
@@ -98,7 +96,7 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('Should only allow the owner to set an attribute', async () => {
-            const { didRegistry, providers } = await setupTest()
+            const { didRegistry } = await setupTest()
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
@@ -115,7 +113,7 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('Should not allow url value gt 2048 bytes long', async () => {
-            const { didRegistry, providers } = await setupTest()
+            const { didRegistry } = await setupTest()
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             // value is about 2049
@@ -126,8 +124,9 @@ contract('DIDRegistry', (accounts) => {
                 constants.registry.error.invalidValueSize
             )
         })
+
         it('Should DID registry handle DID duplicates consistently', async () => {
-            const { didRegistry, providers } = await setupTest()
+            const { didRegistry } = await setupTest()
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
@@ -157,9 +156,10 @@ contract('DIDRegistry', (accounts) => {
             )
         })
     })
+
     describe('get DIDRegister', () => {
         it('successful register should DIDRegister', async () => {
-            const { common, didRegistry, providers } = await setupTest()
+            const { common, didRegistry } = await setupTest()
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'

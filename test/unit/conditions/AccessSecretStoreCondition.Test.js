@@ -52,7 +52,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
         )
 
         if (registerDID) {
-            await didRegistry.registerAttribute(did, checksum, value)
+            await didRegistry.registerAttribute(did, checksum, [], value)
         }
 
         return {
