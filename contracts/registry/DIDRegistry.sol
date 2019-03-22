@@ -22,6 +22,15 @@ contract DIDRegistry is Ownable {
      */
     DIDRegistryLibrary.DIDRegisterList internal didRegisterList;
 
+    modifier onlyDIDOwner(bytes32 _did)
+    {
+        require(
+            msg.sender == didRegisterList.didRegisters[_did].owner,
+            'Invalid DID owner'
+        );
+        _;
+    }
+
     /**
      * @dev This implementation does not store _value on-chain,
      *      but emits DIDAttributeRegistered events to store it in the event log.
@@ -45,15 +54,6 @@ contract DIDRegistry is Ownable {
         bytes32 _did,
         address _provider
     );
-
-    modifier onlyDIDOwner(bytes32 _did)
-    {
-        require(
-            msg.sender == didRegisterList.didRegisters[_did].owner,
-            'Invalid DID owner'
-        );
-        _;
-    }
 
     /**
      * @dev DIDRegistry Initializer
