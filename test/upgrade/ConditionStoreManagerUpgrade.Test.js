@@ -40,6 +40,7 @@ contract('ConditionStoreManager', (accounts) => {
             artifacts,
             ['ConditionStoreManager'],
             true,
+            true,
             verbose
         )
 

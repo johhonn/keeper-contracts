@@ -8,7 +8,7 @@ module.exports = (cb) => {
     upgradeContracts(
         web3,
         contracts,
-        true
+        argv['verbose'] && true
     )
         .then(() => cb())
         .catch(err => cb(err))

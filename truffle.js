@@ -51,7 +51,7 @@ module.exports = {
                 url || `http://localhost:8545`
             ),
             network_id: 0x2324, // 8996
-            gas: 60000000,
+            gas: 8000000,
             gasPrice: 10000,
             from: '0xe2DD09d719Da89e5a3D0F2549c7E24566e947260'
         },

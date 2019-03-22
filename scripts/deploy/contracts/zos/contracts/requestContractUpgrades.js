@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-const getAddressForImplementation = require('./getAddressForImplementation')
-const submitTransaction = require('../../wallet/submitTransaction')
+const getImplementationAddress = require('./addresses/getImplementationAddress')
+const submitTransaction = require('../../../wallet/submitTransaction')
 
 async function requestContractUpgrade(
     oldContractName,
@@ -15,7 +15,7 @@ async function requestContractUpgrade(
         console.log(`Upgrading contract: ${oldContractName} with ${newContractName}`)
     }
 
-    const implementationAddress = getAddressForImplementation(
+    const implementationAddress = getImplementationAddress(
         oldContractName,
         networkId
     )

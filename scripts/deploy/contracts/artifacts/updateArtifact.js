@@ -1,10 +1,11 @@
 /* eslint-disable no-console */
 const fs = require('fs')
+const path = require('path')
 
 const createArtifact = require('./createArtifact')
-const zosGetMigrations = require('../zos/getMigrations')
+const zosGetMigrations = require('../zos/handlers/getMigrations')
 
-const artifactsDir = `${__dirname}/../../../../artifacts/`
+const artifactsDir = `${__dirname}/../../../../artifacts`
 const network = process.env.NETWORK || 'development'
 
 function updateArtifact(
@@ -26,9 +27,13 @@ function updateArtifact(
 
     const artifactFileName = `${oldContractName}.${network.toLowerCase()}.json`
 
+    const resolvedArtifactsDir = path.resolve(artifactsDir)
     /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-    const oldArtofactString = fs.readFileSync(`${artifactsDir}${artifactFileName}`, 'utf8').toString()
-    const oldArtifact = JSON.parse(oldArtofactString)
+    const oldArtifactString = fs.readFileSync(
+        `${resolvedArtifactsDir}/${artifactFileName}`,
+        'utf8'
+    ).toString()
+    const oldArtifact = JSON.parse(oldArtifactString)
 
     const { address } = oldArtifact
 
@@ -42,7 +47,10 @@ function updateArtifact(
     const artifactString = JSON.stringify(artifact, null, 2)
 
     /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-    fs.writeFileSync(`${artifactsDir}${artifactFileName}`, artifactString)
+    fs.writeFileSync(
+        `${artifactsDir}/${artifactFileName}`,
+        artifactString
+    )
 }
 
 module.exports = updateArtifact

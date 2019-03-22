@@ -1,8 +1,9 @@
 const fs = require('fs')
+const path = require('path')
 
 const createArtifact = require('./createArtifact')
 
-const artifactsDir = `${__dirname}/../../../../artifacts/`
+const artifactsDir = `${__dirname}/../../../../artifacts`
 
 function writeArtifact(
     name,
@@ -23,8 +24,9 @@ function writeArtifact(
     // write artifact
     const artifactString = JSON.stringify(artifact, null, 2)
 
+    const resolvedArtifactsDir = path.resolve(artifactsDir)
     /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-    fs.writeFileSync(`${artifactsDir}${filename}`, artifactString)
+    fs.writeFileSync(`${resolvedArtifactsDir}/${filename}`, artifactString)
 
     return artifact
 }
