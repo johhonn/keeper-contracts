@@ -127,15 +127,15 @@ library DIDRegistryLibrary {
     )
         private
         view
-        returns(int256 index)
+        returns(int256 )
     {
-        for(uint256 i=0; _self.didRegisters[_did].providers.length < i; i++)
+        for(uint256 i=0; i < _self.didRegisters[_did].providers.length; i++)
         {
             if(provider == _self.didRegisters[_did].providers[i])
             {
-                index = int(i);
+                return int(i);
             }
         }
-        index = -1;
+        return -1;
     }
 }
