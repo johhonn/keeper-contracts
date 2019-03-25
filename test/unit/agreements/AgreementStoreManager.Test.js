@@ -315,7 +315,6 @@ contract('AgreementStoreManager', (accounts) => {
                 { from: templateId }
             )
 
-
             assert.strictEqual(
                 await agreementStoreManager.isAgreementDIDOwner(agreementId, createRole),
                 true
@@ -381,7 +380,7 @@ contract('AgreementStoreManager', (accounts) => {
                 false
             )
         })
-        it('should able to get the Agreement DID Owner', async() => {
+        it('should able to get the Agreement DID Owner', async () => {
             const { did, owner, common, createRole } = await setupTest({ registerDID: true })
 
             const templateId = accounts[2]
@@ -407,7 +406,6 @@ contract('AgreementStoreManager', (accounts) => {
                 await agreementStoreManager.getAgreementDIDOwner(agreementId),
                 createRole
             )
-
         })
         it('should not create agreement if DID not registered', async () => {
             const { did, owner } = await setupTest()
