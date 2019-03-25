@@ -17,3 +17,7 @@ Documentation:
 @notice getCurrentBlockNumber get block number
 @return the current block number
 ```
+
+### public isContract
+Parameters:
+* address addr
