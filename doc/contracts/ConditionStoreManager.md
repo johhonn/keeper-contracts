@@ -40,6 +40,10 @@ Parameters:
 Parameters:
 * bytes32 _id
 
+### internal onlyValidType
+Parameters:
+* address typeRef
+
 ## Functions
 
 ### public initialize
@@ -50,6 +54,11 @@ Parameters:
 
 ### external delegateCreateRole
 Parameters:
+* address delegatee
+
+### external delegateUpdateRole
+Parameters:
+* bytes32 _id
 * address delegatee
 
 ### external createCondition

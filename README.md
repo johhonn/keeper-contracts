@@ -138,20 +138,20 @@ The contract addresses deployed on Ocean Nile testnet:
 
 | Contract                          | Version | Address                                      |
 |-----------------------------------|---------|----------------------------------------------|
-| AccessSecretStoreCondition        | v0.8.6  | `0x5Ba6ce2dA741765C0BE7F36020c2cf45Fe114cB1` |
-| AgreementStoreManager             | v0.8.6  | `0xF1F163863ca92d0137B8422efb69e18bd8A2702B` |
-| ConditionStoreManager             | v0.8.6  | `0x76623019b1aa68DC81d3209B668Beff5BAd6c8a5` |
-| DIDRegistry                       | v0.8.6  | `0x20C8735F6a9b73a9B1410967df2D4C64bb89Df85` |
-| DIDRegistryLibrary                | v0.8.6  | `0x5369f93E88eEC2928A7b1F48f91c0C750672BDaA` |
-| Dispenser                         | v0.8.6  | `0xB916bbe2b564513bfDf0Ef75131AaD91d9Ef4E68` |
-| EpochLibrary                      | v0.8.6  | `0xcb33e0a2cC89BD1fcE0e62057F3aaA30C0FC8A66` |
-| EscrowAccessSecretStoreTemplate   | v0.8.6  | `0x05659b10Ae28ad96e443fD6310C082FA6596b37f` |
-| EscrowReward                      | v0.8.6  | `0xc5c416e5ad029c706EA5D24cC2c138e80B8Aac74` |
-| HashLockCondition                 | v0.8.6  | `0x41fc8CeBF70DAe91D67Fc542b4004F3A0c5A3F2a` |
-| LockRewardCondition               | v0.8.6  | `0xED1834062d22C0D9e65adbEbA525f548719662dc` |
-| OceanToken                        | v0.8.6  | `0xcDae1AFa8025BE03Bc56D112eB4da3277913563d` |
-| SignCondition                     | v0.8.6  | `0xdA24A09f281076277590bC951693bB96eB240B86` |
-| TemplateStoreManager              | v0.8.6  | `0x2a407A7659dE806FcC06b2C205e7a44D05379C58` |
+| AccessSecretStoreCondition        | v0.8.7  | `0x5Ba6ce2dA741765C0BE7F36020c2cf45Fe114cB1` |
+| AgreementStoreManager             | v0.8.7  | `0xF1F163863ca92d0137B8422efb69e18bd8A2702B` |
+| ConditionStoreManager             | v0.8.7  | `0x76623019b1aa68DC81d3209B668Beff5BAd6c8a5` |
+| DIDRegistry                       | v0.8.7  | `0x20C8735F6a9b73a9B1410967df2D4C64bb89Df85` |
+| DIDRegistryLibrary                | v0.8.7  | `0x5369f93E88eEC2928A7b1F48f91c0C750672BDaA` |
+| Dispenser                         | v0.8.7  | `0xB916bbe2b564513bfDf0Ef75131AaD91d9Ef4E68` |
+| EpochLibrary                      | v0.8.7  | `0xcb33e0a2cC89BD1fcE0e62057F3aaA30C0FC8A66` |
+| EscrowAccessSecretStoreTemplate   | v0.8.7  | `0x05659b10Ae28ad96e443fD6310C082FA6596b37f` |
+| EscrowReward                      | v0.8.7  | `0xc5c416e5ad029c706EA5D24cC2c138e80B8Aac74` |
+| HashLockCondition                 | v0.8.7  | `0x41fc8CeBF70DAe91D67Fc542b4004F3A0c5A3F2a` |
+| LockRewardCondition               | v0.8.7  | `0xED1834062d22C0D9e65adbEbA525f548719662dc` |
+| OceanToken                        | v0.8.7  | `0xcDae1AFa8025BE03Bc56D112eB4da3277913563d` |
+| SignCondition                     | v0.8.7  | `0xdA24A09f281076277590bC951693bB96eB240B86` |
+| TemplateStoreManager              | v0.8.7  | `0x2a407A7659dE806FcC06b2C205e7a44D05379C58` |
 
 #### Kovan Testnet
 
