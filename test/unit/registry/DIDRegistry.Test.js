@@ -251,12 +251,12 @@ contract('DIDRegistry', (accounts) => {
                 providers[1]
             )
             // remove twice to check the fork (-1)
-            const removeDIDProviderState = await didRegistry.removeDIDProvider(
+            await didRegistry.removeDIDProvider(
                 did,
                 providers[1]
             )
 
-            //assert
+            // assert
             assert.strictEqual(
                 await didRegistry.isDIDProvider(did, providers[0]),
                 false
