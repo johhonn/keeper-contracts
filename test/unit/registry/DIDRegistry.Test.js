@@ -208,7 +208,6 @@ contract('DIDRegistry', (accounts) => {
             assert.strictEqual(await didRegistry.isDIDProvider(did, providers[0]), true)
             assert.strictEqual(await didRegistry.isDIDProvider(did, providers[1]), true)
             assert.strictEqual(await didRegistry.isDIDProvider(did, accounts[7]), false)
-
         })
 
         it('register did then add providers', async () => {
@@ -222,7 +221,6 @@ contract('DIDRegistry', (accounts) => {
                 storedDIDRegister.providers.length,
                 0
             )
-
 
             assert.strictEqual(await didRegistry.isDIDProvider(did, providers[0]), false)
             assert.strictEqual(await didRegistry.isDIDProvider(did, providers[1]), false)
