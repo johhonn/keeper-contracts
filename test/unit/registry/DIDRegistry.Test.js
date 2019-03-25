@@ -191,4 +191,49 @@ contract('DIDRegistry', (accounts) => {
             )
         })
     })
+
+    describe('register DID providers', () => {
+        it('register did with providers', async () => {
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            await didRegistry.registerAttribute(did, checksum, providers, value)
+            const storedDIDRegister = await didRegistry.getDIDRegister(did)
+            assert.strictEqual(
+                storedDIDRegister.providers.length,
+                2
+            )
+
+            assert.strictEqual(await didRegistry.isDIDProvider(did, providers[0]), true)
+            assert.strictEqual(await didRegistry.isDIDProvider(did, providers[1]), true)
+            assert.strictEqual(await didRegistry.isDIDProvider(did, accounts[7]), false)
+        })
+
+        it('register did then add providers', async () => {
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            await didRegistry.registerAttribute(did, checksum, [], value)
+            const storedDIDRegister = await didRegistry.getDIDRegister(did)
+            assert.strictEqual(
+                storedDIDRegister.providers.length,
+                0
+            )
+
+            assert.strictEqual(await didRegistry.isDIDProvider(did, providers[0]), false)
+            assert.strictEqual(await didRegistry.isDIDProvider(did, providers[1]), false)
+
+            await didRegistry.addDIDProvider(did, providers[0])
+            assert.strictEqual(await didRegistry.isDIDProvider(did, providers[0]), true)
+
+            const updatedDIDRegister = await didRegistry.getDIDRegister(did)
+            assert.strictEqual(
+                updatedDIDRegister.providers.length,
+                1
+            )
+            assert.strictEqual(updatedDIDRegister.providers[0], providers[0])
+        })
+    })
 })

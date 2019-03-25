@@ -175,7 +175,8 @@ contract DIDRegistry is Ownable {
             address owner,
             bytes32 lastChecksum,
             address lastUpdatedBy,
-            uint256 blockNumberUpdated
+            uint256 blockNumberUpdated,
+            address[] memory providers
         )
     {
         owner = didRegisterList.didRegisters[_did].owner;
@@ -183,6 +184,7 @@ contract DIDRegistry is Ownable {
         lastUpdatedBy = didRegisterList.didRegisters[_did].lastUpdatedBy;
         blockNumberUpdated =
             didRegisterList.didRegisters[_did].blockNumberUpdated;
+        providers = didRegisterList.didRegisters[_did].providers;
     }
 
     /**
