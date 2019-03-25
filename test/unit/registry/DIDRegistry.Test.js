@@ -231,6 +231,42 @@ contract('DIDRegistry', (accounts) => {
             )
         })
 
+        it('should DID owner able to remove all the providers', async () => {
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            await didRegistry.registerAttribute(did, checksum, providers, value)
+            const storedDIDRegister = await didRegistry.getDIDRegister(did)
+            assert.strictEqual(
+                storedDIDRegister.providers.length,
+                providers.length
+            )
+            await didRegistry.removeDIDProvider(
+                did,
+                providers[0]
+            )
+            await didRegistry.removeDIDProvider(
+                did,
+                providers[1]
+            )
+            // remove twice to check the fork (-1)
+            const removeDIDProviderState = await didRegistry.removeDIDProvider(
+                did,
+                providers[1]
+            )
+
+            //assert
+            assert.strictEqual(
+                await didRegistry.isDIDProvider(did, providers[0]),
+                false
+            )
+            assert.strictEqual(
+                await didRegistry.isDIDProvider(did, providers[1]),
+                false
+            )
+        })
+
         it('should register did then add providers', async () => {
             const { didRegistry } = await setupTest()
             const did = constants.did[0]
