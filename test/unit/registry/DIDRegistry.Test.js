@@ -193,7 +193,7 @@ contract('DIDRegistry', (accounts) => {
     })
 
     describe('register DID providers', () => {
-        it('register did with providers', async () => {
+        it('should register did with providers', async () => {
             const { didRegistry } = await setupTest()
             const did = constants.did[0]
             const checksum = testUtils.generateId()
@@ -210,7 +210,28 @@ contract('DIDRegistry', (accounts) => {
             assert.strictEqual(await didRegistry.isDIDProvider(did, accounts[7]), false)
         })
 
-        it('register did then add providers', async () => {
+        it('should owner able to remove DID provider', async () => {
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            await didRegistry.registerAttribute(did, checksum, providers, value)
+            const storedDIDRegister = await didRegistry.getDIDRegister(did)
+            assert.strictEqual(
+                storedDIDRegister.providers.length,
+                providers.length
+            )
+            await didRegistry.removeDIDProvider(
+                did,
+                providers[0]
+            )
+            assert.strictEqual(
+                await didRegistry.isDIDProvider(did, providers[0]),
+                false
+            )
+        })
+
+        it('should register did then add providers', async () => {
             const { didRegistry } = await setupTest()
             const did = constants.did[0]
             const checksum = testUtils.generateId()
