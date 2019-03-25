@@ -205,9 +205,9 @@ contract('DIDRegistry', (accounts) => {
                 2
             )
 
-            assert.strictEqual(await didRegistry.isDIDProvider(providers[0]), true)
-            assert.strictEqual(await didRegistry.isDIDProvider(providers[1]), true)
-            assert.strictEqual(await didRegistry.isDIDProvider(accounts[7]), false)
+            assert.strictEqual(await didRegistry.isDIDProvider(did, providers[0]), true)
+            assert.strictEqual(await didRegistry.isDIDProvider(did, providers[1]), true)
+            assert.strictEqual(await didRegistry.isDIDProvider(did, accounts[7]), false)
 
         })
 
@@ -223,11 +223,12 @@ contract('DIDRegistry', (accounts) => {
                 0
             )
 
-            assert.strictEqual(await didRegistry.isDIDProvider(providers[0]), false)
-            assert.strictEqual(await didRegistry.isDIDProvider(providers[1]), false)
+
+            assert.strictEqual(await didRegistry.isDIDProvider(did, providers[0]), false)
+            assert.strictEqual(await didRegistry.isDIDProvider(did, providers[1]), false)
 
             await didRegistry.addDIDProvider(did, providers[0])
-            assert.strictEqual(await didRegistry.isDIDProvider(providers[0]), true)
+            assert.strictEqual(await didRegistry.isDIDProvider(did, providers[0]), true)
 
             const updatedDIDRegister = await didRegistry.getDIDRegister(did)
             assert.strictEqual(
