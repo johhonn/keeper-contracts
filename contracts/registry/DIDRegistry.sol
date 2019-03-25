@@ -143,7 +143,7 @@ contract DIDRegistry is Ownable {
         external
         onlyDIDOwner(_did)
     {
-        bool state = didRegisterList.addProvider(_did, _provider);
+        bool state = didRegisterList.removeProvider(_did, _provider);
 
         emit DIDProviderRemoved(
             _did,

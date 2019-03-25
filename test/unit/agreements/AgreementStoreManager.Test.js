@@ -294,7 +294,7 @@ contract('AgreementStoreManager', (accounts) => {
         })
 
         it('should not create agreement with existing ID', async () => {
-            const { did, owner, common } = await setupTest({ registerDID: true })
+            const { did, owner, common, createRole } = await setupTest({ registerDID: true })
 
             const templateId = accounts[2]
             await templateStoreManager.proposeTemplate(templateId)
@@ -315,6 +315,10 @@ contract('AgreementStoreManager', (accounts) => {
                 { from: templateId }
             )
 
+            assert.strictEqual(
+                await agreementStoreManager.isAgreementDIDOwner(agreementId, createRole),
+                true
+            )
             const otherAgreement = {
                 did: did,
                 conditionTypes: [common.address],
@@ -333,6 +337,76 @@ contract('AgreementStoreManager', (accounts) => {
             )
         })
 
+        it('should return false if weather it invalid DID or owner', async () => {
+            const { did, owner, common, createRole } = await setupTest({ registerDID: true })
+
+            const templateId = accounts[2]
+            await templateStoreManager.proposeTemplate(templateId)
+            await templateStoreManager.approveTemplate(templateId, { from: owner })
+
+            const agreement = {
+                did: did,
+                conditionTypes: [common.address],
+                conditionIds: [constants.bytes32.zero],
+                timeLocks: [0],
+                timeOuts: [2]
+            }
+            const agreementId = constants.bytes32.zero
+
+            await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement),
+                { from: templateId }
+            )
+
+            // assert
+            assert.strictEqual(
+                await agreementStoreManager.isAgreementDIDOwner(agreementId, createRole),
+                true
+            )
+
+            assert.strictEqual(
+                await agreementStoreManager.isAgreementDIDOwner(agreementId, common.address),
+                false
+            )
+
+            assert.strictEqual(
+                await agreementStoreManager.isAgreementDIDOwner(constants.bytes32.one, createRole),
+                false
+            )
+
+            assert.strictEqual(
+                await agreementStoreManager.isAgreementDIDOwner(constants.bytes32.one, common.address),
+                false
+            )
+        })
+        it('should able to get the Agreement DID Owner', async () => {
+            const { did, owner, common, createRole } = await setupTest({ registerDID: true })
+
+            const templateId = accounts[2]
+            await templateStoreManager.proposeTemplate(templateId)
+            await templateStoreManager.approveTemplate(templateId, { from: owner })
+
+            const agreement = {
+                did: did,
+                conditionTypes: [common.address],
+                conditionIds: [constants.bytes32.zero],
+                timeLocks: [0],
+                timeOuts: [2]
+            }
+            const agreementId = constants.bytes32.zero
+
+            await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement),
+                { from: templateId }
+            )
+
+            assert.strictEqual(
+                await agreementStoreManager.getAgreementDIDOwner(agreementId),
+                createRole
+            )
+        })
         it('should not create agreement if DID not registered', async () => {
             const { did, owner } = await setupTest()
 
