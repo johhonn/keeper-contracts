@@ -1747,11 +1747,11 @@
       }
     },
     "DIDRegistry": {
-      "address": "0x1814112b3d381e1aB0f22bb4a5189Db2EdA98140",
-      "constructorCode": "608060405234801561001057600080fd5b50610ed9806100206000396000f3fe",
-      "bodyBytecodeHash": "f495536fbf036eb17da5fe8e68517c07511ced7d2ab4ffa92ff40e8227746fc1",
-      "localBytecodeHash": "0017430aab1738c3a2447658c76176fa434127dc150abaec2afe97b8f9216bd4",
-      "deployedBytecodeHash": "89906382ecca51ecb91bd078eb446e131e6c43247183a63602b288aa79765051",
+      "address": "0x19861D637Cc38a49826e247971fB5eC288eF437A",
+      "constructorCode": "608060405234801561001057600080fd5b50611073806100206000396000f3fe",
+      "bodyBytecodeHash": "c31a58b31f068a7681546a62d83c01d062bcc69219f67a511946a8edc30f4a23",
+      "localBytecodeHash": "b8fc855dc9d02de75a03d9de3781e29a8dedfba260b8f26ab8dedc4deb23d8b8",
+      "deployedBytecodeHash": "62d228946e294b422bf10914632c5daaa9649f15042057d791953f279a9e454d",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -1782,13 +1782,13 @@
           "members": [
             {
               "label": "didRegisters",
-              "astId": 2882,
+              "astId": 2893,
               "type": "t_mapping<t_struct<DIDRegistryLibrary.DIDRegister>>",
               "src": "419:44:17"
             },
             {
               "label": "didRegisterIds",
-              "astId": 2885,
+              "astId": 2896,
               "type": "t_array:dyn<t_bytes32>",
               "src": "473:24:17"
             }
@@ -1801,31 +1801,31 @@
           "members": [
             {
               "label": "owner",
-              "astId": 2868,
+              "astId": 2879,
               "type": "t_address",
               "src": "234:13:17"
             },
             {
               "label": "lastChecksum",
-              "astId": 2870,
+              "astId": 2881,
               "type": "t_bytes32",
               "src": "257:20:17"
             },
             {
               "label": "lastUpdatedBy",
-              "astId": 2872,
+              "astId": 2883,
               "type": "t_address",
               "src": "287:21:17"
             },
             {
               "label": "blockNumberUpdated",
-              "astId": 2874,
+              "astId": 2885,
               "type": "t_uint256",
               "src": "318:26:17"
             },
             {
               "label": "providers",
-              "astId": 2877,
+              "astId": 2888,
               "type": "t_array:dyn<t_address>",
               "src": "354:19:17"
             }
@@ -1862,7 +1862,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initialized",
-          "astId": 5807,
+          "astId": 5814,
           "type": "t_bool",
           "src": "757:24:61"
         },
@@ -1870,7 +1870,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initializing",
-          "astId": 5809,
+          "astId": 5816,
           "type": "t_bool",
           "src": "876:25:61"
         },
@@ -1878,7 +1878,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "______gap",
-          "astId": 5858,
+          "astId": 5865,
           "type": "t_array:50<t_uint256>",
           "src": "1891:29:61"
         },
@@ -1886,7 +1886,7 @@
           "contract": "Ownable",
           "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
           "label": "_owner",
-          "astId": 4993,
+          "astId": 5000,
           "type": "t_address",
           "src": "302:22:55"
         },
@@ -1894,7 +1894,7 @@
           "contract": "Ownable",
           "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
           "label": "______gap",
-          "astId": 5104,
+          "astId": 5111,
           "type": "t_array:50<t_uint256>",
           "src": "2186:29:55"
         },
@@ -1936,11 +1936,11 @@
       "deployedBytecodeHash": "c46edd05b4033e211232e1f131bf40d625641304454710b707127a51bd7be095"
     },
     "DIDRegistryLibrary": {
-      "address": "0x6e98698222bd8067b0bbc4f57B58Bc68A28E6Dd7",
-      "constructorCode": "610398610030600b82828239805160001a6073146000811461002057610022565bfe5b5030600052607381538281f3fe",
-      "bodyBytecodeHash": "6ff8ef58d5677c7e98227331e6b73348dccb6d3a577e79333a8eb3417162ffb4",
-      "localBytecodeHash": "ada7014e403426a8718f79052775e3be6ab2f4f7dee65e428f2a28b4f177e821",
-      "deployedBytecodeHash": "ada7014e403426a8718f79052775e3be6ab2f4f7dee65e428f2a28b4f177e821"
+      "address": "0x3Da024d530488738EFDCD02043B77EFe4107A749",
+      "constructorCode": "61039b610030600b82828239805160001a6073146000811461002057610022565bfe5b5030600052607381538281f3fe",
+      "bodyBytecodeHash": "226df6a89bf7c1abf389d6dc56d76f262c4b69fe4917cbed88e59ee99edd2abe",
+      "localBytecodeHash": "f627b07033583ab7984f35364a64180e21fc23b56bb9bd75114390e172115c75",
+      "deployedBytecodeHash": "f627b07033583ab7984f35364a64180e21fc23b56bb9bd75114390e172115c75"
     }
   },
   "proxies": {
@@ -1950,6 +1950,18 @@
         "version": "v0.8.6",
         "implementation": "0x786d5341CAEf16499DEbcd60A060186Af7B4DB36",
         "admin": "0x24EB26D4042a2AB576E7E39b87c3f33f276AeF92"
+      },
+      {
+        "address": "0xdFb2588a6aec22Bb30fA7b6bcb67bfcF7daD7072",
+        "version": "v0.8.7",
+        "implementation": "0x19861D637Cc38a49826e247971fB5eC288eF437A",
+        "admin": "0xD237032cC4ca40044912B4DdF580702636614720"
+      },
+      {
+        "address": "0x1CE3e1Eeae3c55623fc464fC3f8cA97D1401831c",
+        "version": "v0.8.8",
+        "implementation": "0x19861D637Cc38a49826e247971fB5eC288eF437A",
+        "admin": "0x4A27a869E625CA1c920F8eB7f7c5A49f4E3AcA92"
       }
     ],
     "@oceanprotocol/keeper-contracts/OceanToken": [
@@ -1958,6 +1970,18 @@
         "version": "v0.8.6",
         "implementation": "0x5dBA049611Ef17fde756EbceC9605004D81b31Cd",
         "admin": "0x24EB26D4042a2AB576E7E39b87c3f33f276AeF92"
+      },
+      {
+        "address": "0x933EFBc6c8F04D8E9b4cECf0dcE7Dc8fFb221420",
+        "version": "v0.8.7",
+        "implementation": "0x5dBA049611Ef17fde756EbceC9605004D81b31Cd",
+        "admin": "0xD237032cC4ca40044912B4DdF580702636614720"
+      },
+      {
+        "address": "0xa2cDde96b25Ff564c25C309D921841A0b4a5862f",
+        "version": "v0.8.8",
+        "implementation": "0x5dBA049611Ef17fde756EbceC9605004D81b31Cd",
+        "admin": "0x4A27a869E625CA1c920F8eB7f7c5A49f4E3AcA92"
       }
     ],
     "@oceanprotocol/keeper-contracts/Dispenser": [
@@ -1966,6 +1990,18 @@
         "version": "v0.8.6",
         "implementation": "0x3b5053e107564268f1d7c61669dC5725E84e5a01",
         "admin": "0x24EB26D4042a2AB576E7E39b87c3f33f276AeF92"
+      },
+      {
+        "address": "0xC38E39E0bD2D35937608806049bb84150D014b76",
+        "version": "v0.8.7",
+        "implementation": "0x3b5053e107564268f1d7c61669dC5725E84e5a01",
+        "admin": "0xD237032cC4ca40044912B4DdF580702636614720"
+      },
+      {
+        "address": "0x100663C221Bb231e1Fa519422CcABbfbe519c585",
+        "version": "v0.8.8",
+        "implementation": "0x3b5053e107564268f1d7c61669dC5725E84e5a01",
+        "admin": "0x4A27a869E625CA1c920F8eB7f7c5A49f4E3AcA92"
       }
     ],
     "@oceanprotocol/keeper-contracts/ConditionStoreManager": [
@@ -1974,6 +2010,18 @@
         "version": "v0.8.6",
         "implementation": "0xFcc19F5bbc29E57B981C4C1b658Fd15f6AE120f3",
         "admin": "0x24EB26D4042a2AB576E7E39b87c3f33f276AeF92"
+      },
+      {
+        "address": "0xa72B30240E79B2d80be993D62e552fa3dAb2D85E",
+        "version": "v0.8.7",
+        "implementation": "0x5175833Ac7A5fA01A70C7a794DE610746a105AC8",
+        "admin": "0xD237032cC4ca40044912B4DdF580702636614720"
+      },
+      {
+        "address": "0xCAd2cDE56a8fA896321B3b855995749427F99710",
+        "version": "v0.8.8",
+        "implementation": "0x5175833Ac7A5fA01A70C7a794DE610746a105AC8",
+        "admin": "0x4A27a869E625CA1c920F8eB7f7c5A49f4E3AcA92"
       }
     ],
     "@oceanprotocol/keeper-contracts/TemplateStoreManager": [
@@ -1982,6 +2030,18 @@
         "version": "v0.8.6",
         "implementation": "0xbb4e607eaD231BB0dbe8dCbdA5AAA7F2c218D150",
         "admin": "0x24EB26D4042a2AB576E7E39b87c3f33f276AeF92"
+      },
+      {
+        "address": "0x5Bb73E11e1944885a1e44CD60120Ea4608d1211b",
+        "version": "v0.8.7",
+        "implementation": "0xbb4e607eaD231BB0dbe8dCbdA5AAA7F2c218D150",
+        "admin": "0xD237032cC4ca40044912B4DdF580702636614720"
+      },
+      {
+        "address": "0xb8DBa6845217f4CBFeb671Fd97E09a7659487506",
+        "version": "v0.8.8",
+        "implementation": "0xbb4e607eaD231BB0dbe8dCbdA5AAA7F2c218D150",
+        "admin": "0x4A27a869E625CA1c920F8eB7f7c5A49f4E3AcA92"
       }
     ],
     "@oceanprotocol/keeper-contracts/SignCondition": [
@@ -1990,6 +2050,18 @@
         "version": "v0.8.6",
         "implementation": "0xBE6B1355a030E33c86A627308B0EA05DD3E28524",
         "admin": "0x24EB26D4042a2AB576E7E39b87c3f33f276AeF92"
+      },
+      {
+        "address": "0xdA9D69D8EB063D8e6243A6678b3e8D26129cE509",
+        "version": "v0.8.7",
+        "implementation": "0xBE6B1355a030E33c86A627308B0EA05DD3E28524",
+        "admin": "0xD237032cC4ca40044912B4DdF580702636614720"
+      },
+      {
+        "address": "0xa6E8D3a08680b78b560dd356f7a1D5E362025A17",
+        "version": "v0.8.8",
+        "implementation": "0xBE6B1355a030E33c86A627308B0EA05DD3E28524",
+        "admin": "0x4A27a869E625CA1c920F8eB7f7c5A49f4E3AcA92"
       }
     ],
     "@oceanprotocol/keeper-contracts/HashLockCondition": [
@@ -1998,6 +2070,18 @@
         "version": "v0.8.6",
         "implementation": "0x42DA4C823eEB97eC098EAf436c3a55a062b55883",
         "admin": "0x24EB26D4042a2AB576E7E39b87c3f33f276AeF92"
+      },
+      {
+        "address": "0xF803298ba19c36F225715c3c0d73193E4D3dca42",
+        "version": "v0.8.7",
+        "implementation": "0x42DA4C823eEB97eC098EAf436c3a55a062b55883",
+        "admin": "0xD237032cC4ca40044912B4DdF580702636614720"
+      },
+      {
+        "address": "0xB42E4ed38c51D0F73F423A947C82F358274713B5",
+        "version": "v0.8.8",
+        "implementation": "0x42DA4C823eEB97eC098EAf436c3a55a062b55883",
+        "admin": "0x4A27a869E625CA1c920F8eB7f7c5A49f4E3AcA92"
       }
     ],
     "@oceanprotocol/keeper-contracts/AgreementStoreManager": [
@@ -2006,6 +2090,18 @@
         "version": "v0.8.6",
         "implementation": "0x578A5a25Ea9d6448dc0aAeb6E40A4367fbD15296",
         "admin": "0x24EB26D4042a2AB576E7E39b87c3f33f276AeF92"
+      },
+      {
+        "address": "0x12E682d21d39A7F1EC73977C9197C537F0C97AcA",
+        "version": "v0.8.7",
+        "implementation": "0xab367FD643e90942Ca0170599fdE988D96D2B1a7",
+        "admin": "0xD237032cC4ca40044912B4DdF580702636614720"
+      },
+      {
+        "address": "0x4a66fe017F31dee536393D78Bd0E0FCde20bB371",
+        "version": "v0.8.8",
+        "implementation": "0xab367FD643e90942Ca0170599fdE988D96D2B1a7",
+        "admin": "0x4A27a869E625CA1c920F8eB7f7c5A49f4E3AcA92"
       }
     ],
     "@oceanprotocol/keeper-contracts/LockRewardCondition": [
@@ -2014,6 +2110,18 @@
         "version": "v0.8.6",
         "implementation": "0x49290A9564631275Bf8702c696A7Eb78725321f2",
         "admin": "0x24EB26D4042a2AB576E7E39b87c3f33f276AeF92"
+      },
+      {
+        "address": "0x0AE409DAe6839bE8730F3686AA473D883520C058",
+        "version": "v0.8.7",
+        "implementation": "0x49290A9564631275Bf8702c696A7Eb78725321f2",
+        "admin": "0xD237032cC4ca40044912B4DdF580702636614720"
+      },
+      {
+        "address": "0xcD22742E4b159e07C552338b44193EB9b20040B0",
+        "version": "v0.8.8",
+        "implementation": "0x49290A9564631275Bf8702c696A7Eb78725321f2",
+        "admin": "0x4A27a869E625CA1c920F8eB7f7c5A49f4E3AcA92"
       }
     ],
     "@oceanprotocol/keeper-contracts/EscrowReward": [
@@ -2022,6 +2130,18 @@
         "version": "v0.8.6",
         "implementation": "0x52043CDc0B5084D509AfA999607117a19924A2b2",
         "admin": "0x24EB26D4042a2AB576E7E39b87c3f33f276AeF92"
+      },
+      {
+        "address": "0x8eC2C4d598Fd184f3ad2027fdF854f35a7079374",
+        "version": "v0.8.7",
+        "implementation": "0x4cD2027eE25A000c04b78C8e6F39d144eD3d7A94",
+        "admin": "0xD237032cC4ca40044912B4DdF580702636614720"
+      },
+      {
+        "address": "0xA2c38e568974BD0126fefb1e00A8fAE707B95773",
+        "version": "v0.8.8",
+        "implementation": "0x4cD2027eE25A000c04b78C8e6F39d144eD3d7A94",
+        "admin": "0x4A27a869E625CA1c920F8eB7f7c5A49f4E3AcA92"
       }
     ],
     "@oceanprotocol/keeper-contracts/AccessSecretStoreCondition": [
@@ -2030,6 +2150,18 @@
         "version": "v0.8.6",
         "implementation": "0x22ADf258DfFf2A846818e702610BBE8F7169644b",
         "admin": "0x24EB26D4042a2AB576E7E39b87c3f33f276AeF92"
+      },
+      {
+        "address": "0x338a43a4498a7d7ebbDc399e5df33ba930Db36fc",
+        "version": "v0.8.7",
+        "implementation": "0xeFC14F60429B4462D90AcEeEf5f9De5f88bDCEcE",
+        "admin": "0xD237032cC4ca40044912B4DdF580702636614720"
+      },
+      {
+        "address": "0x0a96C466aDCa0dDe6a22118f8CF994bC1fcB50eb",
+        "version": "v0.8.8",
+        "implementation": "0xeFC14F60429B4462D90AcEeEf5f9De5f88bDCEcE",
+        "admin": "0x4A27a869E625CA1c920F8eB7f7c5A49f4E3AcA92"
       }
     ],
     "@oceanprotocol/keeper-contracts/EscrowAccessSecretStoreTemplate": [
@@ -2038,11 +2170,23 @@
         "version": "v0.8.6",
         "implementation": "0x7E59456a3156e8E50B1c080A8a42F170920C5d08",
         "admin": "0x24EB26D4042a2AB576E7E39b87c3f33f276AeF92"
+      },
+      {
+        "address": "0xeF8F959E1f000c1bc2256c81D7963b745819A12B",
+        "version": "v0.8.7",
+        "implementation": "0x7E59456a3156e8E50B1c080A8a42F170920C5d08",
+        "admin": "0xD237032cC4ca40044912B4DdF580702636614720"
+      },
+      {
+        "address": "0xC2f334F55b8994a6afF4956FFCF1983fa141Fdf9",
+        "version": "v0.8.8",
+        "implementation": "0x7E59456a3156e8E50B1c080A8a42F170920C5d08",
+        "admin": "0x4A27a869E625CA1c920F8eB7f7c5A49f4E3AcA92"
       }
     ]
   },
   "zosversion": "2.2",
-  "version": "v0.8.7",
+  "version": "v0.8.8",
   "proxyAdmin": {
     "address": "0x4fd2bf7328EAc86897e18325de1126A70cDAF95f"
   }
