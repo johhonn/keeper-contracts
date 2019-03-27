@@ -6,7 +6,11 @@ import '../ISecretStore.sol';
 
 contract AccessSecretStoreCondition is Condition, ISecretStore {
 
-    mapping(bytes32 => mapping(address => bool)) private documentPermissions;
+    struct DocumentPermission {
+        bytes32 agreementId;
+        mapping(address => bool) permission;
+    }
+    mapping(bytes32 => DocumentPermission) private documentPermissions;
 
     AgreementStoreManager private agreementStoreManager;
 
@@ -58,7 +62,8 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
             agreementStoreManager.isAgreementDIDProvider(_agreementId, msg.sender),
             'Invalid UpdateRole'
         );
-        documentPermissions[_documentId][_grantee] = true;
+        documentPermissions[_documentId].permission[_grantee] = true;
+        documentPermissions[_documentId].agreementId = _agreementId;
 
         bytes32 _id = generateId(
             _agreementId,
@@ -92,7 +97,15 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         external view
         returns(bool permissionGranted)
     {
-        return documentPermissions[_documentId][_grantee];
+        //return true if the DID provider
+        if(agreementStoreManager.isAgreementDIDProvider
+            (
+                documentPermissions[_documentId].agreementId,
+                msg.sender
+            )
+           )
+            return true;
+        return documentPermissions[_documentId].permission[_grantee];
     }
 }
 
