@@ -101,7 +101,7 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         if(agreementStoreManager.isAgreementDIDProvider
             (
                 documentPermissions[_documentId].agreementId,
-                msg.sender
+                _grantee
             )
            )
             return true;

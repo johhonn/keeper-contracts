@@ -295,7 +295,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
 
             assert.strictEqual(
                 await accessSecretStoreCondition.checkPermissions(
-                    grantee,
+                    DIDProvider,
                     documentId,
                     {
                         from: DIDProvider
