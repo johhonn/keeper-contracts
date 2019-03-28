@@ -261,7 +261,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
         })
     })
     describe('check permissions', () => {
-        it("should grant permission in case of DID provider", async () => {
+        it('should grant permission in case of DID provider', async () => {
             const { DIDProvider } = await setupTest({ registerDID: true })
             const nonce = constants.bytes32.one
             const documentId = constants.bytes32.one
@@ -291,7 +291,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
                 { from: templateId }
             )
 
-            const result = await accessSecretStoreCondition.fulfill(nonce, documentId, grantee)
+            await accessSecretStoreCondition.fulfill(nonce, documentId, grantee)
 
             assert.strictEqual(
                 await accessSecretStoreCondition.checkPermissions(
@@ -303,7 +303,6 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
                 ),
                 true
             )
-
         })
         it('successful create should check permissions', async () => {
             await setupTest({ registerDID: true })
