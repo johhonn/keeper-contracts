@@ -97,14 +97,13 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         external view
         returns(bool permissionGranted)
     {
-        //return true if the DID provider
-        if(agreementStoreManager.isAgreementDIDProvider
-            (
+        bool isDIDProvider = agreementStoreManager.isAgreementDIDProvider(
                 documentPermissions[_documentId].agreementId,
                 _grantee
-            )
-           )
+            );
+        if(isDIDProvider)
             return true;
+
         return documentPermissions[_documentId].permission[_grantee];
     }
 }
