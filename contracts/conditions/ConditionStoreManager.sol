@@ -11,9 +11,23 @@ contract ConditionStoreManager is Ownable, Common {
     using ConditionStoreLibrary for ConditionStoreLibrary.ConditionList;
     using EpochLibrary for EpochLibrary.EpochList;
 
+    enum RoleType { Create, Update }
     address private createRole;
     ConditionStoreLibrary.ConditionList internal conditionList;
     EpochLibrary.EpochList internal epochList;
+
+    event ConditionCreated(
+        bytes32 indexed _id,
+        address indexed _typeRef,
+        address indexed _who
+    );
+
+    event ConditionUpdated(
+        bytes32 indexed _id,
+        address indexed _typeRef,
+        ConditionStoreLibrary.ConditionState indexed _state,
+        address _who
+    );
 
     modifier onlyCreateRole(){
         require(
@@ -32,16 +46,27 @@ contract ConditionStoreManager is Ownable, Common {
         _;
     }
 
+    modifier onlyValidType(address typeRef)
+    {
+        require(
+            typeRef != address(0),
+            'Invalid address'
+        );
+        require(
+            isContract(typeRef),
+            'Invalid contract address'
+        );
+        _;
+    }
+
     function initialize(
-        address _owner,
-        address _createRole
+        address _owner
     )
-        external
+        public
         initializer
     {
         require(
-            _owner != address(0) &&
-            _createRole != address(0),
+            _owner != address(0),
             'Invalid address'
         );
         require(
@@ -49,7 +74,7 @@ contract ConditionStoreManager is Ownable, Common {
             'Role already assigned'
         );
         Ownable.initialize(_owner);
-        createRole = _createRole;
+        createRole = _owner;
     }
 
     function getCreateRole()
@@ -58,6 +83,37 @@ contract ConditionStoreManager is Ownable, Common {
         returns (address)
     {
         return createRole;
+    }
+
+    function delegateCreateRole(
+        address delegatee
+    )
+        external
+        onlyOwner()
+    {
+        require(
+            delegatee != address(0),
+            'Invalid delegatee address'
+        );
+        createRole = delegatee;
+    }
+
+    function delegateUpdateRole(
+        bytes32 _id,
+        address delegatee
+    )
+        external
+        onlyOwner()
+    {
+        require(
+            delegatee != address(0),
+            'Invalid delegatee address'
+        );
+        require(
+            conditionList.conditions[_id].typeRef != address(0),
+            'Invalid condition Id'
+        );
+        conditionList.conditions[_id].typeRef = delegatee;
     }
 
     function createCondition(
@@ -84,14 +140,19 @@ contract ConditionStoreManager is Ownable, Common {
     )
         public
         onlyCreateRole
+        onlyValidType(_typeRef)
         returns (uint size)
     {
-        require(
-            _typeRef != address(0),
-            'Invalid address'
-        );
         epochList.create(_id, _timeLock, _timeOut);
-        return conditionList.create(_id, _typeRef);
+        uint listSize = conditionList.create(_id, _typeRef);
+
+        emit ConditionCreated(
+            _id,
+            _typeRef,
+            msg.sender
+        );
+
+        return listSize;
     }
 
     // update: Unfulfilled --> Fulfilled | Aborted | ...
@@ -113,7 +174,18 @@ contract ConditionStoreManager is Ownable, Common {
         // auto abort after time out
         if (isConditionTimedOut(_id))
             updateState = ConditionStoreLibrary.ConditionState.Aborted;
-        return conditionList.updateState(_id, updateState);
+
+        ConditionStoreLibrary.ConditionState state = conditionList
+            .updateState(_id, updateState);
+
+        emit ConditionUpdated(
+            _id,
+            conditionList.conditions[_id].typeRef,
+            _newState,
+            msg.sender
+        );
+
+        return state;
     }
 
     function getConditionListSize()

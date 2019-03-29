@@ -125,35 +125,37 @@ npm run upgrade <DEPLOYED_CONTRACT>:<NEW_CONTRACT>
 
 #### Nile Testnet
 
-Follow the steps for local deployment. Make sure that the address `0x90eE7A30339D05E07d9c6e65747132933ff6e624` is having enough (~1) Ether.
+Follow the steps for local deployment. Make sure that the address [`0x90eE7A30339D05E07d9c6e65747132933ff6e624`](https://submarine.dev-ocean.com/address/0x90ee7a30339d05e07d9c6e65747132933ff6e624) is having enough (~1) Ether.
 
 ```bash
 export NMEMORIC=<your nile nmemoric>
 npm run deploy:nile
 ```
 
-The transaction should show up on the account: `0x90eE7A30339D05E07d9c6e65747132933ff6e624`
+The transaction should show up on the account: [`0x90eE7A30339D05E07d9c6e65747132933ff6e624`](https://submarine.dev-ocean.com/address/0x90ee7a30339d05e07d9c6e65747132933ff6e624/transactions)
 
 The contract addresses deployed on Ocean Nile testnet:
 
 | Contract                          | Version | Address                                      |
 |-----------------------------------|---------|----------------------------------------------|
-| AccessSecretStoreCondition        | v0.7.0  | `0x146becf5607b4daea1be310781ee20a84d232541` |
-| AgreementStoreManager             | v0.7.0  | `0x3ec8be9fb4c3b5840650f6deab7e537917ba2243` |
-| ConditionStoreManager             | v0.7.0  | `0x4ca8a132f33989358d0a3042cd5394b57b820931` |
-| DIDRegistry                       | v0.7.0  | `0xa1f09400b6959c3de6a32a58e625858ae0370401` |
-| Dispenser                         | v0.7.0  | `0x3ebd0ab62a354bd3baeeed7345cf369ec7a1f2c5` |
-| EscrowAccessSecretStoreTemplate   | v0.7.0  | `0x743e848db40fb8a3cd996970feeabee0bfd0d2b6` |
-| EscrowReward                      | v0.7.0  | `0xc3ba87cb998d2d529c3ad97aa18a16468764e108` |
-| HashLockCondition                 | v0.7.0  | `0xe7ee67fc1b3009a04d89401eaa8356d6f6e407af` |
-| LockRewardCondition               | v0.7.0  | `0x918eb48009ccc25dbd6b4a6812cc5a859036df7e` |
-| OceanToken                        | v0.7.0  | `0x1e8a47dc8af56d48a2a6a3c9335537778adca420` |
-| SignCondition                     | v0.7.0  | `0x70f90441db73675436c60cdd5b0beb8d14aee01f` |
-| TemplateStoreManager              | v0.7.0  | `0x2778ae1d2e5a0af155b073d7de259f82f7d8f88f` |
+| AccessSecretStoreCondition        | v0.8.8  | `0x0a96C466aDCa0dDe6a22118f8CF994bC1fcB50eb` |
+| AgreementStoreManager             | v0.8.8  | `0x4a66fe017F31dee536393D78Bd0E0FCde20bB371` |
+| ConditionStoreManager             | v0.8.8  | `0xCAd2cDE56a8fA896321B3b855995749427F99710` |
+| DIDRegistry                       | v0.8.8  | `0x1CE3e1Eeae3c55623fc464fC3f8cA97D1401831c` |
+| DIDRegistryLibrary                | v0.8.8  | `0x3Da024d530488738EFDCD02043B77EFe4107A749` |
+| Dispenser                         | v0.8.8  | `0x100663C221Bb231e1Fa519422CcABbfbe519c585` |
+| EpochLibrary                      | v0.8.8  | `0xcb33e0a2cC89BD1fcE0e62057F3aaA30C0FC8A66` |
+| EscrowAccessSecretStoreTemplate   | v0.8.8  | `0xC2f334F55b8994a6afF4956FFCF1983fa141Fdf9` |
+| EscrowReward                      | v0.8.8  | `0xA2c38e568974BD0126fefb1e00A8fAE707B95773` |
+| HashLockCondition                 | v0.8.8  | `0xB42E4ed38c51D0F73F423A947C82F358274713B5` |
+| LockRewardCondition               | v0.8.8  | `0xcD22742E4b159e07C552338b44193EB9b20040B0` |
+| OceanToken                        | v0.8.8  | `0xa2cDde96b25Ff564c25C309D921841A0b4a5862f` |
+| SignCondition                     | v0.8.8  | `0xa6E8D3a08680b78b560dd356f7a1D5E362025A17` |
+| TemplateStoreManager              | v0.8.8  | `0xb8DBa6845217f4CBFeb671Fd97E09a7659487506` |
 
 #### Kovan Testnet
 
-Follow the steps for local deployment. Make sure that the address [0x2c0d5f47374b130ee398f4c34dbe8168824a8616](https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616) is having enough (~1) Ether.
+Follow the steps for local deployment. Make sure that the address [`0x2c0d5f47374b130ee398f4c34dbe8168824a8616`](https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616) is having enough (~1) Ether.
 
 If you managed to deploy the contracts locally do:
 
@@ -163,24 +165,26 @@ export NMEMORIC=<your kovan nmemoric>
 npm run deploy:kovan
 ```
 
-The transaction should show up on: `https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616`
+The transaction should show up on: [`0x2c0d5f47374b130ee398f4c34dbe8168824a8616`](https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616)
 
 The contract addresses deployed on Kovan testnet:
 
 | Contract                          | Version | Address                                      |
 |-----------------------------------|---------|----------------------------------------------|
-| AccessSecretStoreCondition        | v0.7.0  | `0x6e0e0e474102c2f326bfbd5e367455258ed87d1e` |
-| AgreementStoreManager             | v0.7.0  | `0xd462a1b14cbd7a6c2cbea0958d2f755a6f0901a6` |
-| ConditionStoreManager             | v0.7.0  | `0x459ff387330e3f3aadcc46dda6de964aa8e63421` |
-| DIDRegistry                       | v0.7.0  | `0x7061c669fad3efe6ebcb863646649210bd08f534` |
-| Dispenser                         | v0.7.0  | `0xb38d23fdc5c4340144c4ff92954b2a4b47648459` |
-| EscrowAccessSecretStoreTemplate   | v0.7.0  | `0xaeb99e067c09b332c8ff15f6bd4213f5a3327b4e` |
-| EscrowReward                      | v0.7.0  | `0x5e349b50e477dcfebb028f788e2c7c0a4a38505b` |
-| HashLockCondition                 | v0.7.0  | `0x3553a5e64598291e3b4820c368db1ad5bea9b549` |
-| LockRewardCondition               | v0.7.0  | `0x3a25d63058f9c33aba700577a4c0097c47b3998b` |
-| OceanToken                        | v0.7.0  | `0x94b139d39257f3b9b7bd1772749076f8b7f74790` |
-| SignCondition                     | v0.7.0  | `0x7d4959e62be3a32c199c47c14a445eb92d3d8879` |
-| TemplateStoreManager              | v0.7.0  | `0x9660ca4a3d5a114b56050bbe0382f3c44ad4dae7` |
+| AccessSecretStoreCondition        | v0.8.6  | `0x9Ee06Ac392FE11f1933a51B48D1d07dd97f1dec7` |
+| AgreementStoreManager             | v0.8.6  | `0x412d4F57425b41FE027e06b9f37D569dcAE2eAa4` |
+| ConditionStoreManager             | v0.8.6  | `0xA5f5BaB34DE3782A71D37d0B334217Ded341cd64` |
+| DIDRegistry                       | v0.8.6  | `0x9254f7c8f1176C685871E7A8A99E11e96775F488` |
+| DIDRegistryLibrary                | v0.8.6  | `0x16F728A5524B5045B20B36232E716a99F72e3894` |
+| Dispenser                         | v0.8.6  | `0x5B92243133094210F504dF6B9D54fD70E7B281DC` |
+| EpochLibrary                      | v0.8.6  | `0xe85BFc566F7876798Ec5DA7D037d9b28428F7182` |
+| EscrowAccessSecretStoreTemplate   | v0.8.6  | `0xe0Afe9a948f9Fa39524c8d29a98d75409018ABf0` |
+| EscrowReward                      | v0.8.6  | `0xa182ff844c71803Bf767c3AB4180B3bfFADa6B2B` |
+| HashLockCondition                 | v0.8.6  | `0x11ef2D50868c1f1063ba0141aCD53691A0293c25` |
+| LockRewardCondition               | v0.8.6  | `0x2a2A2C5fF51C5f1c84547FC7a194c00F82763432` |
+| OceanToken                        | v0.8.6  | `0xB57C4D626548eB8AC0B82b086721516493E2908d` |
+| SignCondition                     | v0.8.6  | `0x7B8B2756de9Ab474ddbCc87047117a2A16419194` |
+| TemplateStoreManager              | v0.8.6  | `0xD20307e2620Bb8a60991f43c52b64f981103A829` |
 
 ## Libraries
 

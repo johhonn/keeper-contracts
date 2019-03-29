@@ -23,15 +23,12 @@ const utils = {
         assert.strictEqual(n, gotEvents, `Event ${name} was not emitted.`)
     },
 
-    assertRevert: async (promise) => {
-        try {
-            await promise
-            assert.fail('Expected revert not received')
-        } catch (error) {
-            const revertFound = error.message.search('revert') >= 0
-            assert(revertFound, `Expected "revert", got ${error} instead`)
-        }
+    getEventArgsFromTx: (txReceipt, eventName) => {
+        return txReceipt.logs.filter((log) => {
+            return log.event === eventName
+        })[0].args
     }
+
 }
 
 module.exports = utils

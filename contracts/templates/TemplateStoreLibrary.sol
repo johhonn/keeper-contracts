@@ -24,7 +24,7 @@ library TemplateStoreLibrary {
         returns (uint size)
     {
         require(
-            _self.templates[_id].blockNumberUpdated == 0,
+            _self.templates[_id].state == TemplateState.Uninitialized,
             'Id already exists'
         );
         _self.templates[_id] = Template({

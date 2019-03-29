@@ -26,8 +26,12 @@ contract('SignCondition constructor', (accounts) => {
         const conditionStoreManager = await ConditionStoreManager.new()
         await conditionStoreManager.initialize(
             owner,
-            createRole,
             { from: accounts[0] }
+        )
+
+        await conditionStoreManager.delegateCreateRole(
+            createRole,
+            { from: owner }
         )
 
         const signCondition = await SignCondition.new()
@@ -151,7 +155,7 @@ contract('SignCondition constructor', (accounts) => {
         })
 
         it('should fail to fulfill if conditions has different type ref', async () => {
-            const { signCondition, conditionStoreManager } = await setupTest()
+            const { signCondition, conditionStoreManager, createRole, owner } = await setupTest()
 
             let nonce = constants.bytes32.one
             let {
@@ -166,7 +170,13 @@ contract('SignCondition constructor', (accounts) => {
             // create a condition of a type different than sign condition
             await conditionStoreManager.createCondition(
                 conditionId,
-                accounts[0])
+                signCondition.address)
+
+            await conditionStoreManager.delegateUpdateRole(
+                conditionId,
+                createRole,
+                { from: owner }
+            )
 
             // try to fulfill from sign condition
             await assert.isRejected(

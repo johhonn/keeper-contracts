@@ -2,6 +2,13 @@
 # contract: ConditionStoreManager
 
 
+## Enums
+
+###  RoleType
+Members:
+*  Create
+*  Update
+
 ## Variables
 
 ### private createRole
@@ -9,6 +16,21 @@
 ### internal conditionList
 
 ### internal epochList
+
+## Events
+
+###  ConditionCreated
+Parameters:
+* bytes32 _id
+* address _typeRef
+* address _who
+
+###  ConditionUpdated
+Parameters:
+* bytes32 _id
+* address _typeRef
+* enum ConditionStoreLibrary.ConditionState _state
+* address _who
 
 ## Modifiers
 
@@ -18,16 +40,28 @@
 Parameters:
 * bytes32 _id
 
+### internal onlyValidType
+Parameters:
+* address typeRef
+
 ## Functions
 
 ### public initialize
 Parameters:
 * address _owner
-* address _createRole
 
-### public getCreateRole
+### external getCreateRole
 
-### public createCondition
+### external delegateCreateRole
+Parameters:
+* address delegatee
+
+### external delegateUpdateRole
+Parameters:
+* bytes32 _id
+* address delegatee
+
+### external createCondition
 Parameters:
 * bytes32 _id
 * address _typeRef
@@ -39,18 +73,18 @@ Parameters:
 * uint256 _timeLock
 * uint256 _timeOut
 
-### public updateConditionState
+### external updateConditionState
 Parameters:
 * bytes32 _id
 * enum ConditionStoreLibrary.ConditionState _newState
 
-### public getConditionListSize
+### external getConditionListSize
 
 ### external getCondition
 Parameters:
 * bytes32 _id
 
-### public getConditionState
+### external getConditionState
 Parameters:
 * bytes32 _id
 

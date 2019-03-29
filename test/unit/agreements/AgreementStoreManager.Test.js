@@ -8,18 +8,22 @@ const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
 const Common = artifacts.require('Common')
-const DIDRegistryLibrary = artifacts.require('DIDRegistryLibrary')
-const DIDRegistry = artifacts.require('DIDRegistry')
 const EpochLibrary = artifacts.require('EpochLibrary')
 const AgreementStoreLibrary = artifacts.require('AgreementStoreLibrary')
 const ConditionStoreManager = artifacts.require('ConditionStoreManager')
-const TemplateStoreManager = artifacts.require('TemplateStoreManager')
 const AgreementStoreManager = artifacts.require('AgreementStoreManager')
 
-const testUtils = require('../../helpers/utils.js')
 const constants = require('../../helpers/constants.js')
+const deployManagers = require('../../helpers/deployManagers.js')
+const testUtils = require('../../helpers/utils.js')
 
 contract('AgreementStoreManager', (accounts) => {
+    let common,
+        didRegistry,
+        agreementStoreManager,
+        conditionStoreManager,
+        templateStoreManager
+
     async function setupTest({
         agreementId = constants.bytes32.one,
         conditionIds = [constants.address.dummy],
@@ -27,53 +31,27 @@ contract('AgreementStoreManager', (accounts) => {
         checksum = testUtils.generateId(),
         value = constants.registry.url,
         createRole = accounts[0],
-        owner = accounts[1],
+        deployer = accounts[8],
+        owner = accounts[9],
         registerDID = false
     } = {}) {
-        const common = await Common.new()
-
-        const didRegistryLibrary = await DIDRegistryLibrary.new()
-        await DIDRegistry.link('DIDRegistryLibrary', didRegistryLibrary.address)
-        const didRegistry = await DIDRegistry.new()
-        await didRegistry.initialize(owner)
-
-        const epochLibrary = await EpochLibrary.new()
-        await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
-        const conditionStoreManager = await ConditionStoreManager.new()
-
-        const templateStoreManager = await TemplateStoreManager.new()
-        await templateStoreManager.initialize(
-            owner,
-            { from: owner }
-        )
-
-        const agreementStoreLibrary = await AgreementStoreLibrary.new()
-        await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
-        const agreementStoreManager = await AgreementStoreManager.new()
-
-        await agreementStoreManager.methods['initialize(address,address,address,address)'](
-            owner,
-            conditionStoreManager.address,
-            templateStoreManager.address,
-            didRegistry.address,
-            { from: owner }
-        )
-
-        await conditionStoreManager.initialize(
-            owner,
-            agreementStoreManager.address,
-            { from: owner }
-        )
-
+        ({
+            didRegistry,
+            agreementStoreManager,
+            conditionStoreManager,
+            templateStoreManager
+        } = await deployManagers(
+            deployer,
+            owner
+        ))
+        common = await Common.new()
         if (registerDID) {
-            await didRegistry.registerAttribute(did, checksum, value)
+            await didRegistry.registerAttribute(did, checksum, [], value)
         }
 
         return {
             common,
             agreementStoreManager,
-            conditionStoreManager,
-            templateStoreManager,
             agreementId,
             conditionIds,
             did,
@@ -163,13 +141,7 @@ contract('AgreementStoreManager', (accounts) => {
 
     describe('create agreement', () => {
         it('create agreement should create agreement and conditions', async () => {
-            const {
-                agreementStoreManager,
-                templateStoreManager,
-                conditionStoreManager,
-                did,
-                owner
-            } = await setupTest({ registerDID: true })
+            const { did, owner, common } = await setupTest({ registerDID: true })
 
             const templateId = accounts[2]
             await templateStoreManager.proposeTemplate(templateId)
@@ -177,7 +149,7 @@ contract('AgreementStoreManager', (accounts) => {
 
             const agreement = {
                 did: did,
-                conditionTypes: [accounts[2], accounts[3]],
+                conditionTypes: [common.address, common.address],
                 conditionIds: [constants.bytes32.zero, constants.bytes32.one],
                 timeLocks: [0, 1],
                 timeOuts: [2, 3]
@@ -203,18 +175,13 @@ contract('AgreementStoreManager', (accounts) => {
         })
 
         it('should not create agreement with existing conditions', async () => {
-            const {
-                agreementStoreManager,
-                templateStoreManager,
-                did,
-                owner
-            } = await setupTest({ registerDID: true })
+            const { did, owner, common } = await setupTest({ registerDID: true })
 
             const templateId = accounts[2]
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId, { from: owner })
 
-            const conditionTypes = [accounts[2], accounts[3]]
+            const conditionTypes = [common.address, common.address]
             const conditionIds = [constants.bytes32.zero, constants.bytes32.one]
             const agreement = {
                 did: did,
@@ -251,7 +218,7 @@ contract('AgreementStoreManager', (accounts) => {
         })
 
         it('should not create agreement with uninitialized template', async () => {
-            const { agreementStoreManager } = await setupTest()
+            await setupTest()
 
             const templateId = accounts[2]
 
@@ -275,7 +242,7 @@ contract('AgreementStoreManager', (accounts) => {
         })
 
         it('should not create agreement with proposed template', async () => {
-            const { agreementStoreManager, templateStoreManager } = await setupTest()
+            await setupTest()
 
             const templateId = accounts[2]
             await templateStoreManager.proposeTemplate(templateId)
@@ -300,7 +267,7 @@ contract('AgreementStoreManager', (accounts) => {
         })
 
         it('should not create agreement with revoked template', async () => {
-            const { agreementStoreManager, templateStoreManager, owner } = await setupTest()
+            const { owner } = await setupTest()
 
             const templateId = accounts[2]
             await templateStoreManager.proposeTemplate(templateId)
@@ -327,12 +294,7 @@ contract('AgreementStoreManager', (accounts) => {
         })
 
         it('should not create agreement with existing ID', async () => {
-            const {
-                agreementStoreManager,
-                templateStoreManager,
-                did,
-                owner
-            } = await setupTest({ registerDID: true })
+            const { did, owner, common, createRole } = await setupTest({ registerDID: true })
 
             const templateId = accounts[2]
             await templateStoreManager.proposeTemplate(templateId)
@@ -340,7 +302,7 @@ contract('AgreementStoreManager', (accounts) => {
 
             const agreement = {
                 did: did,
-                conditionTypes: [accounts[3]],
+                conditionTypes: [common.address],
                 conditionIds: [constants.bytes32.zero],
                 timeLocks: [0],
                 timeOuts: [2]
@@ -353,9 +315,13 @@ contract('AgreementStoreManager', (accounts) => {
                 { from: templateId }
             )
 
+            assert.strictEqual(
+                await agreementStoreManager.isAgreementDIDOwner(agreementId, createRole),
+                true
+            )
             const otherAgreement = {
                 did: did,
-                conditionTypes: [accounts[3]],
+                conditionTypes: [common.address],
                 conditionIds: [constants.bytes32.one],
                 timeLocks: [2],
                 timeOuts: [3]
@@ -371,13 +337,78 @@ contract('AgreementStoreManager', (accounts) => {
             )
         })
 
+        it('should return false if weather it invalid DID or owner', async () => {
+            const { did, owner, common, createRole } = await setupTest({ registerDID: true })
+
+            const templateId = accounts[2]
+            await templateStoreManager.proposeTemplate(templateId)
+            await templateStoreManager.approveTemplate(templateId, { from: owner })
+
+            const agreement = {
+                did: did,
+                conditionTypes: [common.address],
+                conditionIds: [constants.bytes32.zero],
+                timeLocks: [0],
+                timeOuts: [2]
+            }
+            const agreementId = constants.bytes32.zero
+
+            await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement),
+                { from: templateId }
+            )
+
+            // assert
+            assert.strictEqual(
+                await agreementStoreManager.isAgreementDIDOwner(agreementId, createRole),
+                true
+            )
+
+            assert.strictEqual(
+                await agreementStoreManager.isAgreementDIDOwner(agreementId, common.address),
+                false
+            )
+
+            assert.strictEqual(
+                await agreementStoreManager.isAgreementDIDOwner(constants.bytes32.one, createRole),
+                false
+            )
+
+            assert.strictEqual(
+                await agreementStoreManager.isAgreementDIDOwner(constants.bytes32.one, common.address),
+                false
+            )
+        })
+        it('should able to get the Agreement DID Owner', async () => {
+            const { did, owner, common, createRole } = await setupTest({ registerDID: true })
+
+            const templateId = accounts[2]
+            await templateStoreManager.proposeTemplate(templateId)
+            await templateStoreManager.approveTemplate(templateId, { from: owner })
+
+            const agreement = {
+                did: did,
+                conditionTypes: [common.address],
+                conditionIds: [constants.bytes32.zero],
+                timeLocks: [0],
+                timeOuts: [2]
+            }
+            const agreementId = constants.bytes32.zero
+
+            await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement),
+                { from: templateId }
+            )
+
+            assert.strictEqual(
+                await agreementStoreManager.getAgreementDIDOwner(agreementId),
+                createRole
+            )
+        })
         it('should not create agreement if DID not registered', async () => {
-            const {
-                agreementStoreManager,
-                templateStoreManager,
-                did,
-                owner
-            } = await setupTest()
+            const { did, owner } = await setupTest()
 
             const templateId = accounts[2]
             await templateStoreManager.proposeTemplate(templateId)
@@ -405,13 +436,7 @@ contract('AgreementStoreManager', (accounts) => {
 
     describe('get agreement', () => {
         it('successful create should get agreement', async () => {
-            const {
-                common,
-                agreementStoreManager,
-                templateStoreManager,
-                did,
-                owner
-            } = await setupTest({ registerDID: true })
+            const { did, owner, common } = await setupTest({ registerDID: true })
 
             const templateId = accounts[2]
             await templateStoreManager.proposeTemplate(templateId)
@@ -419,7 +444,7 @@ contract('AgreementStoreManager', (accounts) => {
 
             const agreement = {
                 did: did,
-                conditionTypes: [accounts[3], accounts[4]],
+                conditionTypes: [common.address, common.address],
                 conditionIds: [constants.bytes32.one, constants.bytes32.zero],
                 timeLocks: [0, 1],
                 timeOuts: [2, 3]
@@ -451,12 +476,7 @@ contract('AgreementStoreManager', (accounts) => {
         })
 
         it('should get multiple agreements for same did & template', async () => {
-            const {
-                agreementStoreManager,
-                templateStoreManager,
-                did,
-                owner
-            } = await setupTest({ registerDID: true })
+            const { did, owner, common } = await setupTest({ registerDID: true })
 
             const templateId = accounts[2]
             await templateStoreManager.proposeTemplate(templateId)
@@ -464,7 +484,7 @@ contract('AgreementStoreManager', (accounts) => {
 
             const agreement = {
                 did: did,
-                conditionTypes: [accounts[3]],
+                conditionTypes: [common.address],
                 conditionIds: [constants.bytes32.zero],
                 timeLocks: [0],
                 timeOuts: [2]
@@ -479,7 +499,7 @@ contract('AgreementStoreManager', (accounts) => {
 
             const otherAgreement = {
                 did: did,
-                conditionTypes: [accounts[3]],
+                conditionTypes: [common.address],
                 conditionIds: [constants.bytes32.one],
                 timeLocks: [2],
                 timeOuts: [3]

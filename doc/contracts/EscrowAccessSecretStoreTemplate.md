@@ -4,31 +4,46 @@
 
 ## Structs
 
-### public EscrowAccessSecretStoreAgreement
+### public AgreementDataModel
 Members:
-* address consumer
+* address accessConsumer
+* address accessProvider
 
-### public EscrowAccessSecretStoreAgreementList
+### public AgreementData
 Members:
-* mapping(bytes32 => struct EscrowAccessSecretStoreTemplate.EscrowAccessSecretStoreAgreement) agreements
+* mapping(bytes32 => struct EscrowAccessSecretStoreTemplate.AgreementDataModel) agreementDataItems
 * bytes32[] agreementIds
 
 ## Variables
 
-### private accessSecretStoreCondition
+### internal didRegistry
 
-### private lockRewardCondition
+### internal accessSecretStoreCondition
 
-### private escrowReward
+### internal lockRewardCondition
 
-### private agreementList
+### internal escrowReward
+
+### internal agreementData
+
+## Events
+
+###  AgreementCreated
+Parameters:
+* bytes32 _agreementId
+* bytes32 _did
+* address _accessConsumer
+* address _accessProvider
+* uint256[] _timeLocks
+* uint256[] _timeOuts
 
 ## Functions
 
-### public initialize
+### external initialize
 Parameters:
 * address _owner
 * address _agreementStoreManagerAddress
+* address _didRegistryAddress
 * address _accessSecretStoreConditionAddress
 * address _lockRewardConditionAddress
 * address _escrowRewardAddress
@@ -40,4 +55,8 @@ Parameters:
 * bytes32[] _conditionIds
 * uint256[] _timeLocks
 * uint256[] _timeOuts
-* address _consumer
+* address _accessConsumer
+
+### external getAgreementData
+Parameters:
+* bytes32 _id

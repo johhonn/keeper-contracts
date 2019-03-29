@@ -1,19 +1,24 @@
 /* eslint-env mocha */
-/* global artifacts, contract, describe, it, beforeEach */
+/* global artifacts, web3, contract, describe, it, beforeEach */
 const chai = require('chai')
 const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
-const Web3 = require('web3')
-const { encodeCall } = require('zos-lib')
-const deploy = require('../helpers/zos/deploy')
-const upgrade = require('../helpers/zos/upgrade')
-const loadWallet = require('../helpers/wallet/loadWallet')
-const createWallet = require('../helpers/wallet/createWallet')
+
 const testUtils = require('../helpers/utils')
+
+const {
+    upgradeContracts,
+    deployContracts,
+    confirmUpgrade,
+    submitTransaction,
+    confirmTransaction,
+    loadWallet
+} = require('../../scripts/deploy/deploymentHandler')
 
 const OceanToken = artifacts.require('OceanToken')
 const Dispenser = artifacts.require('Dispenser')
+
 const DispenserChangeFunctionSignature = artifacts.require('DispenserChangeFunctionSignature')
 const DispenserChangeInStorage = artifacts.require('DispenserChangeInStorage')
 const DispenserChangeInStorageAndLogic = artifacts.require('DispenserChangeInStorageAndLogic')
@@ -21,20 +26,14 @@ const DispenserExtraFunctionality = artifacts.require('DispenserExtraFunctionali
 const DispenserWithBug = artifacts.require('DispenserWithBug')
 
 contract('Dispenser', (accounts) => {
-    let adminWallet,
+    let ownerWallet,
         OceanTokenAddress,
-        DispenserAddress,
-        addresses,
-        owner
+        DispenserAddress
 
-    beforeEach('Load wallet each time', async function() {
-        await createWallet(true)
-        adminWallet = await loadWallet('upgrader') // zos admin MultiSig
-        owner = await loadWallet('owner')
-        addresses = await deploy('deploy', ['OceanToken', 'Dispenser'])
-        OceanTokenAddress = addresses.oceanTokenAddress
-        DispenserAddress = addresses.dispenserAddress
-    })
+    const requester = accounts[2]
+    const approver = accounts[3]
+
+    const verbose = false
 
     async function setupTest({
         requestedAmount = 200
@@ -42,150 +41,205 @@ contract('Dispenser', (accounts) => {
         const oceanToken = await OceanToken.at(OceanTokenAddress)
         const dispenser = await Dispenser.at(DispenserAddress)
         // act
-        await dispenser.requestTokens(requestedAmount, { from: accounts[1] })
-        return { dispenser, oceanToken, DispenserAddress, OceanTokenAddress, requestedAmount }
+        await dispenser.requestTokens(requestedAmount)
+        return {
+            dispenser,
+            oceanToken,
+            requestedAmount
+        }
     }
 
     describe('Test upgradability for Dispenser', () => {
-        it('Should be possible to fix/add a bug', async () => {
-            let { dispenser, DispenserAddress } = await setupTest()
+        beforeEach('Load wallet each time', async function() {
+            const addressBook = await deployContracts(
+                web3,
+                artifacts,
+                [
+                    'Dispenser',
+                    'OceanToken'
+                ],
+                true,
+                true,
+                verbose
+            )
+            OceanTokenAddress = addressBook['OceanToken']
+            DispenserAddress = addressBook['Dispenser']
 
-            const txId = await upgrade(
-                'Dispenser',
-                'DispenserWithBug',
-                DispenserAddress,
-                adminWallet,
-                accounts[0]
+            ownerWallet = await loadWallet(
+                web3,
+                'owner',
+                verbose
+            )
+        })
+
+        it('Should be possible to fix/add a bug', async () => {
+            await setupTest()
+
+            const taskBook = await upgradeContracts(
+                web3,
+                ['DispenserWithBug:Dispenser'],
+                verbose
             )
 
-            await adminWallet.confirmTransaction(txId, { from: accounts[1] })
-            dispenser = await DispenserWithBug.at(DispenserAddress)
+            await confirmUpgrade(
+                web3,
+                taskBook['Dispenser'],
+                approver,
+                verbose
+            )
 
             // set Max Amount
-            const SetMaxAmount = encodeCall(
-                'setMaxAmount',
-                ['uint256'],
-                [256]
+            const transactionId = await submitTransaction(
+                ownerWallet,
+                DispenserAddress,
+                [
+                    'setMaxAmount',
+                    ['uint256'],
+                    [256]
+                ],
+                requester,
+                verbose
             )
 
-            const args = [
-                DispenserAddress,
-                0,
-                SetMaxAmount
-            ]
+            await confirmTransaction(
+                ownerWallet,
+                transactionId,
+                approver,
+                verbose
+            )
 
-            const tx = await owner.submitTransaction(...args, { from: accounts[1] })
-            await owner.confirmTransaction(tx.logs[0].args.transactionId.toNumber(), { from: accounts[2] })
+            const DispenserWithBugInstance = await DispenserWithBug.at(DispenserAddress)
 
-            const newMaxAmount = await dispenser.getMaxAmount()
+            const newMaxAmount = await DispenserWithBugInstance.getMaxAmount({ from: approver })
 
             // assert
             assert.strictEqual(
                 newMaxAmount.toString(),
-                Web3.utils.toBN(20).toString(),
+                web3.utils.toBN(20).toString(),
                 'getMaxAmount value is not 20 (according to bug)'
             )
         })
 
         it('Should be possible to change function signature', async () => {
-            let { DispenserAddress, requestedAmount } = await setupTest()
+            let { requestedAmount } = await setupTest()
 
-            const txId = await upgrade(
-                'Dispenser',
-                'DispenserChangeFunctionSignature',
-                DispenserAddress,
-                adminWallet,
-                accounts[0]
+            const taskBook = await upgradeContracts(
+                web3,
+                ['DispenserChangeFunctionSignature:Dispenser'],
+                verbose
             )
 
             // act
-            await adminWallet.confirmTransaction(txId, { from: accounts[1] })
-            const dispenser = await DispenserChangeFunctionSignature.at(DispenserAddress)
+            await confirmUpgrade(
+                web3,
+                taskBook['Dispenser'],
+                approver,
+                verbose
+            )
+
+            const DispenserChangeFunctionSignatureInstance =
+                await DispenserChangeFunctionSignature.at(DispenserAddress)
 
             // assert
-            const result = await dispenser.setMinPeriod(
-                requestedAmount,
-                accounts[1],
-                { from: accounts[0] }
-            )
+            const result =
+                await DispenserChangeFunctionSignatureInstance.setMinPeriod(
+                    requestedAmount,
+                    accounts[1]
+                )
 
             testUtils.assertEmitted(result, 1, 'DispenserChangeFunctionSignatureEvent')
         })
 
         it('Should be possible to append storage variable(s) ', async () => {
-            let { DispenserAddress } = await setupTest()
+            await setupTest()
 
-            const txId = await upgrade(
-                'Dispenser',
-                'DispenserChangeInStorage',
-                DispenserAddress,
-                adminWallet,
-                accounts[0]
+            const taskBook = await upgradeContracts(
+                web3,
+                ['DispenserChangeInStorage:Dispenser'],
+                verbose
             )
 
             // act
-            await adminWallet.confirmTransaction(txId, { from: accounts[1] })
-            const dispenser = await DispenserChangeInStorage.at(DispenserAddress)
-            const totalUnMintedAmount = await dispenser.totalUnMintedAmount()
+            await confirmUpgrade(
+                web3,
+                taskBook['Dispenser'],
+                approver,
+                verbose
+            )
+            const DispenserChangeInStorageInstance =
+                await DispenserChangeInStorage.at(DispenserAddress)
+
+            const totalUnMintedAmount =
+                await DispenserChangeInStorageInstance.totalUnMintedAmount()
 
             // assert
             assert.strictEqual(
                 totalUnMintedAmount.toString(),
-                Web3.utils.toBN(0).toString(),
+                web3.utils.toBN(0).toString(),
                 'totalUnMintedAmount storage variable does not exists'
             )
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
-            let { DispenserAddress, requestedAmount } = await setupTest()
+            let { requestedAmount } = await setupTest()
 
-            const txId = await upgrade(
-                'Dispenser',
-                'DispenserChangeInStorageAndLogic',
-                DispenserAddress,
-                adminWallet,
-                accounts[0]
+            const taskBook = await upgradeContracts(
+                web3,
+                ['DispenserChangeInStorageAndLogic:Dispenser'],
+                verbose
             )
 
             // act
-            await adminWallet.confirmTransaction(txId, { from: accounts[1] })
-            const dispenser = await DispenserChangeInStorageAndLogic.at(DispenserAddress)
+            await confirmUpgrade(
+                web3,
+                taskBook['Dispenser'],
+                approver,
+                verbose
+            )
 
-            const totalUnMintedAmount = await dispenser.totalUnMintedAmount()
+            const DispenserChangeInStorageAndLogicInstance =
+                await DispenserChangeInStorageAndLogic.at(DispenserAddress)
+
+            const totalUnMintedAmount =
+                await DispenserChangeInStorageAndLogicInstance.totalUnMintedAmount()
 
             // assert
             assert.strictEqual(
                 totalUnMintedAmount.toString(),
-                Web3.utils.toBN(0).toString(),
+                web3.utils.toBN(0).toString(),
                 'totalUnMintedAmount storage variable does not exists'
             )
-            const result = await dispenser.setMinPeriod(
+            const result = await DispenserChangeInStorageAndLogicInstance.setMinPeriod(
                 requestedAmount,
-                accounts[1],
-                { from: accounts[0] }
+                accounts[1]
             )
 
             testUtils.assertEmitted(result, 1, 'DispenserChangeFunctionSignatureEvent')
         })
 
         it('Should be able to call new method added after upgrade is approved', async () => {
-            let { DispenserAddress } = await setupTest()
+            await setupTest()
 
-            const txId = await upgrade(
-                'Dispenser',
-                'DispenserExtraFunctionality',
-                DispenserAddress,
-                adminWallet,
-                accounts[0]
+            const taskBook = await upgradeContracts(
+                web3,
+                ['DispenserExtraFunctionality:Dispenser'],
+                verbose
             )
 
             // act
-            await adminWallet.confirmTransaction(txId, { from: accounts[1] })
-            const dispenser = await DispenserExtraFunctionality.at(DispenserAddress)
+            await confirmUpgrade(
+                web3,
+                taskBook['Dispenser'],
+                approver,
+                verbose
+            )
+
+            const DispenserExtraFunctionalityInstance =
+                await DispenserExtraFunctionality.at(DispenserAddress)
 
             // assert
             assert.strictEqual(
-                await dispenser.dummyFunction(),
+                await DispenserExtraFunctionalityInstance.dummyFunction(),
                 true,
                 'failed to inject a new method!'
             )

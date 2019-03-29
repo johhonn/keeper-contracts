@@ -22,15 +22,6 @@ Documentation:
 
 ### internal didRegistry
 
-## Events
-
-###  AgreementCreated
-Parameters:
-* bytes32 _agreementId
-* bytes32 _did
-* address _sender
-* address _templateId
-
 ## Functions
 
 ### public initialize
@@ -94,12 +85,31 @@ Parameters:
 Documentation:
 
 ```
-@dev Get the DID owner for this agreement with _id.
+@dev get the DID owner for this agreement with _id.
 @param _id is the ID of the agreement.
 @return the DID owner associated with agreement.did from the DID registry.
 ```
 Parameters:
 * bytes32 _id
+
+### external isAgreementDIDOwner
+
+Documentation:
+
+```
+@dev check the DID owner for this agreement with _id.
+@param _id is the ID of the agreement.
+@param _owner is the DID owner
+@return the DID owner associated with agreement.did from the DID registry.
+```
+Parameters:
+* bytes32 _id
+* address _owner
+
+### external isAgreementDIDProvider
+Parameters:
+* bytes32 _id
+* address _provider
 
 ### public getAgreementListSize
 

@@ -34,13 +34,6 @@ contract AgreementStoreManager is Ownable {
     TemplateStoreManager internal templateStoreManager;
     DIDRegistry internal didRegistry;
 
-    event AgreementCreated(
-        bytes32 indexed _agreementId,
-        bytes32 indexed _did,
-        address indexed _sender,
-        address _templateId
-    );
-
     /**
      * @dev AgreementStoreManager Initializer
      *      Initialize Ownable. Only on contract creation.
@@ -56,7 +49,7 @@ contract AgreementStoreManager is Ownable {
         address _didRegistryAddress
     )
         public
-        initializer()
+        initializer
     {
         require(
             _owner != address(0) &&
@@ -131,13 +124,6 @@ contract AgreementStoreManager is Ownable {
             _conditionIds
         );
 
-        emit AgreementCreated(
-            _id,
-            _did,
-            msg.sender,
-            msg.sender
-        );
-
         return getAgreementListSize();
     }
 
@@ -169,7 +155,7 @@ contract AgreementStoreManager is Ownable {
     }
 
     /**
-     * @dev Get the DID owner for this agreement with _id.
+     * @dev get the DID owner for this agreement with _id.
      * @param _id is the ID of the agreement.
      * @return the DID owner associated with agreement.did from the DID registry.
      */
@@ -180,6 +166,30 @@ contract AgreementStoreManager is Ownable {
     {
         bytes32 did = agreementList.agreements[_id].did;
         return didRegistry.getDIDOwner(did);
+    }
+
+    /**
+     * @dev check the DID owner for this agreement with _id.
+     * @param _id is the ID of the agreement.
+     * @param _owner is the DID owner
+     * @return the DID owner associated with agreement.did from the DID registry.
+     */
+    function isAgreementDIDOwner(bytes32 _id, address _owner)
+        external
+        view
+        returns (bool)
+    {
+        bytes32 did = agreementList.agreements[_id].did;
+        return (_owner == didRegistry.getDIDOwner(did));
+    }
+
+    function isAgreementDIDProvider(bytes32 _id, address _provider)
+        external
+        view
+        returns(bool)
+    {
+        bytes32 did = agreementList.agreements[_id].did;
+        return didRegistry.isDIDProvider(did, _provider);
     }
 
     /**

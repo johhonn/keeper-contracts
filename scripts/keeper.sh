@@ -10,7 +10,7 @@ then
     npm run clean
     npm run compile
     export NETWORK=${NETWORK_NAME}
-    npm run migrate -- --network ${NETWORK_NAME}
+    npm run deploy -- --network ${NETWORK_NAME}
 
     # set flag to indicate contracts are ready
     touch /keeper-contracts/artifacts/ready
