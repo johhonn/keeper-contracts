@@ -2,6 +2,13 @@
 # contract: AccessSecretStoreCondition
 
 
+## Structs
+
+### public DocumentPermission
+Members:
+* bytes32 agreementId
+* mapping(address => bool) permission
+
 ## Variables
 
 ### private documentPermissions
@@ -43,7 +50,7 @@ Documentation:
 ```
 @notice checkPermissions is called by Parity secret store
 @param _documentId refers to the DID in which secret store will issue the decryption keys
-@param _grantee is the address of the granted user
+@param _grantee is the address of the granted user or the DID provider
 @return true if the access was granted
 ```
 Parameters:
