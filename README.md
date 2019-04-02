@@ -128,7 +128,7 @@ npm run upgrade <DEPLOYED_CONTRACT>:<NEW_CONTRACT>
 Follow the steps for local deployment. Make sure that the address [`0x90eE7A30339D05E07d9c6e65747132933ff6e624`](https://submarine.dev-ocean.com/address/0x90ee7a30339d05e07d9c6e65747132933ff6e624) is having enough (~1) Ether.
 
 ```bash
-export NMEMORIC=<your nile nmemoric>
+export MNEMONIC=<your nile mnemonic>
 npm run deploy:nile
 ```
 
@@ -161,7 +161,7 @@ If you managed to deploy the contracts locally do:
 
 ```bash
 export INFURA_TOKEN=<your infura token>
-export NMEMORIC=<your kovan nmemoric>
+export MNEMONIC=<your kovan mnemonic>
 npm run deploy:kovan
 ```
 
