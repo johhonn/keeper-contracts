@@ -22,7 +22,6 @@ async function exportArtifacts(
     )
 
     await exportLibraryArtifacts(
-        projectName,
         networkName,
         networkId,
         version,
