@@ -2,10 +2,16 @@ const fs = require('fs')
 const path = require('path')
 const glob = require('glob')
 
+function translateNetworkId(
+    networkId
+) {
+    return networkId === 42 ? 'kovan' : networkId
+}
+
 function getMigrations(
     networkId
 ) {
-    const zosSearchPath = `${__dirname}/../../../../../zos.*${networkId}.json`
+    const zosSearchPath = `${__dirname}/../../../../../zos.*${translateNetworkId(networkId)}.json`
     const resolvedPath = path.resolve(zosSearchPath)
 
     const files = glob.sync(
