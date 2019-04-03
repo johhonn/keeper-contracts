@@ -8,7 +8,7 @@ const zosGetMigrations = require('../zos/handlers/getMigrations')
 const artifactsDir = `${__dirname}/../../../../artifacts`
 const network = process.env.NETWORK || 'development'
 
-function updateArtifact(
+function updateContractArtifact(
     oldContractName,
     newContractName,
     version,
@@ -22,17 +22,19 @@ function updateArtifact(
     }
 
     if (verbose) {
-        console.log(`Updating artifact: ${oldContractName} with the ABI of ${newContractName}`)
+        console.log(`Updating contract artifact: ${oldContractName} with the ABI of ${newContractName}`)
     }
 
     const artifactFileName = `${oldContractName}.${network.toLowerCase()}.json`
 
     const resolvedArtifactsDir = path.resolve(artifactsDir)
+
     /* eslint-disable-next-line security/detect-non-literal-fs-filename */
     const oldArtifactString = fs.readFileSync(
         `${resolvedArtifactsDir}/${artifactFileName}`,
         'utf8'
     ).toString()
+
     const oldArtifact = JSON.parse(oldArtifactString)
 
     const { address } = oldArtifact
@@ -53,4 +55,4 @@ function updateArtifact(
     )
 }
 
-module.exports = updateArtifact
+module.exports = updateContractArtifact

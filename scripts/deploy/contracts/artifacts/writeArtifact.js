@@ -25,8 +25,12 @@ function writeArtifact(
     const artifactString = JSON.stringify(artifact, null, 2)
 
     const resolvedArtifactsDir = path.resolve(artifactsDir)
+
     /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-    fs.writeFileSync(`${resolvedArtifactsDir}/${filename}`, artifactString)
+    fs.writeFileSync(
+        `${resolvedArtifactsDir}/${filename}`,
+        artifactString
+    )
 
     return artifact
 }

@@ -14,6 +14,7 @@ function createArtifact(
         `${buildDir}${name}.json`,
         'utf8'
     ).toString()
+
     const contract = JSON.parse(contractString)
 
     // create function signatures in ABI
