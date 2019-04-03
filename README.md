@@ -171,20 +171,20 @@ The contract addresses deployed on Kovan testnet:
 
 | Contract                          | Version | Address                                      |
 |-----------------------------------|---------|----------------------------------------------|
-| AccessSecretStoreCondition        | v0.8.6  | `0x9Ee06Ac392FE11f1933a51B48D1d07dd97f1dec7` |
-| AgreementStoreManager             | v0.8.6  | `0x412d4F57425b41FE027e06b9f37D569dcAE2eAa4` |
-| ConditionStoreManager             | v0.8.6  | `0xA5f5BaB34DE3782A71D37d0B334217Ded341cd64` |
-| DIDRegistry                       | v0.8.6  | `0x9254f7c8f1176C685871E7A8A99E11e96775F488` |
-| DIDRegistryLibrary                | v0.8.6  | `0x16F728A5524B5045B20B36232E716a99F72e3894` |
-| Dispenser                         | v0.8.6  | `0x5B92243133094210F504dF6B9D54fD70E7B281DC` |
-| EpochLibrary                      | v0.8.6  | `0xe85BFc566F7876798Ec5DA7D037d9b28428F7182` |
-| EscrowAccessSecretStoreTemplate   | v0.8.6  | `0xe0Afe9a948f9Fa39524c8d29a98d75409018ABf0` |
-| EscrowReward                      | v0.8.6  | `0xa182ff844c71803Bf767c3AB4180B3bfFADa6B2B` |
-| HashLockCondition                 | v0.8.6  | `0x11ef2D50868c1f1063ba0141aCD53691A0293c25` |
-| LockRewardCondition               | v0.8.6  | `0x2a2A2C5fF51C5f1c84547FC7a194c00F82763432` |
-| OceanToken                        | v0.8.6  | `0xB57C4D626548eB8AC0B82b086721516493E2908d` |
-| SignCondition                     | v0.8.6  | `0x7B8B2756de9Ab474ddbCc87047117a2A16419194` |
-| TemplateStoreManager              | v0.8.6  | `0xD20307e2620Bb8a60991f43c52b64f981103A829` |
+| AccessSecretStoreCondition        | v0.9.1  | `0x9Ee06Ac392FE11f1933a51B48D1d07dd97f1dec7` |
+| AgreementStoreManager             | v0.9.1  | `0x412d4F57425b41FE027e06b9f37D569dcAE2eAa4` |
+| ConditionStoreManager             | v0.9.1  | `0xA5f5BaB34DE3782A71D37d0B334217Ded341cd64` |
+| DIDRegistry                       | v0.9.1  | `0x9254f7c8f1176C685871E7A8A99E11e96775F488` |
+| DIDRegistryLibrary                | v0.9.1  | `0xf6242973290aC0c45CbE4d242059E0DF6cdd2D54` |
+| Dispenser                         | v0.9.1  | `0x5B92243133094210F504dF6B9D54fD70E7B281DC` |
+| EpochLibrary                      | v0.9.1  | `0xe85BFc566F7876798Ec5DA7D037d9b28428F7182` |
+| EscrowAccessSecretStoreTemplate   | v0.9.1  | `0xe0Afe9a948f9Fa39524c8d29a98d75409018ABf0` |
+| EscrowReward                      | v0.9.1  | `0xa182ff844c71803Bf767c3AB4180B3bfFADa6B2B` |
+| HashLockCondition                 | v0.9.1  | `0x11ef2D50868c1f1063ba0141aCD53691A0293c25` |
+| LockRewardCondition               | v0.9.1  | `0x2a2A2C5fF51C5f1c84547FC7a194c00F82763432` |
+| OceanToken                        | v0.9.1  | `0xB57C4D626548eB8AC0B82b086721516493E2908d` |
+| SignCondition                     | v0.9.1  | `0x7B8B2756de9Ab474ddbCc87047117a2A16419194` |
+| TemplateStoreManager              | v0.9.1  | `0xD20307e2620Bb8a60991f43c52b64f981103A829` |
 
 ## Libraries
 
