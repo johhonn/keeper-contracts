@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# default to true in case it is not set
+# default to false in case it is not set
 DEPLOY_CONTRACTS="${DEPLOY_CONTRACTS:-false}"
 
 echo "deploy contracts is ${DEPLOY_CONTRACTS}"
