@@ -1,46 +1,133 @@
-# The keeper-contracts Release Process (Python)
+# The `keeper-contracts` Release Process
 
-- Create a new local feature branch, e.g. `git checkout -b feature/bumpversion-to-v0.2.5`
+## Build a new version
+- Create a new local feature branch, e.g. `git checkout -b release/v0.2.5`
 - Use the `bumpversion.sh` script to bump the project version. You can execute the script using {major|minor|patch} as first argument to bump the version accordingly:
   - To bump the patch version: `./bumpversion.sh patch`
   - To bump the minor version: `./bumpversion.sh minor`
   - To bump the major version: `./bumpversion.sh major`
-- Commit the changes to the feature branch.
+- assuming we are on version `v0.2.4` and the desired version is `v0.2.5` `./bumpversion.sh patch` has to be run.
+- run `npm i` to update the version in `package-lock.json`
+
+## Interact with networks
+
+### Deploy & Upgrade
+
+- run `npm run clean` to clean the work dir.
+- run `npm run compile` to compile the contracts.
+
+#### Nile
+
+- Copy the wallet file for `nile` 
+  - `cp wallets_nile.json wallets.json`
+- run `export MNEMONIC=<your nile mnemonic>`. You will find them in the password manager.
+
+##### Deploy the whole application
+
+- To deploy all contracts run `npm run deploy:nile`
+
+##### Deploy a single contracts
+
+- To deploy a single contract you need to specify the contracts to deploy as a parameter to the deploy script: ie. `npm run deploy:nile OceanToken Dispenser`will deploy `OceanToken` and `Dispenser`.
+
+##### Upgrade the whole application
+
+- To upgrade all contracts run `npm run upgrade:nile`
+
+##### Upgrade a single contract
+
+- To upgrade a single contract run `npm run upgrade:nile OceanToken`. For upgrading the `OceanRToken` contract.
+
+##### Persist artifacts
+
+- Commit all changes in `artifacts/*.nile.json`
+
+#### Kovan
+
+- Copy the wallet file for `kovan` > `cp wallets_kovan.json wallets.json`
+- run `export MNEMONIC=<your kovan mnemonic>`. You will find them in the password manager.
+- run `export INFURA_TOKEN=<your infura token>`. You will get it from `infura`.
+
+##### Deploy the whole application
+
+- To deploy all the contracts run `npm run deploy:kovan`
+
+##### Deploy a single contracts
+
+- To deploy a single contracts you need to specify the contracts to deploy as a parameter to the deploy script: ie. `npm run deploy:kovan OceanToken Dispenser` will deploy `OceanToken` and `Dispenser`.
+
+##### Upgrade the whole application
+
+- To upgrade all contracts run `npm run upgrade:kovan`
+
+##### Upgrade a single contract
+
+- To upgrade a single contract run `npm run upgrade:kovan OceanToken`. For upgrading the `OceanRToken` contract.
+
+##### Persist artifacts
+
+- Commit all changes in `artifacts/*.kovan.json`
+
+#### Approve upgrades
+
+All upgrades of the contracts have to be approved by a the `upgrader` wallet configured in the `wallets.json` file.
+
+- go to https://wallet.gnosis.pm
+- Load `upgrqder` wallet
+- Confirm 
+
+#### General tasks
+
+- On the end of every depooyment, the log has to be copied to [atlantic](https://github.com/oceanprotocol/atlantic/tree/master/keeper/logs)
+
+## Document
+
+### Contracts documentation
+
+- Update the contracts documentation
+- run `node ./scripts/contracts/doc-generator.js`
+- Commit the changes in `doc/contracts`
+
+### Address Documentation
+
+- Update the addresses in the `README.md`
+- run `node ./scripts/contracts/get-addresses.js <network name>` 
+
+It will output the current proxy addresses in the `README` friendly format.
+
+```text
+| AccessSecretStoreCondition        | v0.9.0 | 0x45DE141F8Efc355F1451a102FB6225F1EDd2921d |
+| AgreementStoreManager             | v0.9.0 | 0x62f84700b1A0ea6Bfb505aDC3c0286B7944D247C |
+| ConditionStoreManager             | v0.9.0 | 0x39b0AA775496C5ebf26f3B81C9ed1843f09eE466 |
+| DIDRegistry                       | v0.9.0 | 0x4A0f7F763B1A7937aED21D63b2A78adc89c5Db23 |
+| DIDRegistryLibrary                | v0.9.0 | 0x3B3504908Db36f5D5f07CD420ee2BBBbDfB674cF |
+| Dispenser                         | v0.9.0 | 0x865396b7ddc58C693db7FCAD1168E3BD95Fe3368 |
+....
+
+```
+
+- Copy this to the `README.md`
+
+## Trigger CI 
+
+- Commit the missing changes to the feature branch.
+- Tag the last commit with the new version number ie. `v0.2.5`
 - Push the feature branch to GitHub.
-- Make a pull request from the just-pushed branch.
+- Make a pull request from the just-pushed branch to `develop` branch.
 - Wait for all the tests to pass!
 - Merge the pull request into the `develop` branch.
-- To make a GitHub release (which creates a Git tag):
-  - Go to the keeper-contracts repo's Releases page [https://github.com/oceanprotocol/keeper-contracts/releases](https://github.com/oceanprotocol/keeper-contracts/releases)
-  - Click "Draft a new release".
-  - For tag version, put something like `v0.2.5`
-  - For release title, put the same value (like `v0.2.5`).
-  - For the target, select the `develop` branch, or the just-merged commit.
+
+## Release
+
+The release itself is done by `travis` based on the tagged commit.
+
+It will deploy the following components:
+
+- [npm](https://www.npmjs.com/package/@oceanprotocol/keeper-contracts)
+- [pypi](https://pypi.org/project/keeper-contracts/)
+- [maven](https://search.maven.org/artifact/com.oceanprotocol/keeper-contracts/)
+- [docker](https://cloud.docker.com/u/oceanprotocol/repository/docker/oceanprotocol/keeper-contracts)
+
+
+- update the new github release
   - Describe the main changes. (In the future, these will come from the changelog.)
-  - Click "Publish release".
-- Travis will detect the release (a new tag) and run the deployment section of [.travis.yml](.travis.yml), i.e.
-
-  ```yaml
-    - provider: script
-      script: bash -x ./scripts/deploy_pypi.sh
-      skip_cleanup: true
-      on:
-          tags: true
-          all_branches: true
-          condition: $DEPLOY_PACKAGE = true
-  ```
-  
-  - Travis call the following script that is responsible of package the artifacts and create a new release in PyPI.
-  
-  ```bash
-    #!/bin/bash
-    
-    shopt -s nullglob
-    abifiles=( ./artifacts/*.development.json )
-    [ "${#abifiles[@]}" -lt "1" ] && echo "ABI Files for development environment not found" && exit 1
-    python3 setup.py sdist bdist_wheel
-    twine upload dist/*
-  ```
-
-- Go to Travis and check the Travis job. It should deploy a new release to PyPI.
-- Check PyPI for the new release at [Relase page](https://pypi.org/project/keeper-contracts/)
