@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# default to true in case it is not set
+DEPLOY_CONTRACTS="${DEPLOY_CONTRACTS:-false}"
+
 echo "deploy contracts is ${DEPLOY_CONTRACTS}"
 
 if [ "${DEPLOY_CONTRACTS}" = "true" ]
@@ -9,8 +12,8 @@ then
 
     npm run clean
     npm run compile
-    export NETWORK=${NETWORK_NAME}
-    npm run deploy -- --network ${NETWORK_NAME}
+    export NETWORK="${NETWORK_NAME:-development}"
+    npm run deploy -- --network ${NETWORK}
 
     # set flag to indicate contracts are ready
     touch /keeper-contracts/artifacts/ready
