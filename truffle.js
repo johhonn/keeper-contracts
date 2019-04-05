@@ -4,6 +4,8 @@ const NonceTrackerSubprovider = require('web3-provider-engine/subproviders/nonce
 const rpcHost = process.env.KEEPER_RPC_HOST
 const rpcPort = process.env.KEEPER_RPC_PORT
 const url = process.env.KEEPER_RPC_URL
+// support MNEMONIC and NMEMORIC for some time to be backward compatible
+const MNEMONIC = process.env.MNEMONIC || process.env.NMEMORIC
 
 const hdWalletStartIndex = 0
 const hdWalletAccounts = 5
@@ -11,12 +13,11 @@ const hdWalletAccounts = 5
 let hdWalletProvider
 
 const setupWallet = (
-    nmemoric,
     url
 ) => {
     if (!hdWalletProvider) {
         hdWalletProvider = new HDWalletProvider(
-            nmemoric,
+            MNEMONIC,
             url,
             hdWalletStartIndex,
             hdWalletAccounts)
@@ -47,7 +48,6 @@ module.exports = {
         // spree from docker
         spree: {
             provider: () => setupWallet(
-                process.env.NMEMORIC,
                 url || `http://localhost:8545`
             ),
             network_id: 0x2324, // 8996
@@ -58,7 +58,6 @@ module.exports = {
         // nile the ocean testnet
         nile: {
             provider: () => setupWallet(
-                process.env.NMEMORIC,
                 url || `https://nile.dev-ocean.com`
             ),
             network_id: 0x2323, // 8995
@@ -69,7 +68,6 @@ module.exports = {
         // kovan testnet
         kovan: {
             provider: () => setupWallet(
-                process.env.NMEMORIC,
                 url || `https://kovan.infura.io/v2/${process.env.INFURA_TOKEN}`
             ),
             network_id: 0x2A, // 42
@@ -78,7 +76,6 @@ module.exports = {
         // rinkeby testnet
         rinkeby: {
             provider: () => setupWallet(
-                process.env.NMEMORIC,
                 url || `https://rinkeby.infura.io/v2/${process.env.INFURA_TOKEN}`
             ),
             network_id: 0x4, // 4

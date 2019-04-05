@@ -11,7 +11,9 @@ const zosGetProject = require('./zos/handlers/getProject')
 const zosRegisterContracts = require('./zos/contracts/registerContracts')
 const zosRequestContractUpgrade = require('./zos/contracts/requestContractUpgrades')
 
-const updateArtifact = require('./artifacts/updateArtifact')
+const updateContractArtifact = require('./artifacts/updateContractArtifact')
+const exportLibraryArtifacts = require('./artifacts/exportLibraryArtifacts')
+
 const loadWallet = require('../wallet/loadWallet')
 
 /*
@@ -118,7 +120,7 @@ async function upgradeContracts(
             verbose
         )
 
-        updateArtifact(
+        updateContractArtifact(
             oldContractName,
             newContractName,
             VERSION,
@@ -126,6 +128,13 @@ async function upgradeContracts(
             verbose
         )
     }
+
+    await exportLibraryArtifacts(
+        NETWORK,
+        networkId,
+        VERSION,
+        verbose
+    )
 
     if (verbose) {
         console.log(
