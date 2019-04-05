@@ -11,6 +11,31 @@
 
 ## Interact with networks
 
+### Roles
+
+We define four roles:
+
+- `deployer`: represented as `accounts[0]`
+- `upgrader`: represented as `accounts[1]`
+- `upgraderWallet`: represented as the `upgrader` from `wallets.json`
+- `ownerWallet`: represented as the `owner` from `wallets.json`
+
+#### Deployer
+
+Can be any account. It is used for deploying the initial proxy contracts and the logic contracts.
+
+#### Upgrader
+
+Has to be an `owner` of the `upgrader` multi sig wallet. It is used for issuing upgrade requests against the `upgrader` multi sig wallet.
+
+#### UpgraderWallet
+
+One instance of the multi sig wallet, defined as `upgrader`. This wallet will be assigned as zos admin and is required to do upgrades.
+
+#### OwnerWallet
+
+One instance of the multi sig wallet, defined as `owner`. This wallet will be assigned as the `owner` of all the contracts. It can be used to call specific functions in the contracts ie. change the configuration.
+
 ### Deploy & Upgrade
 
 - run `npm run clean` to clean the work dir.
@@ -70,11 +95,16 @@
 
 #### Approve upgrades
 
-All upgrades of the contracts have to be approved by a the `upgrader` wallet configured in the `wallets.json` file.
+All upgrades of the contracts have to be approved by the `upgrader` wallet configured in the `wallets.json` file.
 
 - go to https://wallet.gnosis.pm
-- Load `upgrqder` wallet
-- Confirm 
+- Load `upgrader` wallet
+- Select an Ethereum Account that is an `owner` of the multi sig wallet, but not the one who issued the upgrade request. This can be done in the following ways:
+  - Connect to a local Blockchain node that holds the private key.
+  - Connect to MetaMask and select the owner account from the multi sig wallet.
+  - Connect a hardware wallet like ledger or trezor.
+- Select the transaction you want to confirm (the upgrade script will tell you which transactions have to be approved in which wallets)
+- Click Confirm 
 
 #### General tasks
 
