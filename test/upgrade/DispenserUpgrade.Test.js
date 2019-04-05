@@ -78,6 +78,7 @@ contract('Dispenser', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['DispenserWithBug:Dispenser'],
+                true,
                 verbose
             )
 
@@ -126,6 +127,7 @@ contract('Dispenser', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['DispenserChangeFunctionSignature:Dispenser'],
+                true,
                 verbose
             )
 
@@ -156,6 +158,7 @@ contract('Dispenser', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['DispenserChangeInStorage:Dispenser'],
+                true,
                 verbose
             )
 
@@ -186,6 +189,7 @@ contract('Dispenser', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['DispenserChangeInStorageAndLogic:Dispenser'],
+                true,
                 verbose
             )
 
@@ -223,6 +227,7 @@ contract('Dispenser', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['DispenserExtraFunctionality:Dispenser'],
+                true,
                 verbose
             )
 

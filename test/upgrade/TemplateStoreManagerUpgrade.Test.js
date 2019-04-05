@@ -59,6 +59,7 @@ contract('TemplateStoreManager', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['TemplateStoreWithBug:TemplateStoreManager'],
+                true,
                 verbose
             )
 
@@ -85,6 +86,7 @@ contract('TemplateStoreManager', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['TemplateStoreChangeFunctionSignature:TemplateStoreManager'],
+                true,
                 verbose
             )
             await confirmUpgrade(
@@ -109,6 +111,7 @@ contract('TemplateStoreManager', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['TemplateStoreChangeInStorage:TemplateStoreManager'],
+                true,
                 verbose
             )
             await confirmUpgrade(
@@ -134,6 +137,7 @@ contract('TemplateStoreManager', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['TemplateStoreChangeInStorageAndLogic:TemplateStoreManager'],
+                true,
                 verbose
             )
             await confirmUpgrade(
@@ -163,6 +167,7 @@ contract('TemplateStoreManager', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['TemplateStoreExtraFunctionality:TemplateStoreManager'],
+                true,
                 verbose
             )
             await confirmUpgrade(
