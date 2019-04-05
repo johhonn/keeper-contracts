@@ -22,6 +22,15 @@ contract DIDRegistry is Ownable {
      */
     DIDRegistryLibrary.DIDRegisterList internal didRegisterList;
 
+    modifier onlyDIDOwner(bytes32 _did)
+    {
+        require(
+            msg.sender == didRegisterList.didRegisters[_did].owner,
+            'Invalid DID owner'
+        );
+        _;
+    }
+
     /**
      * @dev This implementation does not store _value on-chain,
      *      but emits DIDAttributeRegistered events to store it in the event log.
@@ -33,6 +42,17 @@ contract DIDRegistry is Ownable {
         string _value,
         address _lastUpdatedBy,
         uint256 _blockNumberUpdated
+    );
+
+    event DIDProviderRemoved(
+        bytes32 _did,
+        address _provider,
+        bool state
+    );
+
+    event DIDProviderAdded(
+        bytes32 _did,
+        address _provider
     );
 
     /**
@@ -63,6 +83,7 @@ contract DIDRegistry is Ownable {
     function registerAttribute (
         bytes32 _did,
         bytes32 _checksum,
+        address[] memory _providers,
         string memory _value
     )
         public
@@ -73,12 +94,19 @@ contract DIDRegistry is Ownable {
             didRegisterList.didRegisters[_did].owner == msg.sender,
             'Attributes must be registered by the DID owners.'
         );
+
         require(
             //TODO: 2048 should be changed in the future
             bytes(_value).length <= 2048,
             'Invalid value size'
         );
+
         didRegisterList.update(_did, _checksum);
+
+        // push providers to storage
+        for(uint256 i = 0; i < _providers.length; i++) {
+            didRegisterList.addProvider(_did, _providers[i]);
+        }
 
         /* emitting _value here to avoid expensive storage */
         emit DIDAttributeRegistered(
@@ -93,6 +121,49 @@ contract DIDRegistry is Ownable {
         return getDIDRegistrySize();
     }
 
+    function addDIDProvider(
+        bytes32 _did,
+        address _provider
+    )
+        external
+        onlyDIDOwner(_did)
+    {
+        didRegisterList.addProvider(_did, _provider);
+
+        emit DIDProviderAdded(
+            _did,
+            _provider
+        );
+    }
+
+    function removeDIDProvider(
+        bytes32 _did,
+        address _provider
+    )
+        external
+        onlyDIDOwner(_did)
+    {
+        bool state = didRegisterList.removeProvider(_did, _provider);
+
+        emit DIDProviderRemoved(
+            _did,
+            _provider,
+            state
+        );
+    }
+
+    function isDIDProvider
+    (
+        bytes32 _did,
+        address _provider
+    )
+        public
+        view
+        returns(bool)
+    {
+        return didRegisterList.isProvider(_did, _provider);
+    }
+
     /**
      * @param _did refers to decentralized identifier (a bytes32 length ID).
      * @return the address of the DID owner.
@@ -104,7 +175,8 @@ contract DIDRegistry is Ownable {
             address owner,
             bytes32 lastChecksum,
             address lastUpdatedBy,
-            uint256 blockNumberUpdated
+            uint256 blockNumberUpdated,
+            address[] memory providers
         )
     {
         owner = didRegisterList.didRegisters[_did].owner;
@@ -112,6 +184,7 @@ contract DIDRegistry is Ownable {
         lastUpdatedBy = didRegisterList.didRegisters[_did].lastUpdatedBy;
         blockNumberUpdated =
             didRegisterList.didRegisters[_did].blockNumberUpdated;
+        providers = didRegisterList.didRegisters[_did].providers;
     }
 
     /**
@@ -159,4 +232,5 @@ contract DIDRegistry is Ownable {
     {
         return didRegisterList.didRegisterIds;
     }
+
 }

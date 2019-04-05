@@ -16,6 +16,15 @@ Members:
 * mapping(address => struct TemplateStoreLibrary.Template) templates
 * address[] templateIds
 
+## Enums
+
+###  TemplateState
+Members:
+*  Uninitialized
+*  Proposed
+*  Approved
+*  Revoked
+
 ## Functions
 
 ### internal propose

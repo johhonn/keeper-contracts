@@ -4,7 +4,7 @@
 
 ## Variables
 
-### private templateList
+### internal templateList
 
 ## Modifiers
 
@@ -18,15 +18,15 @@ Parameters:
 Parameters:
 * address _owner
 
-### public proposeTemplate
+### external proposeTemplate
 Parameters:
 * address _id
 
-### public approveTemplate
+### external approveTemplate
 Parameters:
 * address _id
 
-### public revokeTemplate
+### external revokeTemplate
 Parameters:
 * address _id
 
@@ -34,8 +34,8 @@ Parameters:
 Parameters:
 * address _id
 
-### public getTemplateListSize
+### external getTemplateListSize
 
-### public isTemplateApproved
+### external isTemplateApproved
 Parameters:
 * address _id

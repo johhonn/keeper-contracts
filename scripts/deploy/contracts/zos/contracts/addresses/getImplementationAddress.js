@@ -1,6 +1,6 @@
-const zosGetMigrations = require('./getMigrations')
+const zosGetMigrations = require('../../handlers/getMigrations')
 
-function getAddressForImplementation(
+function getImplementationAddress(
     contractName,
     networkId
 ) {
@@ -9,4 +9,4 @@ function getAddressForImplementation(
     return implementation.address
 }
 
-module.exports = getAddressForImplementation
+module.exports = getImplementationAddress

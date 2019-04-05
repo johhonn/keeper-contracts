@@ -39,7 +39,7 @@ contract('DIDRegistry', (accounts) => {
         const DIDRegistryInstance = await DIDRegistry.at(DIDRegistryProxyAddress)
 
         let result = await DIDRegistryInstance.registerAttribute(
-            did, checksum, value,
+            did, checksum, [], value,
             { from: didOwner }
         )
         // some quick checks
@@ -62,6 +62,7 @@ contract('DIDRegistry', (accounts) => {
                 web3,
                 artifacts,
                 ['DIDRegistry'],
+                true,
                 true,
                 verbose
             )
@@ -98,7 +99,7 @@ contract('DIDRegistry', (accounts) => {
             const newChecksum = testUtils.generateId()
             const newValue = 'https://example.com/newdid/ocean/test.txt'
             const result = await DIDRegistryWithBugInstance.registerAttribute(
-                newChecksum, newDid, newValue,
+                newChecksum, newDid, [], newValue,
                 { from: didOwner }
             )
 
@@ -141,15 +142,9 @@ contract('DIDRegistry', (accounts) => {
             const newChecksum = testUtils.generateId()
             const newValue = 'https://example.com/newdid/ocean/test.txt'
 
-            // TODO: @ahmed - should revert
-            await DIDRegistryChangeFunctionSignatureInstance.registerAttribute(
-                newDid, newChecksum, newValue,
-                { from: didOwner }
-            )
-
             // act
             const result = await DIDRegistryChangeFunctionSignatureInstance.registerAttribute(
-                newChecksum, newDid, newValue,
+                newDid, [], newChecksum, newValue,
                 { from: didOwner }
             )
 
@@ -158,10 +153,10 @@ contract('DIDRegistry', (accounts) => {
 
             const payload = result.logs[0].args
 
-            assert.strictEqual(newDid, payload._did)
-            assert.strictEqual(didOwner, payload._owner)
-            assert.strictEqual(newChecksum, payload._checksum)
-            assert.strictEqual(newValue, payload._value)
+            assert.strictEqual(payload._did, newDid, 'DID did not match')
+            assert.strictEqual(payload._owner, didOwner, 'owner did not match')
+            assert.strictEqual(payload._checksum, newChecksum, 'checksum did not match')
+            assert.strictEqual(payload._value, newValue, 'value did not match')
         })
 
         it('Should be possible to append storage variables ', async () => {
@@ -229,7 +224,7 @@ contract('DIDRegistry', (accounts) => {
 
             // act
             const result = await DIDRegistryChangeInStorageAndLogicInstance.registerAttribute(
-                newChecksum, newDid, newValue,
+                newDid, [], newChecksum, newValue,
                 { from: didOwner }
             )
 
@@ -237,6 +232,7 @@ contract('DIDRegistry', (accounts) => {
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
             const payload = result.logs[0].args
+
             assert.strictEqual(newDid, payload._did)
             assert.strictEqual(didOwner, payload._owner)
             assert.strictEqual(newChecksum, payload._checksum)

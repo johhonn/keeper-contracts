@@ -236,7 +236,8 @@ contract('LockRewardCondition', (accounts) => {
                 lockRewardCondition,
                 oceanToken,
                 conditionStoreManager,
-                owner
+                owner,
+                createRole
             } = await setupTest()
 
             let nonce = constants.bytes32.one
@@ -249,7 +250,14 @@ contract('LockRewardCondition', (accounts) => {
 
             await conditionStoreManager.createCondition(
                 conditionId,
-                accounts[0])
+                lockRewardCondition.address
+            )
+
+            await conditionStoreManager.delegateUpdateRole(
+                conditionId,
+                createRole,
+                { from: owner }
+            )
 
             await oceanToken.mint(sender, amount, { from: owner })
             await oceanToken.approve(

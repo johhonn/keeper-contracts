@@ -5,16 +5,16 @@ const { execSync } = require('child_process')
 const whitelist = [
     0x2324, // spree
     0x2323, // nile
-    0x2A // kovan
+    0x2A, // kovan
+    0x4 // rinkeby
 ]
 
 async function cleanup(
-    web3,
+    networkId,
     deep = false,
+    deeper = false,
     verbose = true
 ) {
-    const networkId = await web3.eth.net.getId()
-
     const stuffToDelete = [
         './zos.json'
     ]
@@ -28,10 +28,16 @@ async function cleanup(
             './.zos.*' // this will clear the session
         )
 
-        if (!whitelist.find((whitelistEntruy) => whitelistEntruy === networkId)) {
-            stuffToDelete.push(
-                `./zos.dev-${networkId}.json`
-            )
+        if (deeper) {
+            if (verbose) {
+                console.log(`Doing deeper clean`)
+            }
+
+            if (!whitelist.find((whitelistEntruy) => whitelistEntruy === networkId)) {
+                stuffToDelete.push(
+                    `./zos.dev-${networkId}.json`
+                )
+            }
         }
     }
 

@@ -12,19 +12,18 @@ const testUtils = require('../../helpers/utils.js')
 const constants = require('../../helpers/constants.js')
 
 contract('DIDRegistry', (accounts) => {
-    async function setupTest({
-        owner = accounts[1]
-    } = {}) {
+    const owner = accounts[1]
+    const providers = [accounts[8], accounts[9]]
+
+    async function setupTest() {
         const didRegistryLibrary = await DIDRegistryLibrary.new()
         await DIDRegistry.link('DIDRegistryLibrary', didRegistryLibrary.address)
         const didRegistry = await DIDRegistry.new()
-
         await didRegistry.initialize(owner)
         const common = await Common.new()
         return {
             common,
-            didRegistry,
-            owner
+            didRegistry
         }
     }
 
@@ -34,7 +33,7 @@ contract('DIDRegistry', (accounts) => {
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
-            const result = await didRegistry.registerAttribute(did, checksum, value)
+            const result = await didRegistry.registerAttribute(did, checksum, providers, value)
 
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
@@ -50,7 +49,7 @@ contract('DIDRegistry', (accounts) => {
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
-            const result = await didRegistry.registerAttribute(did, checksum, value)
+            const result = await didRegistry.registerAttribute(did, checksum, providers, value)
 
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
@@ -88,10 +87,10 @@ contract('DIDRegistry', (accounts) => {
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
-            await didRegistry.registerAttribute(did, checksum, value)
+            await didRegistry.registerAttribute(did, checksum, providers, value)
 
             // try to register the same attribute the second time
-            const result = await didRegistry.registerAttribute(did, checksum, value)
+            const result = await didRegistry.registerAttribute(did, checksum, providers, value)
 
             testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
         })
@@ -101,14 +100,14 @@ contract('DIDRegistry', (accounts) => {
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
-            await didRegistry.registerAttribute(did, checksum, value)
+            await didRegistry.registerAttribute(did, checksum, providers, value)
 
             const anotherPerson = { from: accounts[1] }
 
             // a different owner can register his own DID
             await assert.isRejected(
                 // must not be able to add attributes to someone else's DID
-                didRegistry.registerAttribute(did, checksum, value, anotherPerson),
+                didRegistry.registerAttribute(did, checksum, providers, value, anotherPerson),
                 constants.registry.error.onlyDIDOwner
             )
         })
@@ -121,22 +120,23 @@ contract('DIDRegistry', (accounts) => {
             const value = 'dabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345xdfwfg'
 
             await assert.isRejected(
-                didRegistry.registerAttribute(did, checksum, value),
+                didRegistry.registerAttribute(did, checksum, providers, value),
                 constants.registry.error.invalidValueSize
             )
         })
+
         it('Should DID registry handle DID duplicates consistently', async () => {
             const { didRegistry } = await setupTest()
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
-            await didRegistry.registerAttribute(did, checksum, value)
+            await didRegistry.registerAttribute(did, checksum, providers, value)
             const didRegistryListSizeBefore = (await didRegistry.getDIDRegistrySize()).toNumber()
 
             // update checksum & value
             const newValue = 'https://exmaple.net/did/ocean/test-attr-example.txt'
             const newChecksum = testUtils.generateId()
-            await didRegistry.registerAttribute(did, newChecksum, newValue)
+            await didRegistry.registerAttribute(did, newChecksum, providers, newValue)
             const didRegistryListSizeAfter = (await didRegistry.getDIDRegistrySize()).toNumber()
 
             assert.equal(
@@ -147,7 +147,7 @@ contract('DIDRegistry', (accounts) => {
 
             // registering new DID
             const newDid = constants.did[1]
-            await didRegistry.registerAttribute(newDid, checksum, value)
+            await didRegistry.registerAttribute(newDid, checksum, providers, value)
             // assert
             assert.equal(
                 (await didRegistry.getDIDRegistrySize()).toNumber(),
@@ -156,6 +156,7 @@ contract('DIDRegistry', (accounts) => {
             )
         })
     })
+
     describe('get DIDRegister', () => {
         it('successful register should DIDRegister', async () => {
             const { common, didRegistry } = await setupTest()
@@ -163,7 +164,7 @@ contract('DIDRegistry', (accounts) => {
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
             const blockNumber = await common.getCurrentBlockNumber()
-            await didRegistry.registerAttribute(did, checksum, value)
+            await didRegistry.registerAttribute(did, checksum, providers, value)
             const storedDIDRegister = await didRegistry.getDIDRegister(did)
             assert.strictEqual(
                 storedDIDRegister.owner,
@@ -188,6 +189,108 @@ contract('DIDRegistry', (accounts) => {
                 getDIDRegisterIds[0],
                 did
             )
+        })
+    })
+
+    describe('register DID providers', () => {
+        it('should register did with providers', async () => {
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            await didRegistry.registerAttribute(did, checksum, providers, value)
+            const storedDIDRegister = await didRegistry.getDIDRegister(did)
+            assert.strictEqual(
+                storedDIDRegister.providers.length,
+                2
+            )
+
+            assert.strictEqual(await didRegistry.isDIDProvider(did, providers[0]), true)
+            assert.strictEqual(await didRegistry.isDIDProvider(did, providers[1]), true)
+            assert.strictEqual(await didRegistry.isDIDProvider(did, accounts[7]), false)
+        })
+
+        it('should owner able to remove DID provider', async () => {
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            await didRegistry.registerAttribute(did, checksum, providers, value)
+            const storedDIDRegister = await didRegistry.getDIDRegister(did)
+            assert.strictEqual(
+                storedDIDRegister.providers.length,
+                providers.length
+            )
+            await didRegistry.removeDIDProvider(
+                did,
+                providers[0]
+            )
+            assert.strictEqual(
+                await didRegistry.isDIDProvider(did, providers[0]),
+                false
+            )
+        })
+
+        it('should DID owner able to remove all the providers', async () => {
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            await didRegistry.registerAttribute(did, checksum, providers, value)
+            const storedDIDRegister = await didRegistry.getDIDRegister(did)
+            assert.strictEqual(
+                storedDIDRegister.providers.length,
+                providers.length
+            )
+            await didRegistry.removeDIDProvider(
+                did,
+                providers[0]
+            )
+            await didRegistry.removeDIDProvider(
+                did,
+                providers[1]
+            )
+            // remove twice to check the fork (-1)
+            await didRegistry.removeDIDProvider(
+                did,
+                providers[1]
+            )
+
+            // assert
+            assert.strictEqual(
+                await didRegistry.isDIDProvider(did, providers[0]),
+                false
+            )
+            assert.strictEqual(
+                await didRegistry.isDIDProvider(did, providers[1]),
+                false
+            )
+        })
+
+        it('should register did then add providers', async () => {
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            await didRegistry.registerAttribute(did, checksum, [], value)
+            const storedDIDRegister = await didRegistry.getDIDRegister(did)
+            assert.strictEqual(
+                storedDIDRegister.providers.length,
+                0
+            )
+
+            assert.strictEqual(await didRegistry.isDIDProvider(did, providers[0]), false)
+            assert.strictEqual(await didRegistry.isDIDProvider(did, providers[1]), false)
+
+            await didRegistry.addDIDProvider(did, providers[0])
+            assert.strictEqual(await didRegistry.isDIDProvider(did, providers[0]), true)
+
+            const updatedDIDRegister = await didRegistry.getDIDRegister(did)
+            assert.strictEqual(
+                updatedDIDRegister.providers.length,
+                1
+            )
+            assert.strictEqual(updatedDIDRegister.providers[0], providers[0])
         })
     })
 })

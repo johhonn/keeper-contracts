@@ -36,6 +36,7 @@ contract('OceanToken', (accounts) => {
                     'OceanToken'
                 ],
                 true,
+                true,
                 verbose
             )
 

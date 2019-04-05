@@ -26,14 +26,15 @@ contract('EscrowAccessSecretStoreTemplate', (accounts) => {
             templateStoreManager
         } = await deployManagers(deployer, owner)
 
+        const contractType = templateStoreManager.address
         const escrowAccessSecretStoreTemplate = await EscrowAccessSecretStoreTemplate.new({ from: deployer })
         await escrowAccessSecretStoreTemplate.methods['initialize(address,address,address,address,address,address)'](
             owner,
             agreementStoreManager.address,
             didRegistry.address,
-            accounts[0],
-            accounts[0],
-            accounts[0],
+            contractType,
+            contractType,
+            contractType,
             { from: deployer }
         )
 
@@ -106,7 +107,7 @@ contract('EscrowAccessSecretStoreTemplate', (accounts) => {
             )
 
             // register DID
-            await didRegistry.registerAttribute(agreement.did, constants.bytes32.one, constants.registry.url)
+            await didRegistry.registerAttribute(agreement.did, constants.bytes32.one, [], constants.registry.url)
 
             await escrowAccessSecretStoreTemplate.createAgreement(agreementId, ...Object.values(agreement))
 
@@ -146,7 +147,7 @@ contract('EscrowAccessSecretStoreTemplate', (accounts) => {
             const { agreementId, agreement } = await prepareAgreement()
 
             // register DID
-            await didRegistry.registerAttribute(agreement.did, constants.bytes32.one, constants.registry.url)
+            await didRegistry.registerAttribute(agreement.did, constants.bytes32.one, [], constants.registry.url)
 
             // propose and approve template
             const templateId = escrowAccessSecretStoreTemplate.address

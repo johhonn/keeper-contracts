@@ -141,6 +141,14 @@ contract EscrowReward is Reward {
         returns (ConditionStoreLibrary.ConditionState)
     {
         require(
+            _receiver != address(0),
+            'Null address is impossible to fulfill'
+        );
+        require(
+            _receiver != address(this),
+            'EscrowReward contract can not be a receiver'
+        );
+        require(
             token.transfer(_receiver, _amount),
             'Could not transfer token'
         );

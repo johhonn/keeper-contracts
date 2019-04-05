@@ -46,6 +46,19 @@ contract ConditionStoreManager is Ownable, Common {
         _;
     }
 
+    modifier onlyValidType(address typeRef)
+    {
+        require(
+            typeRef != address(0),
+            'Invalid address'
+        );
+        require(
+            isContract(typeRef),
+            'Invalid contract address'
+        );
+        _;
+    }
+
     function initialize(
         address _owner
     )
@@ -85,6 +98,24 @@ contract ConditionStoreManager is Ownable, Common {
         createRole = delegatee;
     }
 
+    function delegateUpdateRole(
+        bytes32 _id,
+        address delegatee
+    )
+        external
+        onlyOwner()
+    {
+        require(
+            delegatee != address(0),
+            'Invalid delegatee address'
+        );
+        require(
+            conditionList.conditions[_id].typeRef != address(0),
+            'Invalid condition Id'
+        );
+        conditionList.conditions[_id].typeRef = delegatee;
+    }
+
     function createCondition(
         bytes32 _id,
         address _typeRef
@@ -109,14 +140,10 @@ contract ConditionStoreManager is Ownable, Common {
     )
         public
         onlyCreateRole
+        onlyValidType(_typeRef)
         returns (uint size)
     {
-        require(
-            _typeRef != address(0),
-            'Invalid address'
-        );
         epochList.create(_id, _timeLock, _timeOut);
-
         uint listSize = conditionList.create(_id, _typeRef);
 
         emit ConditionCreated(

@@ -6,7 +6,11 @@ import '../ISecretStore.sol';
 
 contract AccessSecretStoreCondition is Condition, ISecretStore {
 
-    mapping(bytes32 => mapping(address => bool)) private documentPermissions;
+    struct DocumentPermission {
+        bytes32 agreementId;
+        mapping(address => bool) permission;
+    }
+    mapping(bytes32 => DocumentPermission) private documentPermissions;
 
     AgreementStoreManager private agreementStoreManager;
 
@@ -54,11 +58,12 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         returns (ConditionStoreLibrary.ConditionState)
     {
         require(
-            msg.sender ==
-            agreementStoreManager.getAgreementDIDOwner(_agreementId),
+            agreementStoreManager.isAgreementDIDOwner(_agreementId, msg.sender) ||
+            agreementStoreManager.isAgreementDIDProvider(_agreementId, msg.sender),
             'Invalid UpdateRole'
         );
-        documentPermissions[_documentId][_grantee] = true;
+        documentPermissions[_documentId].permission[_grantee] = true;
+        documentPermissions[_documentId].agreementId = _agreementId;
 
         bytes32 _id = generateId(
             _agreementId,
@@ -82,7 +87,7 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
     /**
     * @notice checkPermissions is called by Parity secret store
     * @param _documentId refers to the DID in which secret store will issue the decryption keys
-    * @param _grantee is the address of the granted user
+    * @param _grantee is the address of the granted user or the DID provider
     * @return true if the access was granted
     */
     function checkPermissions(
@@ -92,7 +97,14 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         external view
         returns(bool permissionGranted)
     {
-        return documentPermissions[_documentId][_grantee];
+        bool isDIDProvider = agreementStoreManager.isAgreementDIDProvider(
+                documentPermissions[_documentId].agreementId,
+                _grantee
+            );
+        if(isDIDProvider)
+            return true;
+
+        return documentPermissions[_documentId].permission[_grantee];
     }
 }
 

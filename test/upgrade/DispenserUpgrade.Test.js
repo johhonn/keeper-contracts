@@ -59,6 +59,7 @@ contract('Dispenser', (accounts) => {
                     'OceanToken'
                 ],
                 true,
+                true,
                 verbose
             )
             OceanTokenAddress = addressBook['OceanToken']

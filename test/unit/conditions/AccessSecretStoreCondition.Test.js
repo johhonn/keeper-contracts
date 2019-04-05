@@ -32,7 +32,8 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
         value = constants.registry.url,
         deployer = accounts[8],
         owner = accounts[0],
-        registerDID = false
+        registerDID = false,
+        DIDProvider = accounts[9]
     } = {}) {
         ({
             didRegistry,
@@ -52,13 +53,14 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
         )
 
         if (registerDID) {
-            await didRegistry.registerAttribute(did, checksum, value)
+            await didRegistry.registerAttribute(did, checksum, [DIDProvider], value)
         }
 
         return {
             conditionId,
             conditionType,
-            owner
+            owner,
+            DIDProvider
         }
     }
 
@@ -259,6 +261,46 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
         })
     })
     describe('check permissions', () => {
+        it('should grant permission in case of DID provider', async () => {
+            const { DIDProvider } = await setupTest({ registerDID: true })
+            const nonce = constants.bytes32.one
+            const documentId = constants.bytes32.one
+            const grantee = accounts[1]
+            const timeLock = 0
+            const timeOut = 234898098
+
+            const templateId = accounts[2]
+            await templateStoreManager.proposeTemplate(templateId)
+            await templateStoreManager.approveTemplate(templateId)
+
+            let hashValues = await accessSecretStoreCondition.hashValues(documentId, grantee)
+            let conditionId = await accessSecretStoreCondition.generateId(nonce, hashValues)
+
+            const agreement = {
+                did: constants.did[0],
+                conditionTypes: [accessSecretStoreCondition.address],
+                conditionIds: [conditionId],
+                timeLocks: [timeLock],
+                timeOuts: [timeOut]
+            }
+            const agreementId = constants.bytes32.one
+
+            await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement),
+                { from: templateId }
+            )
+
+            await accessSecretStoreCondition.fulfill(nonce, documentId, grantee)
+
+            assert.strictEqual(
+                await accessSecretStoreCondition.checkPermissions(
+                    DIDProvider,
+                    documentId
+                ),
+                true
+            )
+        })
         it('successful create should check permissions', async () => {
             await setupTest({ registerDID: true })
 

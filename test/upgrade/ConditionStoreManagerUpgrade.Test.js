@@ -40,6 +40,7 @@ contract('ConditionStoreManager', (accounts) => {
             artifacts,
             ['ConditionStoreManager'],
             true,
+            true,
             verbose
         )
 
@@ -57,6 +58,7 @@ contract('ConditionStoreManager', (accounts) => {
         conditionType = constants.address.dummy
     } = {}) {
         const conditionStoreManager = await ConditionStoreManager.at(conditionStoreManagerAddress)
+        conditionType = conditionStoreManagerAddress
         return { conditionStoreManager, conditionId, conditionType }
     }
 

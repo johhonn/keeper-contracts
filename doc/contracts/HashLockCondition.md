@@ -4,7 +4,7 @@
 
 ## Functions
 
-### public initialize
+### external initialize
 Parameters:
 * address _owner
 * address _conditionStoreManagerAddress
@@ -21,11 +21,7 @@ Parameters:
 Parameters:
 * bytes32 _preimage
 
-### public hashValues
-Parameters:
-* bytes _preimage
-
-### public fulfill
+### external fulfill
 Parameters:
 * bytes32 _agreementId
 * uint256 _preimage
@@ -35,7 +31,7 @@ Parameters:
 * bytes32 _agreementId
 * string _preimage
 
-### public fulfill
+### external fulfill
 Parameters:
 * bytes32 _agreementId
 * bytes32 _preimage
