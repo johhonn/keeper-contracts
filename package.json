@@ -6,7 +6,7 @@
     "url": "https://github.com/oceanprotocol/keeper-contracts/issues"
   },
   "homepage": "https://github.com/oceanprotocol/keeper-contracts#readme",
-  "main": "truffle.js",
+  "main": "README.md",
   "scripts": {
     "compile": "truffle compile",
     "deploy": "npx truffle exec ./scripts/deploy/truffle-wrapper/deployContractsWrapper.js",

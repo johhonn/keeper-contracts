@@ -2,7 +2,7 @@
 
 # keeper-contracts
 
-> 💧 Integration of TCRs, CPM and Ocean Tokens in Solidity
+> 💧 Integration of SEAs, DID and OceanToken in Solidity
 > [oceanprotocol.com](https://oceanprotocol.com)
 
 | Dockerhub | TravisCI | Ascribe | Greenkeeper |
@@ -21,63 +21,33 @@
   - [Get Started](#get-started)
      - [Docker](#docker)
      - [Local development](#local-development)
-     - [Testnet deployment](#testnet-deployment)
+     - [Testnets](#testnets)
         - [Nile Testnet](#nile-testnet)
         - [Kovan Testnet](#kovan-testnet)
-  - [Libraries](#libraries)
   - [Testing](#testing)
      - [Code Linting](#code-linting)
+  - [Packages](#packages)
+  - [Deployments, Upgrades, New Versions, New Releases](#deployments-upgrades-new-versions-new-releases)
   - [Documentation](#documentation)
-  - [New Version / New Release](#new-version-new-release)
   - [Contributing](#contributing)
   - [Prior Art](#prior-art)
   - [License](#license)
-
+  
 ---
 
 ## Get Started
 
-For local development you can either use Docker, or setup the development environment on your machine.
+For local development of `keeper-contracts` you can either use Docker, or setup the development environment on your machine.
 
 ### Docker
 
-The most simple way to get started is with Docker:
-
-```bash
-git clone git@github.com:oceanprotocol/keeper-contracts.git
-cd keeper-contracts/
-
-docker build -t oceanprotocol/keeper-contracts:0.1 .
-docker run -d -p 8545:8545 oceanprotocol/keeper-contracts:0.1
-```
-
-or simply pull it from docker hub:
-
-```bash
-docker pull oceanprotocol/keeper-contracts
-docker run -d -p 8545:8545 oceanprotocol/keeper-contracts
-```
-
-Which will expose the Ethereum RPC client with all contracts loaded under localhost:8545, which you can add to your `truffle.js`:
-
-```js
-module.exports = {
-    networks: {
-        development: {
-            host: 'localhost',
-            port: 8545,
-            network_id: '*',
-            gas: 6000000
-        },
-    }
-}
-```
+The simplest way to get started with is [barge](https://github.com/oceanprotocol/barge), a docker compose application to run Ocean Protocol.
 
 ### Local development
 
 As a pre-requisite, you need:
 
-- Node.js >=6, <=v10.13.0
+- Node.js
 - npm
 
 Clone the project and install all dependencies:
@@ -116,23 +86,28 @@ npm run compile
 npm run deploy
 ```
 
-Upgrade contract [**optional**]:
+Upgrade contracts [**optional**]:
 ```bash
-npm run upgrade <DEPLOYED_CONTRACT>:<NEW_CONTRACT>
+npm run upgrade
 ```
 
-### Testnet deployment
+## Testing
+
+Run tests with `npm run test`, e.g.:
+
+```bash
+npm run test -- test/unit/agreements/AgreementStoreManager.Test.js
+```
+
+### Code Linting
+
+Linting is setup for `JavaScript` with [ESLint](https://eslint.org) & Solidity with [Ethlint](https://github.com/duaraghav8/Ethlint).
+
+Code style is enforced through the CI test process, builds will fail if there're any linting errors.
+
+### Testnets
 
 #### Nile Testnet
-
-Follow the steps for local deployment. Make sure that the address [`0x90eE7A30339D05E07d9c6e65747132933ff6e624`](https://submarine.dev-ocean.com/address/0x90ee7a30339d05e07d9c6e65747132933ff6e624) is having enough (~1) Ether.
-
-```bash
-export MNEMONIC=<your nile mnemonic>
-npm run deploy:nile
-```
-
-The transaction should show up on the account: [`0x90eE7A30339D05E07d9c6e65747132933ff6e624`](https://submarine.dev-ocean.com/address/0x90ee7a30339d05e07d9c6e65747132933ff6e624/transactions)
 
 The contract addresses deployed on Ocean Nile testnet:
 
@@ -155,18 +130,6 @@ The contract addresses deployed on Ocean Nile testnet:
 
 #### Kovan Testnet
 
-Follow the steps for local deployment. Make sure that the address [`0x2c0d5f47374b130ee398f4c34dbe8168824a8616`](https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616) is having enough (~1) Ether.
-
-If you managed to deploy the contracts locally do:
-
-```bash
-export INFURA_TOKEN=<your infura token>
-export MNEMONIC=<your kovan mnemonic>
-npm run deploy:kovan
-```
-
-The transaction should show up on: [`0x2c0d5f47374b130ee398f4c34dbe8168824a8616`](https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616)
-
 The contract addresses deployed on Kovan testnet:
 
 | Contract                          | Version | Address                                      |
@@ -186,29 +149,47 @@ The contract addresses deployed on Kovan testnet:
 | SignCondition                     | v0.9.1  | `0x7B8B2756de9Ab474ddbCc87047117a2A16419194` |
 | TemplateStoreManager              | v0.9.1  | `0xD20307e2620Bb8a60991f43c52b64f981103A829` |
 
-## Libraries
+## Packages
 
-To facilitate the integration of the Ocean Keeper Smart Contracts, Python and Javascript libraries are ready to be integrated. Those libraries include the Smart Contract ABI's.
-Using these libraries helps to avoid compiling the Smart Contracts and copying the ABI's manually to your project. In that way the integration is cleaner and easier.
-The libraries provided currently are:
+To facilitate the integration of the Ocean Protocol's `keeper-contracts` there are `Python`, `JavaScript` and `Java` packages ready to be integrated. Those libraries include the Smart Contract ABI's.
+Using these packages helps to avoid compiling the Smart Contracts and copying the ABI's manually to your project. In that way the integration is cleaner and easier.
+The packages provided currently are:
 
-* JavaScript npm package - As part of the [@oceanprotocol npm organization](https://www.npmjs.com/settings/oceanprotocol/packages), the [npm keeper-contracts package](https://www.npmjs.com/package/@oceanprotocol/keeper-contracts) provides the ABI's to be imported from your JavaScript code.
-* Python Pypi package - The [Pypi keeper-contracts package](https://pypi.org/project/keeper-contracts/) provides the same ABI's to be used from Python.
-* Java Maven package - It's possible to generate the maven stubs to interact with the smart contracts. It's necessary to have locally web3j and run the `scripts/maven.sh` script
+* JavaScript `npm` package - As part of the [@oceanprotocol npm organization](https://www.npmjs.com/settings/oceanprotocol/packages), the [npm keeper-contracts package](https://www.npmjs.com/package/@oceanprotocol/keeper-contracts) provides the ABI's to be imported from your `JavaScript` code.
+* Python `Pypi` package - The [Pypi keeper-contracts package](https://pypi.org/project/keeper-contracts/) provides the same ABI's to be used from `Python`.
+* Java `Maven` package - The [Maven keeper-contracts package](https://search.maven.org/artifact/com.oceanprotocol/keeper-contracts) provides the same ABI's to be used from `Java`.
 
-## Testing
+The packages contains all the content from the `doc/` and `artifacts/` folders.
 
-Run tests with `npm run test`, e.g.:
+In `JavaScript` they can be used like this:
+
+Install the `keeper-contracts` `npm` package.
 
 ```bash
-npm run test -- test/unit/agreements/AgreementStoreManager.Test.js
+npm install @oceanprotocol/keeper-contracts
 ```
 
-### Code Linting
+Load the ABI of the `OceanToken` contract on the `nile` network:
 
-Linting is setup for JavaScript with [ESLint](https://eslint.org) & Solidity with [Ethlint](https://github.com/duaraghav8/Ethlint).
+```javascript
+const OceanToken = require('@oceanprotocol/keeper-contracts/artifacts/OceanToken.nile.json')
+```
 
-Code style is enforced through the CI test process, builds will fail if there're any linting errors.
+
+The structure of the `artifacts` is:
+
+```json
+{
+  "abi": "...",
+  "bytecode": "0x60806040523...",
+  "address": "0x45DE141F8Efc355F1451a102FB6225F1EDd2921d",
+  "version": "v0.9.1"
+}
+```
+
+## Deployments, Upgrades, New Versions, New Releases
+
+See [RELEASE_PROCESS.md](RELEASE_PROCESS.md)
 
 ## Documentation
 
@@ -216,10 +197,6 @@ Code style is enforced through the CI test process, builds will fail if there're
 * [Keeper-contracts Diagram](doc/files/Keeper-Contracts.png)
 * [Packaging of libraries](doc/packaging.md)
 * [Upgrading contracts](doc/upgrades.md)
-
-## New Version / New Release
-
-See [RELEASE_PROCESS.md](RELEASE_PROCESS.md)
 
 ## Contributing
 
