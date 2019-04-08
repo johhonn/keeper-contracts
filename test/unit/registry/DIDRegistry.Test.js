@@ -292,5 +292,17 @@ contract('DIDRegistry', (accounts) => {
             )
             assert.strictEqual(updatedDIDRegister.providers[0], providers[0])
         })
+
+        it('should not register a did provider address that has the same DIDRegistry address', async () => {
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+
+            await assert.isRejected(
+                didRegistry.registerAttribute(did, checksum, [ didRegistry.address ], value),
+                'DID provider should not be this contract address'
+            )
+        })
     })
 })
