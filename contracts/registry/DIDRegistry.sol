@@ -96,6 +96,11 @@ contract DIDRegistry is Ownable {
         );
 
         require(
+            didRegisterList.didRegisters[_did].owner != address(this),
+            'DID owner should not be this contract'
+        );
+
+        require(
             //TODO: 2048 should be changed in the future
             bytes(_value).length <= 2048,
             'Invalid value size'
