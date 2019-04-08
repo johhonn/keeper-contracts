@@ -76,6 +76,7 @@ contract('DIDRegistry', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['DIDRegistryWithBug:DIDRegistry'],
+                true,
                 verbose
             )
 
@@ -124,6 +125,7 @@ contract('DIDRegistry', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['DIDRegistryChangeFunctionSignature:DIDRegistry'],
+                true,
                 verbose
             )
 
@@ -166,6 +168,7 @@ contract('DIDRegistry', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['DIDRegistryChangeInStorage:DIDRegistry'],
+                true,
                 verbose
             )
 
@@ -195,6 +198,7 @@ contract('DIDRegistry', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['DIDRegistryChangeInStorageAndLogic:DIDRegistry'],
+                true,
                 verbose
             )
 
@@ -250,6 +254,7 @@ contract('DIDRegistry', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['DIDRegistryExtraFunctionality:DIDRegistry'],
+                true,
                 verbose
             )
 

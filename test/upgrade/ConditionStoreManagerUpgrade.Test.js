@@ -69,6 +69,7 @@ contract('ConditionStoreManager', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['ConditionStoreWithBug:ConditionStoreManager'],
+                true,
                 verbose
             )
 
@@ -96,6 +97,7 @@ contract('ConditionStoreManager', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['ConditionStoreChangeFunctionSignature:ConditionStoreManager'],
+                true,
                 verbose
             )
 
@@ -158,6 +160,7 @@ contract('ConditionStoreManager', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['ConditionStoreChangeInStorage:ConditionStoreManager'],
+                true,
                 verbose
             )
 
@@ -184,6 +187,7 @@ contract('ConditionStoreManager', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['ConditionStoreChangeInStorageAndLogic:ConditionStoreManager'],
+                true,
                 verbose
             )
 
@@ -242,6 +246,7 @@ contract('ConditionStoreManager', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['ConditionStoreExtraFunctionality:ConditionStoreManager'],
+                true,
                 verbose
             )
 

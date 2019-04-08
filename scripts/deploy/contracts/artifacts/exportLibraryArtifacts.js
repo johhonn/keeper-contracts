@@ -1,11 +1,12 @@
 /* eslint-disable no-console */
+const createArtifact = require('./createArtifact')
 const writeArtifact = require('./writeArtifact')
 
 const zosGetMigrations = require('../zos/handlers/getMigrations')
 
 async function exportLibraryArtifacts(
-    networkName,
     networkId,
+    networkName,
     version,
     verbose = true
 ) {
@@ -20,11 +21,17 @@ async function exportLibraryArtifacts(
             )
         }
 
-        const artifact = writeArtifact(
+        // create the artifact
+        const artifact = createArtifact(
             solidityLibName,
             solidityLibs[solidityLibName].address,
-            networkName,
+            solidityLibs[solidityLibName].address,
             version
+        )
+
+        writeArtifact(
+            artifact,
+            networkName
         )
 
         if (verbose) {

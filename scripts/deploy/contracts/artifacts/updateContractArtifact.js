@@ -1,18 +1,17 @@
 /* eslint-disable no-console */
-const fs = require('fs')
-const path = require('path')
-
+const loadArtifact = require('./loadArtifact')
 const createArtifact = require('./createArtifact')
-const zosGetMigrations = require('../zos/handlers/getMigrations')
+const writeArtifact = require('./writeArtifact')
 
-const artifactsDir = `${__dirname}/../../../../artifacts`
-const network = process.env.NETWORK || 'development'
+const zosGetImplementationAddress = require('../zos/contracts/addresses/getImplementationAddress')
+const zosGetMigrations = require('../zos/handlers/getMigrations')
 
 function updateContractArtifact(
     oldContractName,
     newContractName,
     version,
     networkId,
+    networkName,
     verbose = true
 ) {
     const { contracts } = zosGetMigrations(networkId)
@@ -25,33 +24,27 @@ function updateContractArtifact(
         console.log(`Updating contract artifact: ${oldContractName} with the ABI of ${newContractName}`)
     }
 
-    const artifactFileName = `${oldContractName}.${network.toLowerCase()}.json`
+    const { address } = loadArtifact(
+        oldContractName,
+        networkName
+    )
 
-    const resolvedArtifactsDir = path.resolve(artifactsDir)
-
-    /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-    const oldArtifactString = fs.readFileSync(
-        `${resolvedArtifactsDir}/${artifactFileName}`,
-        'utf8'
-    ).toString()
-
-    const oldArtifact = JSON.parse(oldArtifactString)
-
-    const { address } = oldArtifact
+    const implementationAddress = zosGetImplementationAddress(
+        oldContractName,
+        networkId
+    )
 
     // create a new artifact with the new content
     const artifact = createArtifact(
         newContractName,
         address,
+        implementationAddress,
         version
     )
 
-    const artifactString = JSON.stringify(artifact, null, 2)
-
-    /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-    fs.writeFileSync(
-        `${artifactsDir}/${artifactFileName}`,
-        artifactString
+    writeArtifact(
+        artifact,
+        networkName
     )
 }
 
