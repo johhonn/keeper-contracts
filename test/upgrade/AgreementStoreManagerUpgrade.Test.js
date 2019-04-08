@@ -76,6 +76,7 @@ contract('AgreementStoreManager', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['AgreementStoreManagerWithBug:AgreementStoreManager'],
+                true,
                 verbose
             )
 
@@ -108,6 +109,7 @@ contract('AgreementStoreManager', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['AgreementStoreManagerChangeFunctionSignature:AgreementStoreManager'],
+                true,
                 verbose
             )
 
@@ -143,6 +145,7 @@ contract('AgreementStoreManager', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['AgreementStoreManagerChangeInStorage:AgreementStoreManager'],
+                true,
                 verbose
             )
 
@@ -177,6 +180,7 @@ contract('AgreementStoreManager', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['AgreementStoreManagerChangeInStorageAndLogic:AgreementStoreManager'],
+                true,
                 verbose
             )
 
@@ -218,6 +222,7 @@ contract('AgreementStoreManager', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['AgreementStoreManagerExtraFunctionality:AgreementStoreManager'],
+                true,
                 verbose
             )
 

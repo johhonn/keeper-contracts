@@ -49,14 +49,17 @@ contract('OceanToken', (accounts) => {
             const taskBook = await upgradeContracts(
                 web3,
                 ['OceanTokenChangeInStorage:OceanToken'],
+                true,
                 verbose
             )
+
             await confirmUpgrade(
                 web3,
                 taskBook['OceanToken'],
                 approver,
                 verbose
             )
+
             // act
             const OceanTokenChangeInStorageInstance = await OceanTokenChangeInStorage.at(OceanTokenAddress)
 
@@ -72,11 +75,14 @@ contract('OceanToken', (accounts) => {
 
         it('Should be possible to append storage variables and change logic', async () => {
             await setupTest()
+
             const taskBook = await upgradeContracts(
                 web3,
                 ['OceanTokenChangeInStorageAndLogic:OceanToken'],
+                true,
                 verbose
             )
+
             await confirmUpgrade(
                 web3,
                 taskBook['OceanToken'],
@@ -108,11 +114,14 @@ contract('OceanToken', (accounts) => {
 
         it('Should be able to call new method added after upgrade is approved', async () => {
             await setupTest()
+
             const taskBook = await upgradeContracts(
                 web3,
                 ['OceanTokenExtraFunctionality:OceanToken'],
+                true,
                 verbose
             )
+
             await confirmUpgrade(
                 web3,
                 taskBook['OceanToken'],

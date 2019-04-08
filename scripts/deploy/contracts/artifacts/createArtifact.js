@@ -6,7 +6,8 @@ const buildDir = `${__dirname}/../../../../build/contracts/`
 
 function createArtifact(
     name,
-    address,
+    proxyAddress,
+    implementationAddress,
     version
 ) {
     /* eslint-disable-next-line security/detect-non-literal-fs-filename */
@@ -23,9 +24,11 @@ function createArtifact(
     )
 
     return {
+        name,
         abi: contract.abi,
         bytecode: contract.bytecode,
-        address,
+        address: proxyAddress,
+        implementation: implementationAddress,
         version
     }
 }

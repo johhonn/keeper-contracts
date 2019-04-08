@@ -1,13 +1,15 @@
 /* eslint-disable no-console */
+const createArtifact = require('./createArtifact')
 const writeArtifact = require('./writeArtifact')
 
 const zosGetProxyAddress = require('../zos/contracts/addresses/getProxyAddress')
+const zosGetImplementationAddress = require('../zos/contracts/addresses/getImplementationAddress')
 const zosGetMigrations = require('../zos/handlers/getMigrations')
 
 async function exportContractArtifacts(
     projectName,
-    networkName,
     networkId,
+    networkName,
     version,
     verbose = true
 ) {
@@ -28,11 +30,22 @@ async function exportContractArtifacts(
             networkId
         )
 
-        const artifact = writeArtifact(
+        const implementationAddress = await zosGetImplementationAddress(
+            contractName,
+            networkId
+        )
+
+        // create the artifact
+        const artifact = createArtifact(
             contractName,
             proxyAddress,
-            networkName,
+            implementationAddress,
             version
+        )
+
+        writeArtifact(
+            artifact,
+            networkName
         )
 
         if (verbose) {
