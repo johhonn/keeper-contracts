@@ -15,7 +15,7 @@ imagesize==1.0.0
 Jinja2==2.10
 MarkupSafe==1.0
 mccabe==0.6.1
-mythril==0.18.11
+mythril==0.20.0
 packaging==17.1
 pathtools==0.1.2
 pkginfo==1.4.2
@@ -42,3 +42,4 @@ twine==1.11.0
 urllib3==1.23
 virtualenv==16.0.0
 watchdog==0.8.3
+slither-analyzer==0.6.0

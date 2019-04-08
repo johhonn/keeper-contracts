@@ -2,7 +2,7 @@
 
 # keeper-contracts
 
-> 💧 Integration of TCRs, CPM and Ocean Tokens in Solidity
+> 💧 Integration of SEAs, DID and OceanToken in Solidity
 > [oceanprotocol.com](https://oceanprotocol.com)
 
 | Dockerhub | TravisCI | Ascribe | Greenkeeper |
@@ -15,76 +15,39 @@
 
 ---
 
-Ocean Keeper implementation where we put the following modules together:
-
-* **TCRs**: users create challenges and resolve them through voting to maintain registries;
-* **Ocean Tokens**: the intrinsic tokens circulated inside Ocean network, which is used in the voting of TCRs;
-* **Marketplace**: the core marketplace where people can transact with each other with Ocean tokens.
 
 ## Table of Contents
 
   - [Get Started](#get-started)
      - [Docker](#docker)
      - [Local development](#local-development)
-     - [Testnet deployment](#testnet-deployment)
+     - [Testnets](#testnets)
         - [Nile Testnet](#nile-testnet)
         - [Kovan Testnet](#kovan-testnet)
-  - [Libraries](#libraries)
   - [Testing](#testing)
      - [Code Linting](#code-linting)
+  - [Packages](#packages)
+  - [Deployments, Upgrades, New Versions, New Releases](#deployments-upgrades-new-versions-new-releases)
   - [Documentation](#documentation)
-     - [Use Case 1: Register data asset](#use-case-1-register-data-asset)
-     - [Use Case 2: Authorize access with OceanAuth contract](#use-case-2-authorize-access-with-oceanauth-contract)
-  - [New Version / New Release](#new-version-new-release)
   - [Contributing](#contributing)
   - [Prior Art](#prior-art)
   - [License](#license)
-
+  
 ---
 
 ## Get Started
 
-For local development you can either use Docker, or setup the development environment on your machine.
+For local development of `keeper-contracts` you can either use Docker, or setup the development environment on your machine.
 
 ### Docker
 
-The most simple way to get started is with Docker:
-
-```bash
-git clone git@github.com:oceanprotocol/keeper-contracts.git
-cd keeper-contracts/
-
-docker build -t oceanprotocol/keeper-contracts:0.1 .
-docker run -d -p 8545:8545 oceanprotocol/keeper-contracts:0.1
-```
-
-or simply pull it from docker hub:
-
-```bash
-docker pull oceanprotocol/keeper-contracts
-docker run -d -p 8545:8545 oceanprotocol/keeper-contracts
-```
-
-Which will expose the Ethereum RPC client with all contracts loaded under localhost:8545, which you can add to your `truffle.js`:
-
-```js
-module.exports = {
-    networks: {
-        development: {
-            host: 'localhost',
-            port: 8545,
-            network_id: '*',
-            gas: 6000000
-        },
-    }
-}
-```
+The simplest way to get started with is [barge](https://github.com/oceanprotocol/barge), a docker compose application to run Ocean Protocol.
 
 ### Local development
 
 As a pre-requisite, you need:
 
-- Node.js >=6, <=v10.13.0
+- Node.js
 - npm
 
 Clone the project and install all dependencies:
@@ -115,175 +78,125 @@ ganache-cli
 Switch back to your other terminal and deploy the contracts:
 
 ```bash
-npm run migrate
+npm run deploy
 
 # for redeployment run this instead
-npm run migrate -- --reset
+npm run clean
+npm run compile
+npm run deploy
 ```
 
-### Testnet deployment
-
-#### Nile Testnet
-
-Follow the steps for local deployment. Make sure that the address `0x90eE7A30339D05E07d9c6e65747132933ff6e624` is having enough (~1) Ether.
-
+Upgrade contracts [**optional**]:
 ```bash
-export NMEMORIC=<your nile nmemoric>
-npm run migrate:nile
+npm run upgrade
 ```
-
-The transaction should show up on the account: `0x90eE7A30339D05E07d9c6e65747132933ff6e624`
-
-The contract addresses deployed on Ocean Nile testnet:
-
-| Contract                  | Version | Address                                      |
-|---------------------------|---------|----------------------------------------------|
-| AccessConditions          | v0.6.10 | `0x6bd5fdc37b9c87ba73dda230e5dc18e9fda71ff9` |
-| ComputeConditions         | v0.6.10 | `0xb3086de47926bce35327926916b63e1b0c07aada` |
-| DIDRegistry               | v0.6.10 | `0x1c6429a37802ea7541b6bd71d5996a18cc5a95df` |
-| Dispenser                 | v0.6.10 | `0xddd8a7d2ae6bd24bc133842fecbca5357b670134` |
-| FitchainConditions        | v0.6.10 | `0x832a138f90c4170d2f28e40880136c6e9988d914` |
-| OceanToken                | v0.6.10 | `0xf98f9d6726bf2c2e9db9a964c1511908ac8e48e5` |
-| PaymentConditions         | v0.6.10 | `0xcc3784c45c513138c82ebe7b53f65ef6205747b1` |
-| ServiceExecutionAgreement | v0.6.10 | `0x6bb499133842a0a743fd2781ffad4f49a985e66b` |
-
-#### Kovan Testnet
-
-Follow the steps for local deployment. Make sure that the address [0x2c0d5f47374b130ee398f4c34dbe8168824a8616](https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616) is having enough (~1) Ether.
-
-If you managed to deploy the contracts locally do:
-
-```bash
-export INFURA_TOKEN=<your infura token>
-export NMEMORIC=<your kovan nmemoric>
-npm run migrate:kovan
-```
-
-The transaction should show up on: `https://kovan.etherscan.io/address/0x2c0d5f47374b130ee398f4c34dbe8168824a8616`
-
-The contract addresses deployed on Kovan testnet:
-
-| Contract                  | Version | Address                                      |
-|---------------------------|---------|----------------------------------------------|
-| AccessConditions          | v0.6.10 | `0xa5a8c65a5db8f1d18ccbb4759692e4dbe1434974` |
-| ComputeConditions         | v0.6.10 | `0xa33b8526f2842bb21d996a27f58e285f3fc1e355` |
-| DIDRegistry               | v0.6.10 | `0xe838039bc5a796e63cfbc35e68cd21b16b34d9a6` |
-| Dispenser                 | v0.6.10 | `0x7077fb27fbcd4fc8369cbd188c1808d27df54aad` |
-| FitchainConditions        | v0.6.10 | `0xe48abe6c24c6cf0a43578622964b6a09f51db415` |
-| OceanToken                | v0.6.10 | `0xdb003f6eec829d4e936ecee2b4d9db98e676bc5f` |
-| PaymentConditions         | v0.6.10 | `0xf15c29421c85bcddfe4e14b945aa5fc1c15315bb` |
-| ServiceExecutionAgreement | v0.6.10 | `0x513e54350ecbb1513b5c63132a86e340edda34b8` |
-
-## Libraries
-
-To facilitate the integration of the Ocean Keeper Smart Contracts, Python and Javascript libraries are ready to be integrated. Those libraries include the Smart Contract ABI's.
-Using these libraries helps to avoid compiling the Smart Contracts and copying the ABI's manually to your project. In that way the integration is cleaner and easier.
-The libraries provided currently are:
-
-* JavaScript npm package - As part of the [@oceanprotocol npm organization](https://www.npmjs.com/settings/oceanprotocol/packages), the [npm keeper-contracts package](https://www.npmjs.com/package/@oceanprotocol/keeper-contracts) provides the ABI's to be imported from your JavaScript code.
-* Python Pypi package - The [Pypi keeper-contracts package](https://pypi.org/project/keeper-contracts/) provides the same ABI's to be used from Python.
-* Java Maven package - It's possible to generate the maven stubs to interact with the smart contracts. It's necessary to have locally web3j and run the `scripts/maven.sh` script
 
 ## Testing
 
-Run tests with `npm test`, e.g.:
+Run tests with `npm run test`, e.g.:
 
 ```bash
-npm test -- test/Auth.Test.js
+npm run test -- test/unit/agreements/AgreementStoreManager.Test.js
 ```
 
 ### Code Linting
 
-Linting is setup for JavaScript with [ESLint](https://eslint.org) & Solidity with [Ethlint](https://github.com/duaraghav8/Ethlint).
+Linting is setup for `JavaScript` with [ESLint](https://eslint.org) & Solidity with [Ethlint](https://github.com/duaraghav8/Ethlint).
 
 Code style is enforced through the CI test process, builds will fail if there're any linting errors.
 
-## Documentation
+### Testnets
 
-* [**Main Documentation: TCR, Market and Ocean Tokens**](doc/)
-* [Architecture (pdf)](doc/files/Smart-Contract-UML-class-diagram.pdf)
-* [Packaging of libraries](doc/packaging.md)
-* [Upgrading contracts](doc/upgrades.md)
+#### Nile Testnet
 
-### Use Case 1: Register data asset
+The contract addresses deployed on Ocean Nile testnet:
 
-```Javascript
-const Market = artifacts.require('OceanMarket.sol')
-...
-// get instance of OceanMarket contract
-const market = await Market.deployed()
-...
-// generate resource id
-const name = 'resource name'
-const resourceId = await market.generateId(name, { from: accounts[0] })
-const resourcePrice = 100
+| Contract                          | Version | Address                                      |
+|-----------------------------------|---------|----------------------------------------------|
+| AccessSecretStoreCondition        | v0.9.1  | `0x45DE141F8Efc355F1451a102FB6225F1EDd2921d` |
+| AgreementStoreManager             | v0.9.1  | `0x62f84700b1A0ea6Bfb505aDC3c0286B7944D247C` |
+| ConditionStoreManager             | v0.9.1  | `0x39b0AA775496C5ebf26f3B81C9ed1843f09eE466` |
+| DIDRegistry                       | v0.9.1  | `0x4A0f7F763B1A7937aED21D63b2A78adc89c5Db23` |
+| DIDRegistryLibrary                | v0.9.1  | `0x3B3504908Db36f5D5f07CD420ee2BBBbDfB674cF` |
+| Dispenser                         | v0.9.1  | `0x865396b7ddc58C693db7FCAD1168E3BD95Fe3368` |
+| EpochLibrary                      | v0.9.1  | `0x34fa1530C0B1a2106Bf84E81Cd9D654087fB93d2` |
+| EscrowAccessSecretStoreTemplate   | v0.9.1  | `0xfA16d26e9F4fffC6e40963B281a0bB08C31ed40C` |
+| EscrowReward                      | v0.9.1  | `0xeD4Ef53376C6f103d2d7029D7E702e082767C6ff` |
+| HashLockCondition                 | v0.9.1  | `0xB5f2e45e8aD4a1339D542f2defd5095B98054590` |
+| LockRewardCondition               | v0.9.1  | `0xE30FC30c678437e0e8F78C52dE9db8E2752781a0` |
+| OceanToken                        | v0.9.1  | `0x9861Da395d7da984D5E8C712c2EDE44b41F777Ad` |
+| SignCondition                     | v0.9.1  | `0x5a4301F8a7a8A13485621b9B4C82B1E66c112ee2` |
+| TemplateStoreManager              | v0.9.1  | `0x9768c8ae44f1dc81cAA98F48792aA5730cAd2F73` |
 
-// register data asset on-chain
-await market.register(resourceId, resourcePrice, { from: accounts[0] })
+#### Kovan Testnet
+
+The contract addresses deployed on Kovan testnet:
+
+| Contract                          | Version | Address                                      |
+|-----------------------------------|---------|----------------------------------------------|
+| AccessSecretStoreCondition        | v0.9.1  | `0x9Ee06Ac392FE11f1933a51B48D1d07dd97f1dec7` |
+| AgreementStoreManager             | v0.9.1  | `0x412d4F57425b41FE027e06b9f37D569dcAE2eAa4` |
+| ConditionStoreManager             | v0.9.1  | `0xA5f5BaB34DE3782A71D37d0B334217Ded341cd64` |
+| DIDRegistry                       | v0.9.1  | `0x9254f7c8f1176C685871E7A8A99E11e96775F488` |
+| DIDRegistryLibrary                | v0.9.1  | `0xf6242973290aC0c45CbE4d242059E0DF6cdd2D54` |
+| Dispenser                         | v0.9.1  | `0x5B92243133094210F504dF6B9D54fD70E7B281DC` |
+| EpochLibrary                      | v0.9.1  | `0xe85BFc566F7876798Ec5DA7D037d9b28428F7182` |
+| EscrowAccessSecretStoreTemplate   | v0.9.1  | `0xe0Afe9a948f9Fa39524c8d29a98d75409018ABf0` |
+| EscrowReward                      | v0.9.1  | `0xa182ff844c71803Bf767c3AB4180B3bfFADa6B2B` |
+| HashLockCondition                 | v0.9.1  | `0x11ef2D50868c1f1063ba0141aCD53691A0293c25` |
+| LockRewardCondition               | v0.9.1  | `0x2a2A2C5fF51C5f1c84547FC7a194c00F82763432` |
+| OceanToken                        | v0.9.1  | `0xB57C4D626548eB8AC0B82b086721516493E2908d` |
+| SignCondition                     | v0.9.1  | `0x7B8B2756de9Ab474ddbCc87047117a2A16419194` |
+| TemplateStoreManager              | v0.9.1  | `0xD20307e2620Bb8a60991f43c52b64f981103A829` |
+
+## Packages
+
+To facilitate the integration of the Ocean Protocol's `keeper-contracts` there are `Python`, `JavaScript` and `Java` packages ready to be integrated. Those libraries include the Smart Contract ABI's.
+Using these packages helps to avoid compiling the Smart Contracts and copying the ABI's manually to your project. In that way the integration is cleaner and easier.
+The packages provided currently are:
+
+* JavaScript `npm` package - As part of the [@oceanprotocol npm organization](https://www.npmjs.com/settings/oceanprotocol/packages), the [npm keeper-contracts package](https://www.npmjs.com/package/@oceanprotocol/keeper-contracts) provides the ABI's to be imported from your `JavaScript` code.
+* Python `Pypi` package - The [Pypi keeper-contracts package](https://pypi.org/project/keeper-contracts/) provides the same ABI's to be used from `Python`.
+* Java `Maven` package - The [Maven keeper-contracts package](https://search.maven.org/artifact/com.oceanprotocol/keeper-contracts) provides the same ABI's to be used from `Java`.
+
+The packages contains all the content from the `doc/` and `artifacts/` folders.
+
+In `JavaScript` they can be used like this:
+
+Install the `keeper-contracts` `npm` package.
+
+```bash
+npm install @oceanprotocol/keeper-contracts
 ```
 
-### Use Case 2: Authorize access with OceanAuth contract
+Load the ABI of the `OceanToken` contract on the `nile` network:
 
-Here is an example of authorization process with OceanAuth contract.
-
-`accounts[0]` is provider and `accounts[1]` is consumer.
-
-Note that different cryptographic algorithms can be chosen to encrypt and decrypt access token using key pairs (i.e., public key and private key). This example uses [URSA](https://www.npmjs.com/package/ursa) to demonstrate the process for illustration purpose.
-
-```Javascript
-const Token = artifacts.require('OceanToken.sol')
-const Market = artifacts.require('OceanMarket.sol')
-const Auth = artifacts.require('OceanAuth.sol')
-...
-const ursa = require('ursa')
-const ethers = require('ethers')
-const Web3 = require('web3')
-...
-// get instances of deployed contracts
-const token = await Token.deployed()
-const market = await Market.deployed()
-const auth = await Auth.deployed()
-...
-// consumer request some testing tokens to buy data asset
-await market.requestTokens(200, { from: accounts[1] })
-// consumers approve withdraw limit of their funds
-await token.approve(market.address, 200, { from: accounts[1] })
-...
-// consumer generates temporary key pairs in local
-const modulusBit = 512
-const key = ursa.generatePrivateKey(modulusBit, 65537)
-const privatePem = ursa.createPrivateKey(key.toPrivatePem())
-const publicPem = ursa.createPublicKey(key.toPublicPem())
-const publicKey = publicPem.toPublicPem('utf8')
-...
-// consumer initiate a new access request and pass public key
-await auth.initiateAccessRequest(resourceId, accounts[0], publicKey, expireTime, { from: accounts[1] })
-// provider commit the access request
-await auth.commitAccessRequest(accessId, true, expireTime, '', '', '', '', { from: accounts[0] })
-...
-// consumer sends the payment to OceanMarket contract
-await market.sendPayment(accessId, accounts[0], price, expireTime, { from: accounts[1] })
-...
-// provider encrypt "JSON Web Token" (JWT) using consumer's temp public key
-const encJWT = getPubKeyPem.encrypt('JWT', 'utf8', 'hex')
-// provider delivers the encrypted JWT on-chain
-await auth.deliverAccessToken(accessId, `0x${encJWT}`, { from: accounts[0] })
-...
-// consumer generate signature of encrypte JWT and send to provider
-const prefix = '0x'
-const hexString = Buffer.from(onChainencToken).toString('hex')
-const signature = web3.eth.sign(accounts[1], `${prefix}${hexString}`)
-...
-// provider verify the signature from consumer to prove delivery of access token
-const sig = ethers.utils.splitSignature(signature)
-const fixedMsg = `\x19Ethereum Signed Message:\n${onChainencToken.length}${onChainencToken}`
-const fixedMsgSha = web3.sha3(fixedMsg)
-await auth.verifyAccessTokenDelivery(accessId, accounts[1], fixedMsgSha, sig.v, sig.r, sig.s, { from: accounts[0] })
+```javascript
+const OceanToken = require('@oceanprotocol/keeper-contracts/artifacts/OceanToken.nile.json')
 ```
 
-## New Version / New Release
+
+The structure of the `artifacts` is:
+
+```json
+{
+  "abi": "...",
+  "bytecode": "0x60806040523...",
+  "address": "0x45DE141F8Efc355F1451a102FB6225F1EDd2921d",
+  "version": "v0.9.1"
+}
+```
+
+## Deployments, Upgrades, New Versions, New Releases
 
 See [RELEASE_PROCESS.md](RELEASE_PROCESS.md)
+
+## Documentation
+
+* [Main Documentation](doc/)
+* [Keeper-contracts Diagram](doc/files/Keeper-Contracts.png)
+* [Packaging of libraries](doc/packaging.md)
+* [Upgrading contracts](doc/upgrades.md)
 
 ## Contributing
 
@@ -292,10 +205,8 @@ See the page titled "[Ways to Contribute](https://docs.oceanprotocol.com/concept
 ## Prior Art
 
 This project builds on top of the work done in open source projects:
-
-- [ConsenSys/PLCRVoting](https://github.com/ConsenSys/PLCRVoting)
-- [skmgoldin/tcr](https://github.com/skmgoldin/tcr)
-- [OpenZeppelin/openzeppelin-solidity](https://github.com/OpenZeppelin/openzeppelin-solidity)
+- [zeppelinos/zos](https://github.com/zeppelinos/zos)
+- [OpenZeppelin/openzeppelin-eth](https://github.com/OpenZeppelin/openzeppelin-eth)
 
 ## License
 
@@ -314,4 +225,3 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
-
