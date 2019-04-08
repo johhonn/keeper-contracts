@@ -15,15 +15,15 @@ async function exportArtifacts(
 
     await exportContractArtifacts(
         projectName,
-        networkName,
         networkId,
+        networkName,
         version,
         verbose
     )
 
     await exportLibraryArtifacts(
-        networkName,
         networkId,
+        networkName,
         version,
         verbose
     )

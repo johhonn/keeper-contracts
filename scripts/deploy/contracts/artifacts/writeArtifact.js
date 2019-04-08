@@ -1,25 +1,15 @@
 const fs = require('fs')
 const path = require('path')
 
-const createArtifact = require('./createArtifact')
-
 const artifactsDir = `${__dirname}/../../../../artifacts`
 
 function writeArtifact(
-    name,
-    address,
-    networkName,
-    version
+    artifact,
+    // name of the network
+    networkName
 ) {
-    // create the artifact
-    const artifact = createArtifact(
-        name,
-        address,
-        version
-    )
-
     // set filename
-    const filename = `${name}.${networkName.toLowerCase()}.json`
+    const filename = `${artifact.name}.${networkName.toLowerCase()}.json`
 
     // write artifact
     const artifactString = JSON.stringify(artifact, null, 2)
@@ -31,8 +21,6 @@ function writeArtifact(
         `${resolvedArtifactsDir}/${filename}`,
         artifactString
     )
-
-    return artifact
 }
 
 module.exports = writeArtifact
