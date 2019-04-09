@@ -29,12 +29,14 @@ library ConditionStoreLibrary {
             _self.conditions[_id].blockNumberUpdated == 0,
             'Id already exists'
         );
+
         _self.conditions[_id] = Condition({
             typeRef: _typeRef,
             state: ConditionState.Unfulfilled,
             lastUpdatedBy: msg.sender,
             blockNumberUpdated: block.number
         });
+
         _self.conditionIds.push(_id);
 
         return _self.conditionIds.length;
