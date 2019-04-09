@@ -10,6 +10,7 @@ const zosGetImplementationAddress = require('./zos/contracts/addresses/getImplem
 const zosRegisterContracts = require('./zos/contracts/registerContracts')
 const zosRequestContractUpgrade = require('./zos/contracts/requestContractUpgrades')
 
+const evaluateContracts = require('./evaluateContracts')
 const loadArtifact = require('./artifacts/loadArtifact')
 const updateContractArtifact = require('./artifacts/updateContractArtifact')
 const exportLibraryArtifacts = require('./artifacts/exportLibraryArtifacts')
@@ -27,21 +28,18 @@ const NETWORK = process.env.NETWORK || 'development'
 // load current version from package
 const VERSION = `v${pkg.version}`
 
-const contractNames = require('./contracts.json')
-
-async function upgradeContracts(
+async function upgradeContracts({
     web3,
     contracts = [],
     strict = false,
+    testnet = false,
     verbose = true
-) {
-    contracts = !contracts || contracts.length === 0 ? contractNames : contracts
-
-    if (verbose) {
-        console.log(
-            `Upgrading contracts: '${contracts.join(', ')}'`
-        )
-    }
+} = {}) {
+    contracts = evaluateContracts({
+        contracts,
+        testnet,
+        verbose
+    })
 
     const networkId = await web3.eth.net.getId()
 
@@ -143,9 +141,11 @@ async function upgradeContracts(
             verbose
         )
 
+        const taskBookString = JSON.stringify(taskBook, null, 2)
+
         if (verbose) {
             console.log(
-                `Tasks created: \n${JSON.stringify(taskBook, null, 2)}\nplease approve them in the wallet: '${upgraderWallet.address}'`
+                `Tasks created: \n${taskBookString}\nplease approve them in the wallet: '${upgraderWallet.address}'`
             )
         }
     }

@@ -40,8 +40,10 @@ contract('Dispenser', (accounts) => {
     } = {}) {
         const oceanToken = await OceanToken.at(OceanTokenAddress)
         const dispenser = await Dispenser.at(DispenserAddress)
+
         // act
         await dispenser.requestTokens(requestedAmount)
+
         return {
             dispenser,
             oceanToken,
@@ -51,17 +53,18 @@ contract('Dispenser', (accounts) => {
 
     describe('Test upgradability for Dispenser', () => {
         beforeEach('Load wallet each time', async function() {
-            const addressBook = await deployContracts(
+            const addressBook = await deployContracts({
                 web3,
                 artifacts,
-                [
+                contracts: [
                     'Dispenser',
                     'OceanToken'
                 ],
-                true,
-                true,
+                forceWalletCreation: true,
+                deeperClean: true,
                 verbose
-            )
+            })
+
             OceanTokenAddress = addressBook['OceanToken']
             DispenserAddress = addressBook['Dispenser']
 
@@ -75,12 +78,12 @@ contract('Dispenser', (accounts) => {
         it('Should be possible to fix/add a bug', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['DispenserWithBug:Dispenser'],
-                true,
+                contracts: ['DispenserWithBug:Dispenser'],
+                strict: true,
                 verbose
-            )
+            })
 
             await confirmUpgrade(
                 web3,
@@ -124,12 +127,12 @@ contract('Dispenser', (accounts) => {
         it('Should be possible to change function signature', async () => {
             let { requestedAmount } = await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['DispenserChangeFunctionSignature:Dispenser'],
-                true,
+                contracts: ['DispenserChangeFunctionSignature:Dispenser'],
+                strict: true,
                 verbose
-            )
+            })
 
             // act
             await confirmUpgrade(
@@ -155,12 +158,12 @@ contract('Dispenser', (accounts) => {
         it('Should be possible to append storage variable(s) ', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['DispenserChangeInStorage:Dispenser'],
-                true,
+                contracts: ['DispenserChangeInStorage:Dispenser'],
+                strict: true,
                 verbose
-            )
+            })
 
             // act
             await confirmUpgrade(
@@ -186,12 +189,12 @@ contract('Dispenser', (accounts) => {
         it('Should be possible to append storage variables and change logic', async () => {
             let { requestedAmount } = await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['DispenserChangeInStorageAndLogic:Dispenser'],
-                true,
+                contracts: ['DispenserChangeInStorageAndLogic:Dispenser'],
+                strict: true,
                 verbose
-            )
+            })
 
             // act
             await confirmUpgrade(
@@ -224,12 +227,12 @@ contract('Dispenser', (accounts) => {
         it('Should be able to call new method added after upgrade is approved', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['DispenserExtraFunctionality:Dispenser'],
-                true,
+                contracts: ['DispenserExtraFunctionality:Dispenser'],
+                strict: true,
                 verbose
-            )
+            })
 
             // act
             await confirmUpgrade(
