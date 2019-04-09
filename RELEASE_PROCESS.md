@@ -61,7 +61,7 @@ One instance of the multi sig wallet, defined as `owner`. This wallet will be as
 
 ##### Upgrade a single contract
 
-- To upgrade a single contract run `npm run upgrade:nile -- OceanToken`. For upgrading the `OceanRToken` contract.
+- To upgrade a single contract run `npm run upgrade:nile -- OceanToken`. For upgrading the `OceanToken` contract.
 
 ##### Persist artifacts
 
@@ -87,7 +87,7 @@ One instance of the multi sig wallet, defined as `owner`. This wallet will be as
 
 ##### Upgrade a single contract
 
-- To upgrade a single contract run `npm run upgrade:kovan -- OceanToken`. For upgrading the `OceanRToken` contract.
+- To upgrade a single contract run `npm run upgrade:kovan -- OceanToken`. For upgrading the `OceanToken` contract.
 
 ##### Persist artifacts
 
