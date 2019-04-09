@@ -13,7 +13,7 @@ then
     npm run clean
     npm run compile
     export NETWORK="${NETWORK_NAME:-development}"
-    npm run deploy -- --network ${NETWORK}
+    npm run deploy:${NETWORK}
 
     # set flag to indicate contracts are ready
     touch /keeper-contracts/artifacts/ready

@@ -21,7 +21,9 @@ async function requestContractUpgrade(
     )
 
     if (verbose) {
-        console.log(`Upgrading proxy: ${proxyAddress} with implementation: ${implementationAddress}`)
+        console.log(
+            `Upgrading proxy: ${proxyAddress} with implementation: ${implementationAddress}`
+        )
     }
 
     const transactionId = await submitTransaction(
