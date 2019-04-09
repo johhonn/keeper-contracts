@@ -52,19 +52,19 @@ contract('AgreementStoreManager', (accounts) => {
 
     describe('Test upgradability for AgreementStoreManager', () => {
         beforeEach('Load wallet each time', async function() {
-            const addressBook = await deployContracts(
+            const addressBook = await deployContracts({
                 web3,
                 artifacts,
-                [
+                contracts: [
                     'DIDRegistry',
                     'ConditionStoreManager',
                     'TemplateStoreManager',
                     'AgreementStoreManager'
                 ],
-                true,
-                true,
+                forceWalletCreation: true,
+                deeperClean: true,
                 verbose
-            )
+            })
 
             agreementStoreManagerAddress = addressBook['AgreementStoreManager']
             assert(agreementStoreManagerAddress)
@@ -73,12 +73,12 @@ contract('AgreementStoreManager', (accounts) => {
         it('Should be possible to fix/add a bug', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['AgreementStoreManagerWithBug:AgreementStoreManager'],
-                true,
+                contracts: ['AgreementStoreManagerWithBug:AgreementStoreManager'],
+                strict: true,
                 verbose
-            )
+            })
 
             await confirmUpgrade(
                 web3,
@@ -106,12 +106,12 @@ contract('AgreementStoreManager', (accounts) => {
                 timeOuts
             } = await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['AgreementStoreManagerChangeFunctionSignature:AgreementStoreManager'],
-                true,
+                contracts: ['AgreementStoreManagerChangeFunctionSignature:AgreementStoreManager'],
+                strict: true,
                 verbose
-            )
+            })
 
             // act & assert
             await confirmUpgrade(
@@ -142,12 +142,12 @@ contract('AgreementStoreManager', (accounts) => {
         it('Should be possible to append storage variable(s) ', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['AgreementStoreManagerChangeInStorage:AgreementStoreManager'],
-                true,
+                contracts: ['AgreementStoreManagerChangeInStorage:AgreementStoreManager'],
+                strict: true,
                 verbose
-            )
+            })
 
             await confirmUpgrade(
                 web3,
@@ -177,12 +177,12 @@ contract('AgreementStoreManager', (accounts) => {
                 timeOuts
             } = await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['AgreementStoreManagerChangeInStorageAndLogic:AgreementStoreManager'],
-                true,
+                contracts: ['AgreementStoreManagerChangeInStorageAndLogic:AgreementStoreManager'],
+                strict: true,
                 verbose
-            )
+            })
 
             await confirmUpgrade(
                 web3,
@@ -219,12 +219,12 @@ contract('AgreementStoreManager', (accounts) => {
         it('Should be able to call new method added after upgrade is approved', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['AgreementStoreManagerExtraFunctionality:AgreementStoreManager'],
-                true,
+                contracts: ['AgreementStoreManagerExtraFunctionality:AgreementStoreManager'],
+                strict: true,
                 verbose
-            )
+            })
 
             await confirmUpgrade(
                 web3,
