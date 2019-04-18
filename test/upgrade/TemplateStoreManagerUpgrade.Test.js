@@ -38,16 +38,16 @@ contract('TemplateStoreManager', (accounts) => {
 
     describe('Test upgradability for TemplateStoreManager', () => {
         beforeEach('Load wallet each time', async function() {
-            const addressBook = await deployContracts(
+            const addressBook = await deployContracts({
                 web3,
                 artifacts,
-                [
+                contracts: [
                     'TemplateStoreManager'
                 ],
-                true,
-                true,
+                forceWalletCreation: true,
+                deeperClean: true,
                 verbose
-            )
+            })
 
             templateStoreManagerAddress = addressBook['TemplateStoreManager']
             assert(templateStoreManagerAddress)
@@ -56,12 +56,12 @@ contract('TemplateStoreManager', (accounts) => {
         it('Should be possible to fix/add a bug', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['TemplateStoreWithBug:TemplateStoreManager'],
-                true,
+                contracts: ['TemplateStoreWithBug:TemplateStoreManager'],
+                strict: true,
                 verbose
-            )
+            })
 
             await confirmUpgrade(
                 web3,
@@ -83,12 +83,13 @@ contract('TemplateStoreManager', (accounts) => {
         it('Should be possible to change function signature', async () => {
             let { conditionType } = await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['TemplateStoreChangeFunctionSignature:TemplateStoreManager'],
-                true,
+                contracts: ['TemplateStoreChangeFunctionSignature:TemplateStoreManager'],
+                strict: true,
                 verbose
-            )
+            })
+
             await confirmUpgrade(
                 web3,
                 taskBook['TemplateStoreManager'],
@@ -108,12 +109,13 @@ contract('TemplateStoreManager', (accounts) => {
         it('Should be possible to append storage variable(s) ', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['TemplateStoreChangeInStorage:TemplateStoreManager'],
-                true,
+                contracts: ['TemplateStoreChangeInStorage:TemplateStoreManager'],
+                strict: true,
                 verbose
-            )
+            })
+
             await confirmUpgrade(
                 web3,
                 taskBook['TemplateStoreManager'],
@@ -134,12 +136,13 @@ contract('TemplateStoreManager', (accounts) => {
         it('Should be possible to append storage variables and change logic', async () => {
             let { conditionType } = await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['TemplateStoreChangeInStorageAndLogic:TemplateStoreManager'],
-                true,
+                contracts: ['TemplateStoreChangeInStorageAndLogic:TemplateStoreManager'],
+                strict: true,
                 verbose
-            )
+            })
+
             await confirmUpgrade(
                 web3,
                 taskBook['TemplateStoreManager'],
@@ -164,12 +167,13 @@ contract('TemplateStoreManager', (accounts) => {
         it('Should be able to call new method added after upgrade is approved', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['TemplateStoreExtraFunctionality:TemplateStoreManager'],
-                true,
+                contracts: ['TemplateStoreExtraFunctionality:TemplateStoreManager'],
+                strict: true,
                 verbose
-            )
+            })
+
             await confirmUpgrade(
                 web3,
                 taskBook['TemplateStoreManager'],
