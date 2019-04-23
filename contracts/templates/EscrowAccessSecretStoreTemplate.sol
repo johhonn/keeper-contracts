@@ -95,11 +95,23 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
             _timeLocks,
             _timeOuts
         );
+
+        address owner = address(0);
+        address[] providers;
+        (owner, , , , providers) = didRegistry.getDIDRegister(_did);
         // storing some additional information for the template
         agreementData.agreementDataItems[_id]
             .accessConsumer = _accessConsumer;
-        agreementData.agreementDataItems[_id]
-            .accessProvider = didRegistry.getDIDOwner(_did);
+
+        if (providers.length > 0)
+        {
+            agreementData.agreementDataItems[_id]
+                .accessProvider = providers[0];
+
+        } else {
+            agreementData.agreementDataItems[_id]
+                .accessProvider = owner;
+        }
         agreementData.agreementIds.push(_id);
 
         emit AgreementCreated(
