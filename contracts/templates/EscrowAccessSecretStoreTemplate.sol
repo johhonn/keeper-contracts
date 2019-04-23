@@ -97,7 +97,7 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
         );
 
         address owner = address(0);
-        address[] providers;
+        address[] memory providers;
         (owner, , , , providers) = didRegistry.getDIDRegister(_did);
         // storing some additional information for the template
         agreementData.agreementDataItems[_id]
