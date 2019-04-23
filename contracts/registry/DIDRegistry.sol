@@ -80,7 +80,7 @@ contract DIDRegistry is Ownable {
      * @param _value refers to the attribute value, limited to 2048 bytes.
      * @return the size of the registry after the register action.
      */
-    function registerAttribute (
+    function registerAttribute(
         bytes32 _did,
         bytes32 _checksum,
         address[] memory _providers,
@@ -101,11 +101,19 @@ contract DIDRegistry is Ownable {
             'Invalid value size'
         );
 
-        didRegisterList.update(_did, _checksum);
+        uint updatedSize = didRegisterList.update(_did, _checksum);
 
         // push providers to storage
-        for(uint256 i = 0; i < _providers.length; i++) {
-            didRegisterList.addProvider(_did, _providers[i]);
+        for (uint256 i = 0; i < _providers.length; i++) {
+            bool providerAdded = didRegisterList.addProvider(
+                _did,
+                _providers[i]
+            );
+
+            require(
+                providerAdded,
+                'provider was not added'
+            );
         }
 
         /* emitting _value here to avoid expensive storage */
@@ -118,7 +126,7 @@ contract DIDRegistry is Ownable {
             block.number
         );
 
-        return getDIDRegistrySize();
+        return updatedSize;
     }
 
     function addDIDProvider(
@@ -128,7 +136,13 @@ contract DIDRegistry is Ownable {
         external
         onlyDIDOwner(_did)
     {
-        didRegisterList.addProvider(_did, _provider);
+        bool providerAdded =
+            didRegisterList.addProvider(_did, _provider);
+
+        require(
+            providerAdded,
+            'provider was not added'
+        );
 
         emit DIDProviderAdded(
             _did,
@@ -159,7 +173,7 @@ contract DIDRegistry is Ownable {
     )
         public
         view
-        returns(bool)
+        returns (bool)
     {
         return didRegisterList.isProvider(_did, _provider);
     }
@@ -168,7 +182,9 @@ contract DIDRegistry is Ownable {
      * @param _did refers to decentralized identifier (a bytes32 length ID).
      * @return the address of the DID owner.
      */
-    function getDIDRegister(bytes32 _did)
+    function getDIDRegister(
+        bytes32 _did
+    )
         public
         view
         returns (
@@ -183,7 +199,7 @@ contract DIDRegistry is Ownable {
         lastChecksum = didRegisterList.didRegisters[_did].lastChecksum;
         lastUpdatedBy = didRegisterList.didRegisters[_did].lastUpdatedBy;
         blockNumberUpdated =
-            didRegisterList.didRegisters[_did].blockNumberUpdated;
+        didRegisterList.didRegisters[_did].blockNumberUpdated;
         providers = didRegisterList.didRegisters[_did].providers;
     }
 
@@ -194,7 +210,7 @@ contract DIDRegistry is Ownable {
     function getBlockNumberUpdated(bytes32 _did)
         public
         view
-        returns(uint256 blockNumberUpdated)
+        returns (uint256 blockNumberUpdated)
     {
         return didRegisterList.didRegisters[_did].blockNumberUpdated;
     }
@@ -206,7 +222,7 @@ contract DIDRegistry is Ownable {
     function getDIDOwner(bytes32 _did)
         public
         view
-        returns(address didOwner)
+        returns (address didOwner)
     {
         return didRegisterList.didRegisters[_did].owner;
     }

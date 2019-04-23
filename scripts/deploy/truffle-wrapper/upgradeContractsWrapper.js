@@ -5,11 +5,14 @@ const upgradeContracts = require('../contracts/upgradeContracts')
 module.exports = (cb) => {
     const parameters = argv._
     const contracts = parameters.splice(2)
-    upgradeContracts(
+
+    upgradeContracts({
         web3,
         contracts,
-        argv['verbose'] && true
-    )
+        strict: false,
+        testnet: argv['testnet'] || false,
+        verbose: argv['verbose'] && true
+    })
         .then(() => cb())
         .catch(err => cb(err))
 }

@@ -9,6 +9,7 @@ const zosSetAdmin = require('./zos/setAdmin')
 
 const zosRegisterContracts = require('./zos/contracts/registerContracts')
 
+const evaluateContracts = require('./evaluateContracts')
 const initializeContracts = require('./initializeContracts')
 const setupContracts = require('./setupContracts')
 const exportArtifacts = require('./artifacts/exportArtifacts')
@@ -24,18 +25,20 @@ const NETWORK = process.env.NETWORK || 'development'
 // load current version from package
 const VERSION = `v${pkg.version}`
 
-// List of contracts
-const contractNames = require('./contracts.json')
-
-async function deployContracts(
+async function deployContracts({
     web3,
     artifacts,
     contracts = [],
     forceWalletCreation = false,
     deeperClean = false,
+    testnet = false,
     verbose = true
-) {
-    contracts = !contracts || contracts.length === 0 ? contractNames : contracts
+} = {}) {
+    contracts = evaluateContracts({
+        contracts,
+        testnet,
+        verbose
+    })
 
     const networkId = await web3.eth.net.getId()
 
@@ -45,12 +48,6 @@ async function deployContracts(
         deeperClean,
         verbose
     )
-
-    if (verbose) {
-        console.log(
-            `Deploying contracts: '${contracts.join(', ')}'`
-        )
-    }
 
     const roles = await zosInit(
         web3,

@@ -35,14 +35,14 @@ contract('ConditionStoreManager', (accounts) => {
     const conditionCreater = accounts[5]
 
     beforeEach('Load wallet each time', async function() {
-        const addressBook = await deployContracts(
+        const addressBook = await deployContracts({
             web3,
             artifacts,
-            ['ConditionStoreManager'],
-            true,
-            true,
+            contracts: ['ConditionStoreManager'],
+            forceWalletCreation: true,
+            deeperClean: true,
             verbose
-        )
+        })
 
         ownerWallet = await loadWallet(
             web3,
@@ -66,11 +66,12 @@ contract('ConditionStoreManager', (accounts) => {
         it('Should be possible to fix/add a bug', async () => {
             let { conditionId } = await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['ConditionStoreWithBug:ConditionStoreManager'],
+                contracts: ['ConditionStoreWithBug:ConditionStoreManager'],
+                strict: true,
                 verbose
-            )
+            })
 
             await confirmUpgrade(
                 web3,
@@ -93,11 +94,12 @@ contract('ConditionStoreManager', (accounts) => {
         it('Should be possible to change function signature', async () => {
             let { conditionId, conditionType } = await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['ConditionStoreChangeFunctionSignature:ConditionStoreManager'],
+                contracts: ['ConditionStoreChangeFunctionSignature:ConditionStoreManager'],
+                strict: true,
                 verbose
-            )
+            })
 
             // init
             await confirmUpgrade(
@@ -155,11 +157,12 @@ contract('ConditionStoreManager', (accounts) => {
         it('Should be possible to append storage variable(s) ', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['ConditionStoreChangeInStorage:ConditionStoreManager'],
+                contracts: ['ConditionStoreChangeInStorage:ConditionStoreManager'],
+                strict: true,
                 verbose
-            )
+            })
 
             // init
             await confirmUpgrade(
@@ -181,11 +184,12 @@ contract('ConditionStoreManager', (accounts) => {
         it('Should be possible to append storage variables and change logic', async () => {
             let { conditionId, conditionType } = await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['ConditionStoreChangeInStorageAndLogic:ConditionStoreManager'],
+                contracts: ['ConditionStoreChangeInStorageAndLogic:ConditionStoreManager'],
+                strict: true,
                 verbose
-            )
+            })
 
             // init
             await confirmUpgrade(
@@ -239,11 +243,12 @@ contract('ConditionStoreManager', (accounts) => {
         it('Should be able to call new method added after upgrade is approved', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['ConditionStoreExtraFunctionality:ConditionStoreManager'],
+                contracts: ['ConditionStoreExtraFunctionality:ConditionStoreManager'],
+                strict: true,
                 verbose
-            )
+            })
 
             // init
             await confirmUpgrade(

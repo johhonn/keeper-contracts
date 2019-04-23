@@ -124,7 +124,7 @@ contract Dispenser is Ownable {
             /* solium-disable-next-line security/no-block-members */
             tokenRequests[msg.sender] = block.timestamp;
 
-            totalMintAmount.add(amountWithDigits);
+            totalMintAmount = totalMintAmount.add(amountWithDigits);
 
             return true;
         }

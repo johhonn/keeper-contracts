@@ -68,6 +68,11 @@ library DIDRegistryLibrary {
             'Invalid asset provider address'
         );
 
+        require(
+            provider != address(this),
+            'DID provider should not be this contract address'
+        );
+
         if(!isProvider(_self, _did, provider)) {
             _self.didRegisters[_did].providers.push(provider);
         }

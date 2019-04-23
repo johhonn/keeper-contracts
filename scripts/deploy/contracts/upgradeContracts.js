@@ -1,16 +1,17 @@
 /* eslint-disable no-console */
-const fs = require('fs')
-const path = require('path')
 const pkg = require('../../../package.json')
 
 const zosCleanup = require('./zos/setup/cleanup')
 const zosInit = require('./zos/setup/init')
 const zosGetDeployedContracts = require('./zos/contracts/getDeployedContracts')
 const zosGetProject = require('./zos/handlers/getProject')
+const zosGetImplementationAddress = require('./zos/contracts/addresses/getImplementationAddress')
 
 const zosRegisterContracts = require('./zos/contracts/registerContracts')
 const zosRequestContractUpgrade = require('./zos/contracts/requestContractUpgrades')
 
+const evaluateContracts = require('./evaluateContracts')
+const loadArtifact = require('./artifacts/loadArtifact')
 const updateContractArtifact = require('./artifacts/updateContractArtifact')
 const exportLibraryArtifacts = require('./artifacts/exportLibraryArtifacts')
 
@@ -27,22 +28,18 @@ const NETWORK = process.env.NETWORK || 'development'
 // load current version from package
 const VERSION = `v${pkg.version}`
 
-const artifactsDir = `${__dirname}/../../../artifacts/`
-
-const contractNames = require('./contracts.json')
-
-async function upgradeContracts(
+async function upgradeContracts({
     web3,
     contracts = [],
+    strict = false,
+    testnet = false,
     verbose = true
-) {
-    contracts = !contracts || contracts.length === 0 ? contractNames : contracts
-
-    if (verbose) {
-        console.log(
-            `Upgrading contracts: '${contracts.join(', ')}'`
-        )
-    }
+} = {}) {
+    contracts = evaluateContracts({
+        contracts,
+        testnet,
+        verbose
+    })
 
     const networkId = await web3.eth.net.getId()
 
@@ -97,49 +94,60 @@ async function upgradeContracts(
     for (const contractName of contracts) {
         const [newContractName, oldContractName] = contractName.indexOf(':') > -1 ? contractName.split(':') : [contractName, contractName]
 
-        const resolvedArtifactsDir = path.resolve(artifactsDir)
-
-        /* eslint-disable-next-line security/detect-non-literal-fs-filename */
-        const artifactString = fs.readFileSync(
-            `${resolvedArtifactsDir}/${oldContractName}.${NETWORK.toLowerCase()}.json`,
-            'utf8'
-        ).toString()
-
-        const artifact = JSON.parse(artifactString)
-
         // get proxy address of current implementation
-        const { address } = artifact
-
-        taskBook[oldContractName] = await zosRequestContractUpgrade(
+        const { address, implementation } = loadArtifact(
             oldContractName,
-            newContractName,
-            address,
-            upgraderWallet,
-            roles,
-            networkId,
-            verbose
+            NETWORK
         )
 
-        updateContractArtifact(
+        const implementationAddress = zosGetImplementationAddress(
             oldContractName,
-            newContractName,
-            VERSION,
-            networkId,
-            verbose
+            networkId
         )
+
+        if (implementation !== implementationAddress) {
+            taskBook[oldContractName] = await zosRequestContractUpgrade(
+                oldContractName,
+                newContractName,
+                address,
+                upgraderWallet,
+                roles,
+                networkId,
+                verbose
+            )
+
+            updateContractArtifact(
+                oldContractName,
+                newContractName,
+                VERSION,
+                networkId,
+                NETWORK,
+                verbose
+            )
+        } else {
+            const msg = `Warning: no change in contract: ${oldContractName}!`
+            console.warn(msg)
+            if (strict) {
+                throw new Error(msg)
+            }
+        }
     }
 
-    await exportLibraryArtifacts(
-        NETWORK,
-        networkId,
-        VERSION,
-        verbose
-    )
-
-    if (verbose) {
-        console.log(
-            `Tasks created: \n${JSON.stringify(taskBook, null, 2)}\nplease approve them in the wallet: '${upgraderWallet.address}'`
+    if (Object.keys(taskBook).length > 0) {
+        await exportLibraryArtifacts(
+            networkId,
+            NETWORK,
+            VERSION,
+            verbose
         )
+
+        const taskBookString = JSON.stringify(taskBook, null, 2)
+
+        if (verbose) {
+            console.log(
+                `Tasks created: \n${taskBookString}\nplease approve them in the wallet: '${upgraderWallet.address}'`
+            )
+        }
     }
 
     return taskBook

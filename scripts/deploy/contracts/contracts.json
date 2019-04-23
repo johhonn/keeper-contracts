@@ -9,6 +9,5 @@
   "EscrowReward",
   "EscrowAccessSecretStoreTemplate",
   "OceanToken",
-  "Dispenser",
   "DIDRegistry"
 ]

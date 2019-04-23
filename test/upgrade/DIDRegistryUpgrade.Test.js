@@ -58,14 +58,15 @@ contract('DIDRegistry', (accounts) => {
 
     describe('Test upgradability for DIDRegistry', () => {
         beforeEach('Load wallet each time', async () => {
-            const addressBook = await deployContracts(
+            const addressBook = await deployContracts({
                 web3,
                 artifacts,
-                ['DIDRegistry'],
-                true,
-                true,
+                contracts: ['DIDRegistry'],
+                forceWalletCreation: true,
+                deeperClean: true,
                 verbose
-            )
+            })
+
             DIDRegistryProxyAddress = addressBook['DIDRegistry']
         })
 
@@ -73,11 +74,12 @@ contract('DIDRegistry', (accounts) => {
             let { did } = await setupTest()
 
             // Upgrade to new version
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['DIDRegistryWithBug:DIDRegistry'],
+                contracts: ['DIDRegistryWithBug:DIDRegistry'],
+                strict: true,
                 verbose
-            )
+            })
 
             await confirmUpgrade(
                 web3,
@@ -121,11 +123,12 @@ contract('DIDRegistry', (accounts) => {
             await setupTest()
 
             // Upgrade to new version
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['DIDRegistryChangeFunctionSignature:DIDRegistry'],
+                contracts: ['DIDRegistryChangeFunctionSignature:DIDRegistry'],
+                strict: true,
                 verbose
-            )
+            })
 
             await confirmUpgrade(
                 web3,
@@ -163,11 +166,12 @@ contract('DIDRegistry', (accounts) => {
             let { did } = await setupTest()
 
             // Upgrade to new version
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['DIDRegistryChangeInStorage:DIDRegistry'],
+                contracts: ['DIDRegistryChangeInStorage:DIDRegistry'],
+                strict: true,
                 verbose
-            )
+            })
 
             const DIDRegistryChangeInStorageInstance =
                             await DIDRegistryChangeInStorage.at(DIDRegistryProxyAddress)
@@ -192,11 +196,12 @@ contract('DIDRegistry', (accounts) => {
             let { did } = await setupTest()
 
             // Upgrade to new version
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['DIDRegistryChangeInStorageAndLogic:DIDRegistry'],
+                contracts: ['DIDRegistryChangeInStorageAndLogic:DIDRegistry'],
+                strict: true,
                 verbose
-            )
+            })
 
             const DIDRegistryChangeInStorageAndLogicInstance =
                             await DIDRegistryChangeInStorageAndLogic.at(DIDRegistryProxyAddress)
@@ -247,11 +252,12 @@ contract('DIDRegistry', (accounts) => {
             await setupTest()
 
             // Upgrade to new version
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgradeContracts({
                 web3,
-                ['DIDRegistryExtraFunctionality:DIDRegistry'],
+                contracts: ['DIDRegistryExtraFunctionality:DIDRegistry'],
+                strict: true,
                 verbose
-            )
+            })
 
             const DIDRegistryExtraFunctionalityInstance =
                             await DIDRegistryExtraFunctionality.at(DIDRegistryProxyAddress)

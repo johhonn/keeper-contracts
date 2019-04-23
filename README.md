@@ -78,12 +78,12 @@ ganache-cli
 Switch back to your other terminal and deploy the contracts:
 
 ```bash
-npm run deploy
+npm run deploy:development
 
 # for redeployment run this instead
 npm run clean
 npm run compile
-npm run deploy
+npm run deploy:development
 ```
 
 Upgrade contracts [**optional**]:
