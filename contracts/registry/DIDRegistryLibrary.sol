@@ -134,7 +134,7 @@ library DIDRegistryLibrary {
         view
         returns(int256 )
     {
-        for(uint256 i=0; i < _self.didRegisters[_did].providers.length; i++)
+        for(uint256 i = 0; i < _self.didRegisters[_did].providers.length; i++)
         {
             if(provider == _self.didRegisters[_did].providers[i])
             {
