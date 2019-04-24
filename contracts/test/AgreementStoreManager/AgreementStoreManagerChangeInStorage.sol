@@ -1,4 +1,4 @@
-pragma solidity 0.5.3;
+pragma solidity 0.5.6;
 
 // Contain upgraded version of the contracts for test
 import '../../agreements/AgreementStoreManager.sol';

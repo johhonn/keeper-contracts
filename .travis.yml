@@ -27,7 +27,7 @@ before_install:
     - npm install -g npm
     - npm install -g ganache-cli@~6.4.1 greenkeeper-lockfile codacy-coverage
     - pyenv global system 3.6.7
-    - docker pull oceanprotocol/echidna:sloc-5.3
+    - docker pull oceanprotocol/echidna:solc-0.5.6
     - |
         if [ "${DEPLOY_PACKAGE}" = "true" ] && [ ! -z "${TRAVIS_TAG}" ]; then
           sudo apt-get -y install gnupg-agent python3-setuptools
