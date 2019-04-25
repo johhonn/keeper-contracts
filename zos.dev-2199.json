@@ -1,0 +1,2034 @@
+{
+  "contracts": {
+    "AgreementStoreManager": {
+      "address": "0x0C84ECe5A68059220ff114de2b11457Fa7d7Fc45",
+      "constructorCode": "608060405234801561001057600080fd5b506113ab806100206000396000f3fe",
+      "bodyBytecodeHash": "84826f01f6a6855fcb814ead6f98466749f44a6082b03acd8d05bdbb6fcc2f41",
+      "localBytecodeHash": "cb53196a0a21a72bbe2c9c5028e6a6d953932839131836afa10f9573a0a2dbba",
+      "deployedBytecodeHash": "cb53196a0a21a72bbe2c9c5028e6a6d953932839131836afa10f9573a0a2dbba",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        },
+        "t_struct<AgreementStoreLibrary.AgreementList>": {
+          "id": "t_struct<AgreementStoreLibrary.AgreementList>",
+          "kind": "struct",
+          "label": "AgreementStoreLibrary.AgreementList",
+          "members": [
+            {
+              "label": "agreements",
+              "astId": 372,
+              "type": "t_mapping<t_struct<AgreementStoreLibrary.Agreement>>",
+              "src": "271:40:4"
+            },
+            {
+              "label": "didToAgreementIds",
+              "astId": 377,
+              "type": "t_mapping<t_array:dyn<t_bytes32>>",
+              "src": "321:47:4"
+            },
+            {
+              "label": "templateIdToAgreementIds",
+              "astId": 382,
+              "type": "t_mapping<t_array:dyn<t_bytes32>>",
+              "src": "378:54:4"
+            },
+            {
+              "label": "agreementIds",
+              "astId": 385,
+              "type": "t_array:dyn<t_bytes32>",
+              "src": "442:22:4"
+            }
+          ]
+        },
+        "t_struct<AgreementStoreLibrary.Agreement>": {
+          "id": "t_struct<AgreementStoreLibrary.Agreement>",
+          "kind": "struct",
+          "label": "AgreementStoreLibrary.Agreement",
+          "members": [
+            {
+              "label": "blockNumberUpdated",
+              "astId": 358,
+              "type": "t_uint256",
+              "src": "89:26:4"
+            },
+            {
+              "label": "templateId",
+              "astId": 360,
+              "type": "t_address",
+              "src": "125:18:4"
+            },
+            {
+              "label": "lastUpdatedBy",
+              "astId": 362,
+              "type": "t_address",
+              "src": "153:21:4"
+            },
+            {
+              "label": "did",
+              "astId": 364,
+              "type": "t_bytes32",
+              "src": "184:11:4"
+            },
+            {
+              "label": "conditionIds",
+              "astId": 367,
+              "type": "t_array:dyn<t_bytes32>",
+              "src": "205:22:4"
+            }
+          ]
+        },
+        "t_bytes32": {
+          "id": "t_bytes32",
+          "kind": "elementary",
+          "label": "bytes32"
+        },
+        "t_array:dyn<t_bytes32>": {
+          "id": "t_array:dyn<t_bytes32>",
+          "valueType": "t_bytes32",
+          "length": "dyn",
+          "kind": "array",
+          "label": "bytes32[]"
+        },
+        "t_mapping<t_struct<AgreementStoreLibrary.Agreement>>": {
+          "id": "t_mapping<t_struct<AgreementStoreLibrary.Agreement>>",
+          "valueType": "t_struct<AgreementStoreLibrary.Agreement>",
+          "label": "mapping(key => AgreementStoreLibrary.Agreement)",
+          "kind": "mapping"
+        },
+        "t_mapping<t_array:dyn<t_bytes32>>": {
+          "id": "t_mapping<t_array:dyn<t_bytes32>>",
+          "valueType": "t_array:dyn<t_bytes32>",
+          "label": "mapping(key => bytes32[])",
+          "kind": "mapping"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 5870,
+          "type": "t_bool",
+          "src": "757:24:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 5872,
+          "type": "t_bool",
+          "src": "876:25:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 5921,
+          "type": "t_array:50<t_uint256>",
+          "src": "1891:29:61"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 5056,
+          "type": "t_address",
+          "src": "302:22:55"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "______gap",
+          "astId": 5167,
+          "type": "t_array:50<t_uint256>",
+          "src": "2186:29:55"
+        },
+        {
+          "contract": "AgreementStoreManager",
+          "path": "contracts/agreements/AgreementStoreManager.sol",
+          "label": "agreementList",
+          "astId": 475,
+          "type": "t_struct<AgreementStoreLibrary.AgreementList>",
+          "src": "896:58:5"
+        },
+        {
+          "contract": "AgreementStoreManager",
+          "path": "contracts/agreements/AgreementStoreManager.sol",
+          "label": "conditionStoreManager",
+          "astId": 477,
+          "type": "t_address",
+          "src": "961:52:5"
+        },
+        {
+          "contract": "AgreementStoreManager",
+          "path": "contracts/agreements/AgreementStoreManager.sol",
+          "label": "templateStoreManager",
+          "astId": 479,
+          "type": "t_address",
+          "src": "1019:50:5"
+        },
+        {
+          "contract": "AgreementStoreManager",
+          "path": "contracts/agreements/AgreementStoreManager.sol",
+          "label": "didRegistry",
+          "astId": 481,
+          "type": "t_address",
+          "src": "1075:32:5"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
+    },
+    "ConditionStoreManager": {
+      "address": "0x0959092E0D313F0BD3a6441151B2E2685d7350b5",
+      "constructorCode": "608060405234801561001057600080fd5b50611238806100206000396000f3fe",
+      "bodyBytecodeHash": "176d273361db07a878db1eee234f816243f805c6b4311c2073966a8d7466d411",
+      "localBytecodeHash": "4301b4900b934b9f2d63edaa963e0192f284976f9b65b911d650427f364e199c",
+      "deployedBytecodeHash": "55b6c2248b933fceeb1c8cbd4e4c23818cb52d5c00b8295f34d88d23dfe7be5a",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        },
+        "t_struct<ConditionStoreLibrary.ConditionList>": {
+          "id": "t_struct<ConditionStoreLibrary.ConditionList>",
+          "kind": "struct",
+          "label": "ConditionStoreLibrary.ConditionList",
+          "members": [
+            {
+              "label": "conditions",
+              "astId": 1108,
+              "type": "t_mapping<t_struct<ConditionStoreLibrary.Condition>>",
+              "src": "321:40:8"
+            },
+            {
+              "label": "conditionIds",
+              "astId": 1111,
+              "type": "t_array:dyn<t_bytes32>",
+              "src": "371:22:8"
+            }
+          ]
+        },
+        "t_struct<ConditionStoreLibrary.Condition>": {
+          "id": "t_struct<ConditionStoreLibrary.Condition>",
+          "kind": "struct",
+          "label": "ConditionStoreLibrary.Condition",
+          "members": [
+            {
+              "label": "state",
+              "astId": 1097,
+              "type": "t_enum<ConditionStoreLibrary.ConditionState>",
+              "src": "165:20:8"
+            },
+            {
+              "label": "blockNumberUpdated",
+              "astId": 1099,
+              "type": "t_uint256",
+              "src": "195:26:8"
+            },
+            {
+              "label": "typeRef",
+              "astId": 1101,
+              "type": "t_address",
+              "src": "231:15:8"
+            },
+            {
+              "label": "lastUpdatedBy",
+              "astId": 1103,
+              "type": "t_address",
+              "src": "256:21:8"
+            }
+          ]
+        },
+        "t_enum<ConditionStoreLibrary.ConditionState>": {
+          "id": "t_enum<ConditionStoreLibrary.ConditionState>",
+          "kind": "enum",
+          "label": "ConditionStoreLibrary.ConditionState",
+          "members": [
+            "Uninitialized",
+            "Unfulfilled",
+            "Fulfilled",
+            "Aborted"
+          ]
+        },
+        "t_mapping<t_struct<ConditionStoreLibrary.Condition>>": {
+          "id": "t_mapping<t_struct<ConditionStoreLibrary.Condition>>",
+          "valueType": "t_struct<ConditionStoreLibrary.Condition>",
+          "label": "mapping(key => ConditionStoreLibrary.Condition)",
+          "kind": "mapping"
+        },
+        "t_bytes32": {
+          "id": "t_bytes32",
+          "kind": "elementary",
+          "label": "bytes32"
+        },
+        "t_array:dyn<t_bytes32>": {
+          "id": "t_array:dyn<t_bytes32>",
+          "valueType": "t_bytes32",
+          "length": "dyn",
+          "kind": "array",
+          "label": "bytes32[]"
+        },
+        "t_struct<EpochLibrary.EpochList>": {
+          "id": "t_struct<EpochLibrary.EpochList>",
+          "kind": "struct",
+          "label": "EpochLibrary.EpochList",
+          "members": [
+            {
+              "label": "epochs",
+              "astId": 2402,
+              "type": "t_mapping<t_struct<EpochLibrary.Epoch>>",
+              "src": "274:32:15"
+            },
+            {
+              "label": "epochIds",
+              "astId": 2405,
+              "type": "t_array:dyn<t_bytes32>",
+              "src": "316:18:15"
+            }
+          ]
+        },
+        "t_struct<EpochLibrary.Epoch>": {
+          "id": "t_struct<EpochLibrary.Epoch>",
+          "kind": "struct",
+          "label": "EpochLibrary.Epoch",
+          "members": [
+            {
+              "label": "timeLock",
+              "astId": 2393,
+              "type": "t_uint256",
+              "src": "164:16:15"
+            },
+            {
+              "label": "timeOut",
+              "astId": 2395,
+              "type": "t_uint256",
+              "src": "190:15:15"
+            },
+            {
+              "label": "blockNumber",
+              "astId": 2397,
+              "type": "t_uint256",
+              "src": "215:19:15"
+            }
+          ]
+        },
+        "t_mapping<t_struct<EpochLibrary.Epoch>>": {
+          "id": "t_mapping<t_struct<EpochLibrary.Epoch>>",
+          "valueType": "t_struct<EpochLibrary.Epoch>",
+          "label": "mapping(key => EpochLibrary.Epoch)",
+          "kind": "mapping"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 5870,
+          "type": "t_bool",
+          "src": "757:24:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 5872,
+          "type": "t_bool",
+          "src": "876:25:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 5921,
+          "type": "t_array:50<t_uint256>",
+          "src": "1891:29:61"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 5056,
+          "type": "t_address",
+          "src": "302:22:55"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "______gap",
+          "astId": 5167,
+          "type": "t_array:50<t_uint256>",
+          "src": "2186:29:55"
+        },
+        {
+          "contract": "ConditionStoreManager",
+          "path": "contracts/conditions/ConditionStoreManager.sol",
+          "label": "createRole",
+          "astId": 1248,
+          "type": "t_address",
+          "src": "406:26:9"
+        },
+        {
+          "contract": "ConditionStoreManager",
+          "path": "contracts/conditions/ConditionStoreManager.sol",
+          "label": "conditionList",
+          "astId": 1250,
+          "type": "t_struct<ConditionStoreLibrary.ConditionList>",
+          "src": "438:58:9"
+        },
+        {
+          "contract": "ConditionStoreManager",
+          "path": "contracts/conditions/ConditionStoreManager.sol",
+          "label": "epochList",
+          "astId": 1252,
+          "type": "t_struct<EpochLibrary.EpochList>",
+          "src": "502:41:9"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
+    },
+    "LockRewardCondition": {
+      "address": "0x4Eb388C190Cde6Bf8C60e37CCd2C8056A184eD43",
+      "constructorCode": "608060405234801561001057600080fd5b50610a67806100206000396000f3fe",
+      "bodyBytecodeHash": "b6205be3372e9d2e9b7e168863d4c91d5dc3af7901b307d510c8aebb60368084",
+      "localBytecodeHash": "7702c541204eca7e6fba7b117a9336211cf7ee9aae7217c4845b29ece2990c84",
+      "deployedBytecodeHash": "7702c541204eca7e6fba7b117a9336211cf7ee9aae7217c4845b29ece2990c84",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 5870,
+          "type": "t_bool",
+          "src": "757:24:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 5872,
+          "type": "t_bool",
+          "src": "876:25:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 5921,
+          "type": "t_array:50<t_uint256>",
+          "src": "1891:29:61"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 5056,
+          "type": "t_address",
+          "src": "302:22:55"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "______gap",
+          "astId": 5167,
+          "type": "t_array:50<t_uint256>",
+          "src": "2186:29:55"
+        },
+        {
+          "contract": "Condition",
+          "path": "contracts/conditions/Condition.sol",
+          "label": "conditionStoreManager",
+          "astId": 1026,
+          "type": "t_address",
+          "src": "159:52:7"
+        },
+        {
+          "contract": "LockRewardCondition",
+          "path": "contracts/conditions/LockRewardCondition.sol",
+          "label": "token",
+          "astId": 1852,
+          "type": "t_address",
+          "src": "128:24:11"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
+    },
+    "SignCondition": {
+      "address": "0xdAA1D761dCE7192c8d4B8f7B96bE1E4570E056B4",
+      "constructorCode": "608060405234801561001057600080fd5b50610ac7806100206000396000f3fe",
+      "bodyBytecodeHash": "70901c25e2a3e53d7a8323a65773e711e636bd76c41a925b6aa5a97cefed3741",
+      "localBytecodeHash": "1a22406820708dc0d68e6673dc27b9ee75b1ce2c44959b157ad79036e9e73415",
+      "deployedBytecodeHash": "1a22406820708dc0d68e6673dc27b9ee75b1ce2c44959b157ad79036e9e73415",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 5870,
+          "type": "t_bool",
+          "src": "757:24:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 5872,
+          "type": "t_bool",
+          "src": "876:25:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 5921,
+          "type": "t_array:50<t_uint256>",
+          "src": "1891:29:61"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 5056,
+          "type": "t_address",
+          "src": "302:22:55"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "______gap",
+          "astId": 5167,
+          "type": "t_array:50<t_uint256>",
+          "src": "2186:29:55"
+        },
+        {
+          "contract": "Condition",
+          "path": "contracts/conditions/Condition.sol",
+          "label": "conditionStoreManager",
+          "astId": 1026,
+          "type": "t_address",
+          "src": "159:52:7"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
+    },
+    "TemplateStoreManager": {
+      "address": "0xf3cb02038fD4c276188A302b2067f40c6B8a343a",
+      "constructorCode": "608060405234801561001057600080fd5b50610a53806100206000396000f3fe",
+      "bodyBytecodeHash": "76a800a9b6411bd00feb8bf19deb92b9bc12c2c9a7d8461329c82723615e9116",
+      "localBytecodeHash": "d254f8012f150b15a683f524126d3e912b2f28ee775cc40b7f4e881cbab5eea7",
+      "deployedBytecodeHash": "d254f8012f150b15a683f524126d3e912b2f28ee775cc40b7f4e881cbab5eea7",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        },
+        "t_struct<TemplateStoreLibrary.TemplateList>": {
+          "id": "t_struct<TemplateStoreLibrary.TemplateList>",
+          "kind": "struct",
+          "label": "TemplateStoreLibrary.TemplateList",
+          "members": [
+            {
+              "label": "templates",
+              "astId": 3536,
+              "type": "t_mapping<t_struct<TemplateStoreLibrary.Template>>",
+              "src": "309:38:20"
+            },
+            {
+              "label": "templateIds",
+              "astId": 3539,
+              "type": "t_array:dyn<t_address>",
+              "src": "357:21:20"
+            }
+          ]
+        },
+        "t_struct<TemplateStoreLibrary.Template>": {
+          "id": "t_struct<TemplateStoreLibrary.Template>",
+          "kind": "struct",
+          "label": "TemplateStoreLibrary.Template",
+          "members": [
+            {
+              "label": "state",
+              "astId": 3525,
+              "type": "t_enum<TemplateStoreLibrary.TemplateState>",
+              "src": "157:19:20"
+            },
+            {
+              "label": "blockNumberUpdated",
+              "astId": 3527,
+              "type": "t_uint256",
+              "src": "186:26:20"
+            },
+            {
+              "label": "owner",
+              "astId": 3529,
+              "type": "t_address",
+              "src": "222:13:20"
+            },
+            {
+              "label": "lastUpdatedBy",
+              "astId": 3531,
+              "type": "t_address",
+              "src": "245:21:20"
+            }
+          ]
+        },
+        "t_enum<TemplateStoreLibrary.TemplateState>": {
+          "id": "t_enum<TemplateStoreLibrary.TemplateState>",
+          "kind": "enum",
+          "label": "TemplateStoreLibrary.TemplateState",
+          "members": [
+            "Uninitialized",
+            "Proposed",
+            "Approved",
+            "Revoked"
+          ]
+        },
+        "t_mapping<t_struct<TemplateStoreLibrary.Template>>": {
+          "id": "t_mapping<t_struct<TemplateStoreLibrary.Template>>",
+          "valueType": "t_struct<TemplateStoreLibrary.Template>",
+          "label": "mapping(key => TemplateStoreLibrary.Template)",
+          "kind": "mapping"
+        },
+        "t_array:dyn<t_address>": {
+          "id": "t_array:dyn<t_address>",
+          "valueType": "t_address",
+          "length": "dyn",
+          "kind": "array",
+          "label": "address[]"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 5870,
+          "type": "t_bool",
+          "src": "757:24:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 5872,
+          "type": "t_bool",
+          "src": "876:25:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 5921,
+          "type": "t_array:50<t_uint256>",
+          "src": "1891:29:61"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 5056,
+          "type": "t_address",
+          "src": "302:22:55"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "______gap",
+          "astId": 5167,
+          "type": "t_array:50<t_uint256>",
+          "src": "2186:29:55"
+        },
+        {
+          "contract": "TemplateStoreManager",
+          "path": "contracts/templates/TemplateStoreManager.sol",
+          "label": "templateList",
+          "astId": 3703,
+          "type": "t_struct<TemplateStoreLibrary.TemplateList>",
+          "src": "240:55:21"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
+    },
+    "AccessSecretStoreCondition": {
+      "address": "0x78D2CA96F19e0e5b97Ca19Da179CEBF0fC5101BC",
+      "constructorCode": "608060405234801561001057600080fd5b50610bd8806100206000396000f3fe",
+      "bodyBytecodeHash": "7a73c316cefc05bbd64adaced80ff50607c7beac2d3cbc8f7850e42d30dfd9b1",
+      "localBytecodeHash": "723ef2226e42e678eac220b60b1dd2a5a851474b1940a22b66b47597bd949659",
+      "deployedBytecodeHash": "723ef2226e42e678eac220b60b1dd2a5a851474b1940a22b66b47597bd949659",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        },
+        "t_struct<AccessSecretStoreCondition.DocumentPermission>": {
+          "id": "t_struct<AccessSecretStoreCondition.DocumentPermission>",
+          "kind": "struct",
+          "label": "AccessSecretStoreCondition.DocumentPermission",
+          "members": [
+            {
+              "label": "agreementId",
+              "astId": 840,
+              "type": "t_bytes32",
+              "src": "237:19:6"
+            },
+            {
+              "label": "permission",
+              "astId": 844,
+              "type": "t_mapping<t_bool>",
+              "src": "266:35:6"
+            }
+          ]
+        },
+        "t_bytes32": {
+          "id": "t_bytes32",
+          "kind": "elementary",
+          "label": "bytes32"
+        },
+        "t_mapping<t_bool>": {
+          "id": "t_mapping<t_bool>",
+          "valueType": "t_bool",
+          "label": "mapping(key => bool)",
+          "kind": "mapping"
+        },
+        "t_mapping<t_struct<AccessSecretStoreCondition.DocumentPermission>>": {
+          "id": "t_mapping<t_struct<AccessSecretStoreCondition.DocumentPermission>>",
+          "valueType": "t_struct<AccessSecretStoreCondition.DocumentPermission>",
+          "label": "mapping(key => AccessSecretStoreCondition.DocumentPermission)",
+          "kind": "mapping"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 5870,
+          "type": "t_bool",
+          "src": "757:24:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 5872,
+          "type": "t_bool",
+          "src": "876:25:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 5921,
+          "type": "t_array:50<t_uint256>",
+          "src": "1891:29:61"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 5056,
+          "type": "t_address",
+          "src": "302:22:55"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "______gap",
+          "astId": 5167,
+          "type": "t_array:50<t_uint256>",
+          "src": "2186:29:55"
+        },
+        {
+          "contract": "Condition",
+          "path": "contracts/conditions/Condition.sol",
+          "label": "conditionStoreManager",
+          "astId": 1026,
+          "type": "t_address",
+          "src": "159:52:7"
+        },
+        {
+          "contract": "AccessSecretStoreCondition",
+          "path": "contracts/conditions/AccessSecretStoreCondition.sol",
+          "label": "documentPermissions",
+          "astId": 849,
+          "type": "t_mapping<t_struct<AccessSecretStoreCondition.DocumentPermission>>",
+          "src": "313:66:6"
+        },
+        {
+          "contract": "AccessSecretStoreCondition",
+          "path": "contracts/conditions/AccessSecretStoreCondition.sol",
+          "label": "agreementStoreManager",
+          "astId": 851,
+          "type": "t_address",
+          "src": "386:51:6"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
+    },
+    "HashLockCondition": {
+      "address": "0xCa925335D4EC611f35388eEeA9b9F7B0a6947d32",
+      "constructorCode": "608060405234801561001057600080fd5b50610ae6806100206000396000f3fe",
+      "bodyBytecodeHash": "0e67bd9babbcd974dac9abf56e6565ce194aea3ef7c47a58aae7951211eae09d",
+      "localBytecodeHash": "83da016cb4b48b93dd5c9dd269875813764e7df29005a481261d5f1fbed38f40",
+      "deployedBytecodeHash": "83da016cb4b48b93dd5c9dd269875813764e7df29005a481261d5f1fbed38f40",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 5870,
+          "type": "t_bool",
+          "src": "757:24:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 5872,
+          "type": "t_bool",
+          "src": "876:25:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 5921,
+          "type": "t_array:50<t_uint256>",
+          "src": "1891:29:61"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 5056,
+          "type": "t_address",
+          "src": "302:22:55"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "______gap",
+          "astId": 5167,
+          "type": "t_array:50<t_uint256>",
+          "src": "2186:29:55"
+        },
+        {
+          "contract": "Condition",
+          "path": "contracts/conditions/Condition.sol",
+          "label": "conditionStoreManager",
+          "astId": 1026,
+          "type": "t_address",
+          "src": "159:52:7"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
+    },
+    "EscrowReward": {
+      "address": "0xD89158f383EB643d1bbBC43c6BD3D31f41d50844",
+      "constructorCode": "608060405234801561001057600080fd5b50611066806100206000396000f3fe",
+      "bodyBytecodeHash": "439a122b20d59e45b93f4b7a9d839b4512771bca3b8fce35a5748a0ba8a4cc5e",
+      "localBytecodeHash": "2d33297fbfdd19ab7ff56d2396aa32e433177be57db0080757e6ed717548b0c1",
+      "deployedBytecodeHash": "2d33297fbfdd19ab7ff56d2396aa32e433177be57db0080757e6ed717548b0c1",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 5870,
+          "type": "t_bool",
+          "src": "757:24:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 5872,
+          "type": "t_bool",
+          "src": "876:25:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 5921,
+          "type": "t_array:50<t_uint256>",
+          "src": "1891:29:61"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 5056,
+          "type": "t_address",
+          "src": "302:22:55"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "______gap",
+          "astId": 5167,
+          "type": "t_array:50<t_uint256>",
+          "src": "2186:29:55"
+        },
+        {
+          "contract": "Condition",
+          "path": "contracts/conditions/Condition.sol",
+          "label": "conditionStoreManager",
+          "astId": 1026,
+          "type": "t_address",
+          "src": "159:52:7"
+        },
+        {
+          "contract": "Reward",
+          "path": "contracts/conditions/rewards/Reward.sol",
+          "label": "token",
+          "astId": 2384,
+          "type": "t_address",
+          "src": "157:21:14"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
+    },
+    "Dispenser": {
+      "address": "0x5DF3Fef3FFFE4620D30437BBc86Ad88cc907804B",
+      "constructorCode": "608060405234801561001057600080fd5b506109dd806100206000396000f3fe",
+      "bodyBytecodeHash": "bff05d19f73aea6c0f56301eb831ddcd8b243a94da5bfe0f3c64f5eec73c9a6d",
+      "localBytecodeHash": "d5f753991777547fa566a05c460b3e598e9f3fcc0697a62087e4b227269d0ec5",
+      "deployedBytecodeHash": "d5f753991777547fa566a05c460b3e598e9f3fcc0697a62087e4b227269d0ec5",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        },
+        "t_mapping<t_uint256>": {
+          "id": "t_mapping<t_uint256>",
+          "valueType": "t_uint256",
+          "label": "mapping(key => uint256)",
+          "kind": "mapping"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 5870,
+          "type": "t_bool",
+          "src": "757:24:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 5872,
+          "type": "t_bool",
+          "src": "876:25:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 5921,
+          "type": "t_array:50<t_uint256>",
+          "src": "1891:29:61"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 5056,
+          "type": "t_address",
+          "src": "302:22:55"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "______gap",
+          "astId": 5167,
+          "type": "t_array:50<t_uint256>",
+          "src": "2186:29:55"
+        },
+        {
+          "contract": "Dispenser",
+          "path": "contracts/Dispenser.sol",
+          "label": "tokenRequests",
+          "astId": 45,
+          "type": "t_mapping<t_uint256>",
+          "src": "442:50:1"
+        },
+        {
+          "contract": "Dispenser",
+          "path": "contracts/Dispenser.sol",
+          "label": "totalMintAmount",
+          "astId": 47,
+          "type": "t_uint256",
+          "src": "498:32:1"
+        },
+        {
+          "contract": "Dispenser",
+          "path": "contracts/Dispenser.sol",
+          "label": "maxAmount",
+          "astId": 49,
+          "type": "t_uint256",
+          "src": "595:26:1"
+        },
+        {
+          "contract": "Dispenser",
+          "path": "contracts/Dispenser.sol",
+          "label": "maxMintAmount",
+          "astId": 51,
+          "type": "t_uint256",
+          "src": "705:30:1"
+        },
+        {
+          "contract": "Dispenser",
+          "path": "contracts/Dispenser.sol",
+          "label": "minPeriod",
+          "astId": 53,
+          "type": "t_uint256",
+          "src": "804:26:1"
+        },
+        {
+          "contract": "Dispenser",
+          "path": "contracts/Dispenser.sol",
+          "label": "scale",
+          "astId": 55,
+          "type": "t_uint256",
+          "src": "836:22:1"
+        },
+        {
+          "contract": "Dispenser",
+          "path": "contracts/Dispenser.sol",
+          "label": "oceanToken",
+          "astId": 57,
+          "type": "t_address",
+          "src": "865:28:1"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
+    },
+    "OceanToken": {
+      "address": "0x8D700fc128106e81bBF7Ccb13c931705Caae785E",
+      "constructorCode": "608060405234801561001057600080fd5b506114bc806100206000396000f3fe",
+      "bodyBytecodeHash": "c6173723cad7eae0342f11819f793b397c3f3c60f1d2864ca2084b7b5a73684f",
+      "localBytecodeHash": "83dcf0b0eda023f15b25d396e9c3df493d20232e24ea06dc82de0a716c04252d",
+      "deployedBytecodeHash": "83dcf0b0eda023f15b25d396e9c3df493d20232e24ea06dc82de0a716c04252d",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        },
+        "t_string": {
+          "id": "t_string",
+          "kind": "elementary",
+          "label": "string"
+        },
+        "t_uint8": {
+          "id": "t_uint8",
+          "kind": "elementary",
+          "label": "uint8"
+        },
+        "t_mapping<t_uint256>": {
+          "id": "t_mapping<t_uint256>",
+          "valueType": "t_uint256",
+          "label": "mapping(key => uint256)",
+          "kind": "mapping"
+        },
+        "t_struct<Roles.Role>": {
+          "id": "t_struct<Roles.Role>",
+          "kind": "struct",
+          "label": "Roles.Role",
+          "members": [
+            {
+              "label": "bearer",
+              "astId": 4633,
+              "type": "t_mapping<t_bool>",
+              "src": "150:32:51"
+            }
+          ]
+        },
+        "t_mapping<t_bool>": {
+          "id": "t_mapping<t_bool>",
+          "valueType": "t_bool",
+          "label": "mapping(key => bool)",
+          "kind": "mapping"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 5870,
+          "type": "t_bool",
+          "src": "757:24:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 5872,
+          "type": "t_bool",
+          "src": "876:25:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 5921,
+          "type": "t_array:50<t_uint256>",
+          "src": "1891:29:61"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 5056,
+          "type": "t_address",
+          "src": "302:22:55"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "______gap",
+          "astId": 5167,
+          "type": "t_array:50<t_uint256>",
+          "src": "2186:29:55"
+        },
+        {
+          "contract": "ERC20Detailed",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20Detailed.sol",
+          "label": "_name",
+          "astId": 5691,
+          "type": "t_string",
+          "src": "382:20:58"
+        },
+        {
+          "contract": "ERC20Detailed",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20Detailed.sol",
+          "label": "_symbol",
+          "astId": 5693,
+          "type": "t_string",
+          "src": "408:22:58"
+        },
+        {
+          "contract": "ERC20Detailed",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20Detailed.sol",
+          "label": "_decimals",
+          "astId": 5695,
+          "type": "t_uint8",
+          "src": "436:23:58"
+        },
+        {
+          "contract": "ERC20Detailed",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20Detailed.sol",
+          "label": "______gap",
+          "astId": 5747,
+          "type": "t_array:50<t_uint256>",
+          "src": "1097:29:58"
+        },
+        {
+          "contract": "ERC20",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
+          "label": "_balances",
+          "astId": 5184,
+          "type": "t_mapping<t_uint256>",
+          "src": "774:46:56"
+        },
+        {
+          "contract": "ERC20",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
+          "label": "_allowed",
+          "astId": 5190,
+          "type": "t_mapping<t_uint256>",
+          "src": "827:66:56"
+        },
+        {
+          "contract": "ERC20",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
+          "label": "_totalSupply",
+          "astId": 5192,
+          "type": "t_uint256",
+          "src": "900:28:56"
+        },
+        {
+          "contract": "ERC20",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
+          "label": "______gap",
+          "astId": 5606,
+          "type": "t_array:50<t_uint256>",
+          "src": "7661:29:56"
+        },
+        {
+          "contract": "MinterRole",
+          "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
+          "label": "_minters",
+          "astId": 4740,
+          "type": "t_struct<Roles.Role>",
+          "src": "271:27:52"
+        },
+        {
+          "contract": "MinterRole",
+          "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
+          "label": "______gap",
+          "astId": 4839,
+          "type": "t_array:50<t_uint256>",
+          "src": "1081:29:52"
+        },
+        {
+          "contract": "ERC20Mintable",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20Mintable.sol",
+          "label": "______gap",
+          "astId": 5796,
+          "type": "t_array:50<t_uint256>",
+          "src": "745:29:59"
+        },
+        {
+          "contract": "ERC20Capped",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20Capped.sol",
+          "label": "_cap",
+          "astId": 5617,
+          "type": "t_uint256",
+          "src": "233:20:57"
+        },
+        {
+          "contract": "ERC20Capped",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20Capped.sol",
+          "label": "______gap",
+          "astId": 5680,
+          "type": "t_array:50<t_uint256>",
+          "src": "728:29:57"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
+    },
+    "DIDRegistry": {
+      "address": "0xb28BC9489c55be810858F206602cf91c83DF816f",
+      "constructorCode": "608060405234801561001057600080fd5b50611198806100206000396000f3fe",
+      "bodyBytecodeHash": "4eee2d667eca83545f7018cc4c4c7ae97a23091b8678ea60017f7a1501dfc7bf",
+      "localBytecodeHash": "29e90529566e3ea1d21fa442d320d33bcfa4ac9648bc98ad3d8cbb5d16bbb71e",
+      "deployedBytecodeHash": "a19fae14c67e978de01259b3e7633cc2b7604c3aca2c0fda5ef631e2f3328a90",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        },
+        "t_struct<DIDRegistryLibrary.DIDRegisterList>": {
+          "id": "t_struct<DIDRegistryLibrary.DIDRegisterList>",
+          "kind": "struct",
+          "label": "DIDRegistryLibrary.DIDRegisterList",
+          "members": [
+            {
+              "label": "didRegisters",
+              "astId": 2940,
+              "type": "t_mapping<t_struct<DIDRegistryLibrary.DIDRegister>>",
+              "src": "419:44:17"
+            },
+            {
+              "label": "didRegisterIds",
+              "astId": 2943,
+              "type": "t_array:dyn<t_bytes32>",
+              "src": "473:24:17"
+            }
+          ]
+        },
+        "t_struct<DIDRegistryLibrary.DIDRegister>": {
+          "id": "t_struct<DIDRegistryLibrary.DIDRegister>",
+          "kind": "struct",
+          "label": "DIDRegistryLibrary.DIDRegister",
+          "members": [
+            {
+              "label": "blockNumberUpdated",
+              "astId": 2926,
+              "type": "t_uint256",
+              "src": "234:26:17"
+            },
+            {
+              "label": "owner",
+              "astId": 2928,
+              "type": "t_address",
+              "src": "270:13:17"
+            },
+            {
+              "label": "lastUpdatedBy",
+              "astId": 2930,
+              "type": "t_address",
+              "src": "293:21:17"
+            },
+            {
+              "label": "lastChecksum",
+              "astId": 2932,
+              "type": "t_bytes32",
+              "src": "324:20:17"
+            },
+            {
+              "label": "providers",
+              "astId": 2935,
+              "type": "t_array:dyn<t_address>",
+              "src": "354:19:17"
+            }
+          ]
+        },
+        "t_bytes32": {
+          "id": "t_bytes32",
+          "kind": "elementary",
+          "label": "bytes32"
+        },
+        "t_array:dyn<t_address>": {
+          "id": "t_array:dyn<t_address>",
+          "valueType": "t_address",
+          "length": "dyn",
+          "kind": "array",
+          "label": "address[]"
+        },
+        "t_mapping<t_struct<DIDRegistryLibrary.DIDRegister>>": {
+          "id": "t_mapping<t_struct<DIDRegistryLibrary.DIDRegister>>",
+          "valueType": "t_struct<DIDRegistryLibrary.DIDRegister>",
+          "label": "mapping(key => DIDRegistryLibrary.DIDRegister)",
+          "kind": "mapping"
+        },
+        "t_array:dyn<t_bytes32>": {
+          "id": "t_array:dyn<t_bytes32>",
+          "valueType": "t_bytes32",
+          "length": "dyn",
+          "kind": "array",
+          "label": "bytes32[]"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 5870,
+          "type": "t_bool",
+          "src": "757:24:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 5872,
+          "type": "t_bool",
+          "src": "876:25:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 5921,
+          "type": "t_array:50<t_uint256>",
+          "src": "1891:29:61"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 5056,
+          "type": "t_address",
+          "src": "302:22:55"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "______gap",
+          "astId": 5167,
+          "type": "t_array:50<t_uint256>",
+          "src": "2186:29:55"
+        },
+        {
+          "contract": "DIDRegistry",
+          "path": "contracts/registry/DIDRegistry.sol",
+          "label": "didRegisterList",
+          "astId": 2586,
+          "type": "t_struct<DIDRegistryLibrary.DIDRegisterList>",
+          "src": "564:59:16"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
+    },
+    "EscrowAccessSecretStoreTemplate": {
+      "address": "0x31a64a1DCdD9e1b8db84ef94431a61C6B462Ad0c",
+      "constructorCode": "608060405234801561001057600080fd5b50610f47806100206000396000f3fe",
+      "bodyBytecodeHash": "a1388ecf7cdfcf74ae214b8f4d260c90a5705bb890f3a928bb9d2d237f993271",
+      "localBytecodeHash": "436ced2cbd1786cb24c16bac8e7d499b33d9a2f6296b20b36fc80e7e8c0213ec",
+      "deployedBytecodeHash": "436ced2cbd1786cb24c16bac8e7d499b33d9a2f6296b20b36fc80e7e8c0213ec",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        },
+        "t_struct<TemplateStoreLibrary.TemplateList>": {
+          "id": "t_struct<TemplateStoreLibrary.TemplateList>",
+          "kind": "struct",
+          "label": "TemplateStoreLibrary.TemplateList",
+          "members": [
+            {
+              "label": "templates",
+              "astId": 3536,
+              "type": "t_mapping<t_struct<TemplateStoreLibrary.Template>>",
+              "src": "309:38:20"
+            },
+            {
+              "label": "templateIds",
+              "astId": 3539,
+              "type": "t_array:dyn<t_address>",
+              "src": "357:21:20"
+            }
+          ]
+        },
+        "t_struct<TemplateStoreLibrary.Template>": {
+          "id": "t_struct<TemplateStoreLibrary.Template>",
+          "kind": "struct",
+          "label": "TemplateStoreLibrary.Template",
+          "members": [
+            {
+              "label": "state",
+              "astId": 3525,
+              "type": "t_enum<TemplateStoreLibrary.TemplateState>",
+              "src": "157:19:20"
+            },
+            {
+              "label": "blockNumberUpdated",
+              "astId": 3527,
+              "type": "t_uint256",
+              "src": "186:26:20"
+            },
+            {
+              "label": "owner",
+              "astId": 3529,
+              "type": "t_address",
+              "src": "222:13:20"
+            },
+            {
+              "label": "lastUpdatedBy",
+              "astId": 3531,
+              "type": "t_address",
+              "src": "245:21:20"
+            }
+          ]
+        },
+        "t_enum<TemplateStoreLibrary.TemplateState>": {
+          "id": "t_enum<TemplateStoreLibrary.TemplateState>",
+          "kind": "enum",
+          "label": "TemplateStoreLibrary.TemplateState",
+          "members": [
+            "Uninitialized",
+            "Proposed",
+            "Approved",
+            "Revoked"
+          ]
+        },
+        "t_mapping<t_struct<TemplateStoreLibrary.Template>>": {
+          "id": "t_mapping<t_struct<TemplateStoreLibrary.Template>>",
+          "valueType": "t_struct<TemplateStoreLibrary.Template>",
+          "label": "mapping(key => TemplateStoreLibrary.Template)",
+          "kind": "mapping"
+        },
+        "t_array:dyn<t_address>": {
+          "id": "t_array:dyn<t_address>",
+          "valueType": "t_address",
+          "length": "dyn",
+          "kind": "array",
+          "label": "address[]"
+        },
+        "t_struct<EscrowAccessSecretStoreTemplate.AgreementData>": {
+          "id": "t_struct<EscrowAccessSecretStoreTemplate.AgreementData>",
+          "kind": "struct",
+          "label": "EscrowAccessSecretStoreTemplate.AgreementData",
+          "members": [
+            {
+              "label": "agreementDataItems",
+              "astId": 3287,
+              "type": "t_mapping<t_struct<EscrowAccessSecretStoreTemplate.AgreementDataModel>>",
+              "src": "928:57:19"
+            },
+            {
+              "label": "agreementIds",
+              "astId": 3290,
+              "type": "t_array:dyn<t_bytes32>",
+              "src": "995:22:19"
+            }
+          ]
+        },
+        "t_struct<EscrowAccessSecretStoreTemplate.AgreementDataModel>": {
+          "id": "t_struct<EscrowAccessSecretStoreTemplate.AgreementDataModel>",
+          "kind": "struct",
+          "label": "EscrowAccessSecretStoreTemplate.AgreementDataModel",
+          "members": [
+            {
+              "label": "accessConsumer",
+              "astId": 3280,
+              "type": "t_address",
+              "src": "830:22:19"
+            },
+            {
+              "label": "accessProvider",
+              "astId": 3282,
+              "type": "t_address",
+              "src": "862:22:19"
+            }
+          ]
+        },
+        "t_mapping<t_struct<EscrowAccessSecretStoreTemplate.AgreementDataModel>>": {
+          "id": "t_mapping<t_struct<EscrowAccessSecretStoreTemplate.AgreementDataModel>>",
+          "valueType": "t_struct<EscrowAccessSecretStoreTemplate.AgreementDataModel>",
+          "label": "mapping(key => EscrowAccessSecretStoreTemplate.AgreementDataModel)",
+          "kind": "mapping"
+        },
+        "t_bytes32": {
+          "id": "t_bytes32",
+          "kind": "elementary",
+          "label": "bytes32"
+        },
+        "t_array:dyn<t_bytes32>": {
+          "id": "t_array:dyn<t_bytes32>",
+          "valueType": "t_bytes32",
+          "length": "dyn",
+          "kind": "array",
+          "label": "bytes32[]"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 5870,
+          "type": "t_bool",
+          "src": "757:24:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 5872,
+          "type": "t_bool",
+          "src": "876:25:61"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 5921,
+          "type": "t_array:50<t_uint256>",
+          "src": "1891:29:61"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 5056,
+          "type": "t_address",
+          "src": "302:22:55"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "______gap",
+          "astId": 5167,
+          "type": "t_array:50<t_uint256>",
+          "src": "2186:29:55"
+        },
+        {
+          "contract": "AgreementTemplate",
+          "path": "contracts/templates/AgreementTemplate.sol",
+          "label": "templateList",
+          "astId": 3198,
+          "type": "t_struct<TemplateStoreLibrary.TemplateList>",
+          "src": "287:55:18"
+        },
+        {
+          "contract": "AgreementTemplate",
+          "path": "contracts/templates/AgreementTemplate.sol",
+          "label": "conditionTypes",
+          "astId": 3201,
+          "type": "t_array:dyn<t_address>",
+          "src": "348:33:18"
+        },
+        {
+          "contract": "AgreementTemplate",
+          "path": "contracts/templates/AgreementTemplate.sol",
+          "label": "agreementStoreManager",
+          "astId": 3203,
+          "type": "t_address",
+          "src": "388:52:18"
+        },
+        {
+          "contract": "EscrowAccessSecretStoreTemplate",
+          "path": "contracts/templates/EscrowAccessSecretStoreTemplate.sol",
+          "label": "didRegistry",
+          "astId": 3254,
+          "type": "t_address",
+          "src": "318:32:19"
+        },
+        {
+          "contract": "EscrowAccessSecretStoreTemplate",
+          "path": "contracts/templates/EscrowAccessSecretStoreTemplate.sol",
+          "label": "accessSecretStoreCondition",
+          "astId": 3256,
+          "type": "t_address",
+          "src": "356:62:19"
+        },
+        {
+          "contract": "EscrowAccessSecretStoreTemplate",
+          "path": "contracts/templates/EscrowAccessSecretStoreTemplate.sol",
+          "label": "lockRewardCondition",
+          "astId": 3258,
+          "type": "t_address",
+          "src": "424:48:19"
+        },
+        {
+          "contract": "EscrowAccessSecretStoreTemplate",
+          "path": "contracts/templates/EscrowAccessSecretStoreTemplate.sol",
+          "label": "escrowReward",
+          "astId": 3260,
+          "type": "t_address",
+          "src": "478:34:19"
+        },
+        {
+          "contract": "EscrowAccessSecretStoreTemplate",
+          "path": "contracts/templates/EscrowAccessSecretStoreTemplate.sol",
+          "label": "agreementData",
+          "astId": 3262,
+          "type": "t_struct<EscrowAccessSecretStoreTemplate.AgreementData>",
+          "src": "519:36:19"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
+    }
+  },
+  "solidityLibs": {
+    "EpochLibrary": {
+      "address": "0xBDFeAc66c022165Bdb320264398977bf8A54e3C0",
+      "constructorCode": "6101fd610026600b82828239805160001a60731461001957fe5b30600052607381538281f3fe",
+      "bodyBytecodeHash": "575116c59ffbebcc80026b7a58929e97407c0b8832353a6fcdd5936f2fd2820b",
+      "localBytecodeHash": "c4d6f75581cc06888961ee9ee52a8874591a5c02d22cf50ceed11478a34fa4db",
+      "deployedBytecodeHash": "c4d6f75581cc06888961ee9ee52a8874591a5c02d22cf50ceed11478a34fa4db"
+    },
+    "DIDRegistryLibrary": {
+      "address": "0xec424d77772E0a156d0Bc8168e76359889Ca658C",
+      "constructorCode": "610390610026600b82828239805160001a60731461001957fe5b30600052607381538281f3fe",
+      "bodyBytecodeHash": "f2b3fc042ac36475216e37644ed57c06bbc25c442bac2df4228e774c3650dff3",
+      "localBytecodeHash": "85730a046cff59c4e43a11877395788b7642b926f254da18773c563d2c851a30",
+      "deployedBytecodeHash": "85730a046cff59c4e43a11877395788b7642b926f254da18773c563d2c851a30"
+    }
+  },
+  "proxies": {
+    "@oceanprotocol/keeper-contracts/DIDRegistry": [
+      {
+        "address": "0x4878e1dfd4105b8FF3A879C5896495d5DE3274B5",
+        "version": "v0.9.1",
+        "implementation": "0xb28BC9489c55be810858F206602cf91c83DF816f",
+        "admin": "0x8cCD9073B23689ca2BB76a049Eb33dfF5e16228D"
+      }
+    ],
+    "@oceanprotocol/keeper-contracts/OceanToken": [
+      {
+        "address": "0x5e29AcdE5285E24eb7A211d9F4313E5a9Ed07F36",
+        "version": "v0.9.1",
+        "implementation": "0x8D700fc128106e81bBF7Ccb13c931705Caae785E",
+        "admin": "0x8cCD9073B23689ca2BB76a049Eb33dfF5e16228D"
+      }
+    ],
+    "@oceanprotocol/keeper-contracts/Dispenser": [
+      {
+        "address": "0xF7B1be190A13bDD9157d9493dF9F4BFD0c8a097F",
+        "version": "v0.9.1",
+        "implementation": "0x5DF3Fef3FFFE4620D30437BBc86Ad88cc907804B",
+        "admin": "0x8cCD9073B23689ca2BB76a049Eb33dfF5e16228D"
+      }
+    ],
+    "@oceanprotocol/keeper-contracts/ConditionStoreManager": [
+      {
+        "address": "0xe6CeA58707df303b6d9D1DF5BA8Bf88fF4A5920D",
+        "version": "v0.9.1",
+        "implementation": "0x0959092E0D313F0BD3a6441151B2E2685d7350b5",
+        "admin": "0x8cCD9073B23689ca2BB76a049Eb33dfF5e16228D"
+      }
+    ],
+    "@oceanprotocol/keeper-contracts/TemplateStoreManager": [
+      {
+        "address": "0xF454Ec72eCed751ffAD94B11ae7c0323670dd976",
+        "version": "v0.9.1",
+        "implementation": "0xf3cb02038fD4c276188A302b2067f40c6B8a343a",
+        "admin": "0x8cCD9073B23689ca2BB76a049Eb33dfF5e16228D"
+      }
+    ],
+    "@oceanprotocol/keeper-contracts/SignCondition": [
+      {
+        "address": "0x8c4a2cC4572B6CD68c58BFc220f04CD1143230a0",
+        "version": "v0.9.1",
+        "implementation": "0xdAA1D761dCE7192c8d4B8f7B96bE1E4570E056B4",
+        "admin": "0x8cCD9073B23689ca2BB76a049Eb33dfF5e16228D"
+      }
+    ],
+    "@oceanprotocol/keeper-contracts/HashLockCondition": [
+      {
+        "address": "0xA2Ab4153F9df4Cccb859d54Aea7A47298Bc83DF6",
+        "version": "v0.9.1",
+        "implementation": "0xCa925335D4EC611f35388eEeA9b9F7B0a6947d32",
+        "admin": "0x8cCD9073B23689ca2BB76a049Eb33dfF5e16228D"
+      }
+    ],
+    "@oceanprotocol/keeper-contracts/AgreementStoreManager": [
+      {
+        "address": "0xfC6DB8141144831a8B7d858f356D0d1148d8F11d",
+        "version": "v0.9.1",
+        "implementation": "0x0C84ECe5A68059220ff114de2b11457Fa7d7Fc45",
+        "admin": "0x8cCD9073B23689ca2BB76a049Eb33dfF5e16228D"
+      }
+    ],
+    "@oceanprotocol/keeper-contracts/LockRewardCondition": [
+      {
+        "address": "0x518cf43258Ece569D5Cd19e6C0Cee41156FB6aED",
+        "version": "v0.9.1",
+        "implementation": "0x4Eb388C190Cde6Bf8C60e37CCd2C8056A184eD43",
+        "admin": "0x8cCD9073B23689ca2BB76a049Eb33dfF5e16228D"
+      }
+    ],
+    "@oceanprotocol/keeper-contracts/EscrowReward": [
+      {
+        "address": "0xb8D436b29CBF1ef690DD3b0972Cce2090ECb09bc",
+        "version": "v0.9.1",
+        "implementation": "0xD89158f383EB643d1bbBC43c6BD3D31f41d50844",
+        "admin": "0x8cCD9073B23689ca2BB76a049Eb33dfF5e16228D"
+      }
+    ],
+    "@oceanprotocol/keeper-contracts/AccessSecretStoreCondition": [
+      {
+        "address": "0x99FFC24B6749512F6DE6D24c5dBCC390359af4E3",
+        "version": "v0.9.1",
+        "implementation": "0x78D2CA96F19e0e5b97Ca19Da179CEBF0fC5101BC",
+        "admin": "0x8cCD9073B23689ca2BB76a049Eb33dfF5e16228D"
+      }
+    ],
+    "@oceanprotocol/keeper-contracts/EscrowAccessSecretStoreTemplate": [
+      {
+        "address": "0xdAAb92eABB4F2D7fC51948E44A88aa4fd986EDa9",
+        "version": "v0.9.1",
+        "implementation": "0x31a64a1DCdD9e1b8db84ef94431a61C6B462Ad0c",
+        "admin": "0x8cCD9073B23689ca2BB76a049Eb33dfF5e16228D"
+      }
+    ]
+  },
+  "zosversion": "2.2",
+  "version": "v0.9.1",
+  "proxyAdmin": {
+    "address": "0x549A383bE23615B61d0E40cf90cD558D889b5632"
+  }
+}
