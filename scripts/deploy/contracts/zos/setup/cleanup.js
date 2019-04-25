@@ -4,6 +4,7 @@ const { execSync } = require('child_process')
 
 const whitelist = [
     0x2324, // spree
+    0x897, // duero
     0x2323, // nile
     0x2A, // kovan
     0x4 // rinkeby
