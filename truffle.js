@@ -78,7 +78,7 @@ module.exports = {
         // kovan the ethereum testnet
         kovan: {
             provider: () => setupWallet(
-                url || `https://kovan.infura.io/v2/${process.env.INFURA_TOKEN}`
+                url || `https://kovan.infura.io/v3/${process.env.INFURA_TOKEN}`
             ),
             network_id: 0x2A, // 42
             from: '0x2c0D5F47374b130EE398F4C34DBE8168824A8616'
