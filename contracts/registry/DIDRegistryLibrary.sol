@@ -9,10 +9,10 @@ pragma solidity 0.5.6;
 library DIDRegistryLibrary {
 
     struct DIDRegister {
-        uint256 blockNumberUpdated;
         address owner;
-        address lastUpdatedBy;
         bytes32 lastChecksum;
+        address lastUpdatedBy;
+        uint256 blockNumberUpdated;
         address[] providers;
     }
 
@@ -44,10 +44,10 @@ library DIDRegistryLibrary {
         }
 
         _self.didRegisters[_did] = DIDRegister({
-            blockNumberUpdated: block.number,
             owner: didOwner,
-            lastUpdatedBy: msg.sender,
             lastChecksum: _checksum,
+            lastUpdatedBy: msg.sender,
+            blockNumberUpdated: block.number,
             providers: new address[](0)
         });
 
