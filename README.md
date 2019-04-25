@@ -138,9 +138,9 @@ The contract addresses deployed on Ocean's Nile Beta Network:
 | AgreementStoreManager             | v0.9.2  | `0x62f84700b1A0ea6Bfb505aDC3c0286B7944D247C` |
 | ConditionStoreManager             | v0.9.2  | `0x39b0AA775496C5ebf26f3B81C9ed1843f09eE466` |
 | DIDRegistry                       | v0.9.2  | `0x4A0f7F763B1A7937aED21D63b2A78adc89c5Db23` |
-| DIDRegistryLibrary                | v0.9.2  | `0x3B3504908Db36f5D5f07CD420ee2BBBbDfB674cF` |
+| DIDRegistryLibrary                | v0.9.2  | `0xAC524de75A66221f0F26fbE1e2B61EE031DFB975` |
 | Dispenser                         | v0.9.2  | `0x865396b7ddc58C693db7FCAD1168E3BD95Fe3368` |
-| EpochLibrary                      | v0.9.2  | `0x34fa1530C0B1a2106Bf84E81Cd9D654087fB93d2` |
+| EpochLibrary                      | v0.9.2  | `0xAA2C7e6237c22901533400AA9E381327A7B7982F` |
 | EscrowAccessSecretStoreTemplate   | v0.9.2  | `0xfA16d26e9F4fffC6e40963B281a0bB08C31ed40C` |
 | EscrowReward                      | v0.9.2  | `0xeD4Ef53376C6f103d2d7029D7E702e082767C6ff` |
 | HashLockCondition                 | v0.9.2  | `0xB5f2e45e8aD4a1339D542f2defd5095B98054590` |
