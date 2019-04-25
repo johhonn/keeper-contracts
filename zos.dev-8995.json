@@ -1,11 +1,11 @@
 {
   "contracts": {
     "ConditionStoreManager": {
-      "address": "0x63aA67140125AcD461Ef8828f1Bc56e198f44A2C",
-      "constructorCode": "608060405234801561001057600080fd5b50611238806100206000396000f3fe",
-      "bodyBytecodeHash": "f52b7905c409894c939a17df8c2ee87251d7540d85d7142b16850e6b58aaed3c",
-      "localBytecodeHash": "4301b4900b934b9f2d63edaa963e0192f284976f9b65b911d650427f364e199c",
-      "deployedBytecodeHash": "bb8a318925e7dddddf6be9febd3a413402219788e7fd311157daa3705b1336b4",
+      "address": "0xa2C8FCb5f8F0917C4cCCf9F34f2fdeeeE42C9c42",
+      "constructorCode": "608060405234801561001057600080fd5b50611268806100206000396000f3fe",
+      "bodyBytecodeHash": "3aeb245af4ed02d3b44099f2555dc323d58825ba3100d16ddcfb1341abfad6a8",
+      "localBytecodeHash": "944929b5d50b4ff0416b5e8c61534c2034d56ac9371cf3fcb7a6a00e02490c5c",
+      "deployedBytecodeHash": "13834378521858d80389dfbbaeb0eb9ba3f9f45fbfbf7f51e099f889cfae960f",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -54,28 +54,28 @@
           "label": "ConditionStoreLibrary.Condition",
           "members": [
             {
-              "label": "state",
-              "astId": 1097,
-              "type": "t_enum<ConditionStoreLibrary.ConditionState>",
-              "src": "165:20:8"
-            },
-            {
-              "label": "blockNumberUpdated",
-              "astId": 1099,
-              "type": "t_uint256",
-              "src": "195:26:8"
-            },
-            {
               "label": "typeRef",
-              "astId": 1101,
+              "astId": 1097,
               "type": "t_address",
-              "src": "231:15:8"
+              "src": "165:15:8"
+            },
+            {
+              "label": "state",
+              "astId": 1099,
+              "type": "t_enum<ConditionStoreLibrary.ConditionState>",
+              "src": "190:20:8"
             },
             {
               "label": "lastUpdatedBy",
-              "astId": 1103,
+              "astId": 1101,
               "type": "t_address",
-              "src": "256:21:8"
+              "src": "220:21:8"
+            },
+            {
+              "label": "blockNumberUpdated",
+              "astId": 1103,
+              "type": "t_uint256",
+              "src": "251:26:8"
             }
           ]
         },
@@ -253,11 +253,11 @@
       }
     },
     "TemplateStoreManager": {
-      "address": "0x5144E3fCD64D47582987C698A7E2161BC0D3a736",
-      "constructorCode": "608060405234801561001057600080fd5b50610a53806100206000396000f3fe",
-      "bodyBytecodeHash": "76a800a9b6411bd00feb8bf19deb92b9bc12c2c9a7d8461329c82723615e9116",
-      "localBytecodeHash": "d254f8012f150b15a683f524126d3e912b2f28ee775cc40b7f4e881cbab5eea7",
-      "deployedBytecodeHash": "d254f8012f150b15a683f524126d3e912b2f28ee775cc40b7f4e881cbab5eea7",
+      "address": "0x2E2dA715255af063653fFE8e58261E5c7C90B551",
+      "constructorCode": "608060405234801561001057600080fd5b50610a6e806100206000396000f3fe",
+      "bodyBytecodeHash": "d9a42ff1f75436b8f4bb5a7f7befbb6e4cd9409453a2d9fbf7eea1c825631140",
+      "localBytecodeHash": "bc9cc9cbad9e5a97632616b223300ad015be8d6c4261703926952078c636bfa8",
+      "deployedBytecodeHash": "bc9cc9cbad9e5a97632616b223300ad015be8d6c4261703926952078c636bfa8",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -312,22 +312,22 @@
               "src": "157:19:20"
             },
             {
-              "label": "blockNumberUpdated",
-              "astId": 3527,
-              "type": "t_uint256",
-              "src": "186:26:20"
-            },
-            {
               "label": "owner",
-              "astId": 3529,
+              "astId": 3527,
               "type": "t_address",
-              "src": "222:13:20"
+              "src": "186:13:20"
             },
             {
               "label": "lastUpdatedBy",
-              "astId": 3531,
+              "astId": 3529,
               "type": "t_address",
-              "src": "245:21:20"
+              "src": "209:21:20"
+            },
+            {
+              "label": "blockNumberUpdated",
+              "astId": 3531,
+              "type": "t_uint256",
+              "src": "240:26:20"
             }
           ]
         },
@@ -426,11 +426,11 @@
       }
     },
     "AgreementStoreManager": {
-      "address": "0x16e3a09Ae9dc48eC953511d94b7a4795059E27d4",
-      "constructorCode": "608060405234801561001057600080fd5b506113ab806100206000396000f3fe",
-      "bodyBytecodeHash": "84826f01f6a6855fcb814ead6f98466749f44a6082b03acd8d05bdbb6fcc2f41",
-      "localBytecodeHash": "cb53196a0a21a72bbe2c9c5028e6a6d953932839131836afa10f9573a0a2dbba",
-      "deployedBytecodeHash": "cb53196a0a21a72bbe2c9c5028e6a6d953932839131836afa10f9573a0a2dbba",
+      "address": "0xBd70359D662E2d955f35C62A7637B6f8A53AcAf5",
+      "constructorCode": "608060405234801561001057600080fd5b506113be806100206000396000f3fe",
+      "bodyBytecodeHash": "cc5f406933f64512a9ba0f3ec6572544c9aadc54daf850e9671ce5dfdf96f445",
+      "localBytecodeHash": "883e85e9c1cb220c2d478781194cf5fb4f1b946375d814588fa9d7cff31744e9",
+      "deployedBytecodeHash": "883e85e9c1cb220c2d478781194cf5fb4f1b946375d814588fa9d7cff31744e9",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -491,34 +491,34 @@
           "label": "AgreementStoreLibrary.Agreement",
           "members": [
             {
-              "label": "blockNumberUpdated",
+              "label": "did",
               "astId": 358,
-              "type": "t_uint256",
-              "src": "89:26:4"
+              "type": "t_bytes32",
+              "src": "89:11:4"
             },
             {
               "label": "templateId",
               "astId": 360,
               "type": "t_address",
-              "src": "125:18:4"
-            },
-            {
-              "label": "lastUpdatedBy",
-              "astId": 362,
-              "type": "t_address",
-              "src": "153:21:4"
-            },
-            {
-              "label": "did",
-              "astId": 364,
-              "type": "t_bytes32",
-              "src": "184:11:4"
+              "src": "110:18:4"
             },
             {
               "label": "conditionIds",
-              "astId": 367,
+              "astId": 363,
               "type": "t_array:dyn<t_bytes32>",
-              "src": "205:22:4"
+              "src": "138:22:4"
+            },
+            {
+              "label": "lastUpdatedBy",
+              "astId": 365,
+              "type": "t_address",
+              "src": "170:21:4"
+            },
+            {
+              "label": "blockNumberUpdated",
+              "astId": 367,
+              "type": "t_uint256",
+              "src": "201:26:4"
             }
           ]
         },
@@ -1835,11 +1835,11 @@
       }
     },
     "DIDRegistry": {
-      "address": "0xee7a03572952234e60fBEffAbC4882446F90A441",
-      "constructorCode": "608060405234801561001057600080fd5b50611198806100206000396000f3fe",
-      "bodyBytecodeHash": "ab6ca20d773829140d5e1e7a61deea05089d63aeb64578da097799290e60293d",
-      "localBytecodeHash": "29e90529566e3ea1d21fa442d320d33bcfa4ac9648bc98ad3d8cbb5d16bbb71e",
-      "deployedBytecodeHash": "80eaa534220ecc245e255af7a69eb88783dc3994f6fa08b00bf435883783a84c",
+      "address": "0x6aEEC1F0b5e76CdD16BBDFCbB2069f6A24763b96",
+      "constructorCode": "608060405234801561001057600080fd5b50611189806100206000396000f3fe",
+      "bodyBytecodeHash": "08069b5576a2e26363533cbc2644a64642dd8e334fb0ada0d875192b0614e840",
+      "localBytecodeHash": "8ce3a11b3b3f958e9b20fadc011b687b183d24ac20943d8b65b75251811c716e",
+      "deployedBytecodeHash": "ebc610d1db80cba2b4efc64b637368cabe74b53668c96c66a566b2fe7e3ed2a4",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -1888,28 +1888,28 @@
           "label": "DIDRegistryLibrary.DIDRegister",
           "members": [
             {
-              "label": "blockNumberUpdated",
+              "label": "owner",
               "astId": 2926,
-              "type": "t_uint256",
-              "src": "234:26:17"
+              "type": "t_address",
+              "src": "234:13:17"
             },
             {
-              "label": "owner",
+              "label": "lastChecksum",
               "astId": 2928,
-              "type": "t_address",
-              "src": "270:13:17"
+              "type": "t_bytes32",
+              "src": "257:20:17"
             },
             {
               "label": "lastUpdatedBy",
               "astId": 2930,
               "type": "t_address",
-              "src": "293:21:17"
+              "src": "287:21:17"
             },
             {
-              "label": "lastChecksum",
+              "label": "blockNumberUpdated",
               "astId": 2932,
-              "type": "t_bytes32",
-              "src": "324:20:17"
+              "type": "t_uint256",
+              "src": "318:26:17"
             },
             {
               "label": "providers",
@@ -2024,11 +2024,11 @@
       "deployedBytecodeHash": "c4d6f75581cc06888961ee9ee52a8874591a5c02d22cf50ceed11478a34fa4db"
     },
     "DIDRegistryLibrary": {
-      "address": "0xAC524de75A66221f0F26fbE1e2B61EE031DFB975",
-      "constructorCode": "610390610026600b82828239805160001a60731461001957fe5b30600052607381538281f3fe",
-      "bodyBytecodeHash": "f2b3fc042ac36475216e37644ed57c06bbc25c442bac2df4228e774c3650dff3",
-      "localBytecodeHash": "85730a046cff59c4e43a11877395788b7642b926f254da18773c563d2c851a30",
-      "deployedBytecodeHash": "85730a046cff59c4e43a11877395788b7642b926f254da18773c563d2c851a30"
+      "address": "0x7E51692679F0d67723E82f69437B6F64C080B3A4",
+      "constructorCode": "610399610026600b82828239805160001a60731461001957fe5b30600052607381538281f3fe",
+      "bodyBytecodeHash": "ca5cf41ab19e64978f8e67c2a287231a19663416bcbabf989f5c6518d8435649",
+      "localBytecodeHash": "aa278684f08bba486ad99932628a2fdca826cd0532ed3709dfa2a179ae71dce1",
+      "deployedBytecodeHash": "aa278684f08bba486ad99932628a2fdca826cd0532ed3709dfa2a179ae71dce1"
     }
   },
   "proxies": {
@@ -2130,7 +2130,7 @@
     ]
   },
   "zosversion": "2.2",
-  "version": "v0.9.2",
+  "version": "v0.9.3",
   "proxyAdmin": {
     "address": "0x45Cf527ab6b5995Bb841158337E09C967C922E58"
   }
