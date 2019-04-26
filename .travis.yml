@@ -33,9 +33,9 @@ before_install:
           sudo apt-get -y install gnupg-agent python3-setuptools
           gpg-agent --daemon --no-grab --write-env-file $HOME/.gpg-agent-info
           pip3 install --upgrade --user twine six==1.10.0 wheel==0.31.0 setuptools
-          sudo add-apt-repository ppa:webupd8team/java
+          sudo add-apt-repository --yes ppa:webupd8team/java
           sudo apt update
-          sudo apt-get install oracle-java8-set-default maven
+          sudo apt-get install --yes oracle-java8-set-default maven
           java -version
           mvn -version
           export WEB3J_VERSION=4.1.1
