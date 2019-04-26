@@ -54,13 +54,13 @@ before_script:
     - ganache-cli > ganache-cli.log &
 
 script:
-    - npm run lint
-    - npm run test:cover
-    - npm run test:report-coverage
+    #- npm run lint
+    #- npm run test:cover
+    #- npm run test:report-coverage
     - npm run clean
     - npm run compile
-    - npm run test:upgrade
-    - npm run test:echidna
+    #- npm run test:upgrade
+    #- npm run test:echidna
     - npm run deploy:development -- --deeper-clean
     - git status
     - git add package-lock.json
