@@ -17,9 +17,9 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
 
     event AgreementCreated(
         bytes32 indexed _agreementId,
-        bytes32 indexed _did,
+        bytes32 _did,
         address indexed _accessConsumer,
-        address _accessProvider,
+        address indexed _accessProvider,
         uint[]  _timeLocks,
         uint[]  _timeOuts
     );
