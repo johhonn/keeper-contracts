@@ -1,4 +1,4 @@
-pragma solidity 0.5.3;
+pragma solidity 0.5.6;
 
 
 library ConditionStoreLibrary {
@@ -6,10 +6,10 @@ library ConditionStoreLibrary {
     enum ConditionState { Uninitialized, Unfulfilled, Fulfilled, Aborted }
 
     struct Condition {
-        address typeRef;
         ConditionState state;
-        address lastUpdatedBy;
         uint256 blockNumberUpdated;
+        address typeRef;
+        address lastUpdatedBy;
     }
 
     struct ConditionList {
@@ -31,10 +31,10 @@ library ConditionStoreLibrary {
         );
 
         _self.conditions[_id] = Condition({
-            typeRef: _typeRef,
             state: ConditionState.Unfulfilled,
-            lastUpdatedBy: msg.sender,
-            blockNumberUpdated: block.number
+            blockNumberUpdated: block.number,
+            typeRef: _typeRef,
+            lastUpdatedBy: msg.sender
         });
 
         _self.conditionIds.push(_id);

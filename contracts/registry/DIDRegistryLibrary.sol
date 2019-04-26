@@ -1,4 +1,4 @@
-pragma solidity 0.5.3;
+pragma solidity 0.5.6;
 
 /**
  * @title DID Registry Library
@@ -9,10 +9,10 @@ pragma solidity 0.5.3;
 library DIDRegistryLibrary {
 
     struct DIDRegister {
-        address owner;
-        bytes32 lastChecksum;
-        address lastUpdatedBy;
         uint256 blockNumberUpdated;
+        address owner;
+        address lastUpdatedBy;
+        bytes32 lastChecksum;
         address[] providers;
     }
 
@@ -44,10 +44,10 @@ library DIDRegistryLibrary {
         }
 
         _self.didRegisters[_did] = DIDRegister({
-            owner: didOwner,
-            lastChecksum: _checksum,
-            lastUpdatedBy: msg.sender,
             blockNumberUpdated: block.number,
+            owner: didOwner,
+            lastUpdatedBy: msg.sender,
+            lastChecksum: _checksum,
             providers: new address[](0)
         });
 
@@ -134,7 +134,7 @@ library DIDRegistryLibrary {
         view
         returns(int256 )
     {
-        for(uint256 i=0; i < _self.didRegisters[_did].providers.length; i++)
+        for(uint256 i = 0; i < _self.didRegisters[_did].providers.length; i++)
         {
             if(provider == _self.didRegisters[_did].providers[i])
             {

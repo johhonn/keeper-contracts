@@ -1,4 +1,4 @@
-pragma solidity 0.5.3;
+pragma solidity 0.5.6;
 
 import './DIDRegistryLibrary.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
@@ -136,8 +136,7 @@ contract DIDRegistry is Ownable {
         external
         onlyDIDOwner(_did)
     {
-        bool providerAdded =
-            didRegisterList.addProvider(_did, _provider);
+        bool providerAdded = didRegisterList.addProvider(_did, _provider);
 
         require(
             providerAdded,
@@ -198,8 +197,8 @@ contract DIDRegistry is Ownable {
         owner = didRegisterList.didRegisters[_did].owner;
         lastChecksum = didRegisterList.didRegisters[_did].lastChecksum;
         lastUpdatedBy = didRegisterList.didRegisters[_did].lastUpdatedBy;
-        blockNumberUpdated =
-        didRegisterList.didRegisters[_did].blockNumberUpdated;
+        blockNumberUpdated = didRegisterList.didRegisters[_did]
+            .blockNumberUpdated;
         providers = didRegisterList.didRegisters[_did].providers;
     }
 
