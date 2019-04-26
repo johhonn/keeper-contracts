@@ -80,7 +80,7 @@ deploy:
       on:
           tags: true
           all_branches: true
-          condition: $DEPLOY_PACKAGE = true
+          condition: $DEPLOY_PACKAGE = lalaltrue
 
     - provider: npm
       email: "devops@oceanprotocol.com"
