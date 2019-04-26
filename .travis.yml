@@ -33,6 +33,8 @@ before_install:
           sudo apt-get -y install gnupg-agent python3-setuptools
           gpg-agent --daemon --no-grab --write-env-file $HOME/.gpg-agent-info
           pip3 install --upgrade --user twine six==1.10.0 wheel==0.31.0 setuptools
+          sudo add-apt-repository ppa:webupd8team/java
+          sudo apt update
           sudo apt-get install oracle-java8-set-default maven
           java -version
           mvn -version
@@ -80,7 +82,7 @@ deploy:
       on:
           tags: true
           all_branches: true
-          condition: $DEPLOY_PACKAGE = lalaltrue
+          condition: $DEPLOY_PACKAGE = true
 
     - provider: npm
       email: "devops@oceanprotocol.com"
