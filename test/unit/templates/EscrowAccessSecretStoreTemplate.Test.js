@@ -204,6 +204,5 @@ contract('EscrowAccessSecretStoreTemplate', (accounts) => {
             const storedAgreementData = await escrowAccessSecretStoreTemplate.getAgreementData(agreementId)
             assert.strictEqual(storedAgreementData.accessProvider, accounts[2])
         })
-
     })
 })
