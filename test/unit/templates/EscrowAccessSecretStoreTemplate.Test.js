@@ -170,5 +170,39 @@ contract('EscrowAccessSecretStoreTemplate', (accounts) => {
             expect(storedAgreement.lastUpdatedBy)
                 .to.equal(templateId)
         })
+
+        it('create agreement should set asset provider as accessProvider instead of owner', async () => {
+            const {
+                didRegistry,
+                templateStoreManager,
+                escrowAccessSecretStoreTemplate,
+                owner
+            } = await setupTest()
+
+            const { agreementId, agreement } = await prepareAgreement()
+
+            // register DID
+            await didRegistry.registerAttribute(
+                agreement.did, constants.bytes32.one, [accounts[2]], constants.registry.url)
+
+            // propose and approve template
+            const templateId = escrowAccessSecretStoreTemplate.address
+            await templateStoreManager.proposeTemplate(templateId)
+            await templateStoreManager.approveTemplate(templateId, { from: owner })
+
+            const result = await escrowAccessSecretStoreTemplate
+                .createAgreement(agreementId, ...Object.values(agreement))
+
+            testUtils.assertEmitted(result, 1, 'AgreementCreated')
+
+            const eventArgs = testUtils.getEventArgsFromTx(result, 'AgreementCreated')
+            expect(eventArgs._agreementId).to.equal(agreementId)
+            expect(eventArgs._did).to.equal(constants.did[0])
+            expect(eventArgs._accessProvider).to.equal(accounts[2])
+            expect(eventArgs._accessConsumer).to.equal(agreement.accessConsumer)
+
+            const storedAgreementData = await escrowAccessSecretStoreTemplate.getAgreementData(agreementId)
+            assert.strictEqual(storedAgreementData.accessProvider, accounts[2])
+        })
     })
 })

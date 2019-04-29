@@ -33,7 +33,9 @@ before_install:
           sudo apt-get -y install gnupg-agent python3-setuptools
           gpg-agent --daemon --no-grab --write-env-file $HOME/.gpg-agent-info
           pip3 install --upgrade --user twine six==1.10.0 wheel==0.31.0 setuptools
-          sudo apt-get install oracle-java8-set-default maven
+          sudo apt install -y openjdk-8-jdk openjdk-8-jre maven
+          export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
+          export PATH=${JAVA_HOME}/bin:${PATH}
           java -version
           mvn -version
           export WEB3J_VERSION=4.1.1
@@ -74,17 +76,17 @@ notifications:
     email: false
 
 deploy:
-    - provider: npm
-      email: "devops@oceanprotocol.com"
-      api_key: ${NPM_TOKEN}
+    - provider: script
+      script: bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
       skip_cleanup: true
       on:
           tags: true
           all_branches: true
           condition: $DEPLOY_PACKAGE = true
 
-    - provider: script
-      script: bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
+    - provider: npm
+      email: "devops@oceanprotocol.com"
+      api_key: ${NPM_TOKEN}
       skip_cleanup: true
       on:
           tags: true
@@ -107,3 +109,4 @@ deploy:
           tags: true
           all_branches: true
           condition: $DEPLOY_PACKAGE = true
+
