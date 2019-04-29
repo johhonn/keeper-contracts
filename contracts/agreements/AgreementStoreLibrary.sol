@@ -4,11 +4,11 @@ pragma solidity 0.5.6;
 library AgreementStoreLibrary {
 
     struct Agreement {
-        uint256 blockNumberUpdated;
-        address templateId;
-        address lastUpdatedBy;
         bytes32 did;
+        address templateId;
         bytes32[] conditionIds;
+        address lastUpdatedBy;
+        uint256 blockNumberUpdated;
     }
 
     struct AgreementList {
@@ -34,11 +34,11 @@ library AgreementStoreLibrary {
         );
 
         _self.agreements[_id] = Agreement({
-            blockNumberUpdated: block.number,
-            templateId: _templateId,
-            lastUpdatedBy: msg.sender,
             did: _did,
-            conditionIds: _conditionIds
+            templateId: _templateId,
+            conditionIds: _conditionIds,
+            lastUpdatedBy: msg.sender,
+            blockNumberUpdated: block.number
         });
 
         _self.agreementIds.push(_id);
