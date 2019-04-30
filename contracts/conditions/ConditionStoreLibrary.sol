@@ -6,10 +6,10 @@ library ConditionStoreLibrary {
     enum ConditionState { Uninitialized, Unfulfilled, Fulfilled, Aborted }
 
     struct Condition {
-        ConditionState state;
-        uint256 blockNumberUpdated;
         address typeRef;
+        ConditionState state;
         address lastUpdatedBy;
+        uint256 blockNumberUpdated;
     }
 
     struct ConditionList {
@@ -31,10 +31,10 @@ library ConditionStoreLibrary {
         );
 
         _self.conditions[_id] = Condition({
-            state: ConditionState.Unfulfilled,
-            blockNumberUpdated: block.number,
             typeRef: _typeRef,
-            lastUpdatedBy: msg.sender
+            state: ConditionState.Unfulfilled,
+            lastUpdatedBy: msg.sender,
+            blockNumberUpdated: block.number
         });
 
         _self.conditionIds.push(_id);

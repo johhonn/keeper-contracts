@@ -26,6 +26,7 @@ target/
 # ZeppelinOS related
 zos.dev-*.json
 !zos.dev-8995.json
+!zos.dev-2199.json
 .zos.session
 .zos.lock
 zos.json

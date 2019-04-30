@@ -36,7 +36,7 @@ module.exports = {
             network_id: '*',
             gas: 6721975
         },
-        // local network for generate coverage
+        // local network for generating coverage
         coverage: {
             host: 'localhost',
             // has to be '*' because this is usually ganache
@@ -45,7 +45,7 @@ module.exports = {
             gas: 0xfffffffffff,
             gasPrice: 0x01
         },
-        // spree from docker
+        // spree network from docker
         spree: {
             provider: () => setupWallet(
                 url || `http://localhost:8545`
@@ -55,7 +55,17 @@ module.exports = {
             gasPrice: 10000,
             from: '0xe2DD09d719Da89e5a3D0F2549c7E24566e947260'
         },
-        // nile the ocean testnet
+        // duero the ocean testnet
+        duero: {
+            provider: () => setupWallet(
+                url || `https://duero.dev-ocean.com`
+            ),
+            network_id: 0x897, // 2199
+            gas: 6000000,
+            gasPrice: 10000,
+            from: '0x90eE7A30339D05E07d9c6e65747132933ff6e624'
+        },
+        // nile the ocean beta network
         nile: {
             provider: () => setupWallet(
                 url || `https://nile.dev-ocean.com`
@@ -65,15 +75,15 @@ module.exports = {
             gasPrice: 10000,
             from: '0x90eE7A30339D05E07d9c6e65747132933ff6e624'
         },
-        // kovan testnet
+        // kovan the ethereum testnet
         kovan: {
             provider: () => setupWallet(
-                url || `https://kovan.infura.io/v2/${process.env.INFURA_TOKEN}`
+                url || `https://kovan.infura.io/v3/${process.env.INFURA_TOKEN}`
             ),
             network_id: 0x2A, // 42
             from: '0x2c0D5F47374b130EE398F4C34DBE8168824A8616'
         },
-        // rinkeby testnet
+        // rinkeby the ethereum testnet
         rinkeby: {
             provider: () => setupWallet(
                 url || `https://rinkeby.infura.io/v2/${process.env.INFURA_TOKEN}`

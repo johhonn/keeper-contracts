@@ -6,9 +6,9 @@ library TemplateStoreLibrary {
 
     struct Template {
         TemplateState state;
-        uint256 blockNumberUpdated;
         address owner;
         address lastUpdatedBy;
+        uint256 blockNumberUpdated;
     }
 
     struct TemplateList {
@@ -29,9 +29,9 @@ library TemplateStoreLibrary {
         );
         _self.templates[_id] = Template({
             state: TemplateState.Proposed,
-            blockNumberUpdated: block.number,
             owner: msg.sender,
-            lastUpdatedBy: msg.sender
+            lastUpdatedBy: msg.sender,
+            blockNumberUpdated: block.number
         });
         _self.templateIds.push(_id);
         return _self.templateIds.length;
