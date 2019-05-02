@@ -1168,11 +1168,11 @@
       }
     },
     "EscrowAccessSecretStoreTemplate": {
-      "address": "0x3665A6c186377649aB85D5969B638204d54A7E12",
-      "constructorCode": "608060405234801561001057600080fd5b50610f47806100206000396000f3fe",
-      "bodyBytecodeHash": "a1388ecf7cdfcf74ae214b8f4d260c90a5705bb890f3a928bb9d2d237f993271",
-      "localBytecodeHash": "436ced2cbd1786cb24c16bac8e7d499b33d9a2f6296b20b36fc80e7e8c0213ec",
-      "deployedBytecodeHash": "436ced2cbd1786cb24c16bac8e7d499b33d9a2f6296b20b36fc80e7e8c0213ec",
+      "address": "0xf7b4f4EfefD84F41F5bE76d1e4A52e6587eb115B",
+      "constructorCode": "608060405234801561001057600080fd5b506110a5806100206000396000f3fe",
+      "bodyBytecodeHash": "2ab45256af8911bb09b298af741505fd379bc2aaef6eaf8998b04d543d33ce36",
+      "localBytecodeHash": "649a413318361e772c0f18e5e82e6e07a665eb257c8fe58b7d3e648d06f310e4",
+      "deployedBytecodeHash": "649a413318361e772c0f18e5e82e6e07a665eb257c8fe58b7d3e648d06f310e4",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -1203,13 +1203,13 @@
           "members": [
             {
               "label": "templates",
-              "astId": 3536,
+              "astId": 3571,
               "type": "t_mapping<t_struct<TemplateStoreLibrary.Template>>",
               "src": "309:38:20"
             },
             {
               "label": "templateIds",
-              "astId": 3539,
+              "astId": 3574,
               "type": "t_array:dyn<t_address>",
               "src": "357:21:20"
             }
@@ -1222,27 +1222,27 @@
           "members": [
             {
               "label": "state",
-              "astId": 3525,
+              "astId": 3560,
               "type": "t_enum<TemplateStoreLibrary.TemplateState>",
               "src": "157:19:20"
             },
             {
-              "label": "blockNumberUpdated",
-              "astId": 3527,
-              "type": "t_uint256",
-              "src": "186:26:20"
-            },
-            {
               "label": "owner",
-              "astId": 3529,
+              "astId": 3562,
               "type": "t_address",
-              "src": "222:13:20"
+              "src": "186:13:20"
             },
             {
               "label": "lastUpdatedBy",
-              "astId": 3531,
+              "astId": 3564,
               "type": "t_address",
-              "src": "245:21:20"
+              "src": "209:21:20"
+            },
+            {
+              "label": "blockNumberUpdated",
+              "astId": 3566,
+              "type": "t_uint256",
+              "src": "240:26:20"
             }
           ]
         },
@@ -1332,7 +1332,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initialized",
-          "astId": 5870,
+          "astId": 5905,
           "type": "t_bool",
           "src": "757:24:61"
         },
@@ -1340,7 +1340,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initializing",
-          "astId": 5872,
+          "astId": 5907,
           "type": "t_bool",
           "src": "876:25:61"
         },
@@ -1348,7 +1348,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "______gap",
-          "astId": 5921,
+          "astId": 5956,
           "type": "t_array:50<t_uint256>",
           "src": "1891:29:61"
         },
@@ -1356,7 +1356,7 @@
           "contract": "Ownable",
           "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
           "label": "_owner",
-          "astId": 5056,
+          "astId": 5091,
           "type": "t_address",
           "src": "302:22:55"
         },
@@ -1364,7 +1364,7 @@
           "contract": "Ownable",
           "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
           "label": "______gap",
-          "astId": 5167,
+          "astId": 5202,
           "type": "t_array:50<t_uint256>",
           "src": "2186:29:55"
         },
@@ -2130,7 +2130,7 @@
     ]
   },
   "zosversion": "2.2",
-  "version": "v0.9.3",
+  "version": "v0.9.7",
   "proxyAdmin": {
     "address": "0x45Cf527ab6b5995Bb841158337E09C967C922E58"
   }
