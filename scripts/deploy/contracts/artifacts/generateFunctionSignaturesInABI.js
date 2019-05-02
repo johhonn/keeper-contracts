@@ -1,4 +1,4 @@
-const web3 = require('web3')
+const createFunctionSignature = require('./createFunctionSignature')
 
 function generateFunctionSignaturesInABI(
     abi
@@ -7,10 +7,10 @@ function generateFunctionSignaturesInABI(
         .filter((abiEntry) => abiEntry.type === 'function')
         .forEach((abiEntry) => {
             const parameters = abiEntry.inputs.map((i) => i.type)
-            const signature = `${abiEntry.name}(${parameters.join(',')})`
-
-            const signatureHash = web3.utils.sha3(signature)
-            abiEntry.signature = signatureHash.substring(0, 10)
+            abiEntry.signature = createFunctionSignature({
+                functionName: abiEntry.name,
+                parameters
+            })
         })
 
     return abi
