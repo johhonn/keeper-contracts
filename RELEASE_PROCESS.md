@@ -161,3 +161,19 @@ It will deploy the following components:
 
 - update the new github release
   - Describe the main changes. (In the future, these will come from the changelog.)
+
+
+## Audit
+
+To check or document that all transactions have been approved in the multi sig wallet you can run `npm run audit:nile` to get a list of all the current transactions and their current status. 
+
+```text
+ Wallet: 0x24EB26D4042a2AB576E7E39b87c3f33f276AeF92
+
+ Transaction ID: 64 
+ Destination: 0xfA16d26e9F4fffC6e40963B281a0bB08C31ed40C 
+ Contract: EscrowAccessSecretStoreTemplate 
+ Data is `upgradeTo` call: true 
+ Confirmed from: 0x7A13E1aD23546c9b804aDFd13e9AcB184EfCAF58 
+ Executed: false
+```

@@ -9,6 +9,12 @@
   "main": "README.md",
   "scripts": {
     "compile": "truffle compile",
+    "audit": "npx truffle exec ./scripts/deploy/truffle-wrapper/auditWrapper.js",
+    "audit:development": "export NETWORK=development&&npm run audit -- --network development",
+    "audit:spree": "export NETWORK=spree&&npm run audit -- --network spree",
+    "audit:duero": "export NETWORK=duero&&npm run audit -- --network duero",
+    "audit:nile": "export NETWORK=nile&&npm run audit -- --network nile",
+    "audit:kovan": "export NETWORK=kovan&&npm run audit -- --network kovan",
     "deploy": "npx truffle exec ./scripts/deploy/truffle-wrapper/deployContractsWrapper.js",
     "deploy:development": "export NETWORK=development&&npm run deploy -- --network development --testnet true",
     "deploy:spree": "export NETWORK=spree&&npm run deploy -- --network spree --testnet true",

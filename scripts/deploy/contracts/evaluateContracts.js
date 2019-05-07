@@ -20,7 +20,7 @@ function evaluateContracts({
 
     if (verbose) {
         console.log(
-            `Deploying contracts: '${contracts.join(', ')}'`
+            `Contracts: '${contracts.join(', ')}'`
         )
     }
 
