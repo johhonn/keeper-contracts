@@ -1,13 +1,14 @@
 #!/bin/bash
-
-# for more info about the upgradeability checks using slither
+# THIS SCRIPT USES SLITHER TO VALIDATE THAT THE CURRENT KEEPER CONTRACTS ARE UPGRADEABLE
+# for more info about Slither contract upgradeability checks, check out the link below
 # https://github.com/crytic/slither/wiki/Upgradeability-Checks#proxy-contract
+# Setup zos lib
 git clone https://github.com/zeppelinos/zos
 cd zos/packages/lib
 npm install
 rm contracts/mocks/WithConstructorImplementation.sol
 cd ../../../
-
+# run slither-check-upgradeability
 files=$(pwd)/files
 for entry in contracts/*/*/*
 do
