@@ -12,7 +12,7 @@ cd ../../../
 files=$(pwd)/files
 for entry in contracts/*/*/*
 do
-    echo `basename "$entry"` | cut -f 1 -d "." >> files
+    echo $(basename "$entry") | cut -f 1 -d "." >> files
 done
 while IFS= read -r line
 do
