@@ -1,6 +1,7 @@
 # JetBrains tools
 .idea/
 zos/
+files
 # Symbolic Execution Results
 test/verification/manticore/results/*
 # Development
