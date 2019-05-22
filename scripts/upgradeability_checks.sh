@@ -16,8 +16,8 @@ for entry in contracts/*/*/*
 do
     echo $(basename "$entry") | cut -f 1 -d "." >> files
 done
-while IFS= read -r line
+while IFS= read -r contract
 do
-  slither-check-upgradeability zos/packages/lib/ UpgradeabilityProxy . "$line"
+  slither-check-upgradeability zos/packages/lib/ UpgradeabilityProxy . "$contract"
 done < "$files"
 rm "$files"
