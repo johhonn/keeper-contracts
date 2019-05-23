@@ -1,7 +1,7 @@
 {
   "name": "@oceanprotocol/keeper-contracts",
   "version": "0.9.7",
-  "description": "Integration of TCRs, CPM and Ocean Tokens in Solidity",
+  "description": "Integration of SEAs, DID and OceanToken in Solidity",
   "bugs": {
     "url": "https://github.com/oceanprotocol/keeper-contracts/issues"
   },
@@ -15,6 +15,7 @@
     "audit:duero": "export NETWORK=duero&&npm run audit -- --network duero",
     "audit:nile": "export NETWORK=nile&&npm run audit -- --network nile",
     "audit:kovan": "export NETWORK=kovan&&npm run audit -- --network kovan",
+    "audit:mainnet": "export NETWORK=mainnet&&npm run audit -- --network mainnet",
     "deploy": "npx truffle exec ./scripts/deploy/truffle-wrapper/deployContractsWrapper.js",
     "deploy:development": "export NETWORK=development&&npm run deploy -- --network development --testnet true",
     "deploy:spree": "export NETWORK=spree&&npm run deploy -- --network spree --testnet true",
