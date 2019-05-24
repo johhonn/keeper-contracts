@@ -10,6 +10,7 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         bytes32 agreementId;
         mapping(address => bool) permission;
     }
+
     mapping(bytes32 => DocumentPermission) private documentPermissions;
 
     AgreementStoreManager private agreementStoreManager;
@@ -30,9 +31,11 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         initializer()
     {
         Ownable.initialize(_owner);
+
         conditionStoreManager = ConditionStoreManager(
             _conditionStoreManagerAddress
         );
+
         agreementStoreManager = AgreementStoreManager(
             _agreementStoreManagerAddress
         );
@@ -62,6 +65,7 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
             agreementStoreManager.isAgreementDIDProvider(_agreementId, msg.sender),
             'Invalid UpdateRole'
         );
+
         documentPermissions[_documentId].permission[_grantee] = true;
         documentPermissions[_documentId].agreementId = _agreementId;
 
@@ -69,6 +73,7 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
             _agreementId,
             hashValues(_documentId, _grantee)
         );
+
         ConditionStoreLibrary.ConditionState state = super.fulfill(
             _id,
             ConditionStoreLibrary.ConditionState.Fulfilled
@@ -100,9 +105,11 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         bool isDIDProvider = agreementStoreManager.isAgreementDIDProvider(
                 documentPermissions[_documentId].agreementId,
                 _grantee
-            );
-        if(isDIDProvider)
+        );
+
+        if (isDIDProvider) {
             return true;
+        }
 
         return documentPermissions[_documentId].permission[_grantee];
     }

@@ -177,9 +177,11 @@ contract ConditionStoreManager is Ownable, Common {
         );
 
         ConditionStoreLibrary.ConditionState updateState = _newState;
+
         // auto abort after time out
-        if (isConditionTimedOut(_id))
+        if (isConditionTimedOut(_id)) {
             updateState = ConditionStoreLibrary.ConditionState.Aborted;
+        }
 
         ConditionStoreLibrary.ConditionState state = conditionList
             .updateState(_id, updateState);

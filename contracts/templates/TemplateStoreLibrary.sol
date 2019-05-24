@@ -2,7 +2,12 @@ pragma solidity 0.5.6;
 
 library TemplateStoreLibrary {
 
-    enum TemplateState { Uninitialized, Proposed, Approved, Revoked }
+    enum TemplateState {
+        Uninitialized,
+        Proposed,
+        Approved,
+        Revoked
+    }
 
     struct Template {
         TemplateState state;
@@ -27,13 +32,16 @@ library TemplateStoreLibrary {
             _self.templates[_id].state == TemplateState.Uninitialized,
             'Id already exists'
         );
+
         _self.templates[_id] = Template({
             state: TemplateState.Proposed,
             owner: msg.sender,
             lastUpdatedBy: msg.sender,
             blockNumberUpdated: block.number
         });
+
         _self.templateIds.push(_id);
+
         return _self.templateIds.length;
     }
 
@@ -47,6 +55,7 @@ library TemplateStoreLibrary {
             _self.templates[_id].state == TemplateState.Proposed,
             'Template not Proposed'
         );
+
         _self.templates[_id].state = TemplateState.Approved;
         _self.templates[_id].lastUpdatedBy = msg.sender;
         _self.templates[_id].blockNumberUpdated = block.number;
@@ -62,6 +71,7 @@ library TemplateStoreLibrary {
             _self.templates[_id].state == TemplateState.Approved,
             'Template not Approved'
         );
+
         _self.templates[_id].state = TemplateState.Revoked;
         _self.templates[_id].lastUpdatedBy = msg.sender;
         _self.templates[_id].blockNumberUpdated = block.number;
