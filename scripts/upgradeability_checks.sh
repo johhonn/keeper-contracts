@@ -11,13 +11,13 @@ rm contracts/mocks/WithConstructorImplementation.sol
 cd ../../../
 
 # run slither-check-upgradeability
-files=$(pwd)/files
+contracts=$(pwd)/contracts
 for entry in contracts/*/*/*
 do
-    echo $(basename "$entry") | cut -f 1 -d "." >> files
+    echo $(basename "$entry") | cut -f 1 -d "." >> contracts
 done
 while IFS= read -r contract
 do
   slither-check-upgradeability zos/packages/lib/ UpgradeabilityProxy . "$contract"
-done < "$files"
-rm "$files"
+done < "$contracts"
+rm "$contracts"
