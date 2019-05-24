@@ -165,8 +165,7 @@ contract DIDRegistry is Ownable {
         );
     }
 
-    function isDIDProvider
-    (
+    function isDIDProvider(
         bytes32 _did,
         address _provider
     )

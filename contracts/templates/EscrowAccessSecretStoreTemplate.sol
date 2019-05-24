@@ -54,20 +54,25 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
             _escrowRewardAddress != address(0),
             'Invalid address'
         );
+
         Ownable.initialize(_owner);
 
         agreementStoreManager = AgreementStoreManager(
             _agreementStoreManagerAddress
         );
+
         didRegistry = DIDRegistry(
             _didRegistryAddress
         );
+
         accessSecretStoreCondition = AccessSecretStoreCondition(
             _accessSecretStoreConditionAddress
         );
+
         lockRewardCondition = LockRewardCondition(
             _lockRewardConditionAddress
         );
+
         escrowReward = EscrowReward(
             _escrowRewardAddress
         );
@@ -99,19 +104,19 @@ contract EscrowAccessSecretStoreTemplate is AgreementTemplate {
         address owner = address(0);
         address[] memory providers;
         (owner, , , , providers) = didRegistry.getDIDRegister(_did);
+
         // storing some additional information for the template
         agreementData.agreementDataItems[_id]
             .accessConsumer = _accessConsumer;
 
-        if (providers.length > 0)
-        {
+        if (providers.length > 0) {
             agreementData.agreementDataItems[_id]
                 .accessProvider = providers[0];
-
         } else {
             agreementData.agreementDataItems[_id]
                 .accessProvider = owner;
         }
+
         agreementData.agreementIds.push(_id);
 
         emit AgreementCreated(
