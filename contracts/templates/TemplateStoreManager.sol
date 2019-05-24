@@ -28,6 +28,7 @@ contract TemplateStoreManager is Ownable {
             _owner != address(0),
             'Invalid address'
         );
+
         Ownable.initialize(_owner);
     }
 

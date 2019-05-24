@@ -46,6 +46,7 @@ contract Condition is Ownable {
             conditionStoreManager.isConditionTimedOut(_id),
             'Condition needs to be timed out'
         );
+
         return conditionStoreManager.updateConditionState(
             _id,
             ConditionStoreLibrary.ConditionState.Aborted
