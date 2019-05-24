@@ -28,7 +28,7 @@ library DIDRegistryLibrary {
     * @param _did refers to decentralized identifier (a byte32 length ID)
     * @param _checksum includes a one-way HASH calculated using the DDO content
     */
-    function update (
+    function update(
         DIDRegisterList storage _self,
         bytes32 _did,
         bytes32 _checksum
@@ -37,8 +37,8 @@ library DIDRegistryLibrary {
         returns (uint size)
     {
         address didOwner = _self.didRegisters[_did].owner;
-        if (didOwner == address(0))
-        {
+
+        if (didOwner == address(0)) {
             didOwner = msg.sender;
             _self.didRegisterIds.push(_did);
         }
@@ -54,8 +54,7 @@ library DIDRegistryLibrary {
         return _self.didRegisterIds.length;
     }
 
-    function addProvider
-    (
+    function addProvider(
         DIDRegisterList storage _self,
         bytes32 _did,
         address provider
@@ -73,15 +72,14 @@ library DIDRegistryLibrary {
             'DID provider should not be this contract address'
         );
 
-        if(!isProvider(_self, _did, provider)) {
+        if (!isProvider(_self, _did, provider)) {
             _self.didRegisters[_did].providers.push(provider);
         }
 
         return true;
     }
 
-    function removeProvider
-    (
+    function removeProvider(
         DIDRegisterList storage _self,
         bytes32 _did,
         address _provider
@@ -96,7 +94,7 @@ library DIDRegistryLibrary {
 
         int256 i = getProviderIndex(_self, _did, _provider);
 
-        if(i == -1) {
+        if (i == -1) {
             return false;
         }
 
@@ -105,8 +103,7 @@ library DIDRegistryLibrary {
         return true;
     }
 
-    function isProvider
-    (
+    function isProvider(
         DIDRegisterList storage _self,
         bytes32 _did,
         address _provider
@@ -117,15 +114,14 @@ library DIDRegistryLibrary {
     {
         int256 i = getProviderIndex(_self, _did, _provider);
 
-        if(i == -1) {
+        if (i == -1) {
             return false;
         }
 
         return true;
     }
 
-    function getProviderIndex
-    (
+    function getProviderIndex(
         DIDRegisterList storage _self,
         bytes32 _did,
         address provider
@@ -134,13 +130,13 @@ library DIDRegistryLibrary {
         view
         returns(int256 )
     {
-        for(uint256 i = 0; i < _self.didRegisters[_did].providers.length; i++)
-        {
-            if(provider == _self.didRegisters[_did].providers[i])
-            {
+        for (uint256 i = 0;
+            i < _self.didRegisters[_did].providers.length; i++) {
+            if (provider == _self.didRegisters[_did].providers[i]) {
                 return int(i);
             }
         }
-        return -1;
+
+        return - 1;
     }
 }
