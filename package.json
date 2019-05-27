@@ -71,7 +71,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@oceanprotocol/multisigwallet": "git+https://github.com/oceanprotocol/MultiSigWalletContracts.git#v2.0.2",
-    "bignumber.js": "^8.1.1",
+    "bignumber.js": "^9.0.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "eslint": "^5.16.0",
