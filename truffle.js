@@ -90,6 +90,14 @@ module.exports = {
             ),
             network_id: 0x4, // 4
             from: '0x2C63bf697f74C72CFB727Fb5eB8e6266cE341e13'
+        },
+        // rinkeby the ethereum testnet
+        mainnet: {
+            provider: () => setupWallet(
+                url || `https://mainnet.infura.io/v3/${process.env.INFURA_TOKEN}`
+            ),
+            network_id: 0x1, // 1
+            from: 'tbd'
         }
     },
     compilers: {
