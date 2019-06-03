@@ -3,8 +3,13 @@
 # for more info about Slither contract upgradeability check, check out the link below
 # https://github.com/crytic/slither/wiki/Upgradeability-Checks#proxy-contract
 
-# Setup zos lib
-git clone https://github.com/zeppelinos/zos
+zos_version=$(npm info zos version)
+
+# download the same zos version
+wget https://github.com/zeppelinos/zos/archive/v"$zos_version".tar.gz
+tar xfvz v"$zos_version".tar.gz
+mv zos-"$zos_version" zos
+rm v"$zos_version".tar.gz
 cd zos/packages/lib
 npm install
 rm contracts/mocks/WithConstructorImplementation.sol
