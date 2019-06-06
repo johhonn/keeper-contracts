@@ -97,17 +97,6 @@ async function initializeContracts(
                 verbose
             )
         }
-
-        if (contracts.indexOf('WhitelistingCondition') > -1) {
-            addressBook['WhitelistingCondition'] = zosCreate(
-                'WhitelistingCondition',
-                [
-                    roles.ownerWallet,
-                    getAddress('ConditionStoreManager')
-                ],
-                verbose
-            )
-        }
     }
 
     if (getAddress('ConditionStoreManager') &&
@@ -159,18 +148,6 @@ async function initializeContracts(
         if (contracts.indexOf('AccessSecretStoreCondition') > -1) {
             addressBook['AccessSecretStoreCondition'] = zosCreate(
                 'AccessSecretStoreCondition',
-                [
-                    roles.ownerWallet,
-                    getAddress('ConditionStoreManager'),
-                    getAddress('AgreementStoreManager')
-                ],
-                verbose
-            )
-        }
-
-        if (contracts.indexOf('EthereumAddressWhitelistingCondition') > -1) {
-            addressBook['EthereumAddressWhitelistingCondition'] = zosCreate(
-                'EthereumAddressWhitelistingCondition',
                 [
                     roles.ownerWallet,
                     getAddress('ConditionStoreManager'),
