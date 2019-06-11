@@ -7,7 +7,8 @@ const whitelist = [
     0x897, // duero
     0x2323, // nile
     0x2A, // kovan
-    0x4 // rinkeby
+    0x4, // rinkeby
+    0x1 // mainnet
 ]
 
 async function cleanup(

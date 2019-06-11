@@ -1,5 +1,6 @@
 const HDWalletProvider = require('truffle-hdwallet-provider')
 const NonceTrackerSubprovider = require('web3-provider-engine/subproviders/nonce-tracker')
+const utils = require('web3-utils')
 
 const rpcHost = process.env.KEEPER_RPC_HOST
 const rpcPort = process.env.KEEPER_RPC_PORT
@@ -95,9 +96,12 @@ module.exports = {
         mainnet: {
             provider: () => setupWallet(
                 url || `https://mainnet.infura.io/v3/${process.env.INFURA_TOKEN}`
+                // url || `http://localhost:8545`
             ),
             network_id: 0x1, // 1
-            from: 'tbd'
+            from: '0x3f3c526f3A8623b11aAD5c30d6De88E45e385FaD',
+            gas: 7 * 1000000,
+            gasPrice: utils.toWei('8', 'gwei')
         }
     },
     compilers: {
