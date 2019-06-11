@@ -111,7 +111,7 @@ module.exports = {
             network_id: 0xCEA11, // 846353
             from: '0xba3e0ec852dc24ca7f454ea545d40b1462501711',
             gas: 6 * 1000000,
-            gasPrice: utils.toWei('10', 'mwei'),
+            gasPrice: utils.toWei('10', 'mwei')
         }
     },
     compilers: {
