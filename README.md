@@ -174,7 +174,7 @@ The contract addresses deployed on Kovan testnet:
 
 ### Ethereum Mainnet
 
-The contract addresses deployed on Ethereum Mainnet testnet:
+The contract addresses deployed on Ethereum Mainnet:
 
 | Contract                          | Version | Address                                      |
 |-----------------------------------|---------|----------------------------------------------|
@@ -190,6 +190,26 @@ The contract addresses deployed on Ethereum Mainnet testnet:
 | LockRewardCondition               | v0.10.0 | `0xD41161D8f2CE5Ec95465F4b2fBD00Cfea186204C` |
 | SignCondition                     | v0.10.0 | `0xEE33DCDBE6aF6197dD01907cfc4296BFC0448B16` |
 | TemplateStoreManager              | v0.10.0 | `0x04DD5364b12131ae870Ec54bd539b5Cb94B9DC36` |
+
+### Pacific Mainnet
+
+The contract addresses deployed on Pacific Mainnet:
+
+| Contract                          | Version | Address                                      |
+|-----------------------------------|---------|----------------------------------------------|
+| AccessSecretStoreCondition        | v0.10.0 | `0xD57d35f3cc369187F78838eb4e4Ee37095B405a4` |
+| AgreementStoreManager             | v0.10.0 | `0x79465ff79db0CAFaF77ee428207320FBB9aeF315` |
+| ConditionStoreManager             | v0.10.0 | `0xeA27E2b134c6745624e67bF7AC0A056fE58c8481` |
+| DIDRegistry                       | v0.10.0 | `0x7A95F2C739b187C96C52ADb8fFB7f086A968238b` |
+| DIDRegistryLibrary                | v0.10.0 | `0x11F913eC180f2eA78f15e92CB9071627d33FdFdb` |
+| EpochLibrary                      | v0.10.0 | `0x3f51432C504E8612d7625034b93c180dA15bC9be` |
+| EscrowAccessSecretStoreTemplate   | v0.10.0 | `0x573428b11305b5d047752B7e1cD509EcfA43E1dd` |
+| EscrowReward                      | v0.10.0 | `0xeF74A52DEf3A3b5730d34DA78A972073f1bA995D` |
+| HashLockCondition                 | v0.10.0 | `0x664Dd1930782b5c5aE5a0b41FB15e002686bC196` |
+| LockRewardCondition               | v0.10.0 | `0xBA7131370Fe7D2f83b15f1Cfb72a4722E96c593b` |
+| OceanToken                        | v0.10.0 | `0x403f0eFfEE94A488871510ad8284298b9801C001` |
+| SignCondition                     | v0.10.0 | `0x7Da9C8ea6EDa8F2d6D06E6122AeAE95300b2f802` |
+| TemplateStoreManager              | v0.10.0 | `0x748D2ba7449677eBb8758baB65242bFb5eD30a0e` |
 
 ## Packages
 
