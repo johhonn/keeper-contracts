@@ -1,6 +1,6 @@
 {
   "name": "@oceanprotocol/keeper-contracts",
-  "version": "0.9.7",
+  "version": "0.10.2",
   "description": "Integration of SEAs, DID and OceanToken in Solidity",
   "bugs": {
     "url": "https://github.com/oceanprotocol/keeper-contracts/issues"
@@ -16,6 +16,7 @@
     "audit:nile": "export NETWORK=nile&&npm run audit -- --network nile",
     "audit:kovan": "export NETWORK=kovan&&npm run audit -- --network kovan",
     "audit:mainnet": "export NETWORK=mainnet&&npm run audit -- --network mainnet",
+    "audit:pacific": "export NETWORK=pacific&&npm run audit -- --network pacific",
     "deploy": "npx truffle exec ./scripts/deploy/truffle-wrapper/deployContractsWrapper.js",
     "deploy:development": "export NETWORK=development&&npm run deploy -- --network development --testnet true",
     "deploy:spree": "export NETWORK=spree&&npm run deploy -- --network spree --testnet true",
@@ -24,6 +25,7 @@
     "deploy:kovan": "export NETWORK=kovan&&npm run deploy -- --network kovan --testnet true",
     "deploy:rinkeby": "export NETWORK=rinkeby&&npm run deploy -- --network rinkeby --testnet true",
     "deploy:mainnet": "export NETWORK=mainnet&&npm run deploy -- --network mainnet",
+    "deploy:pacific": "export NETWORK=pacific&&npm run deploy -- --network pacific",
     "upgrade": "npx truffle exec ./scripts/deploy/truffle-wrapper/upgradeContractsWrapper.js",
     "upgrade:development": "export NETWORK=development&&npm run upgrade -- --network development --testnet true",
     "upgrade:spree": "export NETWORK=spree&&npm run upgrade -- --network spree --testnet true",
@@ -32,6 +34,7 @@
     "upgrade:kovan": "export NETWORK=kovan&&npm run upgrade -- --network kovan --testnet true",
     "upgrade:rinkeby": "export NETWORK=rinkeby&&npm run upgrade -- --network rinkeby --testnet true",
     "upgrade:mainnet": "export NETWORK=mainnet&&npm run upgrade -- --network mainnet",
+    "upgrade:pacific": "export NETWORK=pacific&&npm run upgrade -- --network pacific",
     "test": "truffle test",
     "test:unit": "truffle test $(find ./test/unit/ -name '*.js')",
     "test:integration": "truffle test $(find ./test/int/ -name '*.js')",

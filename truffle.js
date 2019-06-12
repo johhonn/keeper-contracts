@@ -1,5 +1,6 @@
 const HDWalletProvider = require('truffle-hdwallet-provider')
 const NonceTrackerSubprovider = require('web3-provider-engine/subproviders/nonce-tracker')
+const utils = require('web3-utils')
 
 const rpcHost = process.env.KEEPER_RPC_HOST
 const rpcPort = process.env.KEEPER_RPC_PORT
@@ -91,13 +92,26 @@ module.exports = {
             network_id: 0x4, // 4
             from: '0x2C63bf697f74C72CFB727Fb5eB8e6266cE341e13'
         },
-        // rinkeby the ethereum testnet
+        // mainnet the ethereum mainnet
         mainnet: {
             provider: () => setupWallet(
                 url || `https://mainnet.infura.io/v3/${process.env.INFURA_TOKEN}`
+                // url || `http://localhost:8545`
             ),
             network_id: 0x1, // 1
-            from: 'tbd'
+            from: '0x3f3c526f3A8623b11aAD5c30d6De88E45e385FaD',
+            gas: 7 * 1000000,
+            gasPrice: utils.toWei('8', 'gwei')
+        },
+        // pacific the ethereum mainnet
+        pacific: {
+            provider: () => setupWallet(
+                url || `https://pacific.oceanprotocol.com`
+            ),
+            network_id: 0xCEA11, // 846353
+            from: '0xba3e0ec852dc24ca7f454ea545d40b1462501711',
+            gas: 6 * 1000000,
+            gasPrice: utils.toWei('10', 'mwei')
         }
     },
     compilers: {

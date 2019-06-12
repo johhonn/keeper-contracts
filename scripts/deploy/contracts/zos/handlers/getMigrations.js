@@ -5,7 +5,14 @@ const glob = require('glob')
 function translateNetworkId(
     networkId
 ) {
-    return networkId === 42 ? 'kovan' : networkId
+    switch (networkId) {
+        case 42:
+            return 'kovan'
+        case 1:
+            return 'mainnet'
+    }
+
+    return networkId
 }
 
 function getMigrations(
