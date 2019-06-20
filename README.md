@@ -178,18 +178,18 @@ The contract addresses deployed on Ethereum Mainnet:
 
 | Contract                          | Version | Address                                      |
 |-----------------------------------|---------|----------------------------------------------|
-| AccessSecretStoreCondition        | v0.10.0 | `0x57e299517B6E5637cE9da15E4372f42a63c7e099` |
-| AgreementStoreManager             | v0.10.0 | `0x5E98B9EfABe192aB02a9B39D9B44A22C88A625BD` |
-| ConditionStoreManager             | v0.10.0 | `0x031A0B2FE74086e5963CD5Ac27Bd1451A40Fe593` |
-| DIDRegistry                       | v0.10.0 | `0xC4A1D6d4778C9A17D5e37797dA2FaB48FA9d01f6` |
-| DIDRegistryLibrary                | v0.10.0 | `0xFb4231AF132A8E160292022eBd8ea4292104B1Da` |
-| EpochLibrary                      | v0.10.0 | `0xb5096b69638689eE2dC7CA56Babaf7d8521a7Abb` |
-| EscrowAccessSecretStoreTemplate   | v0.10.0 | `0xa713D8F4791512a599A98f5DcaCC6401D6c76e5f` |
-| EscrowReward                      | v0.10.0 | `0xB950FE753871dc8b79284d76EA4A213db4697578` |
-| HashLockCondition                 | v0.10.0 | `0x860761Dbbe9b8377A2933a1093B39167B907befF` |
-| LockRewardCondition               | v0.10.0 | `0xD41161D8f2CE5Ec95465F4b2fBD00Cfea186204C` |
-| SignCondition                     | v0.10.0 | `0xEE33DCDBE6aF6197dD01907cfc4296BFC0448B16` |
-| TemplateStoreManager              | v0.10.0 | `0x04DD5364b12131ae870Ec54bd539b5Cb94B9DC36` |
+| AccessSecretStoreCondition        | v0.10.3 | `0x57e299517B6E5637cE9da15E4372f42a63c7e099` |
+| AgreementStoreManager             | v0.10.3 | `0x5E98B9EfABe192aB02a9B39D9B44A22C88A625BD` |
+| ConditionStoreManager             | v0.10.3 | `0x031A0B2FE74086e5963CD5Ac27Bd1451A40Fe593` |
+| DIDRegistry                       | v0.10.3 | `0xC4A1D6d4778C9A17D5e37797dA2FaB48FA9d01f6` |
+| DIDRegistryLibrary                | v0.10.3 | `0xFb4231AF132A8E160292022eBd8ea4292104B1Da` |
+| EpochLibrary                      | v0.10.3 | `0xb5096b69638689eE2dC7CA56Babaf7d8521a7Abb` |
+| EscrowAccessSecretStoreTemplate   | v0.10.3 | `0xa713D8F4791512a599A98f5DcaCC6401D6c76e5f` |
+| EscrowReward                      | v0.10.3 | `0xB950FE753871dc8b79284d76EA4A213db4697578` |
+| HashLockCondition                 | v0.10.3 | `0x860761Dbbe9b8377A2933a1093B39167B907befF` |
+| LockRewardCondition               | v0.10.3 | `0xD41161D8f2CE5Ec95465F4b2fBD00Cfea186204C` |
+| SignCondition                     | v0.10.3 | `0xEE33DCDBE6aF6197dD01907cfc4296BFC0448B16` |
+| TemplateStoreManager              | v0.10.3 | `0x04DD5364b12131ae870Ec54bd539b5Cb94B9DC36` |
 
 ### Pacific Mainnet
 
