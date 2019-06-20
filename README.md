@@ -113,20 +113,20 @@ The contract addresses deployed on Ocean's Duero Test Network:
 
 | Contract                          | Version | Address                                      |
 |-----------------------------------|---------|----------------------------------------------|
-| AccessSecretStoreCondition        | v0.10.0 | `0x99FFC24B6749512F6DE6D24c5dBCC390359af4E3` |
-| AgreementStoreManager             | v0.10.0 | `0xfC6DB8141144831a8B7d858f356D0d1148d8F11d` |
-| ConditionStoreManager             | v0.10.0 | `0xe6CeA58707df303b6d9D1DF5BA8Bf88fF4A5920D` |
-| DIDRegistry                       | v0.10.0 | `0x4878e1dfd4105b8FF3A879C5896495d5DE3274B5` |
-| DIDRegistryLibrary                | v0.10.0 | `0x663C7CF54a15fb23aF1dCab15bfa968B8be5903D` |
-| Dispenser                         | v0.10.0 | `0xF7B1be190A13bDD9157d9493dF9F4BFD0c8a097F` |
-| EpochLibrary                      | v0.10.0 | `0xBDFeAc66c022165Bdb320264398977bf8A54e3C0` |
-| EscrowAccessSecretStoreTemplate   | v0.10.0 | `0xdAAb92eABB4F2D7fC51948E44A88aa4fd986EDa9` |
-| EscrowReward                      | v0.10.0 | `0xb8D436b29CBF1ef690DD3b0972Cce2090ECb09bc` |
-| HashLockCondition                 | v0.10.0 | `0xA2Ab4153F9df4Cccb859d54Aea7A47298Bc83DF6` |
-| LockRewardCondition               | v0.10.0 | `0x518cf43258Ece569D5Cd19e6C0Cee41156FB6aED` |
-| OceanToken                        | v0.10.0 | `0x5e29AcdE5285E24eb7A211d9F4313E5a9Ed07F36` |
-| SignCondition                     | v0.10.0 | `0x8c4a2cC4572B6CD68c58BFc220f04CD1143230a0` |
-| TemplateStoreManager              | v0.10.0 | `0xF454Ec72eCed751ffAD94B11ae7c0323670dd976` |
+| AccessSecretStoreCondition        | v0.10.3 | `0x99FFC24B6749512F6DE6D24c5dBCC390359af4E3` |
+| AgreementStoreManager             | v0.10.3 | `0xfC6DB8141144831a8B7d858f356D0d1148d8F11d` |
+| ConditionStoreManager             | v0.10.3 | `0xe6CeA58707df303b6d9D1DF5BA8Bf88fF4A5920D` |
+| DIDRegistry                       | v0.10.3 | `0x4878e1dfd4105b8FF3A879C5896495d5DE3274B5` |
+| DIDRegistryLibrary                | v0.10.3 | `0x663C7CF54a15fb23aF1dCab15bfa968B8be5903D` |
+| Dispenser                         | v0.10.3 | `0xF7B1be190A13bDD9157d9493dF9F4BFD0c8a097F` |
+| EpochLibrary                      | v0.10.3 | `0xBDFeAc66c022165Bdb320264398977bf8A54e3C0` |
+| EscrowAccessSecretStoreTemplate   | v0.10.3 | `0xdAAb92eABB4F2D7fC51948E44A88aa4fd986EDa9` |
+| EscrowReward                      | v0.10.3 | `0xb8D436b29CBF1ef690DD3b0972Cce2090ECb09bc` |
+| HashLockCondition                 | v0.10.3 | `0xA2Ab4153F9df4Cccb859d54Aea7A47298Bc83DF6` |
+| LockRewardCondition               | v0.10.3 | `0x518cf43258Ece569D5Cd19e6C0Cee41156FB6aED` |
+| OceanToken                        | v0.10.3 | `0x5e29AcdE5285E24eb7A211d9F4313E5a9Ed07F36` |
+| SignCondition                     | v0.10.3 | `0x8c4a2cC4572B6CD68c58BFc220f04CD1143230a0` |
+| TemplateStoreManager              | v0.10.3 | `0xF454Ec72eCed751ffAD94B11ae7c0323670dd976` |
 
 #### Nile Beta Network
 
