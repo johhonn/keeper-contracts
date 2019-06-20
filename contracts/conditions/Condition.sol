@@ -2,7 +2,16 @@ pragma solidity 0.5.6;
 
 import './ConditionStoreManager.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
-
+/**
+ * @title Condition
+ * @author Ocean Protocol Team
+ *
+ * @dev Implementation of the Condition
+ *
+ *      
+ *      For more information: https://github.com/oceanprotocol/OEPs/issues/133
+ *      TODO: update the OEP link 
+ */
 contract Condition is Ownable {
 
     ConditionStoreManager internal conditionStoreManager;

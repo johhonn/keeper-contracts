@@ -84,7 +84,7 @@ library TemplateStoreLibrary {
         _self.templates[_id].blockNumberUpdated = block.number;
     }
 
-    /**
+   /**
     * @notice revoke new template
     * @param _self is the TemplateList storage pointer
     * @param _id approved template contract address
