@@ -207,7 +207,7 @@ The contract addresses deployed on Pacific Mainnet:
 | EscrowReward                      | v0.10.3 | `0x656Aa3D9b37A6eA770701ae2c612f760d9254A66` |
 | HashLockCondition                 | v0.10.3 | `0x5Eef92d570996ED20Cb60fE41475f594299Ec21C` |
 | LockRewardCondition               | v0.10.3 | `0x7bf64DaCc7929A1e5466f7d9E575128abf1875f8` |
-| OceanToken                        | v0.10.3 | `0x403f0eFfEE94A488871510ad8284298b9801C001` |
+| OceanToken                        | v0.10.3 | `0x012578f9381e876A9E2a9111Dfd436FF91A451ae` |
 | SignCondition                     | v0.10.3 | `0xB74172078ABb029FaD809335d82241371b998708` |
 | TemplateStoreManager              | v0.10.3 | `0xF2Cf3761c166c6D85d07299427821D18A4329cd1` |
 
