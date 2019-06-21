@@ -54,6 +54,13 @@ library DIDRegistryLibrary {
         return _self.didRegisterIds.length;
     }
 
+   /**
+    * @notice addProvider add provider to DID registry
+    * @dev update the DID registry providers list by adding a new provider
+    * @param _self refers to storage pointer
+    * @param _did refers to decentralized identifier (a byte32 length ID)
+    * @param provider the provider's address 
+    */
     function addProvider(
         DIDRegisterList storage _self,
         bytes32 _did,
@@ -79,6 +86,13 @@ library DIDRegistryLibrary {
         return true;
     }
 
+   /**
+    * @notice removeProvider remove provider from DID registry
+    * @dev update the DID registry providers list by removing an existing provider
+    * @param _self refers to storage pointer
+    * @param _did refers to decentralized identifier (a byte32 length ID)
+    * @param _provider the provider's address 
+    */
     function removeProvider(
         DIDRegisterList storage _self,
         bytes32 _did,
@@ -103,6 +117,13 @@ library DIDRegistryLibrary {
         return true;
     }
 
+   /**
+    * @notice isProvider check whether DID provider exists
+    * @param _self refers to storage pointer
+    * @param _did refers to decentralized identifier (a byte32 length ID)
+    * @param _provider the provider's address 
+    * @return true if the provider already exists
+    */
     function isProvider(
         DIDRegisterList storage _self,
         bytes32 _did,
@@ -121,6 +142,13 @@ library DIDRegistryLibrary {
         return true;
     }
 
+   /**
+    * @notice getProviderIndex get the index of a provider
+    * @param _self refers to storage pointer
+    * @param _did refers to decentralized identifier (a byte32 length ID)
+    * @param provider the provider's address 
+    * @return the index if the provider exists otherwise return -1
+    */
     function getProviderIndex(
         DIDRegisterList storage _self,
         bytes32 _did,

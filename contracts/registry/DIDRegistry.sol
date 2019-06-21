@@ -129,6 +129,14 @@ contract DIDRegistry is Ownable {
         return updatedSize;
     }
 
+    /**
+     * @notice addDIDProvider add new DID provider.
+     *
+     * @dev it adds new DID provider to the providers list. A provider
+     *      is any entity that can serve the registered asset
+     * @param _did refers to decentralized identifier (a bytes32 length ID).
+     * @param _provider provider's address.
+     */
     function addDIDProvider(
         bytes32 _did,
         address _provider
@@ -149,6 +157,11 @@ contract DIDRegistry is Ownable {
         );
     }
 
+    /**
+     * @notice removeDIDProvider delete an existing DID provider.
+     * @param _did refers to decentralized identifier (a bytes32 length ID).
+     * @param _provider provider's address.
+     */
     function removeDIDProvider(
         bytes32 _did,
         address _provider
@@ -165,6 +178,11 @@ contract DIDRegistry is Ownable {
         );
     }
 
+    /**
+     * @notice isDIDProvider check whether a given DID provider exists
+     * @param _did refers to decentralized identifier (a bytes32 length ID).
+     * @param _provider provider's address.
+     */
     function isDIDProvider(
         bytes32 _did,
         address _provider
