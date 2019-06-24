@@ -1085,7 +1085,7 @@ contract('ConditionStoreManager', (accounts) => {
                 constants.condition.state.aborted)
         })
 
-it('timed out condition should abort and emit corresponding ConditionUpdated event', async () => {
+        it('timed out condition should abort and emit corresponding ConditionUpdated event', async () => {
             const {
                 conditionStoreManager,
                 conditionId,
@@ -1096,13 +1096,13 @@ it('timed out condition should abort and emit corresponding ConditionUpdated eve
 
             const conditionTimeLock = 0
             const conditionTimeOut = 1
-    
+
             await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
                 conditionId,
                 hashLockCondition.address,
-		conditionTimeLock,
-		conditionTimeOut,
-		{ from: createRole}
+                conditionTimeLock,
+                conditionTimeOut,
+                { from: createRole }
             )
 
             const newState = constants.condition.state.fulfilled
@@ -1114,7 +1114,7 @@ it('timed out condition should abort and emit corresponding ConditionUpdated eve
             )
 
             await increaseTime(1)
-    
+
             const result = await conditionStoreManager.updateConditionState(conditionId, newState)
 
             assert.strictEqual(
@@ -1127,8 +1127,7 @@ it('timed out condition should abort and emit corresponding ConditionUpdated eve
             expect(eventArgs._typeRef).to.equal(createRole)
             expect(eventArgs._state.toNumber()).to.equal(constants.condition.state.aborted)
         })
-	
-	
+
         it('timed out condition should not abort before timeout', async () => {
             const {
                 conditionStoreManager,
