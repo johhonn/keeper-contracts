@@ -1,0 +1,36 @@
+{
+  "name": "zos-docs",
+  "version": "2.3.1",
+  "description": "Documentation for the ZeppelinOS smart contract platform",
+  "main": "index.js",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "gen-docs": "node scripts/gen-docs.js",
+    "bump-docs": "babel-node scripts/bump-docs.js",
+    "rebuild-docs": "cd docs/website && npm run build",
+    "start": "cd docs/website && npm start"
+  },
+  "files": [],
+  "keywords": [
+    "zeppelinos",
+    "zeppelin",
+    "solidity",
+    "documentation",
+    "generation",
+    "soldoc"
+  ],
+  "dependencies": {
+    "semver": "^5.6.0",
+    "shelljs": "^0.8.2",
+    "solidity-docgen": "^0.1.1",
+    "tmp": "0.0.33"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-export-extensions": "^6.22.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0"
+  }
+}

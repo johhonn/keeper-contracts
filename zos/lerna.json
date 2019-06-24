@@ -1,0 +1,16 @@
+{
+  "packages": [
+    "examples/*",
+    "packages/*",
+    "tests/cli/test",
+    "tests/cli/workdir"
+  ],
+  "version": "2.3.1",
+  "command": {
+    "publish": {
+      "ignoreChanges": [
+        "examples/**"
+      ]
+    }
+  }
+}
