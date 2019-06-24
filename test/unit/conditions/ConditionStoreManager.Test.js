@@ -1085,6 +1085,50 @@ contract('ConditionStoreManager', (accounts) => {
                 constants.condition.state.aborted)
         })
 
+it('timed out condition should abort and emit corresponding ConditionUpdated event', async () => {
+            const {
+                conditionStoreManager,
+                conditionId,
+                hashLockCondition,
+                owner,
+                createRole
+            } = await setupTest({ conditionType: accounts[0] })
+
+            const conditionTimeLock = 0
+            const conditionTimeOut = 1
+    
+            await conditionStoreManager.methods['createCondition(bytes32,address,uint256,uint256)'](
+                conditionId,
+                hashLockCondition.address,
+		conditionTimeLock,
+		conditionTimeOut,
+		{ from: createRole}
+            )
+
+            const newState = constants.condition.state.fulfilled
+
+            await conditionStoreManager.delegateUpdateRole(
+                conditionId,
+                createRole,
+                { from: owner }
+            )
+
+            await increaseTime(1)
+    
+            const result = await conditionStoreManager.updateConditionState(conditionId, newState)
+
+            assert.strictEqual(
+                (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
+                constants.condition.state.aborted)
+
+            testUtils.assertEmitted(result, 1, 'ConditionUpdated')
+            const eventArgs = testUtils.getEventArgsFromTx(result, 'ConditionUpdated')
+            expect(eventArgs._id).to.equal(conditionId)
+            expect(eventArgs._typeRef).to.equal(createRole)
+            expect(eventArgs._state.toNumber()).to.equal(constants.condition.state.aborted)
+        })
+	
+	
         it('timed out condition should not abort before timeout', async () => {
             const {
                 conditionStoreManager,
