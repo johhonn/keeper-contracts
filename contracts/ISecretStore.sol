@@ -8,7 +8,7 @@ pragma solidity 0.5.6;
 interface ISecretStore {
 
    /**
-    *@notice checkPermissions is called by Parity secret store
+    * @notice checkPermissions is called by Parity secret store
     */
     function checkPermissions(
         address user,

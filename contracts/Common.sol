@@ -7,7 +7,7 @@ import 'zos-lib/contracts/Initializable.sol';
  * @author Ocean Protocol Team
  */
 contract Common {
-    /**
+   /**
     * @notice getCurrentBlockNumber get block number
     * @return the current block number
     */
@@ -19,6 +19,11 @@ contract Common {
         return block.number;
     }
 
+    /**
+     * @dev isContract detect whether the address is 
+     *          is a contract address or externally owned account
+     * @return true if it is a contract address
+     */
     function isContract(address addr)
         public
         view

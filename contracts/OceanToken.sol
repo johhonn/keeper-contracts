@@ -9,7 +9,7 @@ import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
  * @author Ocean Protocol Team
  *
  * @dev Implementation of the Ocean Token.
- *      TODO: OEP
+ *      Ocean Token is ERC20 token
  */
 contract OceanToken is Ownable, ERC20Detailed, ERC20Capped {
 
