@@ -1,6 +1,6 @@
 /* global web3 */
 const { argv } = require('yargs')
-const upgradeContracts = require('../contracts/upgradeContracts')
+const { upgradeContracts } = require('@oceanprotocol/dori')
 
 module.exports = (cb) => {
     const parameters = argv._

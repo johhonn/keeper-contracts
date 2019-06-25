@@ -1,6 +1,7 @@
 /* global artifacts, web3 */
 const { argv } = require('yargs')
-const deployContracts = require('../contracts/deployContracts')
+const { deployContracts } = require('@oceanprotocol/dori')
+const initializeContracts = require('./initializeContracts.js')
 
 module.exports = (cb) => {
     const parameters = argv._
@@ -10,6 +11,7 @@ module.exports = (cb) => {
         web3,
         artifacts,
         contracts,
+        initializeContracts,
         forceWalletCreation: argv['force-wallet-creation'] || false,
         deeperClean: argv['deeper-clean'] || false,
         testnet: argv['testnet'] || false,
