@@ -44,6 +44,8 @@
     "test:echidna": "./test/verification/echidna/echidna.sh",
     "test:manticore": "./test/verification/manticore/run.sh",
     "test:report-coverage": "cat ./coverage/lcov.info | codacy-coverage --token b95545c0da4b45848cc5eef363c2711e  --prefix ./",
+    "doc:contracts": "node scripts/contracts/doc-generator.js",
+    "doc:addresses": "node scripts/contracts/get-addresses.js",
     "clean": "npm run clean:build && npm run clean:coverage && npm run clean:zos",
     "clean:build": "rm -rf ./build/ ./artifacts/*.development.json ./artifacts/*.spree.json",
     "clean:coverage": "rm -rf ./coverage/ ./coverageEnv/ ./coverage.json",
