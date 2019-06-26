@@ -8,13 +8,16 @@ chai.use(chaiAsPromised)
 const constants = require('../helpers/constants.js')
 
 const {
-    upgradeContracts,
-    deployContracts,
     confirmUpgrade,
     loadWallet,
     submitTransaction,
     confirmTransaction
 } = require('@oceanprotocol/dori')
+
+const {
+    deploy,
+    upgrade
+} = require('./Upgrader')
 
 const ConditionStoreManager = artifacts.require('ConditionStoreManager')
 
@@ -35,12 +38,10 @@ contract('ConditionStoreManager', (accounts) => {
     const conditionCreater = accounts[5]
 
     beforeEach('Load wallet each time', async function() {
-        const addressBook = await deployContracts({
+        const addressBook = await deploy({
             web3,
             artifacts,
             contracts: ['ConditionStoreManager'],
-            forceWalletCreation: true,
-            deeperClean: true,
             verbose
         })
 
@@ -66,10 +67,9 @@ contract('ConditionStoreManager', (accounts) => {
         it('Should be possible to fix/add a bug', async () => {
             let { conditionId } = await setupTest()
 
-            const taskBook = await upgradeContracts({
+            const taskBook = await upgrade({
                 web3,
                 contracts: ['ConditionStoreWithBug:ConditionStoreManager'],
-                strict: true,
                 verbose
             })
 
@@ -94,10 +94,9 @@ contract('ConditionStoreManager', (accounts) => {
         it('Should be possible to change function signature', async () => {
             let { conditionId, conditionType } = await setupTest()
 
-            const taskBook = await upgradeContracts({
+            const taskBook = await upgrade({
                 web3,
                 contracts: ['ConditionStoreChangeFunctionSignature:ConditionStoreManager'],
-                strict: true,
                 verbose
             })
 
@@ -157,10 +156,9 @@ contract('ConditionStoreManager', (accounts) => {
         it('Should be possible to append storage variable(s) ', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts({
+            const taskBook = await upgrade({
                 web3,
                 contracts: ['ConditionStoreChangeInStorage:ConditionStoreManager'],
-                strict: true,
                 verbose
             })
 
@@ -184,10 +182,9 @@ contract('ConditionStoreManager', (accounts) => {
         it('Should be possible to append storage variables and change logic', async () => {
             let { conditionId, conditionType } = await setupTest()
 
-            const taskBook = await upgradeContracts({
+            const taskBook = await upgrade({
                 web3,
                 contracts: ['ConditionStoreChangeInStorageAndLogic:ConditionStoreManager'],
-                strict: true,
                 verbose
             })
 
@@ -243,10 +240,9 @@ contract('ConditionStoreManager', (accounts) => {
         it('Should be able to call new method added after upgrade is approved', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts({
+            const taskBook = await upgrade({
                 web3,
                 contracts: ['ConditionStoreExtraFunctionality:ConditionStoreManager'],
-                strict: true,
                 verbose
             })
 

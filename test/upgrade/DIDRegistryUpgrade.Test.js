@@ -9,10 +9,13 @@ const constants = require('../helpers/constants.js')
 const testUtils = require('../helpers/utils.js')
 
 const {
-    upgradeContracts,
-    deployContracts,
     confirmUpgrade
 } = require('@oceanprotocol/dori')
+
+const {
+    deploy,
+    upgrade
+} = require('./Upgrader')
 
 const DIDRegistry = artifacts.require('DIDRegistry')
 
@@ -58,12 +61,10 @@ contract('DIDRegistry', (accounts) => {
 
     describe('Test upgradability for DIDRegistry', () => {
         beforeEach('Load wallet each time', async () => {
-            const addressBook = await deployContracts({
+            const addressBook = await deploy({
                 web3,
                 artifacts,
                 contracts: ['DIDRegistry'],
-                forceWalletCreation: true,
-                deeperClean: true,
                 verbose
             })
 
@@ -74,10 +75,9 @@ contract('DIDRegistry', (accounts) => {
             let { did } = await setupTest()
 
             // Upgrade to new version
-            const taskBook = await upgradeContracts({
+            const taskBook = await upgrade({
                 web3,
                 contracts: ['DIDRegistryWithBug:DIDRegistry'],
-                strict: true,
                 verbose
             })
 
@@ -123,10 +123,9 @@ contract('DIDRegistry', (accounts) => {
             await setupTest()
 
             // Upgrade to new version
-            const taskBook = await upgradeContracts({
+            const taskBook = await upgrade({
                 web3,
                 contracts: ['DIDRegistryChangeFunctionSignature:DIDRegistry'],
-                strict: true,
                 verbose
             })
 
@@ -166,10 +165,9 @@ contract('DIDRegistry', (accounts) => {
             let { did } = await setupTest()
 
             // Upgrade to new version
-            const taskBook = await upgradeContracts({
+            const taskBook = await upgrade({
                 web3,
                 contracts: ['DIDRegistryChangeInStorage:DIDRegistry'],
-                strict: true,
                 verbose
             })
 
@@ -196,10 +194,9 @@ contract('DIDRegistry', (accounts) => {
             let { did } = await setupTest()
 
             // Upgrade to new version
-            const taskBook = await upgradeContracts({
+            const taskBook = await upgrade({
                 web3,
                 contracts: ['DIDRegistryChangeInStorageAndLogic:DIDRegistry'],
-                strict: true,
                 verbose
             })
 
@@ -252,10 +249,9 @@ contract('DIDRegistry', (accounts) => {
             await setupTest()
 
             // Upgrade to new version
-            const taskBook = await upgradeContracts({
+            const taskBook = await upgrade({
                 web3,
                 contracts: ['DIDRegistryExtraFunctionality:DIDRegistry'],
-                strict: true,
                 verbose
             })
 
