@@ -47,7 +47,7 @@
     "clean": "npm run clean:build && npm run clean:coverage && npm run clean:zos",
     "clean:build": "rm -rf ./build/ ./artifacts/*.development.json ./artifacts/*.spree.json",
     "clean:coverage": "rm -rf ./coverage/ ./coverageEnv/ ./coverage.json",
-    "clean:zos": "rm -rf ./zos.json ./zos.dev-8996.json ./.zos.session ./wallets.json",
+    "clean:zos": "rm -rf ./zos.json ./zos.dev-8996.json ./.zos.session ./wallets.json zos/",
     "lint": "npm run lint:eslint && npm run lint:ethlint",
     "lint:eslint": "eslint --ignore-pattern '/coverage/' .",
     "lint:ethlint": "solium -d ./contracts/",
@@ -56,7 +56,8 @@
     "security:mythril": "truffle compile && myth -x --truffle --max-depth 12 --outform markdown 2>&1 | tee mythrilReport.md",
     "security:securify": "docker run -v $(pwd):/project chainsecurity/securify -t 2>&1 | tee securifyReport.txt",
     "security:surya": "surya graph contracts/**/*.sol | dot -Tpng > KeeperContracts.png",
-    "security:slither": "slither . 2>&1 | tee slitherReport.txt"
+    "security:slither": "slither . 2>&1 | tee slitherReport.txt",
+    "security:upgradeability": "npm run clean && npm run compile && ./scripts/upgradeability_checks.sh"
   },
   "directories": {
     "doc": "doc",
