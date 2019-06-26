@@ -252,17 +252,16 @@ contract ConditionStoreManager is Ownable, Common {
             updateState = ConditionStoreLibrary.ConditionState.Aborted;
         }
 
-        ConditionStoreLibrary.ConditionState state = conditionList
-            .updateState(_id, updateState);
+        conditionList.updateState(_id, updateState);
 
         emit ConditionUpdated(
             _id,
             conditionList.conditions[_id].typeRef,
-            _newState,
+            updateState,
             msg.sender
         );
 
-        return state;
+        return updateState;
     }
 
     /**
