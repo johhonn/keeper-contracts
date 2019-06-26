@@ -9,7 +9,7 @@ const {
     upgradeContracts,
     deployContracts,
     confirmUpgrade
-} = require('../../scripts/deploy/deploymentHandler')
+} = require('@oceanprotocol/dori')
 
 const OceanToken = artifacts.require('OceanToken')
 

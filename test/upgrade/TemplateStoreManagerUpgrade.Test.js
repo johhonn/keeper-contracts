@@ -10,7 +10,7 @@ const {
     upgradeContracts,
     deployContracts,
     confirmUpgrade
-} = require('../../scripts/deploy/deploymentHandler')
+} = require('@oceanprotocol/dori')
 
 const TemplateStoreManager = artifacts.require('TemplateStoreManager')
 const TemplateStoreChangeFunctionSignature = artifacts.require('TemplateStoreChangeFunctionSignature')

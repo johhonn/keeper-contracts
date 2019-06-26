@@ -14,7 +14,7 @@ const {
     loadWallet,
     submitTransaction,
     confirmTransaction
-} = require('../../scripts/deploy/deploymentHandler')
+} = require('@oceanprotocol/dori')
 
 const ConditionStoreManager = artifacts.require('ConditionStoreManager')
 

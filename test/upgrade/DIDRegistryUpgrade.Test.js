@@ -12,7 +12,7 @@ const {
     upgradeContracts,
     deployContracts,
     confirmUpgrade
-} = require('../../scripts/deploy/deploymentHandler')
+} = require('@oceanprotocol/dori')
 
 const DIDRegistry = artifacts.require('DIDRegistry')
 

@@ -14,7 +14,7 @@ const {
     submitTransaction,
     confirmTransaction,
     loadWallet
-} = require('../../scripts/deploy/deploymentHandler')
+} = require('@oceanprotocol/dori')
 
 const OceanToken = artifacts.require('OceanToken')
 const Dispenser = artifacts.require('Dispenser')

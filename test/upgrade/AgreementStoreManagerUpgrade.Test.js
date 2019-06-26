@@ -11,7 +11,7 @@ const {
     upgradeContracts,
     deployContracts,
     confirmUpgrade
-} = require('../../scripts/deploy/deploymentHandler')
+} = require('@oceanprotocol/dori')
 
 const AgreementStoreManager = artifacts.require('AgreementStoreManager')
 
