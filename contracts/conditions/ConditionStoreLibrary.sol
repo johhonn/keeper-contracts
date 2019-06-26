@@ -48,7 +48,6 @@ library ConditionStoreLibrary {
         ConditionState _newState
     )
         internal
-        returns (ConditionState)
     {
         require(
             _self.conditions[_id].state == ConditionState.Unfulfilled &&
@@ -60,6 +59,5 @@ library ConditionStoreLibrary {
         _self.conditions[_id].lastUpdatedBy = msg.sender;
         _self.conditions[_id].blockNumberUpdated = block.number;
 
-        return _newState;
     }
 }
