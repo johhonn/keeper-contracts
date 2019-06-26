@@ -56,8 +56,9 @@
     "security:mythril": "truffle compile && myth -x --truffle --max-depth 12 --outform markdown 2>&1 | tee mythrilReport.md",
     "security:securify": "docker run -v $(pwd):/project chainsecurity/securify -t 2>&1 | tee securifyReport.txt",
     "security:slither": "slither . 2>&1 | tee slitherReport.txt",
-    "document:copyright": "scripts/add-spdx.sh",
-    "security:upgradeability": "npm run clean && npm run compile && ./scripts/upgradeability_checks.sh"
+    "security:upgradeability": "npm run clean && npm run compile && ./scripts/upgradeability_checks.sh",
+    "documention:copyright": "scripts/add-spdx.sh",
+    "documentation:contracts": "node scripts/contracts/doc-generator.js"
   },
   "directories": {
     "doc": "doc",
