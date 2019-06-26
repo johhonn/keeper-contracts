@@ -257,7 +257,6 @@ See [RELEASE_PROCESS.md](RELEASE_PROCESS.md)
 ## Documentation
 
 * [Main Documentation](doc/)
-* [Keeper-contracts Diagram](doc/files/Keeper-Contracts.png)
 * [Packaging of libraries](doc/packaging.md)
 * [Upgrading contracts](doc/upgrades.md)
 
