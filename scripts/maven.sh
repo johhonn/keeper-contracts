@@ -8,7 +8,7 @@ mkdir ./tmp/
 for file in artifacts/*.development.json
 do
     tmpFile=$(basename $file)
-    tmpFile=$(echo "$tmpFile" | sed "s/.development//")
+    tmpFile=${tmpFile//.development/}
 
     cp $file ./tmp/${tmpFile}
 
