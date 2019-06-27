@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 // List of contracts
-const contractNames = require('./contracts.json')
+const contractNames = require(`${process.env.PWD}/contracts.json`)
 
 function evaluateContracts({
     contracts,

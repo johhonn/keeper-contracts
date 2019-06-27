@@ -7,10 +7,13 @@ chai.use(chaiAsPromised)
 const constants = require('../helpers/constants.js')
 
 const {
-    upgradeContracts,
-    deployContracts,
     confirmUpgrade
-} = require('../../scripts/deploy/deploymentHandler')
+} = require('@oceanprotocol/dori')
+
+const {
+    deploy,
+    upgrade
+} = require('./Upgrader')
 
 const TemplateStoreManager = artifacts.require('TemplateStoreManager')
 const TemplateStoreChangeFunctionSignature = artifacts.require('TemplateStoreChangeFunctionSignature')
@@ -38,14 +41,12 @@ contract('TemplateStoreManager', (accounts) => {
 
     describe('Test upgradability for TemplateStoreManager', () => {
         beforeEach('Load wallet each time', async function() {
-            const addressBook = await deployContracts({
+            const addressBook = await deploy({
                 web3,
                 artifacts,
                 contracts: [
                     'TemplateStoreManager'
                 ],
-                forceWalletCreation: true,
-                deeperClean: true,
                 verbose
             })
 
@@ -56,7 +57,7 @@ contract('TemplateStoreManager', (accounts) => {
         it('Should be possible to fix/add a bug', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts({
+            const taskBook = await upgrade({
                 web3,
                 contracts: ['TemplateStoreWithBug:TemplateStoreManager'],
                 strict: true,
@@ -83,10 +84,9 @@ contract('TemplateStoreManager', (accounts) => {
         it('Should be possible to change function signature', async () => {
             let { conditionType } = await setupTest()
 
-            const taskBook = await upgradeContracts({
+            const taskBook = await upgrade({
                 web3,
                 contracts: ['TemplateStoreChangeFunctionSignature:TemplateStoreManager'],
-                strict: true,
                 verbose
             })
 
@@ -109,10 +109,9 @@ contract('TemplateStoreManager', (accounts) => {
         it('Should be possible to append storage variable(s) ', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts({
+            const taskBook = await upgrade({
                 web3,
                 contracts: ['TemplateStoreChangeInStorage:TemplateStoreManager'],
-                strict: true,
                 verbose
             })
 
@@ -136,10 +135,9 @@ contract('TemplateStoreManager', (accounts) => {
         it('Should be possible to append storage variables and change logic', async () => {
             let { conditionType } = await setupTest()
 
-            const taskBook = await upgradeContracts({
+            const taskBook = await upgrade({
                 web3,
                 contracts: ['TemplateStoreChangeInStorageAndLogic:TemplateStoreManager'],
-                strict: true,
                 verbose
             })
 
@@ -167,10 +165,9 @@ contract('TemplateStoreManager', (accounts) => {
         it('Should be able to call new method added after upgrade is approved', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts({
+            const taskBook = await upgrade({
                 web3,
                 contracts: ['TemplateStoreExtraFunctionality:TemplateStoreManager'],
-                strict: true,
                 verbose
             })
 

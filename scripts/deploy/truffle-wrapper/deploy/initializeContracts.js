@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const zosCreate = require('./zos/setup/create')
+const { zosCreate } = require('@oceanprotocol/dori')
 
 async function initializeContracts(
     contracts,
