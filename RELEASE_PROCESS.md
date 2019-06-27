@@ -108,7 +108,7 @@ All upgrades of the contracts have to be approved by the `upgrader` wallet confi
 
 #### General tasks
 
-- On the end of every depooyment, the log has to be copied to [atlantic](https://github.com/oceanprotocol/atlantic/tree/master/keeper/logs)
+- On the end of every deployment, the log has to be copied to [atlantic](https://github.com/oceanprotocol/atlantic/tree/master/keeper/logs)
 
 ## Document
 
