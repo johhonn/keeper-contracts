@@ -94,6 +94,6 @@
     "web3-provider-engine": "~15.0.0",
     "yargs": "13.2.2",
     "zos": "~2.2.3",
-    "zos-lib": "~2.3.0"
+    "zos-lib": "~2.3.1"
   }
 }
