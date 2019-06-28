@@ -36,13 +36,13 @@ ownerWallet: represented as the owner from wallets.json
 - **OwnerWallet**: One instance of the multi sig wallet, defined as `owner`. This wallet will be assigned as the owner of all the contracts. It can be used to call specific functions in the contracts ie. change the configuration.
 
 ## Deploy & Upgrade
-`zos` does not support migrations, hence all the initial configuration should be performed with a [dori](). 
+`zos` does not support migrations, hence all the initial configuration should be performed with a [dori](https://github.com/oceanprotocol/dori). 
 Contract constructors are ignored so the initial setup of the contract should be made in a [`initialize`](https://docs.zeppelinos.org/docs/advanced.html#initializers-vs-constructors) 
 function that will be executed only once after the initial deployment.
 
 ### 1. Configuration
 
-[Dori]() checks the `contracts.json` in order to detect the current contracts that are going to be deployed:
+[Dori](https://github.com/oceanprotocol/dori) checks the `contracts.json` in order to detect the current contracts that are going to be deployed:
 
 ```json
 [
@@ -60,7 +60,7 @@ function that will be executed only once after the initial deployment.
 ]
 ```
 
-Moreover for each network, [dori]() needs to detect the roles and their addresses from a pre-defined wallets config file. 
+Moreover for each network, [dori](https://github.com/oceanprotocol/dori) needs to detect the roles and their addresses from a pre-defined wallets config file. 
 The following configuration should be an example for `wallets-<NETWORK_NAME>.json`:
 
 ```json
@@ -141,9 +141,48 @@ The following steps shows how to perform contracts deployment and upgrade on `Ni
 - Commit all changes in `artifacts/*.kovan.json`
 
 ### 4. Approve Upgrade(s)
+All upgrades of the contracts have to be approved by the `upgrader` wallet configured in the `wallets.json` file.
 
+- go to https://wallet.gnosis.pm
+- Load `upgrader` wallet
+- Select an Ethereum Account that is an `owner` of the multi sig wallet, but not the one who issued the upgrade request. This can be done in the following ways:
+  - Connect to a local Blockchain node that holds the private key.
+  - Connect to MetaMask and select the owner account from the multi sig wallet.
+  - Connect a hardware wallet like ledger or trezor.
+- Select the transaction you want to confirm (the upgrade script will tell you which transactions have to be approved in which wallets)
+- Click Confirm
 
 
 ### 5. Audit Contracts
 
+To check or document that all transactions have been approved in the multi sig wallet you can run `npm run audit:nile` to get a list of all the current transactions and their current status. 
+
+```text
+ Wallet: 0x24EB26D4042a2AB576E7E39b87c3f33f276AeF92
+
+ Transaction ID: 64 
+ Destination: 0xfA16d26e9F4fffC6e40963B281a0bB08C31ed40C 
+ Contract: EscrowAccessSecretStoreTemplate 
+ Data is `upgradeTo` call: true 
+ Confirmed from: 0x7A13E1aD23546c9b804aDFd13e9AcB184EfCAF58 
+ Executed: false
+```
+
 ### 6. Documentation
+- Update the addresses in the `README.md`
+- run `node ./scripts/contracts/get-addresses.js <network name>` 
+
+It will output the current proxy addresses in the `README` friendly format.
+
+```text
+| AccessSecretStoreCondition        | v0.9.0 | 0x45DE141F8Efc355F1451a102FB6225F1EDd2921d |
+| AgreementStoreManager             | v0.9.0 | 0x62f84700b1A0ea6Bfb505aDC3c0286B7944D247C |
+| ConditionStoreManager             | v0.9.0 | 0x39b0AA775496C5ebf26f3B81C9ed1843f09eE466 |
+| DIDRegistry                       | v0.9.0 | 0x4A0f7F763B1A7937aED21D63b2A78adc89c5Db23 |
+| DIDRegistryLibrary                | v0.9.0 | 0x3B3504908Db36f5D5f07CD420ee2BBBbDfB674cF |
+| Dispenser                         | v0.9.0 | 0x865396b7ddc58C693db7FCAD1168E3BD95Fe3368 |
+....
+
+```
+
+- Copy this to the `README.md`
