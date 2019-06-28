@@ -42,8 +42,8 @@ module.exports = {
             host: 'localhost',
             // has to be '*' because this is usually ganache
             network_id: '*',
-            port: 8545,
-            gas: 6721975,
+            port: 8555,
+            gas: 0xfffffffffff,
             gasPrice: 0x01
         },
         // spree network from docker
