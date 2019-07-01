@@ -14,7 +14,7 @@ Documentation:
 Documentation:
 
 ```
-notice checkPermissions is called by Parity secret store
+@notice checkPermissions is called by Parity secret store
 ```
 Parameters:
 * address user

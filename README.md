@@ -257,7 +257,6 @@ See [RELEASE_PROCESS.md](RELEASE_PROCESS.md)
 ## Documentation
 
 * [Main Documentation](doc/)
-* [Keeper-contracts Diagram](doc/files/Keeper-Contracts.png)
 * [Packaging of libraries](doc/packaging.md)
 * [Upgrading contracts](doc/upgrades.md)
 
@@ -288,3 +287,4 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
+

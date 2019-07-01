@@ -1,8 +1,21 @@
 pragma solidity 0.5.6;
+// Copyright BigchainDB GmbH and Ocean Protocol contributors
+// SPDX-License-Identifier: (Apache-2.0 AND CC-BY-4.0)
+// Code is Apache-2.0 and docs are CC-BY-4.0
 
 import './Condition.sol';
 import '../OceanToken.sol';
 
+/**
+ * @title Lock Reward Condition
+ * @author Ocean Protocol Team
+ *
+ * @dev Implementation of the Lock Reward Condition
+ *
+ *      For more information, please refer the following link
+ *      https://github.com/oceanprotocol/OEPs/issues/122
+ *      TODO: update the OEP link 
+ */
 contract LockRewardCondition is Condition {
 
     OceanToken private token;
@@ -14,6 +27,15 @@ contract LockRewardCondition is Condition {
         uint256 _amount
     );
 
+   /**
+    * @notice initialize init the 
+    *       contract with the following parameters
+    * @dev this function is called only once during the contract
+    *       initialization.
+    * @param _owner contract's owner account address
+    * @param _conditionStoreManagerAddress condition store manager address
+    * @param _tokenAddress Ocean Token contract address
+    */
     function initialize(
         address _owner,
         address _conditionStoreManagerAddress,
@@ -34,6 +56,13 @@ contract LockRewardCondition is Condition {
         token = OceanToken(_tokenAddress);
     }
 
+   /**
+    * @notice hashValues generates the hash of condition inputs 
+    *        with the following parameters
+    * @param _rewardAddress the contract address where the reward will be locked
+    * @param _amount is the amount of the locked tokens
+    * @return bytes32 hash of all these values 
+    */
     function hashValues(
         address _rewardAddress,
         uint256 _amount
@@ -45,6 +74,14 @@ contract LockRewardCondition is Condition {
         return keccak256(abi.encodePacked(_rewardAddress, _amount));
     }
 
+   /**
+    * @notice fulfill requires valid token transfer in order 
+    *           to lock the amount of tokens based on the SEA
+    * @param _agreementId SEA agreement identifier
+    * @param _rewardAddress the contract address where the reward is locked
+    * @param _amount is the amount of tokens to be transferred 
+    * @return condition state
+    */
     function fulfill(
         bytes32 _agreementId,
         address _rewardAddress,
@@ -73,7 +110,6 @@ contract LockRewardCondition is Condition {
             _id,
             _amount
         );
-
         return state;
     }
 }
