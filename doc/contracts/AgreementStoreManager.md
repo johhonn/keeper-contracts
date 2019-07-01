@@ -29,8 +29,8 @@ Documentation:
 Documentation:
 
 ```
-@dev AgreementStoreManager Initializer
-     Initialize Ownable. Only on contract creation.
+@dev initialize AgreementStoreManager Initializer
+     Initializes Ownable. Only on contract creation.
 @param _owner refers to the owner of the contract
 @param _conditionStoreManagerAddress is the address of the connected condition store
 @param _templateStoreManagerAddress is the address of the connected template store

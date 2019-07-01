@@ -35,6 +35,3 @@ There are several folders and each includes solidity source files for each modul
         - [DID Registry](contracts/DIDRegistry.md)
         - [DIDRegistry Library](contracts/DIDRegistryLibrary.md)
     - [Common](contracts/Common.md)
-    
-* **Contracts Diagram**
-    - [Surya Keeper contract's graph](files/Keeper-Contracts.png)

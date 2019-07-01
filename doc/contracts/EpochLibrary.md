@@ -1,6 +1,18 @@
 
 # library: EpochLibrary
 
+Documentation:
+```
+@title Epoch Library
+@author Ocean Protocol Team
+ * @dev Implementation of Epoch Library.
+     For an arbitrary Epoch, this library manages the life
+     cycle of an Epoch. Usually this library is used for 
+     handling the time window between conditions in an agreement.
+     For more information about Epoch checkout the below link
+     https://github.com/oceanprotocol/OEPs/issues/119   
+     TODO: update to the OEP link
+```
 
 ## Structs
 

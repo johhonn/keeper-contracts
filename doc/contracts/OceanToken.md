@@ -6,7 +6,7 @@ Documentation:
 @title Ocean Protocol ERC20 Token Contract
 @author Ocean Protocol Team
  * @dev Implementation of the Ocean Token.
-     TODO: OEP
+     Ocean Token is ERC20 token
 ```
 
 ## Functions

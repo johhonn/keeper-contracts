@@ -4,117 +4,185 @@ This documents explains in detail how [keeper-contracts](https://github.com/ocea
 
 ## Quickstart
 
-The first step to work with `zos` is to install dependencies then initialize the project. Then compile contracts and add contracts to the project. Finally push the contracts into the network and create the  upgradable instances. Once the contracts are deployed they can be tested and upgraded. Also we change the proxy administrator to a MultiSignature wallet to approve upgrades. To deploy the contracts we use a [deployment script](../scripts/deployContracts.js), for more details on each step please keep reading.
+The first step to work with `zos` is to install dependencies then initialize the project. Then compile contracts and add contracts to the project. 
+Finally push the contracts into the network and create the  upgradable instances. Once the contracts are deployed they can be tested and upgraded.
+Also we change the proxy administrator to a MultiSignature wallet to approve upgrades.  We are going to use [dori](https://github.com/oceanprotocol/dori) in order to perform 
+any future deployments/upgrades.
 
 ## Details
 
-Here we provide more details into each step of the initial deploy and the approach of upgradability and governance.
+Here we provide more details into each step of the initial deploy and the approach of upgradeability and governance.
 
-## Initial Deploy
 
-Install dependencies
+## Roles
 
+Before going into more details about the deployment. We should differentiate between different roles in the system which 
+govern the upgradeability in keeper-contracts.
+
+Roles are defined as follows:
+
+```
+deployer: represented as accounts[0]
+upgrader: represented as accounts[1]
+upgraderWallet: represented as the upgrader from wallets.json
+ownerWallet: represented as the owner from wallets.json
+```
+- **Deployer**: Can be any account. It is used for deploying the initial `proxy contracts` and the `logic contracts`.
+
+- **Upgrader**: Has to be an `owner` of the `upgrader` multi sig wallet. It is used for issuing upgrade requests against the upgrader multi sig wallet.
+
+- **UpgraderWallet**: One instance of the multi sig wallet, defined as `upgrader`. This wallet will be assigned as zos admin and is required to do upgrades.
+
+- **OwnerWallet**: One instance of the multi sig wallet, defined as `owner`. This wallet will be assigned as the owner of all the contracts. It can be used to call specific functions in the contracts ie. change the configuration.
+
+## Deploy & Upgrade
+`zos` does not support migrations, hence all the initial configuration should be performed with a [dori](https://github.com/oceanprotocol/dori). 
+Contract constructors are ignored so the initial setup of the contract should be made in a [`initialize`](https://docs.zeppelinos.org/docs/advanced.html#initializers-vs-constructors) 
+function that will be executed only once after the initial deployment.
+
+### 1. Configuration
+
+[Dori](https://github.com/oceanprotocol/dori) checks the `contracts.json` in order to detect the current contracts that are going to be deployed:
+
+```json
+[
+  "ConditionStoreManager",
+  "TemplateStoreManager",
+  "AgreementStoreManager",
+  "SignCondition",
+  "HashLockCondition",
+  "LockRewardCondition",
+  "AccessSecretStoreCondition",
+  "EscrowReward",
+  "EscrowAccessSecretStoreTemplate",
+  "OceanToken",
+  "DIDRegistry"
+]
+```
+
+Moreover for each network, [dori](https://github.com/oceanprotocol/dori) needs to detect the roles and their addresses from a pre-defined wallets config file. 
+The following configuration should be an example for `wallets-<NETWORK_NAME>.json`:
+
+```json
+[
+    {
+        "name": "upgrader",
+        "address": "0x24eb26d4042a2ab576e7e39b87c3f33f276aef92"
+    },
+    {
+        "name": "owner",
+        "address": "0xd02d68c62401472ce35ba3c7e505deae62db2b8b"
+    }
+]
+```
+
+### 2. Preparation
+
+The following commands clean, install dependencies and compile the contracts:
 ```console
-$npm install
+$ npm run clean #to clean the work dir
+$ npm i #install dependencies
+$ npm run compile #to compile the contracts
 ```
 
-`zos` does not support migrations, hence all the initial configuration should be performed with a [deployment script](../scripts/deployContracts.js). Contract constructors are ignored so the initial setup of the contract should be made in a [`initialize`](https://docs.zeppelinos.org/docs/advanced.html#initializers-vs-constructors) function that will be executed only once after the initial deployment.
+### 3. Deploy & Upgrade
 
-To get started first we initialize the zeppelin applications which will create a configuration file [`zos.json`](https://docs.zeppelinos.org/docs/advanced.html#format-of-zosjson-and-zos-network-json-files) that keeps track of the project's details. we use the command [`zos init`](https://docs.zeppelinos.org/docs/init.html)
+The following steps shows how to perform contracts deployment and upgrade on `Nile` and `Kovan` networks. 
+#### Nile
+
+- Copy the wallet file for `nile` 
+  - `cp wallets_nile.json wallets.json`
+- run `export MNEMONIC=<your nile mnemonic>`. You will find them in the password manager.
+
+##### Deploy the whole application
+
+- To deploy all contracts run `npm run deploy:nile`
+
+##### Deploy a single contracts
+
+- To deploy a single contract you need to specify the contracts to deploy as a parameter to the deploy script: ie. `npm run deploy:nile -- OceanToken Dispenser`will deploy `OceanToken` and `Dispenser`.
+
+##### Upgrade the whole application
+
+- To upgrade all contracts run `npm run upgrade:nile`
+
+##### Upgrade a single contract
+
+- To upgrade a single contract run `npm run upgrade:nile -- OceanToken`. For upgrading the `OceanToken` contract.
+
+##### Persist artifacts
+
+- Commit all changes in `artifacts/*.nile.json`
+
+#### Kovan
+
+- Copy the wallet file for `kovan` > `cp wallets_kovan.json wallets.json`
+- run `export MNEMONIC=<your kovan mnemonic>`. You will find them in the password manager.
+- run `export INFURA_TOKEN=<your infura token>`. You will get it from `infura`.
+
+##### Deploy the whole application
+
+- To deploy all the contracts run `npm run deploy:kovan`
+
+##### Deploy a single contracts
+
+- To deploy a single contracts you need to specify the contracts to deploy as a parameter to the deploy script: ie. `npm run deploy:kovan -- OceanToken Dispenser` will deploy `OceanToken` and `Dispenser`.
+
+##### Upgrade the whole application
+
+- To upgrade all contracts run `npm run upgrade:kovan`
+
+##### Upgrade a single contract
+
+- To upgrade a single contract run `npm run upgrade:kovan -- OceanToken`. For upgrading the `OceanToken` contract.
+
+##### Persist artifacts
+
+- Commit all changes in `artifacts/*.kovan.json`
+
+### 4. Approve Upgrade(s)
+All upgrades of the contracts have to be approved by the `upgrader` wallet configured in the `wallets.json` file.
+
+- go to https://wallet.gnosis.pm
+- Load `upgrader` wallet
+- Select an Ethereum Account that is an `owner` of the multi sig wallet, but not the one who issued the upgrade request. This can be done in the following ways:
+  - Connect to a local Blockchain node that holds the private key.
+  - Connect to MetaMask and select the owner account from the multi sig wallet.
+  - Connect a hardware wallet like ledger or trezor.
+- Select the transaction you want to confirm (the upgrade script will tell you which transactions have to be approved in which wallets)
+- Click Confirm
 
 
-```console
-$npx zos init oceanprotocol 0.1.poc -v
-[ZosPackageFile] Successfully written zos.json
+### 5. Audit Contracts
+
+To check or document that all transactions have been approved in the multi sig wallet you can run `npm run audit:nile` to get a list of all the current transactions and their current status. 
+
+```text
+ Wallet: 0x24EB26D4042a2AB576E7E39b87c3f33f276AeF92
+
+ Transaction ID: 64 
+ Destination: 0xfA16d26e9F4fffC6e40963B281a0bB08C31ed40C 
+ Contract: EscrowAccessSecretStoreTemplate 
+ Data is `upgradeTo` call: true 
+ Confirmed from: 0x7A13E1aD23546c9b804aDFd13e9AcB184EfCAF58 
+ Executed: false
 ```
 
-Once the project is initializes we need to register all contracts in the project as upgradable contracts with the command [`zos add`](https://docs.zeppelinos.org/docs/add.html)
+### 6. Documentation
+- Update the addresses in the `README.md`
+- run `node ./scripts/contracts/get-addresses.js <network name>` 
 
-```console
-$npx zos add DIDRegistry -v --skip-compile
-[LocalController] Adding DIDRegistry
-[ZosPackageFile] Successfully written zos.json
+It will output the current proxy addresses in the `README` friendly format.
+
+```text
+| AccessSecretStoreCondition        | v0.9.0 | 0x45DE141F8Efc355F1451a102FB6225F1EDd2921d |
+| AgreementStoreManager             | v0.9.0 | 0x62f84700b1A0ea6Bfb505aDC3c0286B7944D247C |
+| ConditionStoreManager             | v0.9.0 | 0x39b0AA775496C5ebf26f3B81C9ed1843f09eE466 |
+| DIDRegistry                       | v0.9.0 | 0x4A0f7F763B1A7937aED21D63b2A78adc89c5Db23 |
+| DIDRegistryLibrary                | v0.9.0 | 0x3B3504908Db36f5D5f07CD420ee2BBBbDfB674cF |
+| Dispenser                         | v0.9.0 | 0x865396b7ddc58C693db7FCAD1168E3BD95Fe3368 |
+....
+
 ```
 
-Next we need to deploy all contracts to the the specified network with [`zos push`](https://docs.zeppelinos.org/docs/push.html). This will Creates another configuration file  `zos.<network_name>.json`, specific to the network used, which keeps track of deployed addresses.
-
-```console
-$npx zos push --network development --skip-compile  -v
-Validating contract DIDRegistry
-Uploading DIDRegistry contract as DIDRegistry
-Deploying logic contract for DIDRegistry
-Created zos.dev-1545416723029.json
-```
-
-Finally, we need to create a proxy for the deployed contracts. Its important to note that we will be using the proxies and not the deployed contracts and the proxies will delegate to the deployed contracts. When creating the proxies the initialize function is invoked, this function can only be called once.
-
-```console
-$npx zos create DIDRegistry --network development --init initialize --args 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1 -v
-[SimpleProject] Creating proxy to logic contract 0xe78a0f7e598cc8b0bb87894b0f60dd2a88d6a8ab and initializing by calling initialize with:
- - _owner (address): "0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1"
-[SimpleProject] Instance created at 0x5b1869d9a4c187f2eaa108f3062412ecf0526b24
-[ZosNetworkFile] Updated zos.dev-1545416723029.json
-```
-
- A dApp could now use the address of the proxy specified in zos.<network_name>.json with `instance=DIDRegistry.at(0x5b1869d9a4c187f2eaa108f3062412ecf0526b24)`
-
-### Governance
-
-For governance [gnosis multisignature wallet](https://github.com/gnosis/MultiSigWallet) is used. This contract can be replaced with any contract that provides the desired behavior. The test script will create an instance and will give voting rights to the test accounts. When deploying to mainnet the wallet needs to be created accordingly. To change the admin of the proxies to the multisig wallet we use [`zos set-admin`](https://docs.zeppelinos.org/docs/cli_set-admin.html)
-
-```console
-$npx zos set-admin DIDRegistry 0xC89Ce4735882C9F0f0FE26686c53074E09B0D550 --network development --yes
-Proxy 0x5b1869d9a4c187f2eaa108f3062412ecf0526b24 admin changed to 0xC89Ce4735882C9F0f0FE26686c53074E09B0D550
-Updated zos.dev-1545416723029.json
-```
-
-### Upgradability
-
-To upgrade a contract we need to use the `zos` tool. The script after deployment grants admin rights to the wallet rather than to the account that made the deployment. For each upgrade zeppelin is used to submit the upgrade and the multisig wallet is used to approve the upgrade. First we need to add and push the new contract as we did before.
-
-```console
-$npx zos add DIDRegistryExtraFunctionality:DIDRegistry --skip-compile -v
-Adding DIDRegistry:DIDRegistryExtraFunctionality
-Successfully written zos.json
-$npx zos push --skip-compile --network development
-Validating contract DIDRegistryExtraFunctionality
-Uploading DIDRegistryExtraFunctionality contract as DIDRegistry
-Deploying logic contract for DIDRegistryExtraFunctionality
-Updated zos.dev-1545416723029.json
-```
-
-`DIDRegistry:DIDRegistryExtraFunctionality` can be simply `DIDRegistry` if the modified contract has the same name as the original. Once the new contract its deployed we can submit the upgrade request to the multisig wallet. To submit and approve the upgrade we use the following js script
-
-```js
-const encodeCall = require('zos-lib').encodeCall;
-//request upgrade
-async upgradeToNewContract(implementationAddress) {
-    const upgradeCallData = encodeCall('upgradeTo', ['address'], [implementationAddress]);
-    let tx = await wallet.submitTransaction(this.proxyAddress, 0, upgradeCallData, { from: this.owner });
-    // store transaction id to approve later
-    return tx.logs[0].args.transactionId.toNumber();
-}
-//approve upgrade
-async approveLatestTransaction(txID) {
-    await this.wallet.confirmTransaction(txID, { from: this.users[0] });
-}
-```
-
-### Test
-
-To test the contract upgradability the following commands should be run
-
-```console
-$npx truffle compile
-$npx truffle exec scripts/setupWalletWrapper.js
-$npx truffle test test/upgradability/DIDRegistry.Test.js
-```
-
-to run all test the simple run
-
-```console
-$npx truffle compile
-$npm run test
-```
-
-The test script will setup a multisig wallet, run the deployment script after setting the testing parameters and change proxies admin. After each test the contract is downgraded to the initial version.
+- Copy this to the `README.md`
