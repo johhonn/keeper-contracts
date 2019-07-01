@@ -43,7 +43,7 @@ One instance of the multi sig wallet, defined as `owner`. This wallet will be as
 
 #### Nile
 
-- Copy the wallet file for `nile` 
+- Copy the wallet file for `nile`
   - `cp wallets_nile.json wallets.json`
 - run `export MNEMONIC=<your nile mnemonic>`. You will find them in the password manager.
 
@@ -104,7 +104,7 @@ All upgrades of the contracts have to be approved by the `upgrader` wallet confi
   - Connect to MetaMask and select the owner account from the multi sig wallet.
   - Connect a hardware wallet like ledger or trezor.
 - Select the transaction you want to confirm (the upgrade script will tell you which transactions have to be approved in which wallets)
-- Click Confirm 
+- Click Confirm
 
 #### General tasks
 
@@ -121,7 +121,7 @@ All upgrades of the contracts have to be approved by the `upgrader` wallet confi
 ### Address Documentation
 
 - Update the addresses in the `README.md`
-- run `node ./scripts/contracts/get-addresses.js <network name>` 
+- run `node ./scripts/contracts/get-addresses.js <network name>`
 
 It will output the current proxy addresses in the `README` friendly format.
 
@@ -138,7 +138,7 @@ It will output the current proxy addresses in the `README` friendly format.
 
 - Copy this to the `README.md`
 
-## Trigger CI 
+## Trigger CI
 
 - Commit the missing changes to the feature branch.
 - Tag the last commit with the new version number ie. `v0.2.5`
@@ -147,7 +147,7 @@ It will output the current proxy addresses in the `README` friendly format.
 - Wait for all the tests to pass!
 - Merge the pull request into the `develop` branch.
 
-## Release
+## Release and packages
 
 The release itself is done by `travis` based on the tagged commit.
 
@@ -158,22 +158,22 @@ It will deploy the following components:
 - [maven](https://search.maven.org/artifact/com.oceanprotocol/keeper-contracts/)
 - [docker](https://cloud.docker.com/u/oceanprotocol/repository/docker/oceanprotocol/keeper-contracts)
 
+The npm, pypi and maven packages contain the contract artifacts for the contracts already deployed in different networks (suck as `Pacific`, `Duero`, `Nile`, or `Kovan`).
+The docker image generated contains the contracts and script ready to be used to deploy the contracts to a network. It is used for deploying the contracts in the local network `Spree` in [oceanprotocol/barge](https://github.com/oceanprotocol/barge)
 
-- update the new github release
-  - Describe the main changes. (In the future, these will come from the changelog.)
-
+Once the new version is tagged and released, you can edit the `Releases` section of GitHub with the information and changes about the new version (in the future, these will come from the changelog):
 
 ## Audit
 
-To check or document that all transactions have been approved in the multi sig wallet you can run `npm run audit:nile` to get a list of all the current transactions and their current status. 
+To check or document that all transactions have been approved in the multi sig wallet you can run `npm run audit:nile` to get a list of all the current transactions and their current status.
 
 ```text
  Wallet: 0x24EB26D4042a2AB576E7E39b87c3f33f276AeF92
 
- Transaction ID: 64 
- Destination: 0xfA16d26e9F4fffC6e40963B281a0bB08C31ed40C 
- Contract: EscrowAccessSecretStoreTemplate 
- Data is `upgradeTo` call: true 
- Confirmed from: 0x7A13E1aD23546c9b804aDFd13e9AcB184EfCAF58 
+ Transaction ID: 64
+ Destination: 0xfA16d26e9F4fffC6e40963B281a0bB08C31ed40C
+ Contract: EscrowAccessSecretStoreTemplate
+ Data is `upgradeTo` call: true
+ Confirmed from: 0x7A13E1aD23546c9b804aDFd13e9AcB184EfCAF58
  Executed: false
 ```
