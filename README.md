@@ -32,7 +32,6 @@
         - [Ethereum Mainnet](#ethereum-mainnet)
         - [Pacific Mainnet](#pacific-mainnet)
   - [Packages](#packages)
-  - [Deployments, Upgrades, New Versions, New Releases](#deployments-upgrades-new-versions-new-releases)
   - [Documentation](#documentation)
   - [Contributing](#contributing)
   - [Prior Art](#prior-art)
@@ -261,16 +260,12 @@ The structure of the `artifacts` is:
 }
 ```
 
-## Deployments, Upgrades, New Versions, New Releases
-
-See [RELEASE_PROCESS.md](RELEASE_PROCESS.md)
-
 ## Documentation
 
-* [Main Documentation](doc/)
-* [Contracts](doc/contracts/)
-* [Packaging of libraries](doc/packaging.md)
-* [Upgrading contracts](doc/upgrades.md)
+* [Contracts Documentation](doc/contracts/README.md)
+* [Release process](doc/RELEASE_PROCESS.md)
+* [Packaging of libraries](doc/PACKAGING.md)
+* [Upgrading of contracts](doc/UPGRADES.md)
 
 ## Contributing
 
