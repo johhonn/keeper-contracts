@@ -3,19 +3,17 @@ pragma solidity 0.5.6;
 // SPDX-License-Identifier: (Apache-2.0 AND CC-BY-4.0)
 // Code is Apache-2.0 and docs are CC-BY-4.0
 
-
 /**
- * @title Whitelisting Condition Interface
+ * @title List Interface
  * @author Ocean Protocol Team
  */
-interface IWhitelistCondition {
+interface IList {
 
    /**
     * @notice 
     */
-    function fulfill(
-        bytes32 _agreementId,
-        bytes32 addressHash
+    function has(
+        bytes32 item
     )
     external view
     returns (bool exists);

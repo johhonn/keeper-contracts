@@ -5,7 +5,7 @@ pragma solidity 0.5.6;
 
 import './Condition.sol';
 import '../agreements/AgreementStoreManager.sol';
-import '../ISecretStore.sol';
+import '../interfaces/ISecretStore.sol';
 /**
  * @title Access Secret Store Condition
  * @author Ocean Protocol Team

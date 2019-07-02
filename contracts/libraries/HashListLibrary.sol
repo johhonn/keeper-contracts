@@ -65,7 +65,7 @@ library HashListLibrary {
      * @param values is an array of elements value
      * @return true if values are added successfully
      */
-    function put(
+    function add(
         List storage _self,
         bytes32[] memory values
     )
@@ -146,7 +146,7 @@ library HashListLibrary {
     }
     
     /**
-     * @dev get value by index 
+     * @dev has value by index 
      * @param _self is a pointer to list in the storage
      * @param index is where is value is stored in the list
      * @return the value if exists
@@ -274,7 +274,7 @@ library HashListLibrary {
      * @param value is element value in list
      * @return true if the value exists
      */
-    function isExist(
+    function has(
         List storage _self,
         bytes32 value
     )
