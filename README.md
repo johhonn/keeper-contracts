@@ -21,13 +21,17 @@
   - [Get Started](#get-started)
      - [Docker](#docker)
      - [Local development](#local-development)
-     - [Testnets](#testnets)
-        - [Nile Testnet](#nile-testnet)
-        - [Kovan Testnet](#kovan-testnet)
   - [Testing](#testing)
      - [Code Linting](#code-linting)
+  - [Networks](#networks)
+     - [Testnets](#testnets)
+        - [Duero Testnet](#duero-testnet)
+        - [Nile Testnet](#nile-testnet)
+        - [Kovan Testnet](#kovan-testnet)
+     - [Mainnets](#mainnets)
+        - [Ethereum Mainnet](#ethereum-mainnet)
+        - [Pacific Mainnet](#pacific-mainnet)
   - [Packages](#packages)
-  - [Deployments, Upgrades, New Versions, New Releases](#deployments-upgrades-new-versions-new-releases)
   - [Documentation](#documentation)
   - [Contributing](#contributing)
   - [Prior Art](#prior-art)
@@ -105,6 +109,8 @@ Linting is setup for `JavaScript` with [ESLint](https://eslint.org) & Solidity w
 
 Code style is enforced through the CI test process, builds will fail if there're any linting errors.
 
+## Networks
+
 ### Testnets
 
 #### Duero Testnet
@@ -128,7 +134,7 @@ The contract addresses deployed on Ocean's Duero Test Network:
 | SignCondition                     | v0.10.3 | `0x8c4a2cC4572B6CD68c58BFc220f04CD1143230a0` |
 | TemplateStoreManager              | v0.10.3 | `0xF454Ec72eCed751ffAD94B11ae7c0323670dd976` |
 
-#### Nile Beta Network
+#### Nile Testnet
 
 The contract addresses deployed on Ocean's Nile Beta Network:
 
@@ -151,6 +157,12 @@ The contract addresses deployed on Ocean's Nile Beta Network:
 
 #### Kovan Testnet
 
+----
+
+**Deprecated**: The `kovan` network is deprecated and will be removed in the next version.
+
+----
+
 The contract addresses deployed on Kovan testnet:
 
 | Contract                          | Version | Address                                      |
@@ -170,26 +182,7 @@ The contract addresses deployed on Kovan testnet:
 | SignCondition                     | v0.10.3 | `0x7B8B2756de9Ab474ddbCc87047117a2A16419194` |
 | TemplateStoreManager              | v0.10.3 | `0xD20307e2620Bb8a60991f43c52b64f981103A829` |
 
-## Mainnets
-
-### Ethereum Mainnet
-
-The contract addresses deployed on Ethereum Mainnet:
-
-| Contract                          | Version | Address                                      |
-|-----------------------------------|---------|----------------------------------------------|
-| AccessSecretStoreCondition        | v0.10.3 | `0x57e299517B6E5637cE9da15E4372f42a63c7e099` |
-| AgreementStoreManager             | v0.10.3 | `0x5E98B9EfABe192aB02a9B39D9B44A22C88A625BD` |
-| ConditionStoreManager             | v0.10.3 | `0x031A0B2FE74086e5963CD5Ac27Bd1451A40Fe593` |
-| DIDRegistry                       | v0.10.3 | `0xC4A1D6d4778C9A17D5e37797dA2FaB48FA9d01f6` |
-| DIDRegistryLibrary                | v0.10.3 | `0xFb4231AF132A8E160292022eBd8ea4292104B1Da` |
-| EpochLibrary                      | v0.10.3 | `0xb5096b69638689eE2dC7CA56Babaf7d8521a7Abb` |
-| EscrowAccessSecretStoreTemplate   | v0.10.3 | `0xa713D8F4791512a599A98f5DcaCC6401D6c76e5f` |
-| EscrowReward                      | v0.10.3 | `0xB950FE753871dc8b79284d76EA4A213db4697578` |
-| HashLockCondition                 | v0.10.3 | `0x860761Dbbe9b8377A2933a1093B39167B907befF` |
-| LockRewardCondition               | v0.10.3 | `0xD41161D8f2CE5Ec95465F4b2fBD00Cfea186204C` |
-| SignCondition                     | v0.10.3 | `0xEE33DCDBE6aF6197dD01907cfc4296BFC0448B16` |
-| TemplateStoreManager              | v0.10.3 | `0x04DD5364b12131ae870Ec54bd539b5Cb94B9DC36` |
+### Mainnets
 
 ### Pacific Mainnet
 
@@ -211,6 +204,24 @@ The contract addresses deployed on Pacific Mainnet:
 | SignCondition                     | v0.10.3 | `0xB74172078ABb029FaD809335d82241371b998708` |
 | TemplateStoreManager              | v0.10.3 | `0xF2Cf3761c166c6D85d07299427821D18A4329cd1` |
 
+### Ethereum Mainnet
+
+The contract addresses deployed on Ethereum Mainnet:
+
+| Contract                          | Version | Address                                      |
+|-----------------------------------|---------|----------------------------------------------|
+| AccessSecretStoreCondition        | v0.10.3 | `0x57e299517B6E5637cE9da15E4372f42a63c7e099` |
+| AgreementStoreManager             | v0.10.3 | `0x5E98B9EfABe192aB02a9B39D9B44A22C88A625BD` |
+| ConditionStoreManager             | v0.10.3 | `0x031A0B2FE74086e5963CD5Ac27Bd1451A40Fe593` |
+| DIDRegistry                       | v0.10.3 | `0xC4A1D6d4778C9A17D5e37797dA2FaB48FA9d01f6` |
+| DIDRegistryLibrary                | v0.10.3 | `0xFb4231AF132A8E160292022eBd8ea4292104B1Da` |
+| EpochLibrary                      | v0.10.3 | `0xb5096b69638689eE2dC7CA56Babaf7d8521a7Abb` |
+| EscrowAccessSecretStoreTemplate   | v0.10.3 | `0xa713D8F4791512a599A98f5DcaCC6401D6c76e5f` |
+| EscrowReward                      | v0.10.3 | `0xB950FE753871dc8b79284d76EA4A213db4697578` |
+| HashLockCondition                 | v0.10.3 | `0x860761Dbbe9b8377A2933a1093B39167B907befF` |
+| LockRewardCondition               | v0.10.3 | `0xD41161D8f2CE5Ec95465F4b2fBD00Cfea186204C` |
+| SignCondition                     | v0.10.3 | `0xEE33DCDBE6aF6197dD01907cfc4296BFC0448B16` |
+| TemplateStoreManager              | v0.10.3 | `0x04DD5364b12131ae870Ec54bd539b5Cb94B9DC36` |
 
 ## Packages
 
@@ -238,7 +249,6 @@ Load the ABI of the `OceanToken` contract on the `nile` network:
 const OceanToken = require('@oceanprotocol/keeper-contracts/artifacts/OceanToken.nile.json')
 ```
 
-
 The structure of the `artifacts` is:
 
 ```json
@@ -250,15 +260,12 @@ The structure of the `artifacts` is:
 }
 ```
 
-## Deployments, Upgrades, New Versions, New Releases
-
-See [RELEASE_PROCESS.md](RELEASE_PROCESS.md)
-
 ## Documentation
 
-* [Main Documentation](doc/)
-* [Packaging of libraries](doc/packaging.md)
-* [Upgrading contracts](doc/upgrades.md)
+* [Contracts Documentation](doc/contracts/README.md)
+* [Release process](doc/RELEASE_PROCESS.md)
+* [Packaging of libraries](doc/PACKAGING.md)
+* [Upgrading of contracts](doc/UPGRADES.md)
 
 ## Contributing
 
