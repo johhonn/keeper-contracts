@@ -9,12 +9,57 @@ pragma solidity 0.5.6;
  */
 interface IList {
 
-   /**
-    * @notice 
-    */
-    function has(
+    function add(
+        bytes32[] calldata items
+    )
+        external
+        returns(bool);
+    
+    function add(
         bytes32 item
     )
-    external view
-    returns (bool exists);
+        external
+        returns(bool);
+        
+    function remove(
+        bytes32 item
+    )
+        external
+        returns(bool);
+    
+    function has(
+        bytes32 item
+    ) 
+        external 
+        view
+        returns(bool);
+    
+    function size()
+        external
+        view
+        returns(uint256);
+        
+    function get(
+        uint256 index
+    )
+        external
+        view
+        returns(bytes32);
+    
+    function all()
+        external
+        view
+        returns(bytes32[] memory);
+    
+    function indexOf(
+        bytes32 value 
+    )
+        external
+        view
+        returns(uint256);
+        
+    function ownedBy()
+        external
+        view
+        returns(address);
 }

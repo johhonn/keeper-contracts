@@ -303,11 +303,11 @@ library HashListLibrary {
     }
     
     /**
-     * @dev size gets the list size
+     * @dev ownedBy gets the list owner
      * @param _self is a pointer to list in the storage
      * @return list owner
      */
-    function owner(
+    function ownedBy(
         List storage _self
     )
         public
