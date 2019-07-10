@@ -170,32 +170,32 @@ library HashListLibrary {
     /**
      * @dev index is used to map each element value to its index on the list 
      * @param _self is a pointer to list in the storage
-     * @param start index is where to start indexing in the list
-     * @param end index is where to stop indexing
+     * @param from index is where to 'from' indexing in the list
+     * @param to index is where to stop indexing
      * @return true if the sub list is indexed
      */
     function index(
         List storage _self,
-        uint256 start,
-        uint256 end
+        uint256 from,
+        uint256 to
     )
         public
         onlyListOwner(_self)
         returns(bool)
     {
         require(
-            start > 0,
-            'Start index should be greater than zero'
+            from > 0,
+            'from index should be greater than zero'
         );
         
         require(
-            start <= _self.values.length &&
-            end <= _self.values.length,
+            from <= _self.values.length &&
+            to <= _self.values.length,
             'Indices are out of range'
         );
         
         require(
-            start <= end,
+            from <= to,
             'Invalid indices'
         );
         
@@ -205,13 +205,13 @@ library HashListLibrary {
             'List is already indexed'
         );
         
-        bytes32 endIndexValue = _self.values[end - 1];
+        bytes32 endIndexValue = _self.values[to - 1];
         require(
-            _self.indices[endIndexValue] != end,
+            _self.indices[endIndexValue] != to,
             'Values already are indexed, try different indices'
         );
         
-        return _index(_self, start, end);
+        return _index(_self, from, to);
     }
     
     /**
@@ -320,18 +320,18 @@ library HashListLibrary {
     /**
      * @dev _index assign index to the list elements
      * @param _self is a pointer to list in the storage
-     * @param start is the starting index id
-     * @param end is the ending index id
+     * @param from is the starting index id
+     * @param to is the ending index id
      */
     function _index(
         List storage _self,
-        uint256 start,
-        uint256 end
+        uint256 from,
+        uint256 to
     )
         private
         returns(bool)
     {
-        for(uint256 i = start - 1; i < end; i++)
+        for(uint256 i = from - 1; i < to; i++)
             _self.indices[_self.values[i]] = i + 1;
         return true;
     }

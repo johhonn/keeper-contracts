@@ -10,25 +10,39 @@ pragma solidity 0.5.6;
 interface IList {
 
     function add(
-        bytes32[] calldata items
+        bytes32[] calldata values
     )
         external
         returns(bool);
     
     function add(
-        bytes32 item
+        bytes32 value
     )
         external
         returns(bool);
         
     function remove(
-        bytes32 item
+        bytes32 value
     )
         external
         returns(bool);
     
+    function update(
+        bytes32 oldValue,
+        bytes32 newValue
+    )
+        external
+        returns(bool);
+    
+    function index(
+        uint256 from,
+        uint256 to
+    )
+        external
+        returns(bool);
+        
     function has(
-        bytes32 item
+        bytes32 value
     ) 
         external 
         view
@@ -40,7 +54,7 @@ interface IList {
         returns(uint256);
         
     function get(
-        uint256 index
+        uint256 _index
     )
         external
         view
@@ -62,4 +76,9 @@ interface IList {
         external
         view
         returns(address);
+        
+    function isIndexed()
+        external
+        view
+        returns(bool);
 }

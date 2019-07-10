@@ -25,59 +25,69 @@ contract HashList is Ownable, IList {
     )
         public
     {
-        // set list owner, initialize the list
-        bytes32[] memory items;
-        data.add(items);
+        // set list owner, init the list
+        bytes32[] memory values;
+        data.add(values);
         // initialize Ownable
         Ownable.initialize(owner);
     }
     
     function add(
-        bytes32[] calldata items
+        bytes32[] calldata values
     )
         external
         returns(bool)
     {
-        return data.add(items);
+        return data.add(values);
     }
     
     function add(
-        bytes32 item
+        bytes32 value
     )
         external
         returns(bool)
     {
-        return data.add(item);
+        return data.add(value);
+    }
+    
+    function index(
+        uint256 from,
+        uint256 to
+    )
+        external
+        returns(bool)
+    {
+        return data.index(from, to);
     }
     
     function has(
-        bytes32 item
+        bytes32 value
     ) 
         external 
         view
         returns(bool)
     {
-        return data.has(item);
+        return data.has(value);
     }
     
     function remove(
-        bytes32 item
+        bytes32 value
     )
         external
         returns(bool)
     {
-        return data.remove(item);
+        return data.remove(value);
     }
     
     
     function get(
-        uint256 index
+        uint256 _index
     )
         external
         view
         returns(bytes32)
     {
-        return data.get(index);
+        return data.get(_index);
     }
     
     function size()
@@ -97,13 +107,13 @@ contract HashList is Ownable, IList {
     }
     
     function indexOf(
-        bytes32 item
+        bytes32 value
     )
         external
         view
         returns(uint256)
     {
-        return data.indexOf(item);
+        return data.indexOf(value);
     }
     
     function ownedBy()
@@ -112,5 +122,13 @@ contract HashList is Ownable, IList {
         returns(address)
     {
         return data.ownedBy();
+    }
+    
+    function isIndexed()
+        external
+        view
+        returns(bool)
+    {
+        return data.isIndexed();
     }
 }
