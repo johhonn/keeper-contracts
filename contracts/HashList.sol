@@ -20,12 +20,16 @@ contract HashList is Ownable, IList {
     HashListLibrary.List data;
     
     
-    function initialize()
+    function initialize(
+        address owner
+    )
         public
     {
         // set list owner, initialize the list
         bytes32[] memory items;
         data.add(items);
+        // initialize Ownable
+        Ownable.initialize(owner);
     }
     
     function add(
