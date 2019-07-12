@@ -29,12 +29,11 @@ contract('Whitelisting Condition', (accounts) => {
         await HashList.link('HashListLibrary', hashListLibrary.address)
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
-
         const hashList = await HashList.new()
         await hashList.initialize(
             owner,
             {
-                from: accounts[0]
+                from: owner
             }
         )
         const conditionStoreManager = await ConditionStoreManager.new()
@@ -70,14 +69,14 @@ contract('Whitelisting Condition', (accounts) => {
             await hashList.initialize(
                 owner,
                 {
-                    from: accounts[0]
+                    from: owner
                 }
             )
 
             const conditionStoreManager = await ConditionStoreManager.new()
             await conditionStoreManager.initialize(
                 owner,
-                { from: accounts[0] }
+                { from: owner }
             )
 
             await conditionStoreManager.delegateCreateRole(
@@ -89,13 +88,13 @@ contract('Whitelisting Condition', (accounts) => {
             await whitelistingCondition.initialize(
                 owner,
                 conditionStoreManager.address,
-                { from: accounts[0] }
+                { from: owner }
             )
         })
     })
 
     describe('fulfill non existing condition', () => {
-        it('should not fulfill if conditions do not exist for bytes32 message', async () => {
+        it('should not fulfill if conditions do not exist', async () => {
             const { whitelistingCondition, hashList } = await setupTest()
             const someone = accounts[9]
             let agreementId = constants.bytes32.one
@@ -110,115 +109,137 @@ contract('Whitelisting Condition', (accounts) => {
     })
 
     describe('fulfill existing condition', () => {
-        it('should fulfill if conditions exist for bytes32 message', async () => {
-            const { whitelistingCondition, conditionStoreManager } = await setupTest()
-//
-//            let agreementId = constants.bytes32.one
-//            let {
-//                message,
-//                publicKey,
-//                signature
-//            } = constants.condition.sign.bytes32
-//
-//            let hashValues = await signCondition.hashValues(message, publicKey)
-//            let conditionId = await signCondition.generateId(agreementId, hashValues)
-//
-//            await conditionStoreManager.createCondition(
-//                conditionId,
-//                signCondition.address
-//            )
-//
-//            await signCondition.fulfill(agreementId, message, publicKey, signature)
-//
-//            let { state } = await conditionStoreManager.getCondition(conditionId)
-//            assert.strictEqual(constants.condition.state.fulfilled, state.toNumber())
+        it('should fulfill if conditions exist', async () => {
+            const {
+                whitelistingCondition,
+                conditionStoreManager,
+                hashList,
+                conditionId,
+                owner,
+                createRole
+            } = await setupTest()
+
+            // let agreementId = constants.bytes32.one
+            const someone = accounts[9]
+
+            const value = await hashList.hash(someone)
+            await hashList.add(
+                value,
+                {
+                    from: owner
+                }
+            )
+            // let hashValues = await whitelistingCondition.hashValues(hashList.address, value)
+
+            await conditionStoreManager.createCondition(
+                conditionId,
+                whitelistingCondition.address
+            )
+
+            await conditionStoreManager.delegateUpdateRole(
+                conditionId,
+                createRole,
+                { from: owner }
+            )
+
+            //            await whitelistingCondition.fulfill(
+            //                agreementId,
+            //                hashList.address,
+            //                value,
+            //                {
+            //                    from: createRole
+            //                }
+            //            )
+            //
+            //            let { state } = await conditionStoreManager.getCondition(conditionId)
+            //            assert.strictEqual(constants.condition.state.fulfilled, state.toNumber())
         })
     })
 
     describe('fail to fulfill existing condition', () => {
-        it('wrong signature should fail to fulfill if conditions exist for bytes32 message', async () => {
-            const { whitelistingCondition, conditionStoreManager } = await setupTest()
-//
-//            let agreementId = constants.bytes32.one
-//            let {
-//                message,
-//                publicKey
-//            } = constants.condition.sign.bytes32
-//
-//            let hashValues = await signCondition.hashValues(message, publicKey)
-//            let conditionId = await signCondition.generateId(agreementId, hashValues)
-//
-//            await conditionStoreManager.createCondition(
-//                conditionId,
-//                signCondition.address
-//            )
-//
-//            await assert.isRejected(
-//                signCondition.fulfill(
-//                    agreementId, message, publicKey,
-//                    constants.bytes32.one
-//                ),
-//                constants.condition.sign.error.couldNotRecoverSignature
-//            )
+        it('wrong value should fail to fulfill if conditions exist', async () => {
+            // const { whitelistingCondition, conditionStoreManager } = await setupTest()
+            //
+            //            let agreementId = constants.bytes32.one
+            //            let {
+            //                message,
+            //                publicKey
+            //            } = constants.condition.sign.bytes32
+            //
+            //            let hashValues = await signCondition.hashValues(message, publicKey)
+            //            let conditionId = await signCondition.generateId(agreementId, hashValues)
+            //
+            //            await conditionStoreManager.createCondition(
+            //                conditionId,
+            //                signCondition.address
+            //            )
+            //
+            //            await assert.isRejected(
+            //                signCondition.fulfill(
+            //                    agreementId, message, publicKey,
+            //                    constants.bytes32.one
+            //                ),
+            //                constants.condition.sign.error.couldNotRecoverSignature
+            //            )
         })
 
-        it('right signature should fail to fulfill if conditions already fulfilled for bytes32', async () => {
-            const { whitelistingCondition, conditionStoreManager } = await setupTest()
-//
-//            let agreementId = constants.bytes32.one
-//            let {
-//                message,
-//                publicKey,
-//                signature
-//            } = constants.condition.sign.bytes32
-//
-//            let hashValues = await signCondition.hashValues(message, publicKey)
-//            let conditionId = await signCondition.generateId(agreementId, hashValues)
-//
-//            await conditionStoreManager.createCondition(
-//                conditionId,
-//                signCondition.address
-//            )
-//
-//            // fulfill once
-//            await signCondition.fulfill(agreementId, message, publicKey, signature)
-//            // try to fulfill another time
-//            await assert.isRejected(
-//                signCondition.fulfill(agreementId, message, publicKey, signature),
-//                constants.condition.state.error.invalidStateTransition
-//            )
+        it('right value should fail to fulfill if conditions already fulfilled ', async () => {
+            // const { whitelistingCondition, conditionStoreManager } = await setupTest()
+            //
+            //            let agreementId = constants.bytes32.one
+            //            let {
+            //                message,
+            //                publicKey,
+            //                signature
+            //            } = constants.condition.sign.bytes32
+            //
+            //            let hashValues = await signCondition.hashValues(message, publicKey)
+            //            let conditionId = await signCondition.generateId(agreementId, hashValues)
+            //
+            //            await conditionStoreManager.createCondition(
+            //                conditionId,
+            //                signCondition.address
+            //            )
+            //
+            //            // fulfill once
+            //            await signCondition.fulfill(agreementId, message, publicKey, signature)
+            //            // try to fulfill another time
+            //            await assert.isRejected(
+            //                signCondition.fulfill(agreementId, message, publicKey, signature),
+            //                constants.condition.state.error.invalidStateTransition
+            //            )
         })
 
         it('should fail to fulfill if conditions has different type ref', async () => {
-            const { whitelistingCondition, conditionStoreManager, createRole, owner } = await setupTest()
-//
-//            let agreementId = constants.bytes32.one
-//            let {
-//                message,
-//                publicKey,
-//                signature
-//            } = constants.condition.sign.bytes32
-//
-//            let hashValues = await signCondition.hashValues(message, publicKey)
-//            let conditionId = await signCondition.generateId(agreementId, hashValues)
-//
-//            // create a condition of a type different than sign condition
-//            await conditionStoreManager.createCondition(
-//                conditionId,
-//                signCondition.address
-//            )
-//
-//            await conditionStoreManager.delegateUpdateRole(
-//                conditionId,
-//                createRole,
-//                { from: owner }
-//            )
-//
-//            // try to fulfill from sign condition
-//            await assert.isRejected(
-//                signCondition.fulfill(agreementId, message, publicKey, signature),
-//                constants.acl.error.invalidUpdateRole
-//            )
+            // const { whitelistingCondition, conditionStoreManager, createRole, owner } = await setupTest()
+            //
+            //            let agreementId = constants.bytes32.one
+            //            let {
+            //                message,
+            //                publicKey,
+            //                signature
+            //            } = constants.condition.sign.bytes32
+            //
+            //            let hashValues = await signCondition.hashValues(message, publicKey)
+            //            let conditionId = await signCondition.generateId(agreementId, hashValues)
+            //
+            //            // create a condition of a type different than sign condition
+            //            await conditionStoreManager.createCondition(
+            //                conditionId,
+            //                signCondition.address
+            //            )
+            //
+            //            await conditionStoreManager.delegateUpdateRole(
+            //                conditionId,
+            //                createRole,
+            //                { from: owner }
+            //            )
+            //
+            //            // try to fulfill from sign condition
+            //            await assert.isRejected(
+            //                signCondition.fulfill(agreementId, message, publicKey, signature),
+            //                constants.acl.error.invalidUpdateRole
+            //            )
         })
     })
 })
