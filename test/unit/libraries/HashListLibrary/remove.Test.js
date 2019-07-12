@@ -19,7 +19,6 @@ contract('HashListLibrary', (accounts) => {
         HashListLibraryProxy.link('HashListLibrary', hashListLibrary.address)
         hashListLibraryProxy = await HashListLibraryProxy.new()
         hashListLibraryProxy.initialize(accounts[0], { from: owner })
-
     })
 
     describe('remove', () => {
@@ -48,7 +47,6 @@ contract('HashListLibrary', (accounts) => {
         })
 
         it('should fail to remove if value does not exist', async () => {
-
             const newAccountHash = await hashListLibraryProxy.hash(accounts[1])
             await hashListLibraryProxy.add(
                 newAccountHash,

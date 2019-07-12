@@ -216,16 +216,16 @@ library HashListLibrary {
      * @dev setOwner set list owner
      * param _owner owner address
      */
-     function setOwner(
+    function setOwner(
         List storage _self,
         address _owner
-     )
+    )
         public
         onlyListOwner(_self)
-     {
+    {
         _self._owner = _owner;
-     }
-    
+    }
+
     /**
      * @dev indexOf gets the index of a value in a list
      * @param _self is a pointer to list in the storage
