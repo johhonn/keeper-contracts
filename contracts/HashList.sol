@@ -17,19 +17,24 @@ import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 contract HashList is Ownable, IList {
     
     using HashListLibrary for HashListLibrary.List;        
-    HashListLibrary.List data;
+    HashListLibrary.List list;
     
     
     function initialize(
-        address owner
+        address _owner
     )
         public
     {
-        // set list owner, init the list
-        bytes32[] memory values;
-        data.add(values);
-        // initialize Ownable
-        Ownable.initialize(owner);
+        list.setOwner(msg.sender);
+        Ownable.initialize(_owner);
+    }
+    
+    function hash(address account)
+        external
+        pure
+        returns(bytes32)
+    {
+        return keccak256(abi.encodePacked(account));
     }
     
     function add(
@@ -38,7 +43,7 @@ contract HashList is Ownable, IList {
         external
         returns(bool)
     {
-        return data.add(values);
+        return list.add(values);
     }
     
     function add(
@@ -47,9 +52,19 @@ contract HashList is Ownable, IList {
         external
         returns(bool)
     {
-        return data.add(value);
+        return list.add(value);
     }
     
+    function update(
+        bytes32 oldValue,
+        bytes32 newValue
+    )
+        external
+        returns(bool)
+    {
+        return list.update(oldValue, newValue);
+    }
+        
     function index(
         uint256 from,
         uint256 to
@@ -57,7 +72,7 @@ contract HashList is Ownable, IList {
         external
         returns(bool)
     {
-        return data.index(from, to);
+        return list.index(from, to);
     }
     
     function has(
@@ -67,7 +82,7 @@ contract HashList is Ownable, IList {
         view
         returns(bool)
     {
-        return data.has(value);
+        return list.has(value);
     }
     
     function remove(
@@ -76,7 +91,7 @@ contract HashList is Ownable, IList {
         external
         returns(bool)
     {
-        return data.remove(value);
+        return list.remove(value);
     }
     
     
@@ -87,7 +102,7 @@ contract HashList is Ownable, IList {
         view
         returns(bytes32)
     {
-        return data.get(_index);
+        return list.get(_index);
     }
     
     function size()
@@ -95,7 +110,7 @@ contract HashList is Ownable, IList {
         view
         returns(uint256)
     {
-        return data.size();
+        return list.size();
     }
     
     function all()
@@ -103,7 +118,7 @@ contract HashList is Ownable, IList {
         view
         returns(bytes32[] memory)
     {
-        return data.all();
+        return list.all();
     }
     
     function indexOf(
@@ -113,7 +128,7 @@ contract HashList is Ownable, IList {
         view
         returns(uint256)
     {
-        return data.indexOf(value);
+        return list.indexOf(value);
     }
     
     function ownedBy()
@@ -121,7 +136,7 @@ contract HashList is Ownable, IList {
         view
         returns(address)
     {
-        return data.ownedBy();
+        return list.ownedBy();
     }
     
     function isIndexed()
@@ -129,6 +144,6 @@ contract HashList is Ownable, IList {
         view
         returns(bool)
     {
-        return data.isIndexed();
+        return list.isIndexed();
     }
 }
