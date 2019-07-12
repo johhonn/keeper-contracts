@@ -17,10 +17,8 @@ contract HashListLibraryProxy is Ownable {
     )
         public
     {
-    
+        testData.setOwner(msg.sender);
         Ownable.initialize(_owner);
-        bytes32[] memory values;
-        testData.add(values);
     }
 
     
@@ -50,6 +48,16 @@ contract HashListLibraryProxy is Ownable {
         returns(bool)
     {
         return testData.add(value);
+    }
+    
+    function update(
+        bytes32 oldValue,
+        bytes32 newValue
+    )
+        external
+        returns(bool)
+    {
+        return testData.update(oldValue, newValue);
     }
     
     function index(

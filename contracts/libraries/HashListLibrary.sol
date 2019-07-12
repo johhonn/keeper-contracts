@@ -1,4 +1,7 @@
 pragma solidity 0.5.6;
+// Copyright BigchainDB GmbH and Ocean Protocol contributors
+// SPDX-License-Identifier: (Apache-2.0 AND CC-BY-4.0)
+// Code is Apache-2.0 and docs are CC-BY-4.0
 
 import 'openzeppelin-eth/contracts/math/SafeMath.sol';
 
@@ -50,9 +53,6 @@ library HashListLibrary {
             'Value already exists'
         );
         
-        if(_self._owner == address(0))
-            _self._owner = msg.sender;
-        
         _self.values.push(value);
         _self.indices[value] = _self.values.length;
         return true;
@@ -73,8 +73,6 @@ library HashListLibrary {
         onlyListOwner(_self)
         returns(bool)
     {
-        if(_self._owner == address(0))
-            _self._owner = msg.sender;
         _self.values = values;
         return true;
     }
@@ -213,6 +211,20 @@ library HashListLibrary {
         
         return _index(_self, from, to);
     }
+    
+    /**
+     * @dev setOwner set list owner
+     * param _owner owner address
+     */
+     function setOwner(
+        List storage _self,
+        address _owner
+     )
+        public
+        onlyListOwner(_self)
+     {
+        _self._owner = _owner;
+     }
     
     /**
      * @dev indexOf gets the index of a value in a list
