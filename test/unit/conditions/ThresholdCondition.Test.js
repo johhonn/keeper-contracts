@@ -16,6 +16,7 @@ const constants = require('../../helpers/constants.js')
 contract('Threshold Condition', (accounts) => {
     let owner = accounts[1]
     let createRole = accounts[0]
+    let hashLockCondition
     async function setupTest({
         conditionId = constants.bytes32.one,
         conditionType = constants.address.dummy,
@@ -72,8 +73,7 @@ contract('Threshold Condition', (accounts) => {
             hashLockCondition.address
         )
 
-        if(fulfillInputConditions)
-        {
+        if (fulfillInputConditions) {
             await hashLockCondition.fulfill(
                 constants.bytes32.one,
                 constants.condition.hashlock.uint.preimage
@@ -84,8 +84,8 @@ contract('Threshold Condition', (accounts) => {
                 constants.condition.hashlock.uint.preimage
             )
 
-            const firstConditionState  = await conditionStoreManager.getCondition(firstConditionId)
-            const secondConditionState  = await conditionStoreManager.getCondition(secondConditionId)
+            const firstConditionState = await conditionStoreManager.getCondition(firstConditionId)
+            const secondConditionState = await conditionStoreManager.getCondition(secondConditionId)
             assert.strictEqual(firstConditionState.state.toNumber(), constants.condition.state.fulfilled)
             assert.strictEqual(secondConditionState.state.toNumber(), constants.condition.state.fulfilled)
         }
@@ -126,7 +126,6 @@ contract('Threshold Condition', (accounts) => {
     describe('fulfill non existing condition', () => {
         it('should not fulfill if conditions do not exist', async () => {
             const { thresholdCondition, inputConditions } = await setupTest()
-            const someone = accounts[9]
             let agreementId = constants.bytes32.three
 
             await assert.isRejected(
@@ -142,12 +141,10 @@ contract('Threshold Condition', (accounts) => {
                 thresholdCondition,
                 conditionStoreManager,
                 inputConditions,
-                owner,
                 createRole
             } = await setupTest()
 
             let agreementId = constants.bytes32.three
-            const someone = accounts[9]
 
             let hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
 
@@ -181,11 +178,9 @@ contract('Threshold Condition', (accounts) => {
                 thresholdCondition,
                 conditionStoreManager,
                 inputConditions,
-                owner,
                 createRole
             } = await setupTest()
             let agreementId = constants.bytes32.three
-            const someone = accounts[9]
 
             let hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
 
@@ -207,12 +202,12 @@ contract('Threshold Condition', (accounts) => {
                     from: createRole
                 }
             )
-            invalidInputConditions = [
+            const invalidInputConditions = [
                 constants.bytes32.one,
                 constants.bytes32.two
             ]
             await assert.isRejected(
-                    thresholdCondition.methods['fulfill(bytes32,bytes32[],uint256)'](
+                thresholdCondition.methods['fulfill(bytes32,bytes32[],uint256)'](
                     agreementId,
                     invalidInputConditions,
                     inputConditions.length,
@@ -229,11 +224,9 @@ contract('Threshold Condition', (accounts) => {
                 thresholdCondition,
                 conditionStoreManager,
                 inputConditions,
-                owner,
                 createRole
             } = await setupTest()
             let agreementId = constants.bytes32.three
-            const someone = accounts[9]
 
             let hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
 
@@ -247,10 +240,10 @@ contract('Threshold Condition', (accounts) => {
                 thresholdCondition.address
             )
             await assert.isRejected(
-                    thresholdCondition.methods['fulfill(bytes32,bytes32[],uint256)'](
+                thresholdCondition.methods['fulfill(bytes32,bytes32[],uint256)'](
                     agreementId,
                     inputConditions,
-                    inputConditions.length -1,
+                    inputConditions.length - 1,
                     {
                         from: createRole
                     }
@@ -264,12 +257,10 @@ contract('Threshold Condition', (accounts) => {
                 thresholdCondition,
                 conditionStoreManager,
                 inputConditions,
-                owner,
                 createRole
             } = await setupTest()
 
             let agreementId = constants.bytes32.three
-            const someone = accounts[9]
 
             let hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
 
@@ -315,7 +306,6 @@ contract('Threshold Condition', (accounts) => {
             } = await setupTest()
 
             let agreementId = constants.bytes32.three
-            const someone = accounts[9]
 
             let hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
 
