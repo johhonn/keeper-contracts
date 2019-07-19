@@ -31,7 +31,12 @@ contract ThresholdCondition is Condition {
         pure
         returns (bytes32)
     {
-        return keccak256(abi.encodePacked(inputConditions, nInputFulfilledConditions));
+        return keccak256(
+            abi.encodePacked(
+                inputConditions, 
+                nInputFulfilledConditions
+            )
+        );
     }
     
     
@@ -44,9 +49,9 @@ contract ThresholdCondition is Condition {
         returns (ConditionStoreLibrary.ConditionState)
     {
         require(
-             _inputConditions.length >= 2 &&
-             nInputFulfilledConditions <= _inputConditions.length,
-             'Invalid input conditions length'
+            _inputConditions.length >= 2 &&
+            nInputFulfilledConditions <= _inputConditions.length,
+            'Invalid input conditions length'
         );
         
         require(
@@ -78,17 +83,22 @@ contract ThresholdCondition is Condition {
         uint256 counter = 0;
         _fulfill = false;
         ConditionStoreLibrary.ConditionState inputConditionState;
+        ConditionStoreLibrary.ConditionState Fulfilled;
+        Fulfilled = ConditionStoreLibrary.ConditionState.Fulfilled;
+        
         for (uint i=0; i < _inputConditions.length; i++)
         { 
-            (,inputConditionState,,,,,) = conditionStoreManager.getCondition(_inputConditions[i]);
-            if(inputConditionState == ConditionStoreLibrary.ConditionState.Fulfilled)
+            (,inputConditionState,,,,,) = conditionStoreManager.
+            getCondition(_inputConditions[i]);
+            
+            if(inputConditionState == Fulfilled)
                 counter ++;
             if (counter >= nInputFulfilledConditions)
             {
                 _fulfill = true;
                 break;
             }
-      }
+        }
     }
     
 }
