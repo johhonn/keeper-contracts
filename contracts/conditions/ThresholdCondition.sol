@@ -49,12 +49,12 @@ contract ThresholdCondition is Condition {
     * @notice hashValues generates the hash of condition inputs 
     *        with the following parameters
     * @param inputConditions array of input conditions IDs
-    * @param nInputFulfilledConditions the required number of fulfilled input conditions
+    * @param threshold the required number of fulfilled input conditions
     * @return bytes32 hash of all these values 
     */
     function hashValues(
         bytes32[] memory inputConditions, 
-        uint256 nInputFulfilledConditions    
+        uint256 threshold    
     )
         public
         pure
@@ -63,7 +63,7 @@ contract ThresholdCondition is Condition {
         return keccak256(
             abi.encodePacked(
                 inputConditions, 
-                nInputFulfilledConditions
+                threshold
             )
         );
     }
@@ -74,25 +74,25 @@ contract ThresholdCondition is Condition {
     *       fulfilled or not.
     * @param _agreementId agreement identifier
     * @param _inputConditions array of input conditions IDs
-    * @param nInputFulfilledConditions the required number of fulfilled input conditions
+    * @param threshold the required number of fulfilled input conditions
     * @return condition state (Fulfilled/Aborted)
     */
     function fulfill(
         bytes32 _agreementId,
         bytes32[] calldata _inputConditions,
-        uint256 nInputFulfilledConditions
+        uint256 threshold
     )
         external
         returns (ConditionStoreLibrary.ConditionState)
     {
         require(
             _inputConditions.length >= 2 &&
-            nInputFulfilledConditions <= _inputConditions.length,
+            threshold <= _inputConditions.length,
             'Invalid input conditions length'
         );
         
         require(
-            canFulfill(_inputConditions, nInputFulfilledConditions),
+            canFulfill(_inputConditions, threshold),
             'Invalid threshold fulfilment'
         );
         
@@ -101,7 +101,7 @@ contract ThresholdCondition is Condition {
                 _agreementId, 
                 hashValues(
                     _inputConditions, 
-                    nInputFulfilledConditions
+                    threshold
                 )
             ),
             ConditionStoreLibrary.ConditionState.Fulfilled
@@ -111,12 +111,12 @@ contract ThresholdCondition is Condition {
    /**
     * @notice canFulfill check if condition can be fulfilled
     * @param _inputConditions array of input conditions IDs
-    * @param nInputFulfilledConditions the required number of fulfilled input conditions
+    * @param threshold the required number of fulfilled input conditions
     * @return true if can fulfill 
     */
     function canFulfill(
         bytes32[] memory _inputConditions,
-        uint256 nInputFulfilledConditions
+        uint256 threshold
     )
         private
         view
@@ -135,7 +135,7 @@ contract ThresholdCondition is Condition {
             
             if(inputConditionState == Fulfilled)
                 counter ++;
-            if (counter >= nInputFulfilledConditions)
+            if (counter >= threshold)
             {
                 _fulfill = true;
                 break;
