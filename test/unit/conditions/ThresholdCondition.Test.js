@@ -338,4 +338,104 @@ contract('Threshold Condition', (accounts) => {
             )
         })
     })
+
+    describe('UNINITIALIZED OR ABORTED input conditions', () => {
+        it('should fail if input conditions are Uninitialized', async () => {
+            const {
+                thresholdCondition,
+                conditionStoreManager,
+                inputConditions,
+                createRole
+            } = await setupTest({ fulfillInputConditions : false })
+
+            let agreementId = constants.bytes32.three
+
+            let hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
+
+            const conditionId = await thresholdCondition.generateId(
+                agreementId,
+                hashValues
+            )
+
+            await conditionStoreManager.createCondition(
+                conditionId,
+                thresholdCondition.address
+            )
+
+            await assert.isRejected(
+                thresholdCondition.methods['fulfill(bytes32,bytes32[],uint256)'](
+                    agreementId,
+                    inputConditions,
+                    inputConditions.length,
+                    {
+                        from: createRole
+                    }
+                )
+            )
+        })
+
+        it('should fail if input conditions are ABORTED', async () => {
+            const {
+                thresholdCondition,
+                conditionStoreManager,
+                inputConditions,
+                createRole,
+                owner
+            } = await setupTest({ fulfillInputConditions : false })
+
+            let agreementId = constants.bytes32.three
+
+            let hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
+
+            const conditionId = await thresholdCondition.generateId(
+                agreementId,
+                hashValues
+            )
+
+            // Abort input conditions
+            await conditionStoreManager.delegateUpdateRole(
+                inputConditions[0],
+                createRole,
+                {
+                    from: owner
+                }
+            )
+            await conditionStoreManager.delegateUpdateRole(
+                inputConditions[1],
+                createRole,
+                {
+                    from: owner
+                }
+            )
+            await conditionStoreManager.updateConditionState(
+                inputConditions[0],
+                3,
+                {
+                    from: createRole
+                }
+            )
+            await conditionStoreManager.updateConditionState(
+                inputConditions[1],
+                3,
+                {
+                    from: createRole
+                }
+            )
+            await conditionStoreManager.createCondition(
+                conditionId,
+                thresholdCondition.address
+            )
+
+            await assert.isRejected(
+                thresholdCondition.methods['fulfill(bytes32,bytes32[],uint256)'](
+                    agreementId,
+                    inputConditions,
+                    inputConditions.length,
+                    {
+                        from: createRole
+                    }
+                )
+            )
+        })
+    })
 })
