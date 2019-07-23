@@ -12,17 +12,22 @@ const ThresholdCondition = artifacts.require('ThresholdCondition')
 const HashLockCondition = artifacts.require('HashLockCondition')
 
 const constants = require('../../helpers/constants.js')
+const testUtils = require('../../helpers/utils.js')
 
 contract('Threshold Condition', (accounts) => {
     let owner = accounts[1]
     let createRole = accounts[0]
     let hashLockCondition
+    let randomConditionID
+    let randomConditions = []
     async function setupTest({
         conditionId = constants.bytes32.one,
         conditionType = constants.address.dummy,
         createRole = accounts[0],
         owner = accounts[1],
-        fulfillInputConditions = true
+        fulfillInputConditions = true,
+        includeRandomInputConditions = false,
+        MaxNConditions = 1000
     } = {}) {
         const epochLibrary = await EpochLibrary.new()
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
@@ -95,7 +100,20 @@ contract('Threshold Condition', (accounts) => {
             secondConditionId
         ]
 
-        return { thresholdCondition, conditionStoreManager, conditionId, conditionType, createRole, owner, inputConditions }
+        if (includeRandomInputConditions) {
+            for (let i = 0; i < MaxNConditions - 2; i++) {
+                randomConditionID = testUtils.generateId()
+                await conditionStoreManager.createCondition(
+                    randomConditionID,
+                    hashLockCondition.address
+                )
+                randomConditions.push(randomConditionID)
+            }
+            randomConditions.push(inputConditions[0])
+            randomConditions.push(inputConditions[1])
+        }
+
+        return { thresholdCondition, conditionStoreManager, conditionId, conditionType, createRole, owner, inputConditions, randomConditions }
     }
 
     describe('deploy and setup', () => {
@@ -346,7 +364,7 @@ contract('Threshold Condition', (accounts) => {
                 conditionStoreManager,
                 inputConditions,
                 createRole
-            } = await setupTest({ fulfillInputConditions : false })
+            } = await setupTest({ fulfillInputConditions: false })
 
             let agreementId = constants.bytes32.three
 
@@ -381,7 +399,7 @@ contract('Threshold Condition', (accounts) => {
                 inputConditions,
                 createRole,
                 owner
-            } = await setupTest({ fulfillInputConditions : false })
+            } = await setupTest({ fulfillInputConditions: false })
 
             let agreementId = constants.bytes32.three
 
@@ -436,6 +454,47 @@ contract('Threshold Condition', (accounts) => {
                     }
                 )
             )
+        })
+    })
+
+    describe('load testing', () => {
+        it('should pass if the last input conditions pass the threshold', async () => {
+            const {
+                thresholdCondition,
+                conditionStoreManager,
+                randomConditions,
+                inputConditions,
+                createRole
+            } = await setupTest({
+                includeRandomInputConditions: true,
+                fulfillInputConditions: true
+            })
+            let agreementId = constants.bytes32.three
+
+            const threshold = inputConditions.length
+            let hashValues = await thresholdCondition.hashValues(randomConditions, threshold)
+
+            const conditionId = await thresholdCondition.generateId(
+                agreementId,
+                hashValues
+            )
+
+            await conditionStoreManager.createCondition(
+                conditionId,
+                thresholdCondition.address
+            )
+
+            await thresholdCondition.methods['fulfill(bytes32,bytes32[],uint256)'](
+                agreementId,
+                randomConditions,
+                threshold,
+                {
+                    from: createRole
+                }
+            )
+
+            let { state } = await conditionStoreManager.getCondition(conditionId)
+            assert.strictEqual(constants.condition.state.fulfilled, state.toNumber())
         })
     })
 })
