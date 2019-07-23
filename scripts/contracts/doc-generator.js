@@ -23,7 +23,10 @@ const contracts = [
     'Dispenser',
     'DIDRegistry',
     'ISecretStore',
-    'Common'
+    'Common',
+    'HashListLibrary',
+    'WhitelistingCondition',
+    'HashList'
 ]
 
 contracts.forEach((contractName) => {
