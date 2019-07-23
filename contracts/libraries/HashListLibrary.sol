@@ -230,7 +230,7 @@ library HashListLibrary {
      * @dev indexOf gets the index of a value in a list
      * @param _self is a pointer to list in the storage
      * @param value is element value in list
-     * @return true if the list is indexed
+     * @return value index in list
      */
     function indexOf(
         List storage _self,
@@ -268,7 +268,7 @@ library HashListLibrary {
     /**
      * @dev all returns all list elements
      * @param _self is a pointer to list in the storage
-     * @return true if the value exists
+     * @return all list elements
      */
     function all(
         List storage _self
