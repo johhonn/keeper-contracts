@@ -15,8 +15,7 @@ import './Condition.sol';
  *      Threshold condition acts as a filter for a set of input condition(s) in which sends 
  *      a signal whether to complete the flow execution or abort it. This type of conditions 
  *      works as intermediary conditions where they wire SEA conditions in order to support  
- *      more complex scenarios. The logic gate conditions can be categorized into three basic
- *      condition types but also we can expend this to support more features in the future.
+ *      more complex scenarios.
  */
 contract ThresholdCondition is Condition {
     
