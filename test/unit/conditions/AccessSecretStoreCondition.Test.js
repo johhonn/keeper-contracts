@@ -10,6 +10,8 @@ const EpochLibrary = artifacts.require('EpochLibrary')
 const AgreementStoreLibrary = artifacts.require('AgreementStoreLibrary')
 const ConditionStoreManager = artifacts.require('ConditionStoreManager')
 const AgreementStoreManager = artifacts.require('AgreementStoreManager')
+const DIDRegistry = artifacts.require('DIDRegistry')
+const DIDRegistryLibrary = artifacts.require('DIDRegistryLibrary')
 const AccessSecretStoreCondition = artifacts.require('AccessSecretStoreCondition')
 
 const constants = require('../../helpers/constants.js')
@@ -46,10 +48,11 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
 
         accessSecretStoreCondition = await AccessSecretStoreCondition.new()
 
-        await accessSecretStoreCondition.initialize(
-            owner,
+        await accessSecretStoreCondition.methods['initialize(address,address,address,address)'](
+            accounts[0],
             conditionStoreManager.address,
             agreementStoreManager.address,
+            didRegistry.address,
             { from: owner }
         )
 
@@ -58,6 +61,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
         }
 
         return {
+            did,
             conditionId,
             conditionType,
             owner,
@@ -73,13 +77,17 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             const agreementStoreLibrary = await AgreementStoreLibrary.new()
             await AgreementStoreManager.link('AgreementStoreLibrary', agreementStoreLibrary.address)
             const agreementStoreManager = await AgreementStoreManager.new()
-
+            const didRegistryLibrary = await DIDRegistryLibrary.new()
+            await DIDRegistry.link('DIDRegistryLibrary', didRegistryLibrary.address)
+            const didRegistry = await DIDRegistry.new()
+            await didRegistry.initialize(accounts[0])
             const accessSecretStoreCondition = await AccessSecretStoreCondition.new()
 
-            await accessSecretStoreCondition.initialize(
+            await accessSecretStoreCondition.methods['initialize(address,address,address,address)'](
                 accounts[0],
                 conditionStoreManager.address,
                 agreementStoreManager.address,
+                didRegistry.address,
                 { from: accounts[0] }
             )
         })
@@ -95,17 +103,17 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
 
             await assert.isRejected(
                 accessSecretStoreCondition.fulfill(agreementId, documentId, grantee),
-                constants.acl.error.invalidUpdateRole
+                'Invalid DID owner/provider'
             )
         })
     })
 
     describe('fulfill existing condition', () => {
         it('should fulfill if condition exist', async () => {
-            await setupTest({ registerDID: true })
+            const { did } = await setupTest({ registerDID: true })
 
             const agreementId = constants.bytes32.one
-            const documentId = constants.bytes32.one
+            const documentId = did
             const grantee = accounts[1]
 
             const templateId = accounts[2]
@@ -146,10 +154,10 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
 
     describe('fail to fulfill existing condition', () => {
         it('wrong did owner should fail to fulfill if conditions exist', async () => {
-            await setupTest({ registerDID: true })
+            const { did } = await setupTest({ registerDID: true })
 
             const agreementId = constants.bytes32.one
-            const documentId = constants.bytes32.one
+            const documentId = did
             const grantee = accounts[1]
 
             const templateId = accounts[2]
@@ -175,15 +183,15 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
 
             await assert.isRejected(
                 accessSecretStoreCondition.fulfill(agreementId, documentId, grantee, { from: accounts[1] }),
-                constants.acl.error.invalidUpdateRole
+                'Invalid DID owner/provider'
             )
         })
 
         it('right did owner should fail to fulfill if conditions already fulfilled', async () => {
-            await setupTest({ registerDID: true })
+            const { did } = await setupTest({ registerDID: true })
 
             const agreementId = constants.bytes32.one
-            const documentId = constants.bytes32.one
+            const documentId = did
             const grantee = accounts[1]
 
             const templateId = accounts[2]
@@ -218,10 +226,10 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
 
     describe('get access secret store condition', () => {
         it('successful create should get condition and permissions', async () => {
-            await setupTest({ registerDID: true })
+            const { did } = await setupTest({ registerDID: true })
 
             const agreementId = constants.bytes32.one
-            const documentId = constants.bytes32.one
+            const documentId = did
             const grantee = accounts[1]
             const timeLock = 10000210
             const timeOut = 234898098
@@ -259,10 +267,10 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
     })
     describe('check permissions', () => {
         it('should grant permission in case of DID provider', async () => {
-            const { DIDProvider } = await setupTest({ registerDID: true })
+            const { DIDProvider, did } = await setupTest({ registerDID: true })
 
             const agreementId = constants.bytes32.one
-            const documentId = constants.bytes32.one
+            const documentId = did
             const grantee = accounts[1]
             const timeLock = 0
             const timeOut = 234898098
@@ -299,10 +307,10 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             )
         })
         it('successful create should check permissions', async () => {
-            await setupTest({ registerDID: true })
+            const { did } = await setupTest({ registerDID: true })
 
             const agreementId = constants.bytes32.one
-            const documentId = constants.bytes32.one
+            const documentId = did
             const grantee = accounts[1]
             const timeLock = 0
             const timeOut = 234898098

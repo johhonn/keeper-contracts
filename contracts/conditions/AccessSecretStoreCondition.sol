@@ -5,7 +5,7 @@ pragma solidity 0.5.6;
 
 import './Condition.sol';
 import '../ISecretStore.sol';
-import '../SecretStorePermissions.sol';
+import '../registry/DIDRegistry.sol';
 import '../agreements/AgreementStoreManager.sol';
 
 /**
@@ -22,11 +22,19 @@ import '../agreements/AgreementStoreManager.sol';
  *      will check whether the permission is granted for the consumer
  *      in order to encrypt/decrypt the document.
  */
-contract AccessSecretStoreCondition is Condition {
+contract AccessSecretStoreCondition is Condition, ISecretStore {
+
+    struct DocumentPermission {
+        bytes32 _agreementId;
+        mapping(address => bool) permission;
+    }
+
+    mapping(bytes32 => DocumentPermission) private documentPermissions;
 
     AgreementStoreManager private agreementStoreManager;
-    SecretStorePermissions private secretStorePermissions;
-
+    
+    DIDRegistry private didRegistry;
+    
     event Fulfilled(
         bytes32 indexed _agreementId,
         bytes32 indexed _documentId,
@@ -47,16 +55,17 @@ contract AccessSecretStoreCondition is Condition {
         address _owner,
         address _conditionStoreManagerAddress,
         address _agreementStoreManagerAddress,
-        address _secretStorePermissionsAddress
+        address _didRegistryAddress
     )
         external
         initializer()
     {
         require(
+            _owner != address(0) ||
             _conditionStoreManagerAddress != address(0) ||
             _agreementStoreManagerAddress != address(0) ||
-            _secretStorePermissionsAddress != address(0),
-            'Invalid contracts addresses'
+            _didRegistryAddress != address(0),
+            'Invalid contract(s) addresses'
         );
         
         Ownable.initialize(_owner);
@@ -69,8 +78,8 @@ contract AccessSecretStoreCondition is Condition {
             _agreementStoreManagerAddress
         );
         
-        secretStorePermissions = SecretStorePermissions(
-            _secretStorePermissionsAddress
+        didRegistry = DIDRegistry(
+            _didRegistryAddress
         );
     }
 
@@ -111,6 +120,11 @@ contract AccessSecretStoreCondition is Condition {
         public
         returns (ConditionStoreLibrary.ConditionState)
     {
+        grantPermission(
+            _grantee,
+            _documentId
+        );
+        
         bytes32 _id = generateId(
             _agreementId,
             hashValues(_documentId, _grantee)
@@ -119,11 +133,6 @@ contract AccessSecretStoreCondition is Condition {
         ConditionStoreLibrary.ConditionState state = super.fulfill(
             _id,
             ConditionStoreLibrary.ConditionState.Fulfilled
-        );
-        
-        secretStorePermissions.grantPermission(
-            _grantee,
-            _documentId
         );
 
         emit Fulfilled(
@@ -134,6 +143,42 @@ contract AccessSecretStoreCondition is Condition {
         );
 
         return state;
+    }
+    
+    function grantPermission(
+        address _grantee,
+        bytes32 _documentId
+        
+    )
+        public
+    {
+        require(
+            didRegistry.isDIDProvider(_documentId, msg.sender) || 
+            msg.sender == didRegistry.getDIDOwner(_documentId),
+            'Invalid DID owner/provider'
+        );
+
+        documentPermissions[_documentId].permission[_grantee] = true;
+    }
+
+    /**
+    * @notice checkPermissions is called by Parity secret store
+    * @param _documentId refers to the DID in which secret store will issue the decryption keys
+    * @param _grantee is the address of the granted user or the DID provider
+    * @return true if the access was granted
+    */
+    function checkPermissions(
+        address _grantee,
+        bytes32 _documentId
+    )
+        external view
+        returns(bool permissionGranted)
+    {
+        return (
+            didRegistry.isDIDProvider(_documentId, _grantee) || 
+            _grantee == didRegistry.getDIDOwner(_documentId) ||
+            documentPermissions[_documentId].permission[_grantee]
+        );
     }
 }
 
