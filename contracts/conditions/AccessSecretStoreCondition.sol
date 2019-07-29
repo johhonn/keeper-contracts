@@ -24,13 +24,6 @@ import '../agreements/AgreementStoreManager.sol';
  */
 contract AccessSecretStoreCondition is Condition {
 
-    struct DocumentPermission {
-        bytes32 agreementId;
-        mapping(address => bool) permission;
-    }
-
-    mapping(bytes32 => DocumentPermission) private documentPermissions;
-
     AgreementStoreManager private agreementStoreManager;
     SecretStorePermissions private secretStorePermissions;
 
@@ -118,11 +111,6 @@ contract AccessSecretStoreCondition is Condition {
         public
         returns (ConditionStoreLibrary.ConditionState)
     {
-        secretStorePermissions.grantPermission(
-            _grantee,
-            _documentId
-        );
-        
         bytes32 _id = generateId(
             _agreementId,
             hashValues(_documentId, _grantee)
@@ -131,6 +119,11 @@ contract AccessSecretStoreCondition is Condition {
         ConditionStoreLibrary.ConditionState state = super.fulfill(
             _id,
             ConditionStoreLibrary.ConditionState.Fulfilled
+        );
+        
+        secretStorePermissions.grantPermission(
+            _grantee,
+            _documentId
         );
 
         emit Fulfilled(
