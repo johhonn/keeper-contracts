@@ -4,8 +4,10 @@ pragma solidity 0.5.6;
 // Code is Apache-2.0 and docs are CC-BY-4.0
 
 import './Condition.sol';
-import '../agreements/AgreementStoreManager.sol';
 import '../ISecretStore.sol';
+import '../SecretStorePermissions.sol';
+import '../agreements/AgreementStoreManager.sol';
+
 /**
  * @title Access Secret Store Condition
  * @author Ocean Protocol Team
@@ -30,6 +32,7 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
     mapping(bytes32 => DocumentPermission) private documentPermissions;
 
     AgreementStoreManager private agreementStoreManager;
+    SecretStorePermissions private secretStorePermissions;
 
     event Fulfilled(
         bytes32 indexed _agreementId,
@@ -50,11 +53,19 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
     function initialize(
         address _owner,
         address _conditionStoreManagerAddress,
-        address _agreementStoreManagerAddress
+        address _agreementStoreManagerAddress,
+        address _secretStorePermissionsAddress
     )
         external
         initializer()
     {
+        require(
+            _conditionStoreManagerAddress != address(0) ||
+            _agreementStoreManagerAddress != address(0) ||
+            _secretStorePermissionsAddress != address(0),
+            'Invalid contracts addresses'
+        );
+        
         Ownable.initialize(_owner);
 
         conditionStoreManager = ConditionStoreManager(
@@ -63,6 +74,10 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
 
         agreementStoreManager = AgreementStoreManager(
             _agreementStoreManagerAddress
+        );
+        
+        secretStorePermissions = SecretStorePermissions(
+            _secretStorePermissionsAddress
         );
     }
 
@@ -103,15 +118,11 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         public
         returns (ConditionStoreLibrary.ConditionState)
     {
-        require(
-            agreementStoreManager.isAgreementDIDOwner(_agreementId, msg.sender) ||
-            agreementStoreManager.isAgreementDIDProvider(_agreementId, msg.sender),
-            'Invalid UpdateRole'
+        secretStorePermissions.grantPermission(
+            _grantee,
+            _documentId
         );
-
-        documentPermissions[_documentId].permission[_grantee] = true;
-        documentPermissions[_documentId].agreementId = _agreementId;
-
+        
         bytes32 _id = generateId(
             _agreementId,
             hashValues(_documentId, _grantee)
@@ -145,16 +156,10 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         external view
         returns(bool permissionGranted)
     {
-        bool isDIDProvider = agreementStoreManager.isAgreementDIDProvider(
-                documentPermissions[_documentId].agreementId,
-                _grantee
+        return secretStorePermissions.checkPermissions(
+            _grantee,
+            _documentId
         );
-
-        if (isDIDProvider) {
-            return true;
-        }
-
-        return documentPermissions[_documentId].permission[_grantee];
     }
 }
 
