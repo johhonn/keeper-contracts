@@ -25,7 +25,7 @@ import '../agreements/AgreementStoreManager.sol';
 contract AccessSecretStoreCondition is Condition, ISecretStore {
 
     struct DocumentPermission {
-        bytes32 _agreementId;
+        bytes32 agreementId;
         mapping(address => bool) permission;
     }
 
