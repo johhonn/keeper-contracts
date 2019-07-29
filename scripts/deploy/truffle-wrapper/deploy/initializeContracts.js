@@ -144,14 +144,16 @@ async function initializeContracts(
     }
 
     if (getAddress('ConditionStoreManager') &&
-        getAddress('AgreementStoreManager')) {
+        getAddress('AgreementStoreManager') &&
+        getAddress('DIDRegistry')) {
         if (contracts.indexOf('AccessSecretStoreCondition') > -1) {
             addressBook['AccessSecretStoreCondition'] = zosCreate(
                 'AccessSecretStoreCondition',
                 [
                     roles.ownerWallet,
                     getAddress('ConditionStoreManager'),
-                    getAddress('AgreementStoreManager')
+                    getAddress('AgreementStoreManager'),
+                    getAddress('DIDRegistry')
                 ],
                 verbose
             )
