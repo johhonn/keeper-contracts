@@ -22,7 +22,7 @@ import '../agreements/AgreementStoreManager.sol';
  *      will check whether the permission is granted for the consumer
  *      in order to encrypt/decrypt the document.
  */
-contract AccessSecretStoreCondition is Condition, ISecretStore {
+contract AccessSecretStoreCondition is Condition {
 
     struct DocumentPermission {
         bytes32 agreementId;
@@ -141,25 +141,6 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         );
 
         return state;
-    }
-
-    /**
-    * @notice checkPermissions is called by Parity secret store
-    * @param _documentId refers to the DID in which secret store will issue the decryption keys
-    * @param _grantee is the address of the granted user or the DID provider
-    * @return true if the access was granted
-    */
-    function checkPermissions(
-        address _grantee,
-        bytes32 _documentId
-    )
-        external view
-        returns(bool permissionGranted)
-    {
-        return secretStorePermissions.checkPermissions(
-            _grantee,
-            _documentId
-        );
     }
 }
 
