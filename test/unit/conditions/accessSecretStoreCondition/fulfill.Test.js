@@ -14,61 +14,11 @@ const DIDRegistry = artifacts.require('DIDRegistry')
 const DIDRegistryLibrary = artifacts.require('DIDRegistryLibrary')
 const AccessSecretStoreCondition = artifacts.require('AccessSecretStoreCondition')
 
-const constants = require('../../helpers/constants.js')
-const deployManagers = require('../../helpers/deployManagers.js')
-const testUtils = require('../../helpers/utils.js')
+const constants = require('../../../helpers/constants.js')
+const testUtils = require('../../../helpers/utils.js')
+const common = require('./common')
 
 contract('AccessSecretStoreCondition constructor', (accounts) => {
-    let didRegistry,
-        agreementStoreManager,
-        conditionStoreManager,
-        templateStoreManager,
-        accessSecretStoreCondition
-
-    async function setupTest({
-        conditionId = constants.bytes32.one,
-        conditionType = constants.address.dummy,
-        did = constants.did[0],
-        checksum = testUtils.generateId(),
-        value = constants.registry.url,
-        deployer = accounts[8],
-        owner = accounts[0],
-        registerDID = false,
-        DIDProvider = accounts[9]
-    } = {}) {
-        ({
-            didRegistry,
-            agreementStoreManager,
-            conditionStoreManager,
-            templateStoreManager
-        } = await deployManagers(
-            deployer,
-            owner
-        ))
-
-        accessSecretStoreCondition = await AccessSecretStoreCondition.new()
-
-        await accessSecretStoreCondition.methods['initialize(address,address,address,address)'](
-            accounts[0],
-            conditionStoreManager.address,
-            agreementStoreManager.address,
-            didRegistry.address,
-            { from: owner }
-        )
-
-        if (registerDID) {
-            await didRegistry.registerAttribute(did, checksum, [DIDProvider], value)
-        }
-
-        return {
-            did,
-            conditionId,
-            conditionType,
-            owner,
-            DIDProvider
-        }
-    }
-
     describe('deploy and setup', () => {
         it('contract should deploy', async () => {
             const epochLibrary = await EpochLibrary.new()
@@ -95,7 +45,9 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
 
     describe('fulfill non existing condition', () => {
         it('should not fulfill if condition does not exist', async () => {
-            await setupTest()
+            const {
+                accessSecretStoreCondition
+            } = await common.setupTest({ accounts: accounts })
 
             const agreementId = constants.bytes32.one
             const documentId = constants.bytes32.one
@@ -110,7 +62,14 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
 
     describe('fulfill existing condition', () => {
         it('should fulfill if condition exist', async () => {
-            const { did } = await setupTest({ registerDID: true })
+            const {
+                did,
+                agreementStoreManager,
+                conditionStoreManager,
+                templateStoreManager,
+                accessSecretStoreCondition
+
+            } = await common.setupTest({ accounts: accounts, registerDID: true })
 
             const agreementId = constants.bytes32.one
             const documentId = did
@@ -154,7 +113,13 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
 
     describe('fail to fulfill existing condition', () => {
         it('wrong did owner should fail to fulfill if conditions exist', async () => {
-            const { did } = await setupTest({ registerDID: true })
+            const {
+                did,
+                agreementStoreManager,
+                templateStoreManager,
+                accessSecretStoreCondition
+
+            } = await common.setupTest({ accounts: accounts, registerDID: true })
 
             const agreementId = constants.bytes32.one
             const documentId = did
@@ -188,7 +153,13 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
         })
 
         it('right did owner should fail to fulfill if conditions already fulfilled', async () => {
-            const { did } = await setupTest({ registerDID: true })
+            const {
+                did,
+                agreementStoreManager,
+                templateStoreManager,
+                accessSecretStoreCondition
+
+            } = await common.setupTest({ accounts: accounts, registerDID: true })
 
             const agreementId = constants.bytes32.one
             const documentId = did
@@ -226,7 +197,14 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
 
     describe('get access secret store condition', () => {
         it('successful create should get condition and permissions', async () => {
-            const { did } = await setupTest({ registerDID: true })
+            const {
+                did,
+                agreementStoreManager,
+                conditionStoreManager,
+                templateStoreManager,
+                accessSecretStoreCondition
+
+            } = await common.setupTest({ accounts: accounts, registerDID: true })
 
             const agreementId = constants.bytes32.one
             const documentId = did
@@ -267,7 +245,14 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
     })
     describe('check permissions', () => {
         it('should grant permission in case of DID provider', async () => {
-            const { DIDProvider, did } = await setupTest({ registerDID: true })
+            const {
+                DIDProvider,
+                did,
+                agreementStoreManager,
+                templateStoreManager,
+                accessSecretStoreCondition
+
+            } = await common.setupTest({ accounts: accounts, registerDID: true })
 
             const agreementId = constants.bytes32.one
             const documentId = did
@@ -307,7 +292,13 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             )
         })
         it('successful create should check permissions', async () => {
-            const { did } = await setupTest({ registerDID: true })
+            const {
+                did,
+                agreementStoreManager,
+                templateStoreManager,
+                accessSecretStoreCondition
+
+            } = await common.setupTest({ accounts: accounts, registerDID: true })
 
             const agreementId = constants.bytes32.one
             const documentId = did
