@@ -23,7 +23,8 @@ import '../agreements/AgreementStoreManager.sol';
  *      will check whether the permission is granted for the consumer
  *      in order to encrypt/decrypt the document.
  */
-contract AccessSecretStoreCondition is Condition, ISecretStore, ISecretStorePermission {
+contract AccessSecretStoreCondition is Condition, 
+ISecretStore, ISecretStorePermission {
 
     struct DocumentPermission {
         bytes32 agreementIdDeprecated;
