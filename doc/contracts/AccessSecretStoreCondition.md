@@ -28,6 +28,8 @@ Members:
 
 ### private agreementStoreManager
 
+### private didRegistry
+
 ## Events
 
 ###  Fulfilled
@@ -36,6 +38,12 @@ Parameters:
 * bytes32 _documentId
 * address _grantee
 * bytes32 _conditionId
+
+## Modifiers
+
+### internal onlyDIDOwnerOrProvider
+Parameters:
+* bytes32 _documentId
 
 ## Functions
 
@@ -51,11 +59,13 @@ Documentation:
 @param _owner contract's owner account address
 @param _conditionStoreManagerAddress condition store manager address
 @param _agreementStoreManagerAddress agreement store manager address
+@param _didRegistryAddress DID registry contract address
 ```
 Parameters:
 * address _owner
 * address _conditionStoreManagerAddress
 * address _agreementStoreManagerAddress
+* address _didRegistryAddress
 
 ### public hashValues
 
@@ -91,6 +101,34 @@ Parameters:
 * bytes32 _agreementId
 * bytes32 _documentId
 * address _grantee
+
+### public grantPermission
+
+Documentation:
+
+```
+@notice grantPermission is called by Parity secret store
+@param _grantee is the address of the granted user or the DID provider
+@param _documentId refers to the DID in which secret store will issue the decryption keys
+@return true if the access was granted
+```
+Parameters:
+* address _grantee
+* bytes32 _documentId
+
+### public renouncePermission
+
+Documentation:
+
+```
+@notice renouncePermission is called by Parity secret store
+@param _grantee is the address of the granted user or the DID provider
+@param _documentId refers to the DID in which secret store will issue the decryption keys
+@return true if the access was granted
+```
+Parameters:
+* address _grantee
+* bytes32 _documentId
 
 ### external checkPermissions
 

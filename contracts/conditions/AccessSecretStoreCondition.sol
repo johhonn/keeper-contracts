@@ -25,7 +25,7 @@ import '../agreements/AgreementStoreManager.sol';
 contract AccessSecretStoreCondition is Condition, ISecretStore {
 
     struct DocumentPermission {
-        bytes32 agreementId;
+        bytes32 agreementIdDeprecated;
         mapping(address => bool) permission;
     }
 
@@ -157,10 +157,9 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
     }
     
    /**
-    * @notice grantPermission is called by Parity secret store
+    * @notice grantPermission is called only by DID owner or provider
     * @param _grantee is the address of the granted user or the DID provider
     * @param _documentId refers to the DID in which secret store will issue the decryption keys
-    * @return true if the access was granted
     */
     function grantPermission(
         address _grantee,
@@ -174,10 +173,9 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
     }
 
    /**
-    * @notice renouncePermission is called by Parity secret store
+    * @notice renouncePermission is called only by DID owner or provider
     * @param _grantee is the address of the granted user or the DID provider
     * @param _documentId refers to the DID in which secret store will issue the decryption keys
-    * @return true if the access was granted
     */
     function renouncePermission(
         address _grantee,
