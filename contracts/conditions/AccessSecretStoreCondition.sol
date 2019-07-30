@@ -30,9 +30,7 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
     }
 
     mapping(bytes32 => DocumentPermission) private documentPermissions;
-
     AgreementStoreManager private agreementStoreManager;
-    
     DIDRegistry private didRegistry;
     
     event Fulfilled(
@@ -41,6 +39,18 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         address indexed _grantee,
         bytes32 _conditionId
     );
+    
+    modifier onlyDIDOwnerOrProvider(
+        bytes32 _documentId
+    )
+    {
+        require(
+            didRegistry.isDIDProvider(_documentId, msg.sender) || 
+            msg.sender == didRegistry.getDIDOwner(_documentId),
+            'Invalid DID owner/provider'
+        );
+        _;
+    }
 
    /**
     * @notice initialize init the 
@@ -50,6 +60,7 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
     * @param _owner contract's owner account address
     * @param _conditionStoreManagerAddress condition store manager address
     * @param _agreementStoreManagerAddress agreement store manager address
+    * @param _didRegistryAddress DID registry contract address
     */
     function initialize(
         address _owner,
@@ -134,7 +145,7 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
             _id,
             ConditionStoreLibrary.ConditionState.Fulfilled
         );
-
+        
         emit Fulfilled(
             _agreementId,
             _documentId,
@@ -145,23 +156,40 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         return state;
     }
     
+   /**
+    * @notice grantPermission is called by Parity secret store
+    * @param _grantee is the address of the granted user or the DID provider
+    * @param _documentId refers to the DID in which secret store will issue the decryption keys
+    * @return true if the access was granted
+    */
     function grantPermission(
         address _grantee,
         bytes32 _documentId
         
     )
         public
+        onlyDIDOwnerOrProvider(_documentId)
     {
-        require(
-            didRegistry.isDIDProvider(_documentId, msg.sender) || 
-            msg.sender == didRegistry.getDIDOwner(_documentId),
-            'Invalid DID owner/provider'
-        );
-
         documentPermissions[_documentId].permission[_grantee] = true;
     }
 
-    /**
+   /**
+    * @notice renouncePermission is called by Parity secret store
+    * @param _grantee is the address of the granted user or the DID provider
+    * @param _documentId refers to the DID in which secret store will issue the decryption keys
+    * @return true if the access was granted
+    */
+    function renouncePermission(
+        address _grantee,
+        bytes32 _documentId
+    )
+        public
+        onlyDIDOwnerOrProvider(_documentId)
+    {
+        documentPermissions[_documentId].permission[_grantee] = false;
+    }
+    
+   /**
     * @notice checkPermissions is called by Parity secret store
     * @param _documentId refers to the DID in which secret store will issue the decryption keys
     * @param _grantee is the address of the granted user or the DID provider
