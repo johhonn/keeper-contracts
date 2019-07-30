@@ -4,8 +4,9 @@ pragma solidity 0.5.6;
 // Code is Apache-2.0 and docs are CC-BY-4.0
 
 import './Condition.sol';
-import '../ISecretStore.sol';
 import '../registry/DIDRegistry.sol';
+import '../interfaces/ISecretStore.sol';
+import '../interfaces/ISecretStorePermission.sol';
 import '../agreements/AgreementStoreManager.sol';
 
 /**
@@ -22,7 +23,7 @@ import '../agreements/AgreementStoreManager.sol';
  *      will check whether the permission is granted for the consumer
  *      in order to encrypt/decrypt the document.
  */
-contract AccessSecretStoreCondition is Condition, ISecretStore {
+contract AccessSecretStoreCondition is Condition, ISecretStore, ISecretStorePermission {
 
     struct DocumentPermission {
         bytes32 agreementIdDeprecated;
