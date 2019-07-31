@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
 
-async function setupContracts(
+async function setupContracts({
     web3,
     artifacts,
     addressBook,
     roles,
     verbose = true
-) {
+} = {}) {
     /*
      * -----------------------------------------------------------------------
      * Reset deployer account, because it will be left in a strange state
