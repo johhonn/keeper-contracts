@@ -2,8 +2,10 @@
 .idea/
 zos/
 files
+
 # Symbolic Execution Results
 test/verification/manticore/results/*
+
 # Development
 artifacts/*.development.json
 artifacts/*.spree.json
@@ -12,8 +14,12 @@ artifacts/*.spree.json
 build/
 node_modules/
 dist
-coverage*
 ganache-cli.log
+
+# Test / Coverage
+coverage*
+scTopics
+allFiredEvents
 
 # Mac / Apple
 .DS_Store
