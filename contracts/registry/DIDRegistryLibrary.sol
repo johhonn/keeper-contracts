@@ -70,7 +70,6 @@ library DIDRegistryLibrary {
         address provider
     )
         internal
-        returns(bool)
     {
         require(
             provider != address(0),
@@ -86,7 +85,6 @@ library DIDRegistryLibrary {
             _self.didRegisters[_did].providers.push(provider);
         }
 
-        return true;
     }
 
    /**

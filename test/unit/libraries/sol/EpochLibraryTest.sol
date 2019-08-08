@@ -15,9 +15,6 @@ contract EpochLibraryTest{
     }
 
     function testBigNumberShouldNotFail() public {
-        require(
-            epochList.create(keccak256(abi.encodePacked(block.number)),0, maxBigNumberDoesNotFail) == true,
-            'Indicating BigNumber!'
-        );
-    }
+      epochList.create(keccak256(abi.encodePacked(block.number)), 0, maxBigNumberDoesNotFail);
+    } 
 }
