@@ -45,7 +45,6 @@ library EpochLibrary {
         uint256 _timeOut
     )
         internal
-        returns (bool epochCreated)
     {
         require(
             _self.epochs[_id].blockNumber == 0,
@@ -73,7 +72,6 @@ library EpochLibrary {
 
         _self.epochIds.push(_id);
 
-        return true;
     }
 
    /**
