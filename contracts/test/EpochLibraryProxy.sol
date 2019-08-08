@@ -20,9 +20,8 @@ contract EpochLibraryProxy {
         uint256 _timeOut
     )
         external
-        returns (bool epochCreated)
     {
-        return epochList.create(
+        epochList.create(
             _id,
             _timeLock,
             _timeOut
