@@ -10,6 +10,7 @@ const deployConditions = async function(
     owner,
     agreementStoreManager,
     conditionStoreManager,
+    didRegistry,
     oceanToken
 ) {
     const hashLockCondition = await HashLockCondition.new({ from: deployer })
@@ -35,7 +36,7 @@ const deployConditions = async function(
     )
 
     const accessSecretStoreCondition = await AccessSecretStoreCondition.new({ from: deployer })
-    await accessSecretStoreCondition.initialize(
+    await accessSecretStoreCondition.methods['initialize(address,address,address)'](
         owner,
         conditionStoreManager.address,
         agreementStoreManager.address,

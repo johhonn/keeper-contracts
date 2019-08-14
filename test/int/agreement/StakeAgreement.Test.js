@@ -47,6 +47,7 @@ contract('Stake Agreement integration test', (accounts) => {
             owner,
             agreementStoreManager,
             conditionStoreManager,
+            didRegistry,
             oceanToken
         ))
 
