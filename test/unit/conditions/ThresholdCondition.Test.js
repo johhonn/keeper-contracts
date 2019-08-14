@@ -367,7 +367,7 @@ contract('Threshold Condition', (accounts) => {
     })
 
     describe('UNINITIALIZED OR ABORTED input conditions', () => {
-        it('should fail if input conditions are Uninitialized', async () => {
+        it('should fail if input conditions are Unfulfilled', async () => {
             const {
                 thresholdCondition,
                 conditionStoreManager,
@@ -397,7 +397,31 @@ contract('Threshold Condition', (accounts) => {
                     {
                         from: createRole
                     }
-                )
+                ),
+                'Invalid threshold fulfilment'
+            )
+        })
+
+        it('should fail if input conditions are Uninitialized', async () => {
+            const {
+                thresholdCondition,
+                conditionStoreManager,
+                inputConditions,
+                createRole
+            } = await setupTest({ fulfillInputConditions: false })
+
+            let agreementId = constants.bytes32.three
+
+            await assert.isRejected(
+                thresholdCondition.methods['fulfill(bytes32,bytes32[],uint256)'](
+                    agreementId,
+                    inputConditions,
+                    inputConditions.length,
+                    {
+                        from: createRole
+                    }
+                ),
+                'Invalid threshold fulfilment'
             )
         })
 
