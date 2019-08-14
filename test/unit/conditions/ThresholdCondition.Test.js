@@ -113,7 +113,16 @@ contract('Threshold Condition', (accounts) => {
             randomConditions.push(inputConditions[1])
         }
 
-        return { thresholdCondition, conditionStoreManager, conditionId, conditionType, createRole, owner, inputConditions, randomConditions }
+        return {
+            thresholdCondition,
+            conditionStoreManager,
+            conditionId,
+            conditionType,
+            createRole,
+            owner,
+            inputConditions,
+            randomConditions
+        }
     }
 
     describe('deploy and setup', () => {
@@ -418,6 +427,7 @@ contract('Threshold Condition', (accounts) => {
                     from: owner
                 }
             )
+
             await conditionStoreManager.delegateUpdateRole(
                 inputConditions[1],
                 createRole,
@@ -425,6 +435,7 @@ contract('Threshold Condition', (accounts) => {
                     from: owner
                 }
             )
+
             await conditionStoreManager.updateConditionState(
                 inputConditions[0],
                 3,
@@ -432,6 +443,7 @@ contract('Threshold Condition', (accounts) => {
                     from: createRole
                 }
             )
+
             await conditionStoreManager.updateConditionState(
                 inputConditions[1],
                 3,
@@ -439,21 +451,23 @@ contract('Threshold Condition', (accounts) => {
                     from: createRole
                 }
             )
+
             await conditionStoreManager.createCondition(
                 conditionId,
                 thresholdCondition.address
             )
 
             await assert.isRejected(
-                thresholdCondition.methods['fulfill(bytes32,bytes32[],uint256)'](
+               thresholdCondition.methods['fulfill(bytes32,bytes32[],uint256)'](
                     agreementId,
                     inputConditions,
                     inputConditions.length,
                     {
                         from: createRole
                     }
-                )
-            )
+               ),
+               'Invalid threshold fulfilment'
+           )
         })
     })
 
