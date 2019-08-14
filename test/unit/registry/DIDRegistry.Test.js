@@ -330,13 +330,12 @@ contract('DIDRegistry', (accounts) => {
 
     describe('transfer DID ownership', () => {
         it('should DID owner transfer a DID ownership', async () => {
-            const { common, didRegistry } = await setupTest()
+            const { didRegistry } = await setupTest()
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             const didOwner = accounts[2]
             const newDIDOwner = accounts[3]
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
-            const blockNumber = await common.getCurrentBlockNumber()
             await didRegistry.registerAttribute(
                 did,
                 checksum,
@@ -364,13 +363,12 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('should reject to transfer a DID ownership in case of invalid DID owner', async () => {
-            const { common, didRegistry } = await setupTest()
+            const { didRegistry } = await setupTest()
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             const didOwner = accounts[2]
             const newDIDOwner = accounts[3]
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
-            const blockNumber = await common.getCurrentBlockNumber()
             await didRegistry.registerAttribute(
                 did,
                 checksum,
@@ -385,7 +383,7 @@ contract('DIDRegistry', (accounts) => {
             await assert.isRejected(
                 didRegistry.transferDIDOwnership(
                     did,
-                    newDIDOwner,
+                    newDIDOwner
                 ),
                 'Invalid DID owner'
             )
