@@ -31,11 +31,10 @@ contract('AccessSecretStoreCondition', (accounts) => {
             await didRegistry.initialize(accounts[0])
             const accessSecretStoreCondition = await AccessSecretStoreCondition.new()
 
-            await accessSecretStoreCondition.methods['initialize(address,address,address,address)'](
+            await accessSecretStoreCondition.methods['initialize(address,address,address)'](
                 accounts[0],
                 conditionStoreManager.address,
                 agreementStoreManager.address,
-                didRegistry.address,
                 { from: accounts[0] }
             )
         })

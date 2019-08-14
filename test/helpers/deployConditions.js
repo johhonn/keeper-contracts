@@ -36,11 +36,10 @@ const deployConditions = async function(
     )
 
     const accessSecretStoreCondition = await AccessSecretStoreCondition.new({ from: deployer })
-    await accessSecretStoreCondition.methods['initialize(address,address,address,address)'](
+    await accessSecretStoreCondition.methods['initialize(address,address,address)'](
         owner,
         conditionStoreManager.address,
         agreementStoreManager.address,
-        didRegistry.address,
         { from: deployer }
     )
 

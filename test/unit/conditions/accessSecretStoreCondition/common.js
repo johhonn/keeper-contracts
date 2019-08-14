@@ -37,11 +37,10 @@ const common = {
 
         accessSecretStoreCondition = await AccessSecretStoreCondition.new()
 
-        await accessSecretStoreCondition.methods['initialize(address,address,address,address)'](
+        await accessSecretStoreCondition.methods['initialize(address,address,address)'](
             accounts[0],
             conditionStoreManager.address,
             agreementStoreManager.address,
-            didRegistry.address,
             { from: owner }
         )
 

@@ -33,7 +33,7 @@ ISecretStore, ISecretStorePermission {
 
     mapping(bytes32 => DocumentPermission) private documentPermissions;
     AgreementStoreManager private agreementStoreManager;
-    DIDRegistry private didRegistry;
+    
     
     event Fulfilled(
         bytes32 indexed _agreementId,
@@ -46,6 +46,10 @@ ISecretStore, ISecretStorePermission {
         bytes32 _documentId
     )
     {
+        DIDRegistry didRegistry = DIDRegistry(
+            agreementStoreManager.getDIDRegistryAddress()
+        );
+        
         require(
             didRegistry.isDIDProvider(_documentId, msg.sender) || 
             msg.sender == didRegistry.getDIDOwner(_documentId),
@@ -62,13 +66,11 @@ ISecretStore, ISecretStorePermission {
     * @param _owner contract's owner account address
     * @param _conditionStoreManagerAddress condition store manager address
     * @param _agreementStoreManagerAddress agreement store manager address
-    * @param _didRegistryAddress DID registry contract address
     */
     function initialize(
         address _owner,
         address _conditionStoreManagerAddress,
-        address _agreementStoreManagerAddress,
-        address _didRegistryAddress
+        address _agreementStoreManagerAddress
     )
         external
         initializer()
@@ -76,8 +78,7 @@ ISecretStore, ISecretStorePermission {
         require(
             _owner != address(0) ||
             _conditionStoreManagerAddress != address(0) ||
-            _agreementStoreManagerAddress != address(0) ||
-            _didRegistryAddress != address(0),
+            _agreementStoreManagerAddress != address(0),
             'Invalid contract(s) addresses'
         );
         
@@ -89,10 +90,6 @@ ISecretStore, ISecretStorePermission {
 
         agreementStoreManager = AgreementStoreManager(
             _agreementStoreManagerAddress
-        );
-        
-        didRegistry = DIDRegistry(
-            _didRegistryAddress
         );
     }
 
@@ -202,6 +199,9 @@ ISecretStore, ISecretStorePermission {
         external view
         returns(bool permissionGranted)
     {
+        DIDRegistry didRegistry = DIDRegistry(
+            agreementStoreManager.getDIDRegistryAddress()
+        );
         return (
             didRegistry.isDIDProvider(_documentId, _grantee) || 
             _grantee == didRegistry.getDIDOwner(_documentId) ||
