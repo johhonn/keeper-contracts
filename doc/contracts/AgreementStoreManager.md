@@ -140,3 +140,5 @@ Documentation:
 ```
 Parameters:
 * address _templateId
+
+### public getDIDRegistryAddress
