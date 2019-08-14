@@ -229,4 +229,17 @@ contract AgreementStoreManager is Ownable {
     {
         return agreementList.templateIdToAgreementIds[_templateId];
     }
+    
+    /**
+     * @dev getDIDRegistryAddress utility function 
+     * used by other contracts or any EOA.
+     * @return the DIDRegistry address
+     */
+    function getDIDRegistryAddress()
+        public
+        view
+        returns(address)
+    {
+        return address(didRegistry);
+    }
 }
