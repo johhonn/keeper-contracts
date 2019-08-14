@@ -327,4 +327,68 @@ contract('DIDRegistry', (accounts) => {
             )
         })
     })
+
+    describe('transfer DID ownership', () => {
+        it('should DID owner transfer a DID ownership', async () => {
+            const { common, didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const didOwner = accounts[2]
+            const newDIDOwner = accounts[3]
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            const blockNumber = await common.getCurrentBlockNumber()
+            await didRegistry.registerAttribute(
+                did,
+                checksum,
+                providers,
+                value,
+                {
+                    from: didOwner
+                }
+            )
+
+            // act
+            await didRegistry.transferDIDOwnership(
+                did,
+                newDIDOwner,
+                {
+                    from: didOwner
+                }
+            )
+
+            // assert
+            assert.strictEqual(
+                await didRegistry.getDIDOwner(did),
+                newDIDOwner
+            )
+        })
+
+        it('should reject to transfer a DID ownership in case of invalid DID owner', async () => {
+            const { common, didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const didOwner = accounts[2]
+            const newDIDOwner = accounts[3]
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            const blockNumber = await common.getCurrentBlockNumber()
+            await didRegistry.registerAttribute(
+                did,
+                checksum,
+                providers,
+                value,
+                {
+                    from: didOwner
+                }
+            )
+
+            // act & assert
+            await assert.isRejected(
+                didRegistry.transferDIDOwnership(
+                    did,
+                    newDIDOwner,
+                ),
+                'Invalid DID owner'
+            )
+        })
+    })
 })
