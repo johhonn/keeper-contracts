@@ -155,7 +155,7 @@ async function initializeContracts({
     }
 
     if (getAddress('ConditionStoreManager') &&
-        getAddress('AgreementStoreManager') {
+        getAddress('AgreementStoreManager')) {
         if (contracts.indexOf('AccessSecretStoreCondition') > -1) {
             addressBook['AccessSecretStoreCondition'] = zosCreate({
                 contract: 'AccessSecretStoreCondition',
