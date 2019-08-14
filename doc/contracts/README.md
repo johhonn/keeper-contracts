@@ -21,6 +21,7 @@ There are several folders and each includes solidity source files for each modul
         - [Lock Reward Condition](LockRewardCondition.md)
         - [Sign Condition](SignCondition.md)
         - [Access Secret Store Condition](AccessSecretStoreCondition.md)
+        - [Threshold Condition](ThresholdCondition.md)
         - [Rewards](#)
             - [Reward](Reward.md)
             - [Escrow Reward](EscrowReward.md)
