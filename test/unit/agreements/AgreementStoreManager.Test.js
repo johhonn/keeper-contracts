@@ -539,7 +539,6 @@ contract('AgreementStoreManager', (accounts) => {
                 timeOuts: [2, 3]
             }
 
-            const blockNumber = await common.getCurrentBlockNumber()
             const agreementId = constants.bytes32.zero
 
             await agreementStoreManager.createAgreement(
@@ -572,7 +571,6 @@ contract('AgreementStoreManager', (accounts) => {
                 timeOuts: [2, 3]
             }
 
-            const blockNumber = await common.getCurrentBlockNumber()
             const agreementId = constants.bytes32.zero
 
             await agreementStoreManager.createAgreement(
