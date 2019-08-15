@@ -186,6 +186,13 @@ contract AgreementStoreManager is Ownable {
         return (_owner == didRegistry.getDIDOwner(did));
     }
 
+    /**
+     * @dev isAgreementDIDProvider for a given agreement Id 
+     * and address check whether a DID provider is associated with this agreement
+     * @param _id is the ID of the agreement
+     * @param _provider is the DID provider
+     * @return true if a DID provider is associated with the agreement ID
+     */
     function isAgreementDIDProvider(bytes32 _id, address _provider)
         external
         view
