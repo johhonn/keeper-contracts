@@ -47,7 +47,6 @@ library HashListLibrary {
         onlyListOwner(_self)
         returns(bool)
     {
-    
         require(
             _self.indices[value] == 0,
             'Value already exists'

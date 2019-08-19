@@ -8,29 +8,32 @@ import './libraries/HashListLibrary.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
 /**
- * @title HashList contract
+ * @title HashLists contract
  * @author Ocean Protocol Team
- * @dev Hash list contract is a sample list contract in which uses 
- *      ListLibrary.sol in order to store, retrieve, remove, and 
- *      update bytes32 hashes list
+ * @dev Hash lists contract is a sample list contract in which uses 
+ *      HashListLibrary.sol in order to store, retrieve, remove, and 
+ *      update bytes32 values in hash lists.
+ *      This is a reference implementation for IList interface. It is 
+ *      used for whitelisting condition. Any entity can have its own 
+ *      implementation of the interface in which could be used for the
+ *      same condition.
  */
 
-contract HashList is Ownable, IList {
+contract HashLists is Ownable, IList {
     
     using HashListLibrary for HashListLibrary.List;        
-    HashListLibrary.List list;
+    mapping(bytes32 => HashListLibrary.List) lists;
     
     /**
-     * @dev HashList Initializer
+     * @dev HashLists Initializer
      * @param _owner The owner of the hash list
-     * Runs only on initial contract creation.
+     * Runs only upon contract creation.
      */
     function initialize(
         address _owner
     )
         public
     {
-        list.setOwner(msg.sender);
         Ownable.initialize(_owner);
     }
     
@@ -40,7 +43,7 @@ contract HashList is Ownable, IList {
      * @return bytes32 hash of the account
      */
     function hash(address account)
-        external
+        public
         pure
         returns(bytes32)
     {
@@ -59,11 +62,14 @@ contract HashList is Ownable, IList {
         external
         returns(bool)
     {
-        return list.add(values);
+        bytes32 id = hash(msg.sender);
+        if(lists[id].ownedBy() == address(0))
+            lists[id].setOwner(msg.sender);
+        return lists[id].add(values);
     }
     
     /**
-     * @dev add index an element then add it to a list
+     * @dev add indexes an element then adds it to a list
      * @param value is a bytes32 value
      * @return true if value is added successfully
      */
@@ -73,7 +79,10 @@ contract HashList is Ownable, IList {
         external
         returns(bool)
     {
-        return list.add(value);
+        bytes32 id = hash(msg.sender);
+        if(lists[id].ownedBy() == address(0))
+            lists[id].setOwner(msg.sender);
+        return lists[id].add(value);
     }
     
     /**
@@ -89,7 +98,8 @@ contract HashList is Ownable, IList {
         external
         returns(bool)
     {
-        return list.update(oldValue, newValue);
+        bytes32 id = hash(msg.sender);
+        return lists[id].update(oldValue, newValue);
     }
     
     /**
@@ -105,23 +115,43 @@ contract HashList is Ownable, IList {
         external
         returns(bool)
     {
-        return list.index(from, to);
+        bytes32 id = hash(msg.sender);
+        return lists[id].index(from, to);
     }
     
     /**
-     * @dev size returns the list size
+     * @dev has checks whether a value is exist
+     * @param id the list identifier (the hash of list owner's address)
      * @param value is element value in list
      * @return true if the value exists
      */
     function has(
+        bytes32 id,
         bytes32 value
     ) 
         external 
         view
         returns(bool)
     {
-        return list.has(value);
+        return lists[id].has(value);
     }
+    
+    /**
+     * @dev has checks whether a value is exist
+     * @param value is element value in list
+     * @return true if the value exists
+     */
+    function has(
+        bytes32 value
+    )
+        external
+        view
+        returns(bool)
+    {
+        bytes32 id = hash(msg.sender);
+        return lists[id].has(value);
+    }
+    
     /**
      * @dev remove value from a list, updates indices, and list size 
      * @param value is an element value in a list
@@ -133,84 +163,101 @@ contract HashList is Ownable, IList {
         external
         returns(bool)
     {
-        return list.remove(value);
+        bytes32 id = hash(msg.sender);
+        return lists[id].remove(value);
     }
     
     /**
      * @dev has value by index 
+     * @param id the list identifier (the hash of list owner's address)
      * @param _index is where is value is stored in the list
      * @return the value if exists
      */
     function get(
+        bytes32 id,
         uint256 _index
     )
         external
         view
         returns(bytes32)
     {
-        return list.get(_index);
+        return lists[id].get(_index);
     }
     
     /**
      * @dev size gets the list size
+     * @param id the list identifier (the hash of list owner's address)
      * @return total length of the list
      */
-    function size()
+    function size(
+        bytes32 id
+    )
         external
         view
         returns(uint256)
     {
-        return list.size();
+        return lists[id].size();
     }
     
     /**
      * @dev all returns all list elements
+     * @param id the list identifier (the hash of list owner's address)
      * @return all list elements
      */
-    function all()
+    function all(
+        bytes32 id
+    )
         external
         view
         returns(bytes32[] memory)
     {
-        return list.all();
+        return lists[id].all();
     }
     
     /**
      * @dev indexOf gets the index of a value in a list
+     * @param id the list identifier (the hash of list owner's address)
      * @param value is element value in list
      * @return value index in list
      */
     function indexOf(
+        bytes32 id,
         bytes32 value
     )
         external
         view
         returns(uint256)
     {
-        return list.indexOf(value);
+        return lists[id].indexOf(value);
     }
     
     /**
      * @dev ownedBy gets the list owner
+     * @param id the list identifier (the hash of list owner's address)
      * @return list owner
      */
-    function ownedBy()
+    function ownedBy(
+        bytes32 id
+    )
         external
         view
         returns(address)
     {
-        return list.ownedBy();
+        return lists[id].ownedBy();
     }
     
     /**
      * @dev isIndexed checks if the list is indexed
+     * @param id the list identifier (the hash of list owner's address)
      * @return true if the list is indexed
      */
-    function isIndexed()
+    function isIndexed(
+        bytes32 id
+    )
         external
         view
         returns(bool)
     {
-        return list.isIndexed();
+        return lists[id].isIndexed();
     }
 }

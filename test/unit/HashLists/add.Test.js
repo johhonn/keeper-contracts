@@ -7,17 +7,17 @@ const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
 const HashListLibrary = artifacts.require('HashListLibrary')
-const HashList = artifacts.require('HashList')
+const HashLists = artifacts.require('HashLists')
 
-contract('HashListLibrary', (accounts) => {
+contract('HashLists', (accounts) => {
     let hashListLibrary
-    let hashList
+    let hashLists
     let owner = accounts[0]
 
     beforeEach(async () => {
         hashListLibrary = await HashListLibrary.new()
-        HashList.link('HashListLibrary', hashListLibrary.address)
-        hashList = await HashList.new()
+        HashLists.link('HashListLibrary', hashListLibrary.address)
+        hashList = await HashLists.new()
         hashList.initialize(accounts[0], { from: owner })
     })
 
@@ -33,20 +33,6 @@ contract('HashListLibrary', (accounts) => {
             assert.strictEqual(
                 await hashList.has(newAccountHash),
                 true
-            )
-        })
-
-        it('should fail to add if the sender is not the list owner', async () => {
-            const newAccountHash = await hashList.hash(accounts[1])
-            const invalidOwner = accounts[1]
-            await assert.isRejected(
-                hashList.add(
-                    newAccountHash,
-                    {
-                        from: invalidOwner
-                    }
-                ),
-                'Invalid whitelist owner'
             )
         })
 

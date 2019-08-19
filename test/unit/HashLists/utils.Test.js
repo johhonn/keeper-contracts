@@ -7,18 +7,20 @@ const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
 const HashListLibrary = artifacts.require('HashListLibrary')
-const HashList = artifacts.require('HashList')
+const HashLists = artifacts.require('HashLists')
 
-contract('HashListLibrary', (accounts) => {
+contract('HashLists', (accounts) => {
     let hashListLibrary
     let hashList
+    let listId
     let owner = accounts[0]
 
     beforeEach(async () => {
         hashListLibrary = await HashListLibrary.new()
-        HashList.link('HashListLibrary', hashListLibrary.address)
-        hashList = await HashList.new()
+        HashLists.link('HashListLibrary', hashListLibrary.address)
+        hashList = await HashLists.new()
         hashList.initialize(accounts[0], { from: owner })
+        listId = await hashList.hash(owner)
     })
 
     describe('get', () => {
@@ -32,7 +34,10 @@ contract('HashListLibrary', (accounts) => {
             )
 
             assert.strictEqual(
-                await hashList.get(1),
+                await hashList.get(
+                    listId,
+                    1
+                ),
                 newValue
             )
         })
@@ -49,7 +54,7 @@ contract('HashListLibrary', (accounts) => {
             )
 
             assert.strictEqual(
-                (await hashList.all()).length,
+                (await hashList.all(listId)).length,
                 1
             )
         })
@@ -66,7 +71,7 @@ contract('HashListLibrary', (accounts) => {
             )
             // assert
             assert.strictEqual(
-                (await hashList.indexOf(newValue)).toNumber(),
+                (await hashList.indexOf(listId, newValue)).toNumber(),
                 1
             )
         })
@@ -74,7 +79,7 @@ contract('HashListLibrary', (accounts) => {
         it('should fail if value does not exists', async () => {
             const newValue = await hashList.hash(accounts[1])
             await assert.isRejected(
-                hashList.indexOf(newValue),
+                hashList.indexOf(listId, newValue),
                 'Value does not exist'
             )
         })
@@ -83,7 +88,7 @@ contract('HashListLibrary', (accounts) => {
     describe('isIndexed', () => {
         it('should return false if not indexed list', async () => {
             await assert.isRejected(
-                hashList.isIndexed()
+                hashList.isIndexed(listId)
             )
         })
 
@@ -97,7 +102,7 @@ contract('HashListLibrary', (accounts) => {
             )
             // assert
             assert.strictEqual(
-                await hashList.isIndexed(),
+                await hashList.isIndexed(listId),
                 true
             )
         })
@@ -125,7 +130,7 @@ contract('HashListLibrary', (accounts) => {
 
             // assert
             assert.strictEqual(
-                await hashList.isIndexed(),
+                await hashList.isIndexed(listId),
                 true
             )
         })
@@ -145,7 +150,7 @@ contract('HashListLibrary', (accounts) => {
 
             // assert
             assert.strictEqual(
-                await hashList.isIndexed(),
+                await hashList.isIndexed(listId),
                 false
             )
         })
@@ -162,7 +167,7 @@ contract('HashListLibrary', (accounts) => {
             )
             // assert
             assert.strictEqual(
-                (await hashList.size()).toNumber(),
+                (await hashList.size(listId)).toNumber(),
                 1
             )
         })

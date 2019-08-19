@@ -6,7 +6,7 @@ const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
-const HashList = artifacts.require('HashList')
+const HashLists = artifacts.require('HashLists')
 const EpochLibrary = artifacts.require('EpochLibrary')
 const HashListLibrary = artifacts.require('HashListLibrary')
 const ConditionStoreManager = artifacts.require('ConditionStoreManager')
@@ -26,10 +26,10 @@ contract('Whitelisting Condition', (accounts) => {
         const epochLibrary = await EpochLibrary.new()
         const hashListLibrary = await HashListLibrary.new()
 
-        await HashList.link('HashListLibrary', hashListLibrary.address)
+        await HashLists.link('HashListLibrary', hashListLibrary.address)
         await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
-        const hashList = await HashList.new()
+        const hashList = await HashLists.new()
         await hashList.initialize(
             owner,
             {
@@ -62,10 +62,10 @@ contract('Whitelisting Condition', (accounts) => {
             const epochLibrary = await EpochLibrary.new()
             const hashListLibrary = await HashListLibrary.new()
 
-            await HashList.link('HashListLibrary', hashListLibrary.address)
+            await HashLists.link('HashListLibrary', hashListLibrary.address)
             await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
 
-            const hashList = await HashList.new()
+            const hashList = await HashLists.new()
             await hashList.initialize(
                 owner,
                 {
@@ -120,12 +120,12 @@ contract('Whitelisting Condition', (accounts) => {
 
             let agreementId = constants.bytes32.one
             const someone = accounts[9]
-
+            const listOwner = createRole
             const value = await hashList.hash(someone)
             await hashList.add(
                 value,
                 {
-                    from: owner
+                    from: listOwner
                 }
             )
             let hashValues = await whitelistingCondition.hashValues(hashList.address, value)
@@ -259,10 +259,11 @@ contract('Whitelisting Condition', (accounts) => {
             const someone = accounts[9]
 
             const value = await hashList.hash(someone)
+            const listOwner = createRole
             await hashList.add(
                 value,
                 {
-                    from: owner
+                    from: listOwner
                 }
             )
             let hashValues = await whitelistingCondition.hashValues(hashList.address, value)
@@ -345,7 +346,7 @@ contract('Whitelisting Condition', (accounts) => {
                         from: createRole
                     }
                 ),
-                constants.acl.error.invalidUpdateRole
+                'Item does not exist'
             )
         })
     })

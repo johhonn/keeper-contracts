@@ -7,17 +7,17 @@ const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
 const HashListLibrary = artifacts.require('HashListLibrary')
-const HashList = artifacts.require('HashList')
+const HashLists = artifacts.require('HashLists')
 
-contract('HashListLibrary', (accounts) => {
+contract('HashLists', (accounts) => {
     let hashListLibrary
     let hashList
     let owner = accounts[0]
 
     beforeEach(async () => {
         hashListLibrary = await HashListLibrary.new()
-        HashList.link('HashListLibrary', hashListLibrary.address)
-        hashList = await HashList.new()
+        HashLists.link('HashListLibrary', hashListLibrary.address)
+        hashList = await HashLists.new()
         hashList.initialize(accounts[0], { from: owner })
     })
 
@@ -66,6 +66,7 @@ contract('HashListLibrary', (accounts) => {
         it('should update if old value is exists', async () => {
             const oldValue = await hashList.hash(accounts[1])
             const newValue = await hashList.hash(accounts[2])
+            const listId = await hashList.hash(owner)
 
             await hashList.add(
                 oldValue,
@@ -84,7 +85,10 @@ contract('HashListLibrary', (accounts) => {
 
             // assert
             assert.strictEqual(
-                await hashList.has(newValue),
+                await hashList.has(
+                    listId,
+                    newValue
+                ),
                 true
             )
         })
@@ -106,7 +110,7 @@ contract('HashListLibrary', (accounts) => {
                         from: invalidOwner
                     }
                 ),
-                'Invalid whitelist owner'
+                'Value does not exist'
             )
         })
     })
