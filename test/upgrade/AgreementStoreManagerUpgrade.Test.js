@@ -97,7 +97,7 @@ contract('AgreementStoreManager', (accounts) => {
         })
 
         it('Should be possible to change function signature', async () => {
-            let {
+            const {
                 did,
                 agreementId,
                 conditionIds,
@@ -166,7 +166,7 @@ contract('AgreementStoreManager', (accounts) => {
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
-            let {
+            const {
                 did,
                 agreementId,
                 conditionIds,
