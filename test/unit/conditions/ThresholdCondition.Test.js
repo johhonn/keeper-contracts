@@ -15,11 +15,11 @@ const constants = require('../../helpers/constants.js')
 const testUtils = require('../../helpers/utils.js')
 
 contract('Threshold Condition', (accounts) => {
-    let owner = accounts[1]
-    let createRole = accounts[0]
+    const owner = accounts[1]
+    const createRole = accounts[0]
     let hashLockCondition
     let randomConditionID
-    let randomConditions = []
+    const randomConditions = []
     async function setupTest({
         conditionId = constants.bytes32.one,
         conditionType = constants.address.dummy,
@@ -153,7 +153,7 @@ contract('Threshold Condition', (accounts) => {
     describe('fulfill non existing condition', () => {
         it('should not fulfill if conditions do not exist', async () => {
             const { thresholdCondition, inputConditions } = await setupTest()
-            let agreementId = constants.bytes32.three
+            const agreementId = constants.bytes32.three
 
             await assert.isRejected(
                 thresholdCondition.fulfill(agreementId, inputConditions, 2, { from: accounts[2] }),
@@ -171,9 +171,9 @@ contract('Threshold Condition', (accounts) => {
                 createRole
             } = await setupTest()
 
-            let agreementId = constants.bytes32.three
+            const agreementId = constants.bytes32.three
 
-            let hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
+            const hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
 
             const conditionId = await thresholdCondition.generateId(
                 agreementId,
@@ -194,7 +194,7 @@ contract('Threshold Condition', (accounts) => {
                 }
             )
 
-            let { state } = await conditionStoreManager.getCondition(conditionId)
+            const { state } = await conditionStoreManager.getCondition(conditionId)
             assert.strictEqual(constants.condition.state.fulfilled, state.toNumber())
         })
     })
@@ -207,9 +207,9 @@ contract('Threshold Condition', (accounts) => {
                 inputConditions,
                 createRole
             } = await setupTest()
-            let agreementId = constants.bytes32.three
+            const agreementId = constants.bytes32.three
 
-            let hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
+            const hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
 
             const conditionId = await thresholdCondition.generateId(
                 agreementId,
@@ -253,9 +253,9 @@ contract('Threshold Condition', (accounts) => {
                 inputConditions,
                 createRole
             } = await setupTest()
-            let agreementId = constants.bytes32.three
+            const agreementId = constants.bytes32.three
 
-            let hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
+            const hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
 
             const conditionId = await thresholdCondition.generateId(
                 agreementId,
@@ -287,9 +287,9 @@ contract('Threshold Condition', (accounts) => {
                 createRole
             } = await setupTest()
 
-            let agreementId = constants.bytes32.three
+            const agreementId = constants.bytes32.three
 
-            let hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
+            const hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
 
             const conditionId = await thresholdCondition.generateId(
                 agreementId,
@@ -332,9 +332,9 @@ contract('Threshold Condition', (accounts) => {
                 createRole
             } = await setupTest()
 
-            let agreementId = constants.bytes32.three
+            const agreementId = constants.bytes32.three
 
-            let hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
+            const hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
 
             const conditionId = await thresholdCondition.generateId(
                 agreementId,
@@ -375,9 +375,9 @@ contract('Threshold Condition', (accounts) => {
                 createRole
             } = await setupTest({ fulfillInputConditions: false })
 
-            let agreementId = constants.bytes32.three
+            const agreementId = constants.bytes32.three
 
-            let hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
+            const hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
 
             const conditionId = await thresholdCondition.generateId(
                 agreementId,
@@ -409,7 +409,7 @@ contract('Threshold Condition', (accounts) => {
                 createRole
             } = await setupTest({ fulfillInputConditions: false })
 
-            let agreementId = constants.bytes32.three
+            const agreementId = constants.bytes32.three
 
             await assert.isRejected(
                 thresholdCondition.methods['fulfill(bytes32,bytes32[],uint256)'](
@@ -433,9 +433,9 @@ contract('Threshold Condition', (accounts) => {
                 owner
             } = await setupTest({ fulfillInputConditions: false })
 
-            let agreementId = constants.bytes32.three
+            const agreementId = constants.bytes32.three
 
-            let hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
+            const hashValues = await thresholdCondition.hashValues(inputConditions, inputConditions.length)
 
             const conditionId = await thresholdCondition.generateId(
                 agreementId,
@@ -506,10 +506,10 @@ contract('Threshold Condition', (accounts) => {
                 includeRandomInputConditions: true,
                 fulfillInputConditions: true
             })
-            let agreementId = constants.bytes32.three
+            const agreementId = constants.bytes32.three
 
             const threshold = inputConditions.length
-            let hashValues = await thresholdCondition.hashValues(randomConditions, threshold)
+            const hashValues = await thresholdCondition.hashValues(randomConditions, threshold)
 
             const conditionId = await thresholdCondition.generateId(
                 agreementId,
@@ -530,7 +530,7 @@ contract('Threshold Condition', (accounts) => {
                 }
             )
 
-            let { state } = await conditionStoreManager.getCondition(conditionId)
+            const { state } = await conditionStoreManager.getCondition(conditionId)
             assert.strictEqual(constants.condition.state.fulfilled, state.toNumber())
         })
     })

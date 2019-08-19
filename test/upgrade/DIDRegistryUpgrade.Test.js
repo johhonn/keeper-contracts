@@ -41,7 +41,7 @@ contract('DIDRegistry', (accounts) => {
     } = {}) {
         const DIDRegistryInstance = await DIDRegistry.at(DIDRegistryProxyAddress)
 
-        let result = await DIDRegistryInstance.registerAttribute(
+        const result = await DIDRegistryInstance.registerAttribute(
             did, checksum, [], value,
             { from: didOwner }
         )
@@ -49,7 +49,7 @@ contract('DIDRegistry', (accounts) => {
 
         testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
 
-        let payload = result.logs[0].args
+        const payload = result.logs[0].args
 
         assert.strictEqual(did, payload._did)
         assert.strictEqual(didOwner, payload._owner)
@@ -72,7 +72,7 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('Should be possible to fix/add a bug', async () => {
-            let { did } = await setupTest()
+            const { did } = await setupTest()
 
             // Upgrade to new version
             const taskBook = await upgrade({
@@ -162,7 +162,7 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('Should be possible to append storage variables ', async () => {
-            let { did } = await setupTest()
+            const { did } = await setupTest()
 
             // Upgrade to new version
             const taskBook = await upgrade({
@@ -191,7 +191,7 @@ contract('DIDRegistry', (accounts) => {
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
-            let { did } = await setupTest()
+            const { did } = await setupTest()
 
             // Upgrade to new version
             const taskBook = await upgrade({
