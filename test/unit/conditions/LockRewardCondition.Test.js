@@ -79,10 +79,10 @@ contract('LockRewardCondition', (accounts) => {
         it('should not fulfill if conditions do not exist', async () => {
             const { lockRewardCondition, oceanToken, owner } = await setupTest()
 
-            let agreementId = constants.bytes32.one
-            let rewardAddress = accounts[2]
-            let sender = accounts[0]
-            let amount = 10
+            const agreementId = constants.bytes32.one
+            const rewardAddress = accounts[2]
+            const sender = accounts[0]
+            const amount = 10
 
             await oceanToken.mint(sender, amount, { from: owner })
             await oceanToken.approve(
@@ -106,13 +106,13 @@ contract('LockRewardCondition', (accounts) => {
                 owner
             } = await setupTest()
 
-            let agreementId = constants.bytes32.one
-            let rewardAddress = accounts[2]
-            let sender = accounts[0]
-            let amount = 10
+            const agreementId = constants.bytes32.one
+            const rewardAddress = accounts[2]
+            const sender = accounts[0]
+            const amount = 10
 
-            let hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
-            let conditionId = await lockRewardCondition.generateId(agreementId, hashValues)
+            const hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
+            const conditionId = await lockRewardCondition.generateId(agreementId, hashValues)
 
             await conditionStoreManager.createCondition(
                 conditionId,
@@ -125,9 +125,9 @@ contract('LockRewardCondition', (accounts) => {
                 { from: sender })
 
             const result = await lockRewardCondition.fulfill(agreementId, rewardAddress, amount)
-            let { state } = await conditionStoreManager.getCondition(conditionId)
+            const { state } = await conditionStoreManager.getCondition(conditionId)
             assert.strictEqual(state.toNumber(), constants.condition.state.fulfilled)
-            let rewardBalance = await getBalance(oceanToken, rewardAddress)
+            const rewardBalance = await getBalance(oceanToken, rewardAddress)
             assert.strictEqual(rewardBalance, amount)
 
             testUtils.assertEmitted(result, 1, 'Fulfilled')
@@ -143,12 +143,12 @@ contract('LockRewardCondition', (accounts) => {
         it('out of balance should fail to fulfill if conditions exist', async () => {
             const { lockRewardCondition, conditionStoreManager } = await setupTest()
 
-            let agreementId = constants.bytes32.one
-            let rewardAddress = accounts[2]
-            let amount = 10
+            const agreementId = constants.bytes32.one
+            const rewardAddress = accounts[2]
+            const amount = 10
 
-            let hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
-            let conditionId = await lockRewardCondition.generateId(agreementId, hashValues)
+            const hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
+            const conditionId = await lockRewardCondition.generateId(agreementId, hashValues)
 
             await conditionStoreManager.createCondition(
                 conditionId,
@@ -168,13 +168,13 @@ contract('LockRewardCondition', (accounts) => {
                 owner
             } = await setupTest()
 
-            let agreementId = constants.bytes32.one
-            let rewardAddress = accounts[2]
-            let amount = 10
-            let sender = accounts[0]
+            const agreementId = constants.bytes32.one
+            const rewardAddress = accounts[2]
+            const amount = 10
+            const sender = accounts[0]
 
-            let hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
-            let conditionId = await lockRewardCondition.generateId(agreementId, hashValues)
+            const hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
+            const conditionId = await lockRewardCondition.generateId(agreementId, hashValues)
 
             await conditionStoreManager.createCondition(
                 conditionId,
@@ -196,13 +196,13 @@ contract('LockRewardCondition', (accounts) => {
                 owner
             } = await setupTest()
 
-            let agreementId = constants.bytes32.one
-            let rewardAddress = accounts[2]
-            let amount = 10
-            let sender = accounts[0]
+            const agreementId = constants.bytes32.one
+            const rewardAddress = accounts[2]
+            const amount = 10
+            const sender = accounts[0]
 
-            let hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
-            let conditionId = await lockRewardCondition.generateId(agreementId, hashValues)
+            const hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
+            const conditionId = await lockRewardCondition.generateId(agreementId, hashValues)
 
             await conditionStoreManager.createCondition(
                 conditionId,
@@ -243,12 +243,12 @@ contract('LockRewardCondition', (accounts) => {
             } = await setupTest()
 
             const agreementId = constants.bytes32.one
-            let rewardAddress = accounts[2]
-            let amount = 10
-            let sender = accounts[0]
+            const rewardAddress = accounts[2]
+            const amount = 10
+            const sender = accounts[0]
 
-            let hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
-            let conditionId = await lockRewardCondition.generateId(agreementId, hashValues)
+            const hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
+            const conditionId = await lockRewardCondition.generateId(agreementId, hashValues)
 
             await conditionStoreManager.createCondition(
                 conditionId,

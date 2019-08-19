@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 // List of contracts
+// eslint-disable-next-line security/detect-non-literal-require
 const contractNames = require(`${process.env.PWD}/contracts.json`)
 
 function evaluateContracts({

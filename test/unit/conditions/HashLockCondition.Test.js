@@ -101,7 +101,7 @@ contract('HashLockCondition constructor', (accounts) => {
         it('should fulfill if conditions exist for uint preimage', async () => {
             const { hashLockCondition, conditionStoreManager } = await setupTest()
 
-            let conditionId = await hashLockCondition.generateId(
+            const conditionId = await hashLockCondition.generateId(
                 constants.bytes32.one,
                 constants.condition.hashlock.uint.keccak
             )
@@ -114,14 +114,14 @@ contract('HashLockCondition constructor', (accounts) => {
                 constants.condition.hashlock.uint.preimage
             )
 
-            let { state } = await conditionStoreManager.getCondition(conditionId)
+            const { state } = await conditionStoreManager.getCondition(conditionId)
             assert.strictEqual(state.toNumber(), constants.condition.state.fulfilled)
         })
 
         it('should fulfill if conditions exist for string preimage', async () => {
             const { hashLockCondition, conditionStoreManager } = await setupTest()
 
-            let conditionId = await hashLockCondition.generateId(
+            const conditionId = await hashLockCondition.generateId(
                 constants.bytes32.one,
                 constants.condition.hashlock.string.keccak
             )
@@ -134,14 +134,14 @@ contract('HashLockCondition constructor', (accounts) => {
                 constants.condition.hashlock.string.preimage
             )
 
-            let { state } = await conditionStoreManager.getCondition(conditionId)
+            const { state } = await conditionStoreManager.getCondition(conditionId)
             assert.strictEqual(state.toNumber(), constants.condition.state.fulfilled)
         })
 
         it('should fulfill if conditions exist for bytes32 preimage', async () => {
             const { hashLockCondition, conditionStoreManager } = await setupTest()
 
-            let conditionId = await hashLockCondition.generateId(
+            const conditionId = await hashLockCondition.generateId(
                 constants.bytes32.one,
                 constants.condition.hashlock.bytes32.keccak
             )
@@ -154,7 +154,7 @@ contract('HashLockCondition constructor', (accounts) => {
                 constants.condition.hashlock.bytes32.preimage
             )
 
-            let { state } = await conditionStoreManager.getCondition(conditionId)
+            const { state } = await conditionStoreManager.getCondition(conditionId)
             assert.strictEqual(state.toNumber(), constants.condition.state.fulfilled)
         })
     })
@@ -163,7 +163,7 @@ contract('HashLockCondition constructor', (accounts) => {
         it('wrong preimage should fail to fulfill if conditions exist for uint preimage', async () => {
             const { hashLockCondition, conditionStoreManager } = await setupTest()
 
-            let conditionId = await hashLockCondition.generateId(
+            const conditionId = await hashLockCondition.generateId(
                 constants.bytes32.one,
                 constants.condition.hashlock.uint.keccak
             )
@@ -183,7 +183,7 @@ contract('HashLockCondition constructor', (accounts) => {
         it('wrong preimage should fail to fulfill if conditions exist for uint preimage with string', async () => {
             const { hashLockCondition, conditionStoreManager } = await setupTest()
 
-            let conditionId = await hashLockCondition.generateId(
+            const conditionId = await hashLockCondition.generateId(
                 constants.bytes32.one,
                 constants.condition.hashlock.uint.keccak
             )
@@ -203,7 +203,7 @@ contract('HashLockCondition constructor', (accounts) => {
         it('wrong preimage should fail to fulfill if conditions exist for string preimage', async () => {
             const { hashLockCondition, conditionStoreManager } = await setupTest()
 
-            let conditionId = await hashLockCondition.generateId(
+            const conditionId = await hashLockCondition.generateId(
                 constants.bytes32.one,
                 constants.condition.hashlock.string.keccak
             )
@@ -223,7 +223,7 @@ contract('HashLockCondition constructor', (accounts) => {
         it('wrong preimage should fail to fulfill if conditions exist for uint preimage with bytes32', async () => {
             const { hashLockCondition, conditionStoreManager } = await setupTest()
 
-            let conditionId = await hashLockCondition.generateId(
+            const conditionId = await hashLockCondition.generateId(
                 constants.bytes32.one,
                 constants.condition.hashlock.uint.keccak
             )
@@ -243,7 +243,7 @@ contract('HashLockCondition constructor', (accounts) => {
         it('right preimage should fail to fulfill if conditions already fulfilled for uint', async () => {
             const { hashLockCondition, conditionStoreManager } = await setupTest()
 
-            let conditionId = await hashLockCondition.generateId(
+            const conditionId = await hashLockCondition.generateId(
                 constants.bytes32.one,
                 constants.condition.hashlock.uint.keccak
             )
@@ -269,7 +269,7 @@ contract('HashLockCondition constructor', (accounts) => {
         it('should fail to fulfill if conditions has different type ref', async () => {
             const { hashLockCondition, conditionStoreManager, createRole, owner } = await setupTest()
 
-            let conditionId = await hashLockCondition.generateId(
+            const conditionId = await hashLockCondition.generateId(
                 constants.bytes32.one,
                 constants.condition.hashlock.uint.keccak
             )

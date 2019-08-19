@@ -1,3 +1,6 @@
 {
-    "extends": "oceanprotocol"
+    "extends": "oceanprotocol",
+    "rules": {
+        "security/detect-non-literal-fs-filename": "off"
+    }
 }

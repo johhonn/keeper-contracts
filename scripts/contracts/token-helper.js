@@ -4,6 +4,7 @@ const contract = require('truffle-contract')
 const BN = require('bignumber.js')
 
 const network = process.env.NETWORK || 'development'
+// eslint-disable-next-line security/detect-non-literal-require
 const oceanTokenArtifact = require(`../../artifacts/OceanToken.${network}.json`)
 const OceanToken = contract({ abi: oceanTokenArtifact.abi })
 

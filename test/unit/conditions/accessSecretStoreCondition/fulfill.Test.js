@@ -78,8 +78,8 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId)
 
-            let hashValues = await accessSecretStoreCondition.hashValues(documentId, grantee)
-            let conditionId = await accessSecretStoreCondition.generateId(agreementId, hashValues)
+            const hashValues = await accessSecretStoreCondition.hashValues(documentId, grantee)
+            const conditionId = await accessSecretStoreCondition.generateId(agreementId, hashValues)
 
             const agreement = {
                 did: constants.did[0],
@@ -128,8 +128,8 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId)
 
-            let hashValues = await accessSecretStoreCondition.hashValues(documentId, grantee)
-            let conditionId = await accessSecretStoreCondition.generateId(agreementId, hashValues)
+            const hashValues = await accessSecretStoreCondition.hashValues(documentId, grantee)
+            const conditionId = await accessSecretStoreCondition.generateId(agreementId, hashValues)
 
             const agreement = {
                 did: constants.did[0],
@@ -168,8 +168,8 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId)
 
-            let hashValues = await accessSecretStoreCondition.hashValues(documentId, grantee)
-            let conditionId = await accessSecretStoreCondition.generateId(agreementId, hashValues)
+            const hashValues = await accessSecretStoreCondition.hashValues(documentId, grantee)
+            const conditionId = await accessSecretStoreCondition.generateId(agreementId, hashValues)
 
             const agreement = {
                 did: constants.did[0],
@@ -215,8 +215,8 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId)
 
-            let hashValues = await accessSecretStoreCondition.hashValues(documentId, grantee)
-            let conditionId = await accessSecretStoreCondition.generateId(agreementId, hashValues)
+            const hashValues = await accessSecretStoreCondition.hashValues(documentId, grantee)
+            const conditionId = await accessSecretStoreCondition.generateId(agreementId, hashValues)
 
             const agreement = {
                 did: constants.did[0],
@@ -263,8 +263,8 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId)
 
-            let hashValues = await accessSecretStoreCondition.hashValues(documentId, grantee)
-            let conditionId = await accessSecretStoreCondition.generateId(agreementId, hashValues)
+            const hashValues = await accessSecretStoreCondition.hashValues(documentId, grantee)
+            const conditionId = await accessSecretStoreCondition.generateId(agreementId, hashValues)
 
             const agreement = {
                 did: constants.did[0],
@@ -309,8 +309,8 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId)
 
-            let hashValues = await accessSecretStoreCondition.hashValues(documentId, grantee)
-            let conditionId = await accessSecretStoreCondition.generateId(agreementId, hashValues)
+            const hashValues = await accessSecretStoreCondition.hashValues(documentId, grantee)
+            const conditionId = await accessSecretStoreCondition.generateId(agreementId, hashValues)
 
             const agreement = {
                 did: constants.did[0],

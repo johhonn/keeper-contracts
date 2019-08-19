@@ -1,4 +1,4 @@
-let constants = {
+const constants = {
     keeper: {
         nodeUrl: `http://localhost:${process.env.ETHEREUM_RPC_PORT || '8545'}`
     },
