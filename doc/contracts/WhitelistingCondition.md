@@ -47,7 +47,9 @@ Parameters:
 Documentation:
 
 ```
-@notice fulfill validate the signed message and fulfill the condition
+@notice fulfill check whether address is whitelisted
+in order to fulfill the condition. This method will be 
+called by whitelist owner. 
 @param _agreementId SEA agreement identifier
 @param _listAddress list contract address
 @param _item item in the list

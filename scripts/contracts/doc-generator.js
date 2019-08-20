@@ -26,7 +26,7 @@ const contracts = [
     'Common',
     'HashListLibrary',
     'WhitelistingCondition',
-    'HashList'
+    'HashLists'
 ]
 
 contracts.forEach((contractName) => {
