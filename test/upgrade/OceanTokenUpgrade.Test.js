@@ -41,7 +41,7 @@ contract('OceanToken', (accounts) => {
                 verbose
             })
 
-            OceanTokenAddress = addressBook['OceanToken']
+            OceanTokenAddress = addressBook.OceanToken
             assert(OceanTokenAddress)
         })
 
@@ -55,7 +55,7 @@ contract('OceanToken', (accounts) => {
 
             await confirmUpgrade(
                 web3,
-                taskBook['OceanToken'],
+                taskBook.OceanToken,
                 approver,
                 verbose
             )
@@ -84,7 +84,7 @@ contract('OceanToken', (accounts) => {
 
             await confirmUpgrade(
                 web3,
-                taskBook['OceanToken'],
+                taskBook.OceanToken,
                 approver,
                 verbose
             )
@@ -122,7 +122,7 @@ contract('OceanToken', (accounts) => {
 
             await confirmUpgrade(
                 web3,
-                taskBook['OceanToken'],
+                taskBook.OceanToken,
                 approver,
                 verbose
             )

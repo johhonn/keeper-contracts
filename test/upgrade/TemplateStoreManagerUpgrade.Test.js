@@ -50,7 +50,7 @@ contract('TemplateStoreManager', (accounts) => {
                 verbose
             })
 
-            templateStoreManagerAddress = addressBook['TemplateStoreManager']
+            templateStoreManagerAddress = addressBook.TemplateStoreManager
             assert(templateStoreManagerAddress)
         })
 
@@ -66,7 +66,7 @@ contract('TemplateStoreManager', (accounts) => {
 
             await confirmUpgrade(
                 web3,
-                taskBook['TemplateStoreManager'],
+                taskBook.TemplateStoreManager,
                 approver,
                 verbose
             )
@@ -92,7 +92,7 @@ contract('TemplateStoreManager', (accounts) => {
 
             await confirmUpgrade(
                 web3,
-                taskBook['TemplateStoreManager'],
+                taskBook.TemplateStoreManager,
                 approver,
                 verbose
             )
@@ -117,7 +117,7 @@ contract('TemplateStoreManager', (accounts) => {
 
             await confirmUpgrade(
                 web3,
-                taskBook['TemplateStoreManager'],
+                taskBook.TemplateStoreManager,
                 approver,
                 verbose
             )
@@ -143,7 +143,7 @@ contract('TemplateStoreManager', (accounts) => {
 
             await confirmUpgrade(
                 web3,
-                taskBook['TemplateStoreManager'],
+                taskBook.TemplateStoreManager,
                 approver,
                 verbose
             )
@@ -173,7 +173,7 @@ contract('TemplateStoreManager', (accounts) => {
 
             await confirmUpgrade(
                 web3,
-                taskBook['TemplateStoreManager'],
+                taskBook.TemplateStoreManager,
                 approver,
                 verbose
             )

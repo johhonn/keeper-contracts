@@ -12,8 +12,8 @@ module.exports = (cb) => {
         contracts,
         evaluateContracts,
         strict: false,
-        testnet: argv['testnet'] || false,
-        verbose: argv['verbose'] && true
+        testnet: argv.testnet || false,
+        verbose: argv.verbose && true
     })
         .then(() => cb())
         .catch(err => cb(err))

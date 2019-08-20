@@ -67,7 +67,7 @@ contract('AgreementStoreManager', (accounts) => {
                 verbose
             })
 
-            agreementStoreManagerAddress = addressBook['AgreementStoreManager']
+            agreementStoreManagerAddress = addressBook.AgreementStoreManager
             assert(agreementStoreManagerAddress)
         })
 
@@ -82,7 +82,7 @@ contract('AgreementStoreManager', (accounts) => {
 
             await confirmUpgrade(
                 web3,
-                taskBook['AgreementStoreManager'],
+                taskBook.AgreementStoreManager,
                 approver,
                 verbose
             )
@@ -115,7 +115,7 @@ contract('AgreementStoreManager', (accounts) => {
             // act & assert
             await confirmUpgrade(
                 web3,
-                taskBook['AgreementStoreManager'],
+                taskBook.AgreementStoreManager,
                 approver,
                 verbose
             )
@@ -149,7 +149,7 @@ contract('AgreementStoreManager', (accounts) => {
 
             await confirmUpgrade(
                 web3,
-                taskBook['AgreementStoreManager'],
+                taskBook.AgreementStoreManager,
                 approver,
                 verbose
             )
@@ -183,7 +183,7 @@ contract('AgreementStoreManager', (accounts) => {
 
             await confirmUpgrade(
                 web3,
-                taskBook['AgreementStoreManager'],
+                taskBook.AgreementStoreManager,
                 approver,
                 verbose
             )
@@ -224,7 +224,7 @@ contract('AgreementStoreManager', (accounts) => {
 
             await confirmUpgrade(
                 web3,
-                taskBook['AgreementStoreManager'],
+                taskBook.AgreementStoreManager,
                 approver,
                 verbose
             )
