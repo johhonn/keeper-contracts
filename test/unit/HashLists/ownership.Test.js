@@ -26,7 +26,6 @@ contract('HashList', (accounts) => {
                 from: owner
             }
         )
-
     })
 
     describe('ownedBy', () => {

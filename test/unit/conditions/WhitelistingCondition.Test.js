@@ -114,7 +114,6 @@ contract('Whitelisting Condition', (accounts) => {
                 whitelistingCondition,
                 conditionStoreManager,
                 hashList,
-                owner,
                 createRole
             } = await setupTest()
 
@@ -251,7 +250,6 @@ contract('Whitelisting Condition', (accounts) => {
                 whitelistingCondition,
                 conditionStoreManager,
                 hashList,
-                owner,
                 createRole
             } = await setupTest()
 

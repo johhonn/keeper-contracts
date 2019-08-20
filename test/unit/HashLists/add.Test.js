@@ -11,7 +11,7 @@ const HashLists = artifacts.require('HashLists')
 
 contract('HashLists', (accounts) => {
     let hashListLibrary
-    let hashLists
+    let hashList
     let owner = accounts[0]
 
     beforeEach(async () => {
