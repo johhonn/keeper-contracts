@@ -69,7 +69,6 @@ script:
     - git status
     - git add package-lock.json
     - git diff-index --quiet HEAD || git commit -m "Travis update"
-    - bash -x scripts/security_analysis.sh
 
 after_script:
     - greenkeeper-lockfile-upload

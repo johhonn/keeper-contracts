@@ -199,7 +199,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: manticore
-        image: "ubuntu:18:04"
+        image: "ubuntu:18.04"
         command:
         - /bin/slither-script.sh
         - ${TRAVIS_BRANCH}
