@@ -206,12 +206,7 @@ contract ConditionStoreManager is Ownable, Common {
         onlyValidType(_typeRef)
         returns (uint size)
     {
-        bool epochCreated = epochList.create(_id, _timeLock, _timeOut);
-
-        require(
-            epochCreated,
-            'epoch was not created'
-        );
+        epochList.create(_id, _timeLock, _timeOut);
 
         uint listSize = conditionList.create(_id, _typeRef);
 

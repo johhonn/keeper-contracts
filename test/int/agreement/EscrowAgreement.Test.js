@@ -50,6 +50,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
             owner,
             agreementStoreManager,
             conditionStoreManager,
+            didRegistry,
             oceanToken
         ))
 
@@ -255,14 +256,16 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(agreement.conditionIds[1])).toNumber(),
                 constants.condition.state.fulfilled)
-            expect(await accessSecretStoreCondition.checkPermissions(receiver, agreement.did)).to.equal(false)
+            // receiver is a DID owner
+            // expect(await accessSecretStoreCondition.checkPermissions(receiver, agreement.did)).to.equal(false)
 
             // fail: fulfill access before time lock
             await assert.isRejected(
                 accessSecretStoreCondition.fulfill(agreementId, agreement.did, receiver, { from: receiver }),
                 constants.condition.epoch.error.isTimeLocked
             )
-            expect(await accessSecretStoreCondition.checkPermissions(receiver, agreement.did)).to.equal(false)
+            // receiver is a DID owner
+            // expect(await accessSecretStoreCondition.checkPermissions(receiver, agreement.did)).to.equal(false)
 
             // wait: for time lock
             await increaseTime(timeLockAccess)

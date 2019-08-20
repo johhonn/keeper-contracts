@@ -140,3 +140,13 @@ Documentation:
 ```
 Parameters:
 * address _templateId
+
+### public getDIDRegistryAddress
+
+Documentation:
+
+```
+@dev getDIDRegistryAddress utility function 
+used by other contracts or any EOA.
+@return the DIDRegistry address
+```

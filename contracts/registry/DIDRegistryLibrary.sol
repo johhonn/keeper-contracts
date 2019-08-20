@@ -70,7 +70,6 @@ library DIDRegistryLibrary {
         address provider
     )
         internal
-        returns(bool)
     {
         require(
             provider != address(0),
@@ -86,7 +85,6 @@ library DIDRegistryLibrary {
             _self.didRegisters[_did].providers.push(provider);
         }
 
-        return true;
     }
 
    /**
@@ -120,6 +118,26 @@ library DIDRegistryLibrary {
         return true;
     }
 
+   /**
+    * @notice updateDIDOwner transfer DID ownership to a new owner
+    * @param _self refers to storage pointer
+    * @param _did refers to decentralized identifier (a byte32 length ID)
+    * @param _newOwner the new DID owner address
+    */
+    function updateDIDOwner(
+        DIDRegisterList storage _self,
+        bytes32 _did,
+        address _newOwner
+    )
+        internal
+    {
+        require(
+            _newOwner != address(0),
+            'Invalid new DID owner address'
+        );
+        _self.didRegisters[_did].owner = _newOwner;
+    }
+    
    /**
     * @notice isProvider check whether DID provider exists
     * @param _self refers to storage pointer

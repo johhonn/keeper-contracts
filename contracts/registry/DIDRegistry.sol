@@ -57,6 +57,12 @@ contract DIDRegistry is Ownable {
         bytes32 _did,
         address _provider
     );
+    
+    event DIDOwnershipTransferred(
+        bytes32 _did,
+        address _previousOwner,
+        address _newOwner
+    );
 
     /**
      * @dev DIDRegistry Initializer
@@ -108,15 +114,11 @@ contract DIDRegistry is Ownable {
 
         // push providers to storage
         for (uint256 i = 0; i < _providers.length; i++) {
-            bool providerAdded = didRegisterList.addProvider(
+            didRegisterList.addProvider(
                 _did,
                 _providers[i]
             );
 
-            require(
-                providerAdded,
-                'provider was not added'
-            );
         }
 
         /* emitting _value here to avoid expensive storage */
@@ -147,12 +149,7 @@ contract DIDRegistry is Ownable {
         external
         onlyDIDOwner(_did)
     {
-        bool providerAdded = didRegisterList.addProvider(_did, _provider);
-
-        require(
-            providerAdded,
-            'provider was not added'
-        );
+        didRegisterList.addProvider(_did, _provider);
 
         emit DIDProviderAdded(
             _did,
@@ -178,6 +175,25 @@ contract DIDRegistry is Ownable {
             _did,
             _provider,
             state
+        );
+    }
+    
+    /**
+     * @notice transferDIDOwnership transfer DID ownership
+     * @param _did refers to decentralized identifier (a bytes32 length ID)
+     * @param _newOwner new owner address
+     */
+    function transferDIDOwnership(bytes32 _did, address _newOwner)
+        external
+        onlyDIDOwner(_did)
+    {
+        address _previousOwner = didRegisterList.didRegisters[_did].owner;
+        didRegisterList.updateDIDOwner(_did, _newOwner);
+        
+        emit DIDOwnershipTransferred(
+            _did,
+            _previousOwner,
+            _newOwner
         );
     }
 

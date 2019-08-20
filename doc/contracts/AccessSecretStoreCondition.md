@@ -19,7 +19,7 @@ Documentation:
 
 ### public DocumentPermission
 Members:
-* bytes32 agreementId
+* bytes32 agreementIdDeprecated
 * mapping(address => bool) permission
 
 ## Variables
@@ -36,6 +36,12 @@ Parameters:
 * bytes32 _documentId
 * address _grantee
 * bytes32 _conditionId
+
+## Modifiers
+
+### internal onlyDIDOwnerOrProvider
+Parameters:
+* bytes32 _documentId
 
 ## Functions
 
@@ -91,6 +97,32 @@ Parameters:
 * bytes32 _agreementId
 * bytes32 _documentId
 * address _grantee
+
+### public grantPermission
+
+Documentation:
+
+```
+@notice grantPermission is called only by DID owner or provider
+@param _grantee is the address of the granted user or the DID provider
+@param _documentId refers to the DID in which secret store will issue the decryption keys
+```
+Parameters:
+* address _grantee
+* bytes32 _documentId
+
+### public renouncePermission
+
+Documentation:
+
+```
+@notice renouncePermission is called only by DID owner or provider
+@param _grantee is the address of the granted user or the DID provider
+@param _documentId refers to the DID in which secret store will issue the decryption keys
+```
+Parameters:
+* address _grantee
+* bytes32 _documentId
 
 ### external checkPermissions
 
