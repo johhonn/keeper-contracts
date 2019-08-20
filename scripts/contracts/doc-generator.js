@@ -26,7 +26,7 @@ const contracts = [
     'Common',
     'HashListLibrary',
     'WhitelistingCondition',
-    'HashLists'
+    'HashLists',
     'ThresholdCondition'
 ]
 
