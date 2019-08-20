@@ -15,8 +15,8 @@ const WhitelistingCondition = artifacts.require('WhitelistingCondition')
 const constants = require('../../helpers/constants.js')
 
 contract('Whitelisting Condition', (accounts) => {
-    let owner = accounts[1]
-    let createRole = accounts[0]
+    const owner = accounts[1]
+    const createRole = accounts[0]
     async function setupTest({
         conditionId = constants.bytes32.one,
         conditionType = constants.address.dummy,
@@ -97,7 +97,7 @@ contract('Whitelisting Condition', (accounts) => {
         it('should not fulfill if conditions do not exist', async () => {
             const { whitelistingCondition, hashList } = await setupTest()
             const someone = accounts[9]
-            let agreementId = constants.bytes32.one
+            const agreementId = constants.bytes32.one
 
             const value = await hashList.hash(someone)
 
@@ -117,7 +117,7 @@ contract('Whitelisting Condition', (accounts) => {
                 createRole
             } = await setupTest()
 
-            let agreementId = constants.bytes32.one
+            const agreementId = constants.bytes32.one
             const someone = accounts[9]
             const listOwner = createRole
             const value = await hashList.hash(someone)
@@ -127,7 +127,7 @@ contract('Whitelisting Condition', (accounts) => {
                     from: listOwner
                 }
             )
-            let hashValues = await whitelistingCondition.hashValues(hashList.address, value)
+            const hashValues = await whitelistingCondition.hashValues(hashList.address, value)
 
             const conditionId = await whitelistingCondition.generateId(
                 agreementId,
@@ -148,7 +148,7 @@ contract('Whitelisting Condition', (accounts) => {
                 }
             )
 
-            let { state } = await conditionStoreManager.getCondition(conditionId)
+            const { state } = await conditionStoreManager.getCondition(conditionId)
             assert.strictEqual(constants.condition.state.fulfilled, state.toNumber())
         })
     })
@@ -163,7 +163,7 @@ contract('Whitelisting Condition', (accounts) => {
                 createRole
             } = await setupTest()
 
-            let agreementId = constants.bytes32.one
+            const agreementId = constants.bytes32.one
             const someone = accounts[9]
 
             const value = await hashList.hash(someone)
@@ -173,7 +173,7 @@ contract('Whitelisting Condition', (accounts) => {
                     from: owner
                 }
             )
-            let hashValues = await whitelistingCondition.hashValues(hashList.address, value)
+            const hashValues = await whitelistingCondition.hashValues(hashList.address, value)
 
             const conditionId = await whitelistingCondition.generateId(
                 agreementId,
@@ -210,7 +210,7 @@ contract('Whitelisting Condition', (accounts) => {
                 createRole
             } = await setupTest()
 
-            let agreementId = constants.bytes32.one
+            const agreementId = constants.bytes32.one
             const someone = accounts[9]
 
             const value = await hashList.hash(someone)
@@ -221,7 +221,7 @@ contract('Whitelisting Condition', (accounts) => {
                 }
             )
 
-            let hashValues = await whitelistingCondition.hashValues(hashList.address, value)
+            const hashValues = await whitelistingCondition.hashValues(hashList.address, value)
 
             const conditionId = await whitelistingCondition.generateId(
                 agreementId,
@@ -253,7 +253,7 @@ contract('Whitelisting Condition', (accounts) => {
                 createRole
             } = await setupTest()
 
-            let agreementId = constants.bytes32.one
+            const agreementId = constants.bytes32.one
             const someone = accounts[9]
 
             const value = await hashList.hash(someone)
@@ -264,7 +264,7 @@ contract('Whitelisting Condition', (accounts) => {
                     from: listOwner
                 }
             )
-            let hashValues = await whitelistingCondition.hashValues(hashList.address, value)
+            const hashValues = await whitelistingCondition.hashValues(hashList.address, value)
 
             const conditionId = await whitelistingCondition.generateId(
                 agreementId,
@@ -307,7 +307,7 @@ contract('Whitelisting Condition', (accounts) => {
                 createRole
             } = await setupTest()
 
-            let agreementId = constants.bytes32.one
+            const agreementId = constants.bytes32.one
             const someone = accounts[9]
 
             const value = await hashList.hash(someone)
@@ -317,7 +317,7 @@ contract('Whitelisting Condition', (accounts) => {
                     from: owner
                 }
             )
-            let hashValues = await whitelistingCondition.hashValues(hashList.address, value)
+            const hashValues = await whitelistingCondition.hashValues(hashList.address, value)
 
             const conditionId = await whitelistingCondition.generateId(
                 agreementId,

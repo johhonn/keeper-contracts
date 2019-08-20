@@ -13,7 +13,7 @@ contract('HashLists', (accounts) => {
     let hashListLibrary
     let hashList
     let listId
-    let owner = accounts[0]
+    const owner = accounts[0]
 
     beforeEach(async () => {
         hashListLibrary = await HashListLibrary.new()
