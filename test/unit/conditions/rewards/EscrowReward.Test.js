@@ -91,12 +91,12 @@ contract('EscrowReward constructor', (accounts) => {
             await setupTest()
             const { escrowReward } = await setupTest()
 
-            let agreementId = constants.bytes32.one
-            let lockConditionId = accounts[2]
-            let releaseConditionId = accounts[3]
-            let sender = accounts[0]
-            let receiver = accounts[1]
-            let amount = 10
+            const agreementId = constants.bytes32.one
+            const lockConditionId = accounts[2]
+            const releaseConditionId = accounts[3]
+            const sender = accounts[0]
+            const receiver = accounts[1]
+            const amount = 10
 
             await assert.isRejected(
                 escrowReward.fulfill(
@@ -121,28 +121,28 @@ contract('EscrowReward constructor', (accounts) => {
                 owner
             } = await setupTest()
 
-            let agreementId = constants.bytes32.one
-            let sender = accounts[0]
-            let receiver = accounts[1]
-            let amount = 10
+            const agreementId = constants.bytes32.one
+            const sender = accounts[0]
+            const receiver = accounts[1]
+            const amount = 10
 
-            let hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
-            let conditionLockId = await lockRewardCondition.generateId(agreementId, hashValuesLock)
+            const hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
+            const conditionLockId = await lockRewardCondition.generateId(agreementId, hashValuesLock)
 
             await conditionStoreManager.createCondition(
                 conditionLockId,
                 lockRewardCondition.address)
 
-            let lockConditionId = conditionLockId
-            let releaseConditionId = conditionLockId
+            const lockConditionId = conditionLockId
+            const releaseConditionId = conditionLockId
 
-            let hashValues = await escrowReward.hashValues(
+            const hashValues = await escrowReward.hashValues(
                 amount,
                 receiver,
                 sender,
                 lockConditionId,
                 releaseConditionId)
-            let conditionId = await escrowReward.generateId(agreementId, hashValues)
+            const conditionId = await escrowReward.generateId(agreementId, hashValues)
 
             await conditionStoreManager.createCondition(
                 constants.bytes32.one,
@@ -205,28 +205,28 @@ contract('EscrowReward constructor', (accounts) => {
                 owner
             } = await setupTest()
 
-            let agreementId = constants.bytes32.one
-            let sender = accounts[0]
-            let receiver = constants.address.zero
-            let amount = 10
+            const agreementId = constants.bytes32.one
+            const sender = accounts[0]
+            const receiver = constants.address.zero
+            const amount = 10
 
-            let hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
-            let conditionLockId = await lockRewardCondition.generateId(agreementId, hashValuesLock)
+            const hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
+            const conditionLockId = await lockRewardCondition.generateId(agreementId, hashValuesLock)
 
             await conditionStoreManager.createCondition(
                 conditionLockId,
                 lockRewardCondition.address)
 
-            let lockConditionId = conditionLockId
-            let releaseConditionId = conditionLockId
+            const lockConditionId = conditionLockId
+            const releaseConditionId = conditionLockId
 
-            let hashValues = await escrowReward.hashValues(
+            const hashValues = await escrowReward.hashValues(
                 amount,
                 receiver,
                 sender,
                 lockConditionId,
                 releaseConditionId)
-            let conditionId = await escrowReward.generateId(agreementId, hashValues)
+            const conditionId = await escrowReward.generateId(agreementId, hashValues)
 
             await conditionStoreManager.createCondition(
                 constants.bytes32.one,
@@ -268,28 +268,28 @@ contract('EscrowReward constructor', (accounts) => {
                 owner
             } = await setupTest()
 
-            let agreementId = constants.bytes32.one
-            let sender = accounts[0]
-            let receiver = escrowReward.address
-            let amount = 10
+            const agreementId = constants.bytes32.one
+            const sender = accounts[0]
+            const receiver = escrowReward.address
+            const amount = 10
 
-            let hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
-            let conditionLockId = await lockRewardCondition.generateId(agreementId, hashValuesLock)
+            const hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
+            const conditionLockId = await lockRewardCondition.generateId(agreementId, hashValuesLock)
 
             await conditionStoreManager.createCondition(
                 conditionLockId,
                 lockRewardCondition.address)
 
-            let lockConditionId = conditionLockId
-            let releaseConditionId = conditionLockId
+            const lockConditionId = conditionLockId
+            const releaseConditionId = conditionLockId
 
-            let hashValues = await escrowReward.hashValues(
+            const hashValues = await escrowReward.hashValues(
                 amount,
                 receiver,
                 sender,
                 lockConditionId,
                 releaseConditionId)
-            let conditionId = await escrowReward.generateId(agreementId, hashValues)
+            const conditionId = await escrowReward.generateId(agreementId, hashValues)
 
             await conditionStoreManager.createCondition(
                 constants.bytes32.one,

@@ -65,7 +65,7 @@ contract('ConditionStoreManager', (accounts) => {
 
     describe('Test upgradability for ConditionStoreManager', () => {
         it('Should be possible to fix/add a bug', async () => {
-            let { conditionId } = await setupTest()
+            const { conditionId } = await setupTest()
 
             const taskBook = await upgrade({
                 web3,
@@ -92,7 +92,7 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('Should be possible to change function signature', async () => {
-            let { conditionId, conditionType } = await setupTest()
+            const { conditionId, conditionType } = await setupTest()
 
             const taskBook = await upgrade({
                 web3,
@@ -180,7 +180,7 @@ contract('ConditionStoreManager', (accounts) => {
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
-            let { conditionId, conditionType } = await setupTest()
+            const { conditionId, conditionType } = await setupTest()
 
             const taskBook = await upgrade({
                 web3,
