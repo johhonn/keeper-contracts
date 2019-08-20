@@ -4,8 +4,11 @@ pragma solidity 0.5.6;
 // Code is Apache-2.0 and docs are CC-BY-4.0
 
 import './Condition.sol';
-import '../agreements/AgreementStoreManager.sol';
+import '../registry/DIDRegistry.sol';
 import '../interfaces/ISecretStore.sol';
+import '../interfaces/ISecretStorePermission.sol';
+import '../agreements/AgreementStoreManager.sol';
+
 /**
  * @title Access Secret Store Condition
  * @author Ocean Protocol Team
@@ -20,23 +23,40 @@ import '../interfaces/ISecretStore.sol';
  *      will check whether the permission is granted for the consumer
  *      in order to encrypt/decrypt the document.
  */
-contract AccessSecretStoreCondition is Condition, ISecretStore {
+contract AccessSecretStoreCondition is Condition, 
+ISecretStore, ISecretStorePermission {
 
     struct DocumentPermission {
-        bytes32 agreementId;
+        bytes32 agreementIdDeprecated;
         mapping(address => bool) permission;
     }
 
     mapping(bytes32 => DocumentPermission) private documentPermissions;
-
     AgreementStoreManager private agreementStoreManager;
-
+    
+    
     event Fulfilled(
         bytes32 indexed _agreementId,
         bytes32 indexed _documentId,
         address indexed _grantee,
         bytes32 _conditionId
     );
+    
+    modifier onlyDIDOwnerOrProvider(
+        bytes32 _documentId
+    )
+    {
+        DIDRegistry didRegistry = DIDRegistry(
+            agreementStoreManager.getDIDRegistryAddress()
+        );
+        
+        require(
+            didRegistry.isDIDProvider(_documentId, msg.sender) || 
+            msg.sender == didRegistry.getDIDOwner(_documentId),
+            'Invalid DID owner/provider'
+        );
+        _;
+    }
 
    /**
     * @notice initialize init the 
@@ -54,7 +74,7 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
     )
         external
         initializer()
-    {
+    {   
         Ownable.initialize(_owner);
 
         conditionStoreManager = ConditionStoreManager(
@@ -103,15 +123,11 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         public
         returns (ConditionStoreLibrary.ConditionState)
     {
-        require(
-            agreementStoreManager.isAgreementDIDOwner(_agreementId, msg.sender) ||
-            agreementStoreManager.isAgreementDIDProvider(_agreementId, msg.sender),
-            'Invalid UpdateRole'
+        grantPermission(
+            _grantee,
+            _documentId
         );
-
-        documentPermissions[_documentId].permission[_grantee] = true;
-        documentPermissions[_documentId].agreementId = _agreementId;
-
+        
         bytes32 _id = generateId(
             _agreementId,
             hashValues(_documentId, _grantee)
@@ -121,7 +137,7 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
             _id,
             ConditionStoreLibrary.ConditionState.Fulfilled
         );
-
+        
         emit Fulfilled(
             _agreementId,
             _documentId,
@@ -131,8 +147,39 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
 
         return state;
     }
+    
+   /**
+    * @notice grantPermission is called only by DID owner or provider
+    * @param _grantee is the address of the granted user or the DID provider
+    * @param _documentId refers to the DID in which secret store will issue the decryption keys
+    */
+    function grantPermission(
+        address _grantee,
+        bytes32 _documentId
+        
+    )
+        public
+        onlyDIDOwnerOrProvider(_documentId)
+    {
+        documentPermissions[_documentId].permission[_grantee] = true;
+    }
 
-    /**
+   /**
+    * @notice renouncePermission is called only by DID owner or provider
+    * @param _grantee is the address of the granted user or the DID provider
+    * @param _documentId refers to the DID in which secret store will issue the decryption keys
+    */
+    function renouncePermission(
+        address _grantee,
+        bytes32 _documentId
+    )
+        public
+        onlyDIDOwnerOrProvider(_documentId)
+    {
+        documentPermissions[_documentId].permission[_grantee] = false;
+    }
+    
+   /**
     * @notice checkPermissions is called by Parity secret store
     * @param _documentId refers to the DID in which secret store will issue the decryption keys
     * @param _grantee is the address of the granted user or the DID provider
@@ -145,16 +192,14 @@ contract AccessSecretStoreCondition is Condition, ISecretStore {
         external view
         returns(bool permissionGranted)
     {
-        bool isDIDProvider = agreementStoreManager.isAgreementDIDProvider(
-                documentPermissions[_documentId].agreementId,
-                _grantee
+        DIDRegistry didRegistry = DIDRegistry(
+            agreementStoreManager.getDIDRegistryAddress()
         );
-
-        if (isDIDProvider) {
-            return true;
-        }
-
-        return documentPermissions[_documentId].permission[_grantee];
+        return (
+            didRegistry.isDIDProvider(_documentId, _grantee) || 
+            _grantee == didRegistry.getDIDOwner(_documentId) ||
+            documentPermissions[_documentId].permission[_grantee]
+        );
     }
 }
 
