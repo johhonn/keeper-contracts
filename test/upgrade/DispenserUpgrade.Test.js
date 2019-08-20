@@ -66,8 +66,8 @@ contract('Dispenser', (accounts) => {
                 verbose
             })
 
-            OceanTokenAddress = addressBook['OceanToken']
-            DispenserAddress = addressBook['Dispenser']
+            OceanTokenAddress = addressBook.OceanToken
+            DispenserAddress = addressBook.Dispenser
 
             ownerWallet = await loadWallet(
                 web3,
@@ -87,7 +87,7 @@ contract('Dispenser', (accounts) => {
 
             await confirmUpgrade(
                 web3,
-                taskBook['Dispenser'],
+                taskBook.Dispenser,
                 approver,
                 verbose
             )
@@ -136,7 +136,7 @@ contract('Dispenser', (accounts) => {
             // act
             await confirmUpgrade(
                 web3,
-                taskBook['Dispenser'],
+                taskBook.Dispenser,
                 approver,
                 verbose
             )
@@ -166,7 +166,7 @@ contract('Dispenser', (accounts) => {
             // act
             await confirmUpgrade(
                 web3,
-                taskBook['Dispenser'],
+                taskBook.Dispenser,
                 approver,
                 verbose
             )
@@ -196,7 +196,7 @@ contract('Dispenser', (accounts) => {
             // act
             await confirmUpgrade(
                 web3,
-                taskBook['Dispenser'],
+                taskBook.Dispenser,
                 approver,
                 verbose
             )
@@ -233,7 +233,7 @@ contract('Dispenser', (accounts) => {
             // act
             await confirmUpgrade(
                 web3,
-                taskBook['Dispenser'],
+                taskBook.Dispenser,
                 approver,
                 verbose
             )

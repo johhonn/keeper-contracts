@@ -8,7 +8,7 @@ module.exports = (cb) => {
         web3,
         evaluateContracts,
         strict: false,
-        verbose: argv['verbose'] && true
+        verbose: argv.verbose && true
     })
         .then(() => cb())
         .catch(err => cb(err))

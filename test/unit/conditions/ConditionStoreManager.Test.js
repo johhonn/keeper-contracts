@@ -178,7 +178,8 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionStoreManager,
                 conditionId,
                 hashLockCondition,
-                createRole } = await setupTest()
+                createRole
+            } = await setupTest()
 
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
@@ -203,7 +204,8 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionStoreManager,
                 conditionId,
                 hashLockCondition,
-                createRole } = await setupTest()
+                createRole
+            } = await setupTest()
 
             await conditionStoreManager.methods['createCondition(bytes32,address)'](
                 conditionId,
@@ -810,7 +812,8 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionStoreManager,
                 conditionId,
                 hashLockCondition,
-                createRole } = await setupTest({ conditionType: accounts[0] })
+                createRole
+            } = await setupTest({ conditionType: accounts[0] })
 
             const conditionTimeLock = 0
             const conditionTimeOut = 0
@@ -832,7 +835,8 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionStoreManager,
                 conditionId,
                 hashLockCondition,
-                createRole } = await setupTest({ conditionType: accounts[0] })
+                createRole
+            } = await setupTest({ conditionType: accounts[0] })
 
             const conditionTimeLock = 10
             const conditionTimeOut = 0
@@ -932,7 +936,8 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionStoreManager,
                 conditionId,
                 hashLockCondition,
-                createRole } = await setupTest({ conditionType: accounts[0] })
+                createRole
+            } = await setupTest({ conditionType: accounts[0] })
 
             const conditionTimeLock = 0
             const conditionTimeOut = 0
@@ -956,7 +961,8 @@ contract('ConditionStoreManager', (accounts) => {
                 conditionStoreManager,
                 conditionId,
                 hashLockCondition,
-                createRole } = await setupTest({ conditionType: accounts[0] })
+                createRole
+            } = await setupTest({ conditionType: accounts[0] })
 
             const conditionTimeLock = 0
             const conditionTimeOut = 1
