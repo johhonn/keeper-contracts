@@ -322,7 +322,7 @@ contract('DIDRegistry', (accounts) => {
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
 
             await assert.isRejected(
-                didRegistry.registerAttribute(did, checksum, [ didRegistry.address ], value),
+                didRegistry.registerAttribute(did, checksum, [didRegistry.address], value),
                 'DID provider should not be this contract address'
             )
         })
