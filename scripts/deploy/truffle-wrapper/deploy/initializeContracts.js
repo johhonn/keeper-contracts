@@ -29,7 +29,7 @@ async function initializeContracts({
     }
 
     if (contracts.indexOf('DIDRegistry') > -1) {
-        addressBook['DIDRegistry'] = zosCreate({
+        addressBook.DIDRegistry = zosCreate({
             contract: 'DIDRegistry',
             network,
             args: [roles.ownerWallet],
@@ -38,7 +38,7 @@ async function initializeContracts({
     }
 
     if (contracts.indexOf('OceanToken') > -1) {
-        addressBook['OceanToken'] = zosCreate({
+        addressBook.OceanToken = zosCreate({
             contract: 'OceanToken',
             network,
             args: [
@@ -51,7 +51,7 @@ async function initializeContracts({
 
     if (getAddress('OceanToken')) {
         if (contracts.indexOf('Dispenser') > -1) {
-            addressBook['Dispenser'] = zosCreate({
+            addressBook.Dispenser = zosCreate({
                 contract: 'Dispenser',
                 network,
                 args: [
@@ -64,7 +64,7 @@ async function initializeContracts({
     }
 
     if (contracts.indexOf('ConditionStoreManager') > -1) {
-        addressBook['ConditionStoreManager'] = zosCreate({
+        addressBook.ConditionStoreManager = zosCreate({
             contract: 'ConditionStoreManager',
             network,
             args: [roles.deployer],
@@ -73,7 +73,7 @@ async function initializeContracts({
     }
 
     if (contracts.indexOf('TemplateStoreManager') > -1) {
-        addressBook['TemplateStoreManager'] = zosCreate({
+        addressBook.TemplateStoreManager = zosCreate({
             contract: 'TemplateStoreManager',
             network,
             args: [roles.deployer],
@@ -83,7 +83,7 @@ async function initializeContracts({
 
     if (getAddress('ConditionStoreManager')) {
         if (contracts.indexOf('SignCondition') > -1) {
-            addressBook['SignCondition'] = zosCreate({
+            addressBook.SignCondition = zosCreate({
                 contract: 'SignCondition',
                 network,
                 args: [
@@ -95,7 +95,7 @@ async function initializeContracts({
         }
 
         if (contracts.indexOf('HashLockCondition') > -1) {
-            addressBook['HashLockCondition'] = zosCreate({
+            addressBook.HashLockCondition = zosCreate({
                 contract: 'HashLockCondition',
                 network,
                 args: [
@@ -111,7 +111,7 @@ async function initializeContracts({
         getAddress('TemplateStoreManager') &&
         getAddress('DIDRegistry')) {
         if (contracts.indexOf('AgreementStoreManager') > -1) {
-            addressBook['AgreementStoreManager'] = zosCreate({
+            addressBook.AgreementStoreManager = zosCreate({
                 contract: 'AgreementStoreManager',
                 network,
                 args: [
@@ -128,7 +128,7 @@ async function initializeContracts({
     if (getAddress('ConditionStoreManager') &&
         getAddress('OceanToken')) {
         if (contracts.indexOf('LockRewardCondition') > -1) {
-            addressBook['LockRewardCondition'] = zosCreate({
+            addressBook.LockRewardCondition = zosCreate({
                 contract: 'LockRewardCondition',
                 network,
                 args: [
@@ -141,7 +141,7 @@ async function initializeContracts({
         }
 
         if (contracts.indexOf('EscrowReward') > -1) {
-            addressBook['EscrowReward'] = zosCreate({
+            addressBook.EscrowReward = zosCreate({
                 contract: 'EscrowReward',
                 network,
                 args: [
@@ -157,7 +157,7 @@ async function initializeContracts({
     if (getAddress('ConditionStoreManager') &&
         getAddress('AgreementStoreManager')) {
         if (contracts.indexOf('AccessSecretStoreCondition') > -1) {
-            addressBook['AccessSecretStoreCondition'] = zosCreate({
+            addressBook.AccessSecretStoreCondition = zosCreate({
                 contract: 'AccessSecretStoreCondition',
                 network,
                 args: [
@@ -176,7 +176,7 @@ async function initializeContracts({
         getAddress('LockRewardCondition') &&
         getAddress('EscrowReward')) {
         if (contracts.indexOf('EscrowAccessSecretStoreTemplate') > -1) {
-            addressBook['EscrowAccessSecretStoreTemplate'] = zosCreate({
+            addressBook.EscrowAccessSecretStoreTemplate = zosCreate({
                 contract: 'EscrowAccessSecretStoreTemplate',
                 network,
                 args: [

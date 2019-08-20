@@ -18,8 +18,8 @@ module.exports = (cb) => {
         setupContracts,
         forceWalletCreation: argv['force-wallet-creation'] || false,
         deeperClean: argv['deeper-clean'] || false,
-        testnet: argv['testnet'] || false,
-        verbose: argv['verbose'] && true
+        testnet: argv.testnet || false,
+        verbose: argv.verbose && true
     })
         .then(() => cb())
         .catch(err => cb(err))

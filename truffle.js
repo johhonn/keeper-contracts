@@ -49,7 +49,7 @@ module.exports = {
         // spree network from docker
         spree: {
             provider: () => setupWallet(
-                url || `http://localhost:8545`
+                url || 'http://localhost:8545'
             ),
             network_id: 0x2324, // 8996
             gas: 8000000,
@@ -59,7 +59,7 @@ module.exports = {
         // duero the ocean testnet
         duero: {
             provider: () => setupWallet(
-                url || `https://duero.dev-ocean.com`
+                url || 'https://duero.dev-ocean.com'
             ),
             network_id: 0x897, // 2199
             gas: 6000000,
@@ -69,7 +69,7 @@ module.exports = {
         // nile the ocean beta network
         nile: {
             provider: () => setupWallet(
-                url || `https://nile.dev-ocean.com`
+                url || 'https://nile.dev-ocean.com'
             ),
             network_id: 0x2323, // 8995
             gas: 6000000,
@@ -106,7 +106,7 @@ module.exports = {
         // pacific the ethereum mainnet
         pacific: {
             provider: () => setupWallet(
-                url || `https://pacific.oceanprotocol.com`
+                url || 'https://pacific.oceanprotocol.com'
             ),
             network_id: 0xCEA11, // 846353
             from: '0xba3e0ec852dc24ca7f454ea545d40b1462501711',
