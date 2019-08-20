@@ -68,7 +68,7 @@ contract('DIDRegistry', (accounts) => {
                 verbose
             })
 
-            DIDRegistryProxyAddress = addressBook['DIDRegistry']
+            DIDRegistryProxyAddress = addressBook.DIDRegistry
         })
 
         it('Should be possible to fix/add a bug', async () => {
@@ -83,7 +83,7 @@ contract('DIDRegistry', (accounts) => {
 
             await confirmUpgrade(
                 web3,
-                taskBook['DIDRegistry'],
+                taskBook.DIDRegistry,
                 approver,
                 verbose
             )
@@ -131,7 +131,7 @@ contract('DIDRegistry', (accounts) => {
 
             await confirmUpgrade(
                 web3,
-                taskBook['DIDRegistry'],
+                taskBook.DIDRegistry,
                 approver,
                 verbose
             )
@@ -180,7 +180,7 @@ contract('DIDRegistry', (accounts) => {
             // call again after approved
             await confirmUpgrade(
                 web3,
-                taskBook['DIDRegistry'],
+                taskBook.DIDRegistry,
                 approver,
                 verbose
             )
@@ -208,7 +208,7 @@ contract('DIDRegistry', (accounts) => {
 
             await confirmUpgrade(
                 web3,
-                taskBook['DIDRegistry'],
+                taskBook.DIDRegistry,
                 approver,
                 verbose
             )
@@ -263,7 +263,7 @@ contract('DIDRegistry', (accounts) => {
 
             await confirmUpgrade(
                 web3,
-                taskBook['DIDRegistry'],
+                taskBook.DIDRegistry,
                 approver,
                 verbose
             )

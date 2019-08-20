@@ -25,32 +25,32 @@ async function setupContracts({
      * setup deployed contracts
      * -----------------------------------------------------------------------
      */
-    if (addressBook['TemplateStoreManager']) {
+    if (addressBook.TemplateStoreManager) {
         const TemplateStoreManager =
             artifacts.require('TemplateStoreManager')
         const TemplateStoreManagerInstance =
-            await TemplateStoreManager.at(addressBook['TemplateStoreManager'])
+            await TemplateStoreManager.at(addressBook.TemplateStoreManager)
 
-        if (addressBook['EscrowAccessSecretStoreTemplate']) {
+        if (addressBook.EscrowAccessSecretStoreTemplate) {
             if (verbose) {
                 console.log(
-                    `Proposing template ${addressBook['EscrowAccessSecretStoreTemplate']} from ${roles.deployer}`
+                    `Proposing template ${addressBook.EscrowAccessSecretStoreTemplate} from ${roles.deployer}`
                 )
             }
 
             await TemplateStoreManagerInstance.proposeTemplate(
-                addressBook['EscrowAccessSecretStoreTemplate'],
+                addressBook.EscrowAccessSecretStoreTemplate,
                 { from: roles.deployer }
             )
 
             if (verbose) {
                 console.log(
-                    `Approving template ${addressBook['EscrowAccessSecretStoreTemplate']} from ${roles.deployer}`
+                    `Approving template ${addressBook.EscrowAccessSecretStoreTemplate} from ${roles.deployer}`
                 )
             }
 
             await TemplateStoreManagerInstance.approveTemplate(
-                addressBook['EscrowAccessSecretStoreTemplate'],
+                addressBook.EscrowAccessSecretStoreTemplate,
                 { from: roles.deployer }
             )
         }
@@ -67,20 +67,20 @@ async function setupContracts({
         )
     }
 
-    if (addressBook['ConditionStoreManager']) {
+    if (addressBook.ConditionStoreManager) {
         const ConditionStoreManager = artifacts.require('ConditionStoreManager')
         const ConditionStoreManagerInstance =
-            await ConditionStoreManager.at(addressBook['ConditionStoreManager'])
+            await ConditionStoreManager.at(addressBook.ConditionStoreManager)
 
-        if (addressBook['AgreementStoreManager']) {
+        if (addressBook.AgreementStoreManager) {
             if (verbose) {
                 console.log(
-                    `Delegating create role to ${addressBook['AgreementStoreManager']}`
+                    `Delegating create role to ${addressBook.AgreementStoreManager}`
                 )
             }
 
             await ConditionStoreManagerInstance.delegateCreateRole(
-                addressBook['AgreementStoreManager'],
+                addressBook.AgreementStoreManager,
                 { from: roles.deployer }
             )
         }
@@ -97,19 +97,19 @@ async function setupContracts({
         )
     }
 
-    if (addressBook['OceanToken']) {
+    if (addressBook.OceanToken) {
         const OceanToken = artifacts.require('OceanToken')
-        const oceanToken = await OceanToken.at(addressBook['OceanToken'])
+        const oceanToken = await OceanToken.at(addressBook.OceanToken)
 
-        if (addressBook['Dispenser']) {
+        if (addressBook.Dispenser) {
             if (verbose) {
                 console.log(
-                    `adding dispenser as a minter ${addressBook['Dispenser']} from ${roles.deployer}`
+                    `adding dispenser as a minter ${addressBook.Dispenser} from ${roles.deployer}`
                 )
             }
 
             await oceanToken.addMinter(
-                addressBook['Dispenser'],
+                addressBook.Dispenser,
                 { from: roles.deployer }
             )
         }

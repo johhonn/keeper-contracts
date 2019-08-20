@@ -51,7 +51,7 @@ contract('ConditionStoreManager', (accounts) => {
             verbose
         )
 
-        conditionStoreManagerAddress = addressBook['ConditionStoreManager']
+        conditionStoreManagerAddress = addressBook.ConditionStoreManager
     })
 
     async function setupTest({
@@ -75,7 +75,7 @@ contract('ConditionStoreManager', (accounts) => {
 
             await confirmUpgrade(
                 web3,
-                taskBook['ConditionStoreManager'],
+                taskBook.ConditionStoreManager,
                 approver,
                 verbose
             )
@@ -103,7 +103,7 @@ contract('ConditionStoreManager', (accounts) => {
             // init
             await confirmUpgrade(
                 web3,
-                taskBook['ConditionStoreManager'],
+                taskBook.ConditionStoreManager,
                 approver,
                 verbose
             )
@@ -165,7 +165,7 @@ contract('ConditionStoreManager', (accounts) => {
             // init
             await confirmUpgrade(
                 web3,
-                taskBook['ConditionStoreManager'],
+                taskBook.ConditionStoreManager,
                 approver,
                 verbose
             )
@@ -191,7 +191,7 @@ contract('ConditionStoreManager', (accounts) => {
             // init
             await confirmUpgrade(
                 web3,
-                taskBook['ConditionStoreManager'],
+                taskBook.ConditionStoreManager,
                 approver,
                 verbose
             )
@@ -249,7 +249,7 @@ contract('ConditionStoreManager', (accounts) => {
             // init
             await confirmUpgrade(
                 web3,
-                taskBook['ConditionStoreManager'],
+                taskBook.ConditionStoreManager,
                 approver,
                 verbose
             )
