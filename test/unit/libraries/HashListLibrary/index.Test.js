@@ -48,9 +48,6 @@ contract('HashListLibrary', (accounts) => {
                 await hashListLibraryProxy.hash(accounts[1]),
                 await hashListLibraryProxy.hash(accounts[2])
             ]
-
-            const listId = hashListLibraryProxy.hash(owner)
-
             await hashListLibraryProxy.methods['add(bytes32[])'](
                 values,
                 {
