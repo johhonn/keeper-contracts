@@ -4,6 +4,7 @@ pragma solidity 0.5.6;
 // Code is Apache-2.0 and docs are CC-BY-4.0
 
 import './DIDRegistryLibrary.sol';
+import './DIDPermissionsRegistry.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
 /**
@@ -13,7 +14,7 @@ import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
  * @dev Implementation of the DID Registry.
  *      https://github.com/oceanprotocol/OEPs/tree/master/7#registry
  */
-contract DIDRegistry is Ownable {
+contract DIDRegistry is Ownable, DIDPermissionsRegistry {
 
     /**
      * @dev The DIDRegistry Library takes care of the basic storage functions.
@@ -197,6 +198,53 @@ contract DIDRegistry is Ownable {
         );
     }
 
+    /**
+     * @dev grantPermission grants access permission to grantee 
+     * @param _did refers to decentralized identifier (a bytes32 length ID)
+     * @param _grantee address 
+     */
+    function grantPermission(
+        bytes32 _did,
+        address _grantee
+    )
+        external
+        onlyDIDOwner(_did)
+    {
+        _grantPermission(_did, _grantee);
+    }
+    
+    /**
+     * @dev revokePermission revokes access permission from grantee 
+     * @param _did refers to decentralized identifier (a bytes32 length ID)
+     * @param _grantee address 
+     */
+    function revokePermission(
+        bytes32 _did,
+        address _grantee
+    )
+        external
+        onlyDIDOwner(_did)
+    {
+        _revokePermission(_did, _grantee);
+    }
+    
+    /**
+     * @dev getPermission gets access permission of a grantee
+     * @param _did refers to decentralized identifier (a bytes32 length ID)
+     * @param _grantee address
+     * @return true if grantee has access permission to a DID
+     */
+    function getPermission(
+        bytes32 _did,
+        address _grantee
+    )
+        external
+        view
+        returns(bool)
+    {
+        return _getPermission(_did, _grantee);
+    }
+        
     /**
      * @notice isDIDProvider check whether a given DID provider exists
      * @param _did refers to decentralized identifier (a bytes32 length ID).
