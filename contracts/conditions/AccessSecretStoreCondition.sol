@@ -198,7 +198,8 @@ ISecretStore, ISecretStorePermission {
         return (
             didRegistry.isDIDProvider(_documentId, _grantee) || 
             _grantee == didRegistry.getDIDOwner(_documentId) ||
-            documentPermissions[_documentId].permission[_grantee]
+            documentPermissions[_documentId].permission[_grantee] ||
+            didRegistry.getPermission(_documentId, _grantee)
         );
     }
 }
