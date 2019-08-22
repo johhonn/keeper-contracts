@@ -24,6 +24,9 @@ const contracts = [
     'DIDRegistry',
     'ISecretStore',
     'Common',
+    'HashListLibrary',
+    'WhitelistingCondition',
+    'HashLists',
     'ThresholdCondition'
 ]
 

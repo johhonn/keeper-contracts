@@ -42,6 +42,12 @@ Parameters:
 * bytes32 _did
 * address _provider
 
+###  DIDOwnershipTransferred
+Parameters:
+* bytes32 _did
+* address _previousOwner
+* address _newOwner
+
 ## Modifiers
 
 ### internal onlyDIDOwner
@@ -108,6 +114,19 @@ Documentation:
 Parameters:
 * bytes32 _did
 * address _provider
+
+### external transferDIDOwnership
+
+Documentation:
+
+```
+@notice transferDIDOwnership transfer DID ownership
+@param _did refers to decentralized identifier (a bytes32 length ID)
+@param _newOwner new owner address
+```
+Parameters:
+* bytes32 _did
+* address _newOwner
 
 ### public isDIDProvider
 
