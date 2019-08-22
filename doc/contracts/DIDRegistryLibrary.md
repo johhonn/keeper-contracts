@@ -73,6 +73,21 @@ Parameters:
 * bytes32 _did
 * address _provider
 
+### internal updateDIDOwner
+
+Documentation:
+
+```
+@notice updateDIDOwner transfer DID ownership to a new owner
+@param _self refers to storage pointer
+@param _did refers to decentralized identifier (a byte32 length ID)
+@param _newOwner the new DID owner address
+```
+Parameters:
+* struct DIDRegistryLibrary.DIDRegisterList _self
+* bytes32 _did
+* address _newOwner
+
 ### public isProvider
 
 Documentation:

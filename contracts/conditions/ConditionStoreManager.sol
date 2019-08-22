@@ -60,7 +60,7 @@ contract ConditionStoreManager is Ownable, Common {
     modifier onlyUpdateRole(bytes32 _id)
     {
         require(
-            conditionList.conditions[_id].typeRef == address(msg.sender),
+            conditionList.conditions[_id].typeRef == msg.sender,
             'Invalid UpdateRole'
         );
         _;
