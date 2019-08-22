@@ -58,7 +58,7 @@ contract DIDPermissionsRegistry is Ownable {
         internal
     {
         require(
-            !DIDPermissions[_did][_grantee],
+            DIDPermissions[_did][_grantee],
             'Grantee already was revoked'
         );
         DIDPermissions[_did][_grantee] = false;
