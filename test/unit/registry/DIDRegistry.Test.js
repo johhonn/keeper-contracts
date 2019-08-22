@@ -513,7 +513,6 @@ contract('DIDRegistry', (accounts) => {
             const checksum = testUtils.generateId()
             const didOwner = accounts[2]
             const grantee = accounts[3]
-            const newDIDOwner = accounts[4]
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
             await didRegistry.registerAttribute(
                 did,
@@ -544,7 +543,6 @@ contract('DIDRegistry', (accounts) => {
                 ),
                 false
             )
-
         })
     })
 })
