@@ -105,6 +105,30 @@ async function initializeContracts({
                 verbose
             })
         }
+
+        if (contracts.indexOf('ThresholdCondition') > -1) {
+            addressBook.ThresholdCondition = zosCreate({
+                contract: 'ThresholdCondition',
+                network,
+                args: [
+                    roles.ownerWallet,
+                    getAddress('ConditionStoreManager')
+                ],
+                verbose
+            })
+        }
+
+        if (contracts.indexOf('WhitelistingCondition') > -1) {
+            addressBook.WhitelistingCondition = zosCreate({
+                contract: 'WhitelistingCondition',
+                network,
+                args: [
+                    roles.ownerWallet,
+                    getAddress('ConditionStoreManager')
+                ],
+                verbose
+            })
+        }
     }
 
     if (getAddress('ConditionStoreManager') &&
