@@ -9,5 +9,7 @@
   "EscrowReward",
   "EscrowAccessSecretStoreTemplate",
   "OceanToken",
-  "DIDRegistry"
+  "DIDRegistry",
+  "ThresholdCondition",
+  "WhitelistingCondition"
 ]
