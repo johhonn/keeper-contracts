@@ -12,6 +12,11 @@ import '../agreements/AgreementStoreManager.sol';
  * @author Ocean Protocol Team
  *
  * @dev Implementation of the Service Executor Condition
+ *      This condition is meant to be a signal in which triggers
+ *      the execution of a service. The service is fully described
+ *      in the associated DID document. The provider of a service will
+ *      send this signal to its workers by fulfilling the condition where
+ *      they are listening to the fulfilled event.
  */
 contract ServiceExecutorCondition is Condition {
 
@@ -91,8 +96,8 @@ contract ServiceExecutorCondition is Condition {
 
    /**
     * @notice fulfill service executor condition
-    * @dev only the service provider can fulfill this condition. By fulling this 
-    * condition the service provider will allow service to trigger the execution of 
+    * @dev only the service provider can fulfill this condition. By fulfilling this 
+    * condition the service provider will trigger the execution of 
     * the offered job/service. The service is described in a DID document.
     * @param _agreementId agreement identifier
     * @param _did Decentralized Identifier (unique service/asset resolver) describes the service
@@ -130,8 +135,7 @@ contract ServiceExecutorCondition is Condition {
     }
     
     /**
-    * @notice isTriggeredService checks service status whether 
-    *          it is triggered or not.
+    * @notice isTriggeredService checks whether the service is triggered or not.
     * @param _did Decentralized Identifier (unique service/asset resolver) describes the service
     * @param _serviceConsumer is the service consumer's address
     * @return true if the service is triggered 
