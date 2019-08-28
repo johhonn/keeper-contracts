@@ -156,6 +156,8 @@ The contract addresses deployed on Ocean's Nile Beta Network:
 | OceanToken                        | v0.10.3 | `0x9861Da395d7da984D5E8C712c2EDE44b41F777Ad` |
 | SignCondition                     | v0.10.3 | `0x5a4301F8a7a8A13485621b9B4C82B1E66c112ee2` |
 | TemplateStoreManager              | v0.10.3 | `0x9768c8ae44f1dc81cAA98F48792aA5730cAd2F73` |
+| ThresholdCondition                | v0.11.1 | `0xf29a50080163Fb2938E2024f19681Ac2FB8745De` |
+| WhitelistingCondition             | v0.11.1 | `0x9Db7fE5A18Ff4fb1746c290192EDE67a64EB4385` |
 
 #### Kovan Testnet
 
