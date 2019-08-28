@@ -13,7 +13,6 @@ const AgreementStoreManager = artifacts.require('AgreementStoreManager')
 const DIDRegistry = artifacts.require('DIDRegistry')
 const DIDRegistryLibrary = artifacts.require('DIDRegistryLibrary')
 const ServiceExecutorCondition = artifacts.require('ServiceExecutorCondition')
-
 const constants = require('../../helpers/constants.js')
 const testUtils = require('../../helpers/utils.js')
 
