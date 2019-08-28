@@ -212,6 +212,12 @@ The contract addresses deployed on Pacific Mainnet:
 
 ### Ethereum Mainnet
 
+----
+
+**Deprecated**: The `ethereum mainnet` network is deprecated and will be removed in the next version.
+
+----
+
 The contract addresses deployed on Ethereum Mainnet:
 
 | Contract                          | Version | Address                                      |
