@@ -207,6 +207,8 @@ The contract addresses deployed on Pacific Mainnet:
 | OceanToken                        | v0.10.3 | `0x012578f9381e876A9E2a9111Dfd436FF91A451ae` |
 | SignCondition                     | v0.10.3 | `0xB74172078ABb029FaD809335d82241371b998708` |
 | TemplateStoreManager              | v0.10.3 | `0xF2Cf3761c166c6D85d07299427821D18A4329cd1` |
+| ThresholdCondition                | v0.11.1 | `0xeD2A0787885f4ef781E35c5808F3C786fc8C1817` |
+| WhitelistingCondition             | v0.11.1 | `0x5b4c3B48062bDCa9DaA5441c5F5A9D557bFE3356` |
 
 ### Ethereum Mainnet
 

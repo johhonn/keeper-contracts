@@ -1549,6 +1549,182 @@
         "hasInitialValuesInDeclarations": false,
         "uninitializedBaseContracts": []
       }
+    },
+    "ThresholdCondition": {
+      "address": "0xc1329d59aD48CdADFc1319442064D1dF43107bbf",
+      "constructorCode": "608060405234801561001057600080fd5b50610b40806100206000396000f3fe",
+      "bodyBytecodeHash": "22e954745a84073a3b9263e5fafe05d5f956be7ccc2ab8d889b164239e34bf8b",
+      "localBytecodeHash": "cf83911698de40c7d76a24a8382660f3229368116bca905c3c069ee92874899d",
+      "deployedBytecodeHash": "cf83911698de40c7d76a24a8382660f3229368116bca905c3c069ee92874899d",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 7375,
+          "type": "t_bool",
+          "src": "757:24:68"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 7377,
+          "type": "t_bool",
+          "src": "876:25:68"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 7433,
+          "type": "t_array:50<t_uint256>",
+          "src": "1951:29:68"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 6610,
+          "type": "t_address",
+          "src": "302:22:62"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "______gap",
+          "astId": 6721,
+          "type": "t_array:50<t_uint256>",
+          "src": "2262:29:62"
+        },
+        {
+          "contract": "Condition",
+          "path": "contracts/conditions/Condition.sol",
+          "label": "conditionStoreManager",
+          "astId": 1406,
+          "type": "t_address",
+          "src": "1043:52:7"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
+    },
+    "WhitelistingCondition": {
+      "address": "0x6cB79dD55c482b23ca52B5097F2f2f90c4F0fC42",
+      "constructorCode": "608060405234801561001057600080fd5b50610a01806100206000396000f3fe",
+      "bodyBytecodeHash": "947aedefa8707e5fe4b1177e940fc327a81bb56ae258d685adecbc7f036404a0",
+      "localBytecodeHash": "4c4eebfcf5780e22fbe9b5c9ee08b3012ca55ab4c90d4d61541785e8886adf05",
+      "deployedBytecodeHash": "4c4eebfcf5780e22fbe9b5c9ee08b3012ca55ab4c90d4d61541785e8886adf05",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 7375,
+          "type": "t_bool",
+          "src": "757:24:68"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 7377,
+          "type": "t_bool",
+          "src": "876:25:68"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 7433,
+          "type": "t_array:50<t_uint256>",
+          "src": "1951:29:68"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 6610,
+          "type": "t_address",
+          "src": "302:22:62"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "______gap",
+          "astId": 6721,
+          "type": "t_array:50<t_uint256>",
+          "src": "2262:29:62"
+        },
+        {
+          "contract": "Condition",
+          "path": "contracts/conditions/Condition.sol",
+          "label": "conditionStoreManager",
+          "astId": 1406,
+          "type": "t_address",
+          "src": "1043:52:7"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
     }
   },
   "solidityLibs": {
@@ -1647,10 +1823,26 @@
         "implementation": "0x15EaC01cBCC8fEB96Cb60E2dF53Af59382aa0F2F",
         "admin": "0x52449583B10f2Bf58EB59EE00D2Ca2A3Cb3dc0bc"
       }
+    ],
+    "@oceanprotocol/keeper-contracts/ThresholdCondition": [
+      {
+        "address": "0xeD2A0787885f4ef781E35c5808F3C786fc8C1817",
+        "version": "v0.11.1",
+        "implementation": "0xc1329d59aD48CdADFc1319442064D1dF43107bbf",
+        "admin": "0x52449583B10f2Bf58EB59EE00D2Ca2A3Cb3dc0bc"
+      }
+    ],
+    "@oceanprotocol/keeper-contracts/WhitelistingCondition": [
+      {
+        "address": "0x5b4c3B48062bDCa9DaA5441c5F5A9D557bFE3356",
+        "version": "v0.11.1",
+        "implementation": "0x6cB79dD55c482b23ca52B5097F2f2f90c4F0fC42",
+        "admin": "0x52449583B10f2Bf58EB59EE00D2Ca2A3Cb3dc0bc"
+      }
     ]
   },
   "zosversion": "2.2",
-  "version": "v0.10.3",
+  "version": "v0.11.1",
   "proxyAdmin": {
     "address": "0x87c590F23346e6e1216D607a6B83874Ded249FCE"
   }
