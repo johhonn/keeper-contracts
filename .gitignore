@@ -1,7 +1,11 @@
 # JetBrains tools
 .idea/
+zos/
+files
+
 # Symbolic Execution Results
 test/verification/manticore/results/*
+
 # Development
 artifacts/*.development.json
 artifacts/*.spree.json
@@ -10,8 +14,12 @@ artifacts/*.spree.json
 build/
 node_modules/
 dist
-coverage*
 ganache-cli.log
+
+# Test / Coverage
+coverage*
+scTopics
+allFiredEvents
 
 # Mac / Apple
 .DS_Store
@@ -26,6 +34,8 @@ target/
 # ZeppelinOS related
 zos.dev-*.json
 !zos.dev-8995.json
+!zos.dev-2199.json
+!zos.dev-846353.json
 .zos.session
 .zos.lock
 zos.json

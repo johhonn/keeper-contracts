@@ -8,10 +8,13 @@ chai.use(chaiAsPromised)
 const constants = require('../helpers/constants.js')
 
 const {
-    upgradeContracts,
-    deployContracts,
     confirmUpgrade
-} = require('../../scripts/deploy/deploymentHandler')
+} = require('@oceanprotocol/dori')
+
+const {
+    deploy,
+    upgrade
+} = require('./Upgrader')
 
 const AgreementStoreManager = artifacts.require('AgreementStoreManager')
 
@@ -52,36 +55,34 @@ contract('AgreementStoreManager', (accounts) => {
 
     describe('Test upgradability for AgreementStoreManager', () => {
         beforeEach('Load wallet each time', async function() {
-            const addressBook = await deployContracts(
+            const addressBook = await deploy({
                 web3,
                 artifacts,
-                [
+                contracts: [
                     'DIDRegistry',
                     'ConditionStoreManager',
                     'TemplateStoreManager',
                     'AgreementStoreManager'
                 ],
-                true,
-                true,
                 verbose
-            )
+            })
 
-            agreementStoreManagerAddress = addressBook['AgreementStoreManager']
+            agreementStoreManagerAddress = addressBook.AgreementStoreManager
             assert(agreementStoreManagerAddress)
         })
 
         it('Should be possible to fix/add a bug', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgrade({
                 web3,
-                ['AgreementStoreManagerWithBug:AgreementStoreManager'],
+                contracts: ['AgreementStoreManagerWithBug:AgreementStoreManager'],
                 verbose
-            )
+            })
 
             await confirmUpgrade(
                 web3,
-                taskBook['AgreementStoreManager'],
+                taskBook.AgreementStoreManager,
                 approver,
                 verbose
             )
@@ -96,7 +97,7 @@ contract('AgreementStoreManager', (accounts) => {
         })
 
         it('Should be possible to change function signature', async () => {
-            let {
+            const {
                 did,
                 agreementId,
                 conditionIds,
@@ -105,16 +106,16 @@ contract('AgreementStoreManager', (accounts) => {
                 timeOuts
             } = await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgrade({
                 web3,
-                ['AgreementStoreManagerChangeFunctionSignature:AgreementStoreManager'],
+                contracts: ['AgreementStoreManagerChangeFunctionSignature:AgreementStoreManager'],
                 verbose
-            )
+            })
 
             // act & assert
             await confirmUpgrade(
                 web3,
-                taskBook['AgreementStoreManager'],
+                taskBook.AgreementStoreManager,
                 approver,
                 verbose
             )
@@ -140,15 +141,15 @@ contract('AgreementStoreManager', (accounts) => {
         it('Should be possible to append storage variable(s) ', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgrade({
                 web3,
-                ['AgreementStoreManagerChangeInStorage:AgreementStoreManager'],
+                contracts: ['AgreementStoreManagerChangeInStorage:AgreementStoreManager'],
                 verbose
-            )
+            })
 
             await confirmUpgrade(
                 web3,
-                taskBook['AgreementStoreManager'],
+                taskBook.AgreementStoreManager,
                 approver,
                 verbose
             )
@@ -165,7 +166,7 @@ contract('AgreementStoreManager', (accounts) => {
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
-            let {
+            const {
                 did,
                 agreementId,
                 conditionIds,
@@ -174,15 +175,15 @@ contract('AgreementStoreManager', (accounts) => {
                 timeOuts
             } = await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgrade({
                 web3,
-                ['AgreementStoreManagerChangeInStorageAndLogic:AgreementStoreManager'],
+                contracts: ['AgreementStoreManagerChangeInStorageAndLogic:AgreementStoreManager'],
                 verbose
-            )
+            })
 
             await confirmUpgrade(
                 web3,
-                taskBook['AgreementStoreManager'],
+                taskBook.AgreementStoreManager,
                 approver,
                 verbose
             )
@@ -215,15 +216,15 @@ contract('AgreementStoreManager', (accounts) => {
         it('Should be able to call new method added after upgrade is approved', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgrade({
                 web3,
-                ['AgreementStoreManagerExtraFunctionality:AgreementStoreManager'],
+                contracts: ['AgreementStoreManagerExtraFunctionality:AgreementStoreManager'],
                 verbose
-            )
+            })
 
             await confirmUpgrade(
                 web3,
-                taskBook['AgreementStoreManager'],
+                taskBook.AgreementStoreManager,
                 approver,
                 verbose
             )

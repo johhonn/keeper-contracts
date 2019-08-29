@@ -1,4 +1,7 @@
-pragma solidity 0.5.3;
+pragma solidity 0.5.6;
+// Copyright BigchainDB GmbH and Ocean Protocol contributors
+// SPDX-License-Identifier: (Apache-2.0 AND CC-BY-4.0)
+// Code is Apache-2.0 and docs are CC-BY-4.0
 
 import './DIDRegistryLibrary.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
@@ -54,6 +57,12 @@ contract DIDRegistry is Ownable {
         bytes32 _did,
         address _provider
     );
+    
+    event DIDOwnershipTransferred(
+        bytes32 _did,
+        address _previousOwner,
+        address _newOwner
+    );
 
     /**
      * @dev DIDRegistry Initializer
@@ -80,7 +89,7 @@ contract DIDRegistry is Ownable {
      * @param _value refers to the attribute value, limited to 2048 bytes.
      * @return the size of the registry after the register action.
      */
-    function registerAttribute (
+    function registerAttribute(
         bytes32 _did,
         bytes32 _checksum,
         address[] memory _providers,
@@ -101,11 +110,15 @@ contract DIDRegistry is Ownable {
             'Invalid value size'
         );
 
-        didRegisterList.update(_did, _checksum);
+        uint updatedSize = didRegisterList.update(_did, _checksum);
 
         // push providers to storage
-        for(uint256 i = 0; i < _providers.length; i++) {
-            didRegisterList.addProvider(_did, _providers[i]);
+        for (uint256 i = 0; i < _providers.length; i++) {
+            didRegisterList.addProvider(
+                _did,
+                _providers[i]
+            );
+
         }
 
         /* emitting _value here to avoid expensive storage */
@@ -118,9 +131,17 @@ contract DIDRegistry is Ownable {
             block.number
         );
 
-        return getDIDRegistrySize();
+        return updatedSize;
     }
 
+    /**
+     * @notice addDIDProvider add new DID provider.
+     *
+     * @dev it adds new DID provider to the providers list. A provider
+     *      is any entity that can serve the registered asset
+     * @param _did refers to decentralized identifier (a bytes32 length ID).
+     * @param _provider provider's address.
+     */
     function addDIDProvider(
         bytes32 _did,
         address _provider
@@ -136,6 +157,11 @@ contract DIDRegistry is Ownable {
         );
     }
 
+    /**
+     * @notice removeDIDProvider delete an existing DID provider.
+     * @param _did refers to decentralized identifier (a bytes32 length ID).
+     * @param _provider provider's address.
+     */
     function removeDIDProvider(
         bytes32 _did,
         address _provider
@@ -151,15 +177,38 @@ contract DIDRegistry is Ownable {
             state
         );
     }
+    
+    /**
+     * @notice transferDIDOwnership transfer DID ownership
+     * @param _did refers to decentralized identifier (a bytes32 length ID)
+     * @param _newOwner new owner address
+     */
+    function transferDIDOwnership(bytes32 _did, address _newOwner)
+        external
+        onlyDIDOwner(_did)
+    {
+        address _previousOwner = didRegisterList.didRegisters[_did].owner;
+        didRegisterList.updateDIDOwner(_did, _newOwner);
+        
+        emit DIDOwnershipTransferred(
+            _did,
+            _previousOwner,
+            _newOwner
+        );
+    }
 
-    function isDIDProvider
-    (
+    /**
+     * @notice isDIDProvider check whether a given DID provider exists
+     * @param _did refers to decentralized identifier (a bytes32 length ID).
+     * @param _provider provider's address.
+     */
+    function isDIDProvider(
         bytes32 _did,
         address _provider
     )
         public
         view
-        returns(bool)
+        returns (bool)
     {
         return didRegisterList.isProvider(_did, _provider);
     }
@@ -168,7 +217,9 @@ contract DIDRegistry is Ownable {
      * @param _did refers to decentralized identifier (a bytes32 length ID).
      * @return the address of the DID owner.
      */
-    function getDIDRegister(bytes32 _did)
+    function getDIDRegister(
+        bytes32 _did
+    )
         public
         view
         returns (
@@ -182,8 +233,8 @@ contract DIDRegistry is Ownable {
         owner = didRegisterList.didRegisters[_did].owner;
         lastChecksum = didRegisterList.didRegisters[_did].lastChecksum;
         lastUpdatedBy = didRegisterList.didRegisters[_did].lastUpdatedBy;
-        blockNumberUpdated =
-            didRegisterList.didRegisters[_did].blockNumberUpdated;
+        blockNumberUpdated = didRegisterList.didRegisters[_did]
+            .blockNumberUpdated;
         providers = didRegisterList.didRegisters[_did].providers;
     }
 
@@ -194,7 +245,7 @@ contract DIDRegistry is Ownable {
     function getBlockNumberUpdated(bytes32 _did)
         public
         view
-        returns(uint256 blockNumberUpdated)
+        returns (uint256 blockNumberUpdated)
     {
         return didRegisterList.didRegisters[_did].blockNumberUpdated;
     }
@@ -206,7 +257,7 @@ contract DIDRegistry is Ownable {
     function getDIDOwner(bytes32 _did)
         public
         view
-        returns(address didOwner)
+        returns (address didOwner)
     {
         return didRegisterList.didRegisters[_did].owner;
     }

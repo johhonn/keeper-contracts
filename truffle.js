@@ -1,5 +1,6 @@
 const HDWalletProvider = require('truffle-hdwallet-provider')
 const NonceTrackerSubprovider = require('web3-provider-engine/subproviders/nonce-tracker')
+const utils = require('web3-utils')
 
 const rpcHost = process.env.KEEPER_RPC_HOST
 const rpcPort = process.env.KEEPER_RPC_PORT
@@ -36,7 +37,7 @@ module.exports = {
             network_id: '*',
             gas: 6721975
         },
-        // local network for generate coverage
+        // local network for generating coverage
         coverage: {
             host: 'localhost',
             // has to be '*' because this is usually ganache
@@ -45,46 +46,77 @@ module.exports = {
             gas: 0xfffffffffff,
             gasPrice: 0x01
         },
-        // spree from docker
+        // spree network from docker
         spree: {
             provider: () => setupWallet(
-                url || `http://localhost:8545`
+                url || 'http://localhost:8545'
             ),
             network_id: 0x2324, // 8996
             gas: 8000000,
             gasPrice: 10000,
             from: '0xe2DD09d719Da89e5a3D0F2549c7E24566e947260'
         },
-        // nile the ocean testnet
+        // duero the ocean testnet
+        duero: {
+            provider: () => setupWallet(
+                url || 'https://duero.dev-ocean.com'
+            ),
+            network_id: 0x897, // 2199
+            gas: 6000000,
+            gasPrice: 10000,
+            from: '0x90eE7A30339D05E07d9c6e65747132933ff6e624'
+        },
+        // nile the ocean beta network
         nile: {
             provider: () => setupWallet(
-                url || `https://nile.dev-ocean.com`
+                url || 'https://nile.dev-ocean.com'
             ),
             network_id: 0x2323, // 8995
             gas: 6000000,
             gasPrice: 10000,
             from: '0x90eE7A30339D05E07d9c6e65747132933ff6e624'
         },
-        // kovan testnet
+        // kovan the ethereum testnet
         kovan: {
             provider: () => setupWallet(
-                url || `https://kovan.infura.io/v2/${process.env.INFURA_TOKEN}`
+                url || `https://kovan.infura.io/v3/${process.env.INFURA_TOKEN}`
             ),
             network_id: 0x2A, // 42
             from: '0x2c0D5F47374b130EE398F4C34DBE8168824A8616'
         },
-        // rinkeby testnet
+        // rinkeby the ethereum testnet
         rinkeby: {
             provider: () => setupWallet(
                 url || `https://rinkeby.infura.io/v2/${process.env.INFURA_TOKEN}`
             ),
             network_id: 0x4, // 4
             from: '0x2C63bf697f74C72CFB727Fb5eB8e6266cE341e13'
+        },
+        // mainnet the ethereum mainnet
+        mainnet: {
+            provider: () => setupWallet(
+                url || `https://mainnet.infura.io/v3/${process.env.INFURA_TOKEN}`
+                // url || `http://localhost:8545`
+            ),
+            network_id: 0x1, // 1
+            from: '0x3f3c526f3A8623b11aAD5c30d6De88E45e385FaD',
+            gas: 7 * 1000000,
+            gasPrice: utils.toWei('8', 'gwei')
+        },
+        // pacific the ethereum mainnet
+        pacific: {
+            provider: () => setupWallet(
+                url || 'https://pacific.oceanprotocol.com'
+            ),
+            network_id: 0xCEA11, // 846353
+            from: '0xba3e0ec852dc24ca7f454ea545d40b1462501711',
+            gas: 6 * 1000000,
+            gasPrice: utils.toWei('10', 'mwei')
         }
     },
     compilers: {
         solc: {
-            version: '0.5.3',
+            version: '0.5.6',
             settings: {
                 optimizer: {
                     enabled: true,

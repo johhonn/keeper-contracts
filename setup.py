@@ -42,6 +42,7 @@ setup(
     install_requires=requirements,
     license="Apache Software License 2.0",
     long_description=readme,
+    long_description_content_type='text/markdown',
     include_package_data=True,
     keywords='keeper-contracts',
     name='keeper-contracts',
@@ -49,7 +50,7 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/oceanprotocol/keeper-contracts',
-    version='0.9.1',
+    version='0.11.1',
     zip_safe=False,
 )
 

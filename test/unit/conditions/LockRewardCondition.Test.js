@@ -1,7 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
 /* global artifacts, contract, describe, it, expect */
-
 const chai = require('chai')
 const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
@@ -80,10 +79,10 @@ contract('LockRewardCondition', (accounts) => {
         it('should not fulfill if conditions do not exist', async () => {
             const { lockRewardCondition, oceanToken, owner } = await setupTest()
 
-            let nonce = constants.bytes32.one
-            let rewardAddress = accounts[2]
-            let sender = accounts[0]
-            let amount = 10
+            const agreementId = constants.bytes32.one
+            const rewardAddress = accounts[2]
+            const sender = accounts[0]
+            const amount = 10
 
             await oceanToken.mint(sender, amount, { from: owner })
             await oceanToken.approve(
@@ -92,7 +91,7 @@ contract('LockRewardCondition', (accounts) => {
                 { from: sender })
 
             await assert.isRejected(
-                lockRewardCondition.fulfill(nonce, rewardAddress, amount),
+                lockRewardCondition.fulfill(agreementId, rewardAddress, amount),
                 constants.acl.error.invalidUpdateRole
             )
         })
@@ -107,13 +106,13 @@ contract('LockRewardCondition', (accounts) => {
                 owner
             } = await setupTest()
 
-            let nonce = constants.bytes32.one
-            let rewardAddress = accounts[2]
-            let sender = accounts[0]
-            let amount = 10
+            const agreementId = constants.bytes32.one
+            const rewardAddress = accounts[2]
+            const sender = accounts[0]
+            const amount = 10
 
-            let hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
-            let conditionId = await lockRewardCondition.generateId(nonce, hashValues)
+            const hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
+            const conditionId = await lockRewardCondition.generateId(agreementId, hashValues)
 
             await conditionStoreManager.createCondition(
                 conditionId,
@@ -125,15 +124,15 @@ contract('LockRewardCondition', (accounts) => {
                 amount,
                 { from: sender })
 
-            const result = await lockRewardCondition.fulfill(nonce, rewardAddress, amount)
-            let { state } = await conditionStoreManager.getCondition(conditionId)
+            const result = await lockRewardCondition.fulfill(agreementId, rewardAddress, amount)
+            const { state } = await conditionStoreManager.getCondition(conditionId)
             assert.strictEqual(state.toNumber(), constants.condition.state.fulfilled)
-            let rewardBalance = await getBalance(oceanToken, rewardAddress)
+            const rewardBalance = await getBalance(oceanToken, rewardAddress)
             assert.strictEqual(rewardBalance, amount)
 
             testUtils.assertEmitted(result, 1, 'Fulfilled')
             const eventArgs = testUtils.getEventArgsFromTx(result, 'Fulfilled')
-            expect(eventArgs._agreementId).to.equal(nonce)
+            expect(eventArgs._agreementId).to.equal(agreementId)
             expect(eventArgs._conditionId).to.equal(conditionId)
             expect(eventArgs._rewardAddress).to.equal(rewardAddress)
             expect(eventArgs._amount.toNumber()).to.equal(amount)
@@ -144,19 +143,19 @@ contract('LockRewardCondition', (accounts) => {
         it('out of balance should fail to fulfill if conditions exist', async () => {
             const { lockRewardCondition, conditionStoreManager } = await setupTest()
 
-            let nonce = constants.bytes32.one
-            let rewardAddress = accounts[2]
-            let amount = 10
+            const agreementId = constants.bytes32.one
+            const rewardAddress = accounts[2]
+            const amount = 10
 
-            let hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
-            let conditionId = await lockRewardCondition.generateId(nonce, hashValues)
+            const hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
+            const conditionId = await lockRewardCondition.generateId(agreementId, hashValues)
 
             await conditionStoreManager.createCondition(
                 conditionId,
                 lockRewardCondition.address)
 
             await assert.isRejected(
-                lockRewardCondition.fulfill(nonce, rewardAddress, amount),
+                lockRewardCondition.fulfill(agreementId, rewardAddress, amount),
                 undefined
             )
         })
@@ -169,13 +168,13 @@ contract('LockRewardCondition', (accounts) => {
                 owner
             } = await setupTest()
 
-            let nonce = constants.bytes32.one
-            let rewardAddress = accounts[2]
-            let amount = 10
-            let sender = accounts[0]
+            const agreementId = constants.bytes32.one
+            const rewardAddress = accounts[2]
+            const amount = 10
+            const sender = accounts[0]
 
-            let hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
-            let conditionId = await lockRewardCondition.generateId(nonce, hashValues)
+            const hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
+            const conditionId = await lockRewardCondition.generateId(agreementId, hashValues)
 
             await conditionStoreManager.createCondition(
                 conditionId,
@@ -184,7 +183,7 @@ contract('LockRewardCondition', (accounts) => {
             await oceanToken.mint(sender, amount, { from: owner })
 
             await assert.isRejected(
-                lockRewardCondition.fulfill(nonce, rewardAddress, amount),
+                lockRewardCondition.fulfill(agreementId, rewardAddress, amount),
                 undefined
             )
         })
@@ -197,34 +196,37 @@ contract('LockRewardCondition', (accounts) => {
                 owner
             } = await setupTest()
 
-            let nonce = constants.bytes32.one
-            let rewardAddress = accounts[2]
-            let amount = 10
-            let sender = accounts[0]
+            const agreementId = constants.bytes32.one
+            const rewardAddress = accounts[2]
+            const amount = 10
+            const sender = accounts[0]
 
-            let hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
-            let conditionId = await lockRewardCondition.generateId(nonce, hashValues)
+            const hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
+            const conditionId = await lockRewardCondition.generateId(agreementId, hashValues)
 
             await conditionStoreManager.createCondition(
                 conditionId,
-                lockRewardCondition.address)
+                lockRewardCondition.address
+            )
 
             await oceanToken.mint(sender, amount, { from: owner })
             await oceanToken.approve(
                 lockRewardCondition.address,
                 amount,
-                { from: sender })
+                { from: sender }
+            )
 
-            await lockRewardCondition.fulfill(nonce, rewardAddress, amount)
+            await lockRewardCondition.fulfill(agreementId, rewardAddress, amount)
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
                 constants.condition.state.fulfilled
             )
 
             await assert.isRejected(
-                lockRewardCondition.fulfill(nonce, rewardAddress, amount),
+                lockRewardCondition.fulfill(agreementId, rewardAddress, amount),
                 undefined
             )
+
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
                 constants.condition.state.fulfilled
@@ -240,13 +242,13 @@ contract('LockRewardCondition', (accounts) => {
                 createRole
             } = await setupTest()
 
-            let nonce = constants.bytes32.one
-            let rewardAddress = accounts[2]
-            let amount = 10
-            let sender = accounts[0]
+            const agreementId = constants.bytes32.one
+            const rewardAddress = accounts[2]
+            const amount = 10
+            const sender = accounts[0]
 
-            let hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
-            let conditionId = await lockRewardCondition.generateId(nonce, hashValues)
+            const hashValues = await lockRewardCondition.hashValues(rewardAddress, amount)
+            const conditionId = await lockRewardCondition.generateId(agreementId, hashValues)
 
             await conditionStoreManager.createCondition(
                 conditionId,
@@ -266,7 +268,7 @@ contract('LockRewardCondition', (accounts) => {
                 { from: sender })
 
             await assert.isRejected(
-                lockRewardCondition.fulfill(nonce, rewardAddress, amount),
+                lockRewardCondition.fulfill(agreementId, rewardAddress, amount),
                 constants.acl.error.invalidUpdateRole
             )
         })

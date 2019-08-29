@@ -1,4 +1,7 @@
-pragma solidity 0.5.3;
+pragma solidity 0.5.6;
+// Copyright BigchainDB GmbH and Ocean Protocol contributors
+// SPDX-License-Identifier: (Apache-2.0 AND CC-BY-4.0)
+// Code is Apache-2.0 and docs are CC-BY-4.0
 
 import 'zos-lib/contracts/Initializable.sol';
 
@@ -7,7 +10,7 @@ import 'zos-lib/contracts/Initializable.sol';
  * @author Ocean Protocol Team
  */
 contract Common {
-    /**
+   /**
     * @notice getCurrentBlockNumber get block number
     * @return the current block number
     */
@@ -19,6 +22,11 @@ contract Common {
         return block.number;
     }
 
+    /**
+     * @dev isContract detect whether the address is 
+     *          is a contract address or externally owned account
+     * @return true if it is a contract address
+     */
     function isContract(address addr)
         public
         view

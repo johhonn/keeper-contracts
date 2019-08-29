@@ -8,13 +8,16 @@ chai.use(chaiAsPromised)
 const testUtils = require('../helpers/utils')
 
 const {
-    upgradeContracts,
-    deployContracts,
     confirmUpgrade,
     submitTransaction,
     confirmTransaction,
     loadWallet
-} = require('../../scripts/deploy/deploymentHandler')
+} = require('@oceanprotocol/dori')
+
+const {
+    deploy,
+    upgrade
+} = require('./Upgrader')
 
 const OceanToken = artifacts.require('OceanToken')
 const Dispenser = artifacts.require('Dispenser')
@@ -40,8 +43,10 @@ contract('Dispenser', (accounts) => {
     } = {}) {
         const oceanToken = await OceanToken.at(OceanTokenAddress)
         const dispenser = await Dispenser.at(DispenserAddress)
+
         // act
         await dispenser.requestTokens(requestedAmount)
+
         return {
             dispenser,
             oceanToken,
@@ -51,19 +56,18 @@ contract('Dispenser', (accounts) => {
 
     describe('Test upgradability for Dispenser', () => {
         beforeEach('Load wallet each time', async function() {
-            const addressBook = await deployContracts(
+            const addressBook = await deploy({
                 web3,
                 artifacts,
-                [
+                contracts: [
                     'Dispenser',
                     'OceanToken'
                 ],
-                true,
-                true,
                 verbose
-            )
-            OceanTokenAddress = addressBook['OceanToken']
-            DispenserAddress = addressBook['Dispenser']
+            })
+
+            OceanTokenAddress = addressBook.OceanToken
+            DispenserAddress = addressBook.Dispenser
 
             ownerWallet = await loadWallet(
                 web3,
@@ -75,15 +79,15 @@ contract('Dispenser', (accounts) => {
         it('Should be possible to fix/add a bug', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgrade({
                 web3,
-                ['DispenserWithBug:Dispenser'],
+                contracts: ['DispenserWithBug:Dispenser'],
                 verbose
-            )
+            })
 
             await confirmUpgrade(
                 web3,
-                taskBook['Dispenser'],
+                taskBook.Dispenser,
                 approver,
                 verbose
             )
@@ -121,18 +125,18 @@ contract('Dispenser', (accounts) => {
         })
 
         it('Should be possible to change function signature', async () => {
-            let { requestedAmount } = await setupTest()
+            const { requestedAmount } = await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgrade({
                 web3,
-                ['DispenserChangeFunctionSignature:Dispenser'],
+                contracts: ['DispenserChangeFunctionSignature:Dispenser'],
                 verbose
-            )
+            })
 
             // act
             await confirmUpgrade(
                 web3,
-                taskBook['Dispenser'],
+                taskBook.Dispenser,
                 approver,
                 verbose
             )
@@ -153,16 +157,16 @@ contract('Dispenser', (accounts) => {
         it('Should be possible to append storage variable(s) ', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgrade({
                 web3,
-                ['DispenserChangeInStorage:Dispenser'],
+                contracts: ['DispenserChangeInStorage:Dispenser'],
                 verbose
-            )
+            })
 
             // act
             await confirmUpgrade(
                 web3,
-                taskBook['Dispenser'],
+                taskBook.Dispenser,
                 approver,
                 verbose
             )
@@ -181,18 +185,18 @@ contract('Dispenser', (accounts) => {
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
-            let { requestedAmount } = await setupTest()
+            const { requestedAmount } = await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgrade({
                 web3,
-                ['DispenserChangeInStorageAndLogic:Dispenser'],
+                contracts: ['DispenserChangeInStorageAndLogic:Dispenser'],
                 verbose
-            )
+            })
 
             // act
             await confirmUpgrade(
                 web3,
-                taskBook['Dispenser'],
+                taskBook.Dispenser,
                 approver,
                 verbose
             )
@@ -220,16 +224,16 @@ contract('Dispenser', (accounts) => {
         it('Should be able to call new method added after upgrade is approved', async () => {
             await setupTest()
 
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgrade({
                 web3,
-                ['DispenserExtraFunctionality:Dispenser'],
+                contracts: ['DispenserExtraFunctionality:Dispenser'],
                 verbose
-            )
+            })
 
             // act
             await confirmUpgrade(
                 web3,
-                taskBook['Dispenser'],
+                taskBook.Dispenser,
                 approver,
                 verbose
             )

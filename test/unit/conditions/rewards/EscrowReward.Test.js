@@ -1,7 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
 /* global artifacts, contract, describe, it, expect */
-
 const chai = require('chai')
 const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
@@ -92,16 +91,16 @@ contract('EscrowReward constructor', (accounts) => {
             await setupTest()
             const { escrowReward } = await setupTest()
 
-            let nonce = constants.bytes32.one
-            let lockConditionId = accounts[2]
-            let releaseConditionId = accounts[3]
-            let sender = accounts[0]
-            let receiver = accounts[1]
-            let amount = 10
+            const agreementId = constants.bytes32.one
+            const lockConditionId = accounts[2]
+            const releaseConditionId = accounts[3]
+            const sender = accounts[0]
+            const receiver = accounts[1]
+            const amount = 10
 
             await assert.isRejected(
                 escrowReward.fulfill(
-                    nonce,
+                    agreementId,
                     amount,
                     receiver,
                     sender,
@@ -122,28 +121,28 @@ contract('EscrowReward constructor', (accounts) => {
                 owner
             } = await setupTest()
 
-            let nonce = constants.bytes32.one
-            let sender = accounts[0]
-            let receiver = accounts[1]
-            let amount = 10
+            const agreementId = constants.bytes32.one
+            const sender = accounts[0]
+            const receiver = accounts[1]
+            const amount = 10
 
-            let hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
-            let conditionLockId = await lockRewardCondition.generateId(nonce, hashValuesLock)
+            const hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
+            const conditionLockId = await lockRewardCondition.generateId(agreementId, hashValuesLock)
 
             await conditionStoreManager.createCondition(
                 conditionLockId,
                 lockRewardCondition.address)
 
-            let lockConditionId = conditionLockId
-            let releaseConditionId = conditionLockId
+            const lockConditionId = conditionLockId
+            const releaseConditionId = conditionLockId
 
-            let hashValues = await escrowReward.hashValues(
+            const hashValues = await escrowReward.hashValues(
                 amount,
                 receiver,
                 sender,
                 lockConditionId,
                 releaseConditionId)
-            let conditionId = await escrowReward.generateId(nonce, hashValues)
+            const conditionId = await escrowReward.generateId(agreementId, hashValues)
 
             await conditionStoreManager.createCondition(
                 constants.bytes32.one,
@@ -159,13 +158,13 @@ contract('EscrowReward constructor', (accounts) => {
                 amount,
                 { from: sender })
 
-            await lockRewardCondition.fulfill(nonce, escrowReward.address, amount)
+            await lockRewardCondition.fulfill(agreementId, escrowReward.address, amount)
 
             assert.strictEqual(await getBalance(oceanToken, lockRewardCondition.address), 0)
             assert.strictEqual(await getBalance(oceanToken, escrowReward.address), amount)
 
             const result = await escrowReward.fulfill(
-                nonce,
+                agreementId,
                 amount,
                 receiver,
                 sender,
@@ -179,7 +178,7 @@ contract('EscrowReward constructor', (accounts) => {
 
             testUtils.assertEmitted(result, 1, 'Fulfilled')
             const eventArgs = testUtils.getEventArgsFromTx(result, 'Fulfilled')
-            expect(eventArgs._agreementId).to.equal(nonce)
+            expect(eventArgs._agreementId).to.equal(agreementId)
             expect(eventArgs._conditionId).to.equal(conditionId)
             expect(eventArgs._receiver).to.equal(receiver)
             expect(eventArgs._amount.toNumber()).to.equal(amount)
@@ -193,7 +192,7 @@ contract('EscrowReward constructor', (accounts) => {
 
             assert.strictEqual(await getBalance(oceanToken, escrowReward.address), amount)
             await assert.isRejected(
-                escrowReward.fulfill(nonce, amount, receiver, sender, lockConditionId, releaseConditionId),
+                escrowReward.fulfill(agreementId, amount, receiver, sender, lockConditionId, releaseConditionId),
                 constants.condition.state.error.invalidStateTransition
             )
         })
@@ -206,28 +205,28 @@ contract('EscrowReward constructor', (accounts) => {
                 owner
             } = await setupTest()
 
-            let nonce = constants.bytes32.one
-            let sender = accounts[0]
-            let receiver = constants.address.zero
-            let amount = 10
+            const agreementId = constants.bytes32.one
+            const sender = accounts[0]
+            const receiver = constants.address.zero
+            const amount = 10
 
-            let hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
-            let conditionLockId = await lockRewardCondition.generateId(nonce, hashValuesLock)
+            const hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
+            const conditionLockId = await lockRewardCondition.generateId(agreementId, hashValuesLock)
 
             await conditionStoreManager.createCondition(
                 conditionLockId,
                 lockRewardCondition.address)
 
-            let lockConditionId = conditionLockId
-            let releaseConditionId = conditionLockId
+            const lockConditionId = conditionLockId
+            const releaseConditionId = conditionLockId
 
-            let hashValues = await escrowReward.hashValues(
+            const hashValues = await escrowReward.hashValues(
                 amount,
                 receiver,
                 sender,
                 lockConditionId,
                 releaseConditionId)
-            let conditionId = await escrowReward.generateId(nonce, hashValues)
+            const conditionId = await escrowReward.generateId(agreementId, hashValues)
 
             await conditionStoreManager.createCondition(
                 constants.bytes32.one,
@@ -243,14 +242,14 @@ contract('EscrowReward constructor', (accounts) => {
                 amount,
                 { from: sender })
 
-            await lockRewardCondition.fulfill(nonce, escrowReward.address, amount)
+            await lockRewardCondition.fulfill(agreementId, escrowReward.address, amount)
 
             assert.strictEqual(await getBalance(oceanToken, lockRewardCondition.address), 0)
             assert.strictEqual(await getBalance(oceanToken, escrowReward.address), amount)
 
             await assert.isRejected(
                 escrowReward.fulfill(
-                    nonce,
+                    agreementId,
                     amount,
                     receiver,
                     sender,
@@ -269,28 +268,28 @@ contract('EscrowReward constructor', (accounts) => {
                 owner
             } = await setupTest()
 
-            let nonce = constants.bytes32.one
-            let sender = accounts[0]
-            let receiver = escrowReward.address
-            let amount = 10
+            const agreementId = constants.bytes32.one
+            const sender = accounts[0]
+            const receiver = escrowReward.address
+            const amount = 10
 
-            let hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
-            let conditionLockId = await lockRewardCondition.generateId(nonce, hashValuesLock)
+            const hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
+            const conditionLockId = await lockRewardCondition.generateId(agreementId, hashValuesLock)
 
             await conditionStoreManager.createCondition(
                 conditionLockId,
                 lockRewardCondition.address)
 
-            let lockConditionId = conditionLockId
-            let releaseConditionId = conditionLockId
+            const lockConditionId = conditionLockId
+            const releaseConditionId = conditionLockId
 
-            let hashValues = await escrowReward.hashValues(
+            const hashValues = await escrowReward.hashValues(
                 amount,
                 receiver,
                 sender,
                 lockConditionId,
                 releaseConditionId)
-            let conditionId = await escrowReward.generateId(nonce, hashValues)
+            const conditionId = await escrowReward.generateId(agreementId, hashValues)
 
             await conditionStoreManager.createCondition(
                 constants.bytes32.one,
@@ -306,14 +305,14 @@ contract('EscrowReward constructor', (accounts) => {
                 amount,
                 { from: sender })
 
-            await lockRewardCondition.fulfill(nonce, escrowReward.address, amount)
+            await lockRewardCondition.fulfill(agreementId, escrowReward.address, amount)
 
             assert.strictEqual(await getBalance(oceanToken, lockRewardCondition.address), 0)
             assert.strictEqual(await getBalance(oceanToken, escrowReward.address), amount)
 
             await assert.isRejected(
                 escrowReward.fulfill(
-                    nonce,
+                    agreementId,
                     amount,
                     receiver,
                     sender,
@@ -335,13 +334,13 @@ contract('EscrowReward constructor', (accounts) => {
                 owner
             } = await setupTest()
 
-            const nonce1 = constants.bytes32.one
+            const agreementId = constants.bytes32.one
             const sender = accounts[0]
             const attacker = accounts[2]
             const amount = 10
 
             const hashValuesLock = await lockRewardCondition.hashValues(escrowReward.address, amount)
-            const conditionLockId = await lockRewardCondition.generateId(nonce1, hashValuesLock)
+            const conditionLockId = await lockRewardCondition.generateId(agreementId, hashValuesLock)
 
             await conditionStoreManager.createCondition(
                 conditionLockId,
@@ -365,25 +364,25 @@ contract('EscrowReward constructor', (accounts) => {
                 amount,
                 { from: sender })
 
-            await lockRewardCondition.fulfill(nonce1, escrowReward.address, amount)
+            await lockRewardCondition.fulfill(agreementId, escrowReward.address, amount)
 
             const escrowRewardBalance = 110
 
             /* attacker creates escrowRewardBalance/amount bogus conditions to claim the locked reward: */
 
             for (let i = 0; i < escrowRewardBalance / amount; ++i) {
-                let nonce = (3 + i).toString(16)
-                while (nonce.length < 32 * 2) {
-                    nonce = '0' + nonce
+                let agreementId = (3 + i).toString(16)
+                while (agreementId.length < 32 * 2) {
+                    agreementId = '0' + agreementId
                 }
-                const attackNonce = '0x' + nonce
+                const attackerAgreementId = '0x' + agreementId
                 const attackerHashValues = await escrowReward.hashValues(
                     amount,
                     attacker,
                     attacker,
                     lockConditionId,
                     releaseConditionId)
-                const attackerConditionId = await escrowReward.generateId(attackNonce, attackerHashValues)
+                const attackerConditionId = await escrowReward.generateId(attackerAgreementId, attackerHashValues)
 
                 await conditionStoreManager.createCondition(
                     attackerConditionId,
@@ -392,7 +391,7 @@ contract('EscrowReward constructor', (accounts) => {
                 /* attacker tries to claim the escrow before the legitimate users: */
                 await assert.isRejected(
                     escrowReward.fulfill(
-                        attackNonce,
+                        attackerAgreementId,
                         amount,
                         attacker,
                         attacker,

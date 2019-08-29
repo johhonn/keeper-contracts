@@ -6,10 +6,13 @@ const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
 const {
-    upgradeContracts,
-    deployContracts,
     confirmUpgrade
-} = require('../../scripts/deploy/deploymentHandler')
+} = require('@oceanprotocol/dori')
+
+const {
+    deploy,
+    upgrade
+} = require('./Upgrader')
 
 const OceanToken = artifacts.require('OceanToken')
 
@@ -29,34 +32,34 @@ contract('OceanToken', (accounts) => {
 
     describe('Test upgradability for OceanToken', () => {
         beforeEach('Load wallet each time', async function() {
-            const addressBook = await deployContracts(
+            const addressBook = await deploy({
                 web3,
                 artifacts,
-                [
+                contracts: [
                     'OceanToken'
                 ],
-                true,
-                true,
                 verbose
-            )
+            })
 
-            OceanTokenAddress = addressBook['OceanToken']
+            OceanTokenAddress = addressBook.OceanToken
             assert(OceanTokenAddress)
         })
 
         it('Should be possible to append storage variable(s) ', async () => {
             await setupTest()
-            const taskBook = await upgradeContracts(
+            const taskBook = await upgrade({
                 web3,
-                ['OceanTokenChangeInStorage:OceanToken'],
+                contracts: ['OceanTokenChangeInStorage:OceanToken'],
                 verbose
-            )
+            })
+
             await confirmUpgrade(
                 web3,
-                taskBook['OceanToken'],
+                taskBook.OceanToken,
                 approver,
                 verbose
             )
+
             // act
             const OceanTokenChangeInStorageInstance = await OceanTokenChangeInStorage.at(OceanTokenAddress)
 
@@ -72,14 +75,16 @@ contract('OceanToken', (accounts) => {
 
         it('Should be possible to append storage variables and change logic', async () => {
             await setupTest()
-            const taskBook = await upgradeContracts(
+
+            const taskBook = await upgrade({
                 web3,
-                ['OceanTokenChangeInStorageAndLogic:OceanToken'],
+                contracts: ['OceanTokenChangeInStorageAndLogic:OceanToken'],
                 verbose
-            )
+            })
+
             await confirmUpgrade(
                 web3,
-                taskBook['OceanToken'],
+                taskBook.OceanToken,
                 approver,
                 verbose
             )
@@ -108,14 +113,16 @@ contract('OceanToken', (accounts) => {
 
         it('Should be able to call new method added after upgrade is approved', async () => {
             await setupTest()
-            const taskBook = await upgradeContracts(
+
+            const taskBook = await upgrade({
                 web3,
-                ['OceanTokenExtraFunctionality:OceanToken'],
+                contracts: ['OceanTokenExtraFunctionality:OceanToken'],
                 verbose
-            )
+            })
+
             await confirmUpgrade(
                 web3,
-                taskBook['OceanToken'],
+                taskBook.OceanToken,
                 approver,
                 verbose
             )

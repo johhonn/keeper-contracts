@@ -1,7 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
 /* global artifacts, contract, describe, it */
-
 const chai = require('chai')
 const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
@@ -63,15 +62,15 @@ contract('SignCondition constructor', (accounts) => {
         it('should not fulfill if conditions do not exist for bytes32 message', async () => {
             const { signCondition } = await setupTest()
 
-            let nonce = constants.bytes32.one
-            let {
+            const agreementId = constants.bytes32.one
+            const {
                 message,
                 publicKey,
                 signature
             } = constants.condition.sign.bytes32
 
             await assert.isRejected(
-                signCondition.fulfill(nonce, message, publicKey, signature, { from: accounts[2] }),
+                signCondition.fulfill(agreementId, message, publicKey, signature, { from: accounts[2] }),
                 constants.condition.state.error.conditionNeedsToBeUnfulfilled
             )
         })
@@ -81,23 +80,24 @@ contract('SignCondition constructor', (accounts) => {
         it('should fulfill if conditions exist for bytes32 message', async () => {
             const { signCondition, conditionStoreManager } = await setupTest()
 
-            let nonce = constants.bytes32.one
-            let {
+            const agreementId = constants.bytes32.one
+            const {
                 message,
                 publicKey,
                 signature
             } = constants.condition.sign.bytes32
 
-            let hashValues = await signCondition.hashValues(message, publicKey)
-            let conditionId = await signCondition.generateId(nonce, hashValues)
+            const hashValues = await signCondition.hashValues(message, publicKey)
+            const conditionId = await signCondition.generateId(agreementId, hashValues)
 
             await conditionStoreManager.createCondition(
                 conditionId,
-                signCondition.address)
+                signCondition.address
+            )
 
-            await signCondition.fulfill(nonce, message, publicKey, signature)
+            await signCondition.fulfill(agreementId, message, publicKey, signature)
 
-            let { state } = await conditionStoreManager.getCondition(conditionId)
+            const { state } = await conditionStoreManager.getCondition(conditionId)
             assert.strictEqual(constants.condition.state.fulfilled, state.toNumber())
         })
     })
@@ -106,22 +106,23 @@ contract('SignCondition constructor', (accounts) => {
         it('wrong signature should fail to fulfill if conditions exist for bytes32 message', async () => {
             const { signCondition, conditionStoreManager } = await setupTest()
 
-            let nonce = constants.bytes32.one
-            let {
+            const agreementId = constants.bytes32.one
+            const {
                 message,
                 publicKey
             } = constants.condition.sign.bytes32
 
-            let hashValues = await signCondition.hashValues(message, publicKey)
-            let conditionId = await signCondition.generateId(nonce, hashValues)
+            const hashValues = await signCondition.hashValues(message, publicKey)
+            const conditionId = await signCondition.generateId(agreementId, hashValues)
 
             await conditionStoreManager.createCondition(
                 conditionId,
-                signCondition.address)
+                signCondition.address
+            )
 
             await assert.isRejected(
                 signCondition.fulfill(
-                    nonce, message, publicKey,
+                    agreementId, message, publicKey,
                     constants.bytes32.one
                 ),
                 constants.condition.sign.error.couldNotRecoverSignature
@@ -131,25 +132,26 @@ contract('SignCondition constructor', (accounts) => {
         it('right signature should fail to fulfill if conditions already fulfilled for bytes32', async () => {
             const { signCondition, conditionStoreManager } = await setupTest()
 
-            let nonce = constants.bytes32.one
-            let {
+            const agreementId = constants.bytes32.one
+            const {
                 message,
                 publicKey,
                 signature
             } = constants.condition.sign.bytes32
 
-            let hashValues = await signCondition.hashValues(message, publicKey)
-            let conditionId = await signCondition.generateId(nonce, hashValues)
+            const hashValues = await signCondition.hashValues(message, publicKey)
+            const conditionId = await signCondition.generateId(agreementId, hashValues)
 
             await conditionStoreManager.createCondition(
                 conditionId,
-                signCondition.address)
+                signCondition.address
+            )
 
             // fulfill once
-            await signCondition.fulfill(nonce, message, publicKey, signature)
+            await signCondition.fulfill(agreementId, message, publicKey, signature)
             // try to fulfill another time
             await assert.isRejected(
-                signCondition.fulfill(nonce, message, publicKey, signature),
+                signCondition.fulfill(agreementId, message, publicKey, signature),
                 constants.condition.state.error.invalidStateTransition
             )
         })
@@ -157,20 +159,21 @@ contract('SignCondition constructor', (accounts) => {
         it('should fail to fulfill if conditions has different type ref', async () => {
             const { signCondition, conditionStoreManager, createRole, owner } = await setupTest()
 
-            let nonce = constants.bytes32.one
-            let {
+            const agreementId = constants.bytes32.one
+            const {
                 message,
                 publicKey,
                 signature
             } = constants.condition.sign.bytes32
 
-            let hashValues = await signCondition.hashValues(message, publicKey)
-            let conditionId = await signCondition.generateId(nonce, hashValues)
+            const hashValues = await signCondition.hashValues(message, publicKey)
+            const conditionId = await signCondition.generateId(agreementId, hashValues)
 
             // create a condition of a type different than sign condition
             await conditionStoreManager.createCondition(
                 conditionId,
-                signCondition.address)
+                signCondition.address
+            )
 
             await conditionStoreManager.delegateUpdateRole(
                 conditionId,
@@ -180,7 +183,7 @@ contract('SignCondition constructor', (accounts) => {
 
             // try to fulfill from sign condition
             await assert.isRejected(
-                signCondition.fulfill(nonce, message, publicKey, signature),
+                signCondition.fulfill(agreementId, message, publicKey, signature),
                 constants.acl.error.invalidUpdateRole
             )
         })

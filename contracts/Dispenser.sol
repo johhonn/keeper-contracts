@@ -1,4 +1,7 @@
-pragma solidity 0.5.3;
+pragma solidity 0.5.6;
+// Copyright BigchainDB GmbH and Ocean Protocol contributors
+// SPDX-License-Identifier: (Apache-2.0 AND CC-BY-4.0)
+// Code is Apache-2.0 and docs are CC-BY-4.0
 
 import 'openzeppelin-eth/contracts/math/SafeMath.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
@@ -124,7 +127,7 @@ contract Dispenser is Ownable {
             /* solium-disable-next-line security/no-block-members */
             tokenRequests[msg.sender] = block.timestamp;
 
-            totalMintAmount.add(amountWithDigits);
+            totalMintAmount = totalMintAmount.add(amountWithDigits);
 
             return true;
         }

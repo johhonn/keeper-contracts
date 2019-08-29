@@ -25,15 +25,19 @@ matrix:
 
 before_install:
     - npm install -g npm
-    - npm install -g ganache-cli@~6.4.1 greenkeeper-lockfile codacy-coverage
+    - npm install -g ganache-cli@~6.4.4 greenkeeper-lockfile codacy-coverage
     - pyenv global system 3.6.7
-    - docker pull oceanprotocol/echidna:sloc-5.3
+    - docker pull oceanprotocol/echidna:solc-0.5.6
+    - sudo apt-get -y install gnupg-agent python3-setuptools
+    - pip3 install slither-analyzer==0.6.4
     - |
         if [ "${DEPLOY_PACKAGE}" = "true" ] && [ ! -z "${TRAVIS_TAG}" ]; then
           sudo apt-get -y install gnupg-agent python3-setuptools
           gpg-agent --daemon --no-grab --write-env-file $HOME/.gpg-agent-info
           pip3 install --upgrade --user twine six==1.10.0 wheel==0.31.0 setuptools
-          sudo apt-get install oracle-java8-set-default maven
+          sudo apt install -y openjdk-8-jdk openjdk-8-jre maven
+          export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
+          export PATH=${JAVA_HOME}/bin:${PATH}
           java -version
           mvn -version
           export WEB3J_VERSION=4.1.1
@@ -56,16 +60,15 @@ before_script:
 script:
     - npm run lint
     - npm run test:cover
-    - npm run report-coverage
+    - npm run test:report-coverage
     - npm run clean
     - npm run compile
     - npm run test:upgrade
     - npm run test:echidna
-    - npm run deploy -- --deeper-clean
+    - npm run deploy:development -- --deeper-clean
     - git status
     - git add package-lock.json
     - git diff-index --quiet HEAD || git commit -m "Travis update"
-    - bash -x scripts/security_analysis.sh
 
 after_script:
     - greenkeeper-lockfile-upload
@@ -74,17 +77,17 @@ notifications:
     email: false
 
 deploy:
-    - provider: npm
-      email: "devops@oceanprotocol.com"
-      api_key: ${NPM_TOKEN}
+    - provider: script
+      script: bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
       skip_cleanup: true
       on:
           tags: true
           all_branches: true
           condition: $DEPLOY_PACKAGE = true
 
-    - provider: script
-      script: bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
+    - provider: npm
+      email: "devops@oceanprotocol.com"
+      api_key: ${NPM_TOKEN}
       skip_cleanup: true
       on:
           tags: true
@@ -107,3 +110,4 @@ deploy:
           tags: true
           all_branches: true
           condition: $DEPLOY_PACKAGE = true
+

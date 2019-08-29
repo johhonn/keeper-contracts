@@ -1,7 +1,22 @@
-pragma solidity 0.5.3;
+pragma solidity 0.5.6;
+// Copyright BigchainDB GmbH and Ocean Protocol contributors
+// SPDX-License-Identifier: (Apache-2.0 AND CC-BY-4.0)
+// Code is Apache-2.0 and docs are CC-BY-4.0
 
 import 'openzeppelin-eth/contracts/math/SafeMath.sol';
 
+/**
+ * @title Epoch Library
+ * @author Ocean Protocol Team
+ *
+ * @dev Implementation of Epoch Library.
+ *      For an arbitrary Epoch, this library manages the life
+ *      cycle of an Epoch. Usually this library is used for 
+ *      handling the time window between conditions in an agreement.
+ *      For more information about Epoch checkout the below link
+ *      https://github.com/oceanprotocol/OEPs/issues/119   
+ *      TODO: update to the OEP link
+ */
 library EpochLibrary {
 
     using SafeMath for uint256;
@@ -16,7 +31,7 @@ library EpochLibrary {
         mapping(bytes32 => Epoch) epochs;
         bytes32[] epochIds;
     }
-    
+
    /**
     * @notice create creates new Epoch
     * @param _self is the Epoch storage pointer
@@ -30,7 +45,6 @@ library EpochLibrary {
         uint256 _timeOut
     )
         internal
-        returns (uint size)
     {
         require(
             _self.epochs[_id].blockNumber == 0,
@@ -43,19 +57,21 @@ library EpochLibrary {
             'Indicating integer overflow/underflow'
         );
 
-        if(_timeOut > 0 && _timeLock > 0){
+        if (_timeOut > 0 && _timeLock > 0) {
             require(
                 _timeLock < _timeOut,
                 'Invalid time margin'
             );
         }
+
         _self.epochs[_id] = Epoch({
-            timeLock: _timeLock,
-            timeOut: _timeOut,
-            blockNumber: block.number
+            timeLock : _timeLock,
+            timeOut : _timeOut,
+            blockNumber : block.number
         });
+
         _self.epochIds.push(_id);
-        return _self.epochIds.length;
+
     }
 
    /**
@@ -69,10 +85,12 @@ library EpochLibrary {
     )
         external
         view
-        returns(bool)
+        returns (bool)
     {
-        if (_self.epochs[_id].timeOut == 0)
+        if (_self.epochs[_id].timeOut == 0) {
             return false;
+        }
+
         return (block.number > getEpochTimeOut(_self.epochs[_id]));
     }
 
@@ -87,7 +105,7 @@ library EpochLibrary {
     )
         external
         view
-        returns(bool)
+        returns (bool)
     {
         return (block.number < getEpochTimeLock(_self.epochs[_id]));
     }
@@ -101,7 +119,7 @@ library EpochLibrary {
     )
         public
         view
-        returns(uint256)
+        returns (uint256)
     {
         return _self.timeOut.add(_self.blockNumber);
     }
@@ -115,7 +133,7 @@ library EpochLibrary {
     )
         public
         view
-        returns(uint256)
+        returns (uint256)
     {
         return _self.timeLock.add(_self.blockNumber);
     }

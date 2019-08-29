@@ -42,6 +42,12 @@ Parameters:
 * bytes32 _did
 * address _provider
 
+###  DIDOwnershipTransferred
+Parameters:
+* bytes32 _did
+* address _previousOwner
+* address _newOwner
+
 ## Modifiers
 
 ### internal onlyDIDOwner
@@ -82,16 +88,55 @@ Parameters:
 * string _value
 
 ### external addDIDProvider
+
+Documentation:
+
+```
+@notice addDIDProvider add new DID provider.
+     * @dev it adds new DID provider to the providers list. A provider
+     is any entity that can serve the registered asset
+@param _did refers to decentralized identifier (a bytes32 length ID).
+@param _provider provider's address.
+```
 Parameters:
 * bytes32 _did
 * address _provider
 
 ### external removeDIDProvider
+
+Documentation:
+
+```
+@notice removeDIDProvider delete an existing DID provider.
+@param _did refers to decentralized identifier (a bytes32 length ID).
+@param _provider provider's address.
+```
 Parameters:
 * bytes32 _did
 * address _provider
 
+### external transferDIDOwnership
+
+Documentation:
+
+```
+@notice transferDIDOwnership transfer DID ownership
+@param _did refers to decentralized identifier (a bytes32 length ID)
+@param _newOwner new owner address
+```
+Parameters:
+* bytes32 _did
+* address _newOwner
+
 ### public isDIDProvider
+
+Documentation:
+
+```
+@notice isDIDProvider check whether a given DID provider exists
+@param _did refers to decentralized identifier (a bytes32 length ID).
+@param _provider provider's address.
+```
 Parameters:
 * bytes32 _did
 * address _provider

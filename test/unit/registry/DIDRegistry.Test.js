@@ -35,7 +35,11 @@ contract('DIDRegistry', (accounts) => {
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
             const result = await didRegistry.registerAttribute(did, checksum, providers, value)
 
-            testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
+            testUtils.assertEmitted(
+                result,
+                1,
+                'DIDAttributeRegistered'
+            )
 
             const payload = result.logs[0].args
             assert.strictEqual(did, payload._did)
@@ -46,12 +50,16 @@ contract('DIDRegistry', (accounts) => {
 
         it('Should find the event from the block number', async () => {
             const { didRegistry } = await setupTest()
-            const did = constants.did[0]
+            const did = testUtils.generateId()
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
             const result = await didRegistry.registerAttribute(did, checksum, providers, value)
 
-            testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
+            testUtils.assertEmitted(
+                result,
+                1,
+                'DIDAttributeRegistered'
+            )
 
             // get owner for a did
             const owner = await didRegistry.getDIDOwner(did)
@@ -66,20 +74,20 @@ contract('DIDRegistry', (accounts) => {
                 fromBlock: blockNumber,
                 toBlock: blockNumber,
                 filter: {
-                    did: did,
-                    owner: owner
+                    _did: did,
+                    _owner: owner
                 }
             }
-            didRegistry.getPastEvents(filterOptions, function(error, logItems) {
-                if (!error) {
-                    if (logItems.length > 0) {
-                        const logItem = logItems[logItems.length - 1]
-                        assert.strictEqual(did, logItem.returnValues._did)
-                        assert.strictEqual(owner, logItem.returnValues._owner)
-                        assert.strictEqual(value, logItem.returnValues._value)
-                    }
-                }
-            })
+
+            const logItems = await didRegistry.getPastEvents('DIDAttributeRegistered', filterOptions)
+
+            assert(logItems.length > 0)
+
+            const logItem = logItems[logItems.length - 1]
+
+            assert.strictEqual(did, logItem.returnValues._did)
+            assert.strictEqual(owner, logItem.returnValues._owner)
+            assert.strictEqual(value, logItem.returnValues._value)
         })
 
         it('Should not fail to register the same attribute twice', async () => {
@@ -87,12 +95,26 @@ contract('DIDRegistry', (accounts) => {
             const did = constants.did[0]
             const checksum = testUtils.generateId()
             const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
-            await didRegistry.registerAttribute(did, checksum, providers, value)
+            await didRegistry.registerAttribute(
+                did,
+                checksum,
+                providers,
+                value
+            )
 
             // try to register the same attribute the second time
-            const result = await didRegistry.registerAttribute(did, checksum, providers, value)
+            const result = await didRegistry.registerAttribute(
+                did,
+                checksum,
+                providers,
+                value
+            )
 
-            testUtils.assertEmitted(result, 1, 'DIDAttributeRegistered')
+            testUtils.assertEmitted(
+                result,
+                1,
+                'DIDAttributeRegistered'
+            )
         })
 
         it('Should only allow the owner to set an attribute', async () => {
@@ -291,6 +313,80 @@ contract('DIDRegistry', (accounts) => {
                 1
             )
             assert.strictEqual(updatedDIDRegister.providers[0], providers[0])
+        })
+
+        it('should not register a did provider address that has the same DIDRegistry address', async () => {
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+
+            await assert.isRejected(
+                didRegistry.registerAttribute(did, checksum, [didRegistry.address], value),
+                'DID provider should not be this contract address'
+            )
+        })
+    })
+
+    describe('transfer DID ownership', () => {
+        it('should DID owner transfer a DID ownership', async () => {
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const didOwner = accounts[2]
+            const newDIDOwner = accounts[3]
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            await didRegistry.registerAttribute(
+                did,
+                checksum,
+                providers,
+                value,
+                {
+                    from: didOwner
+                }
+            )
+
+            // act
+            await didRegistry.transferDIDOwnership(
+                did,
+                newDIDOwner,
+                {
+                    from: didOwner
+                }
+            )
+
+            // assert
+            assert.strictEqual(
+                await didRegistry.getDIDOwner(did),
+                newDIDOwner
+            )
+        })
+
+        it('should reject to transfer a DID ownership in case of invalid DID owner', async () => {
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const didOwner = accounts[2]
+            const newDIDOwner = accounts[3]
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            await didRegistry.registerAttribute(
+                did,
+                checksum,
+                providers,
+                value,
+                {
+                    from: didOwner
+                }
+            )
+
+            // act & assert
+            await assert.isRejected(
+                didRegistry.transferDIDOwnership(
+                    did,
+                    newDIDOwner
+                ),
+                'Invalid DID owner'
+            )
         })
     })
 })

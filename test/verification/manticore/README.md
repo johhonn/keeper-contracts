@@ -5,7 +5,7 @@
 - Pull manticore docker image as follows:
 
 ```bash
-$ docker pull oceanprotocol/manticore:solc-0.5.3
+$ docker pull oceanprotocol/manticore:solc-0.5.6
 ```
 
 Keep in mind that symbolic execution can have high requirements of memory and CPU: in particular, these tests will use up to 10 cores at the same time and a few GBs of memory. 

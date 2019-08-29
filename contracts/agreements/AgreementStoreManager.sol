@@ -1,4 +1,7 @@
-pragma solidity 0.5.3;
+pragma solidity 0.5.6;
+// Copyright BigchainDB GmbH and Ocean Protocol contributors
+// SPDX-License-Identifier: (Apache-2.0 AND CC-BY-4.0)
+// Code is Apache-2.0 and docs are CC-BY-4.0
 
 import './AgreementStoreLibrary.sol';
 import '../conditions/ConditionStoreManager.sol';
@@ -35,8 +38,8 @@ contract AgreementStoreManager is Ownable {
     DIDRegistry internal didRegistry;
 
     /**
-     * @dev AgreementStoreManager Initializer
-     *      Initialize Ownable. Only on contract creation.
+     * @dev initialize AgreementStoreManager Initializer
+     *      Initializes Ownable. Only on contract creation.
      * @param _owner refers to the owner of the contract
      * @param _conditionStoreManagerAddress is the address of the connected condition store
      * @param _templateStoreManagerAddress is the address of the connected template store
@@ -183,6 +186,13 @@ contract AgreementStoreManager is Ownable {
         return (_owner == didRegistry.getDIDOwner(did));
     }
 
+    /**
+     * @dev isAgreementDIDProvider for a given agreement Id 
+     * and address check whether a DID provider is associated with this agreement
+     * @param _id is the ID of the agreement
+     * @param _provider is the DID provider
+     * @return true if a DID provider is associated with the agreement ID
+     */
     function isAgreementDIDProvider(bytes32 _id, address _provider)
         external
         view
@@ -225,5 +235,18 @@ contract AgreementStoreManager is Ownable {
         returns (bytes32[] memory)
     {
         return agreementList.templateIdToAgreementIds[_templateId];
+    }
+    
+    /**
+     * @dev getDIDRegistryAddress utility function 
+     * used by other contracts or any EOA.
+     * @return the DIDRegistry address
+     */
+    function getDIDRegistryAddress()
+        public
+        view
+        returns(address)
+    {
+        return address(didRegistry);
     }
 }

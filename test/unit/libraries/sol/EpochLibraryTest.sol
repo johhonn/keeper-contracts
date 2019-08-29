@@ -1,4 +1,4 @@
-pragma solidity 0.5.3;
+pragma solidity 0.5.6;
 
 import '../../../../contracts/libraries/EpochLibrary.sol';
 
@@ -15,9 +15,6 @@ contract EpochLibraryTest{
     }
 
     function testBigNumberShouldNotFail() public {
-        require(
-            epochList.create(keccak256(abi.encodePacked(block.number)),0, maxBigNumberDoesNotFail) == 1,
-            'Indicating BigNumber!'
-        );
-    }
+      epochList.create(keccak256(abi.encodePacked(block.number)), 0, maxBigNumberDoesNotFail);
+    } 
 }

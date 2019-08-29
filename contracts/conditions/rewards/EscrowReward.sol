@@ -1,8 +1,24 @@
-pragma solidity 0.5.3;
+pragma solidity 0.5.6;
+// Copyright BigchainDB GmbH and Ocean Protocol contributors
+// SPDX-License-Identifier: (Apache-2.0 AND CC-BY-4.0)
+// Code is Apache-2.0 and docs are CC-BY-4.0
 
 import './Reward.sol';
 import '../ConditionStoreLibrary.sol';
 
+/**
+ * @title Escrow Reward
+ * @author Ocean Protocol Team
+ *
+ * @dev Implementation of the Escrow Reward.
+ *
+ *      The Escrow reward is reward condition in which only 
+ *      can release reward if lock and release conditions
+ *      are fulfilled.
+ *      For more information, please refer the following link: 
+ *      https://github.com/oceanprotocol/OEPs/issues/133
+ *      TODO: update the OEP link 
+ */
 contract EscrowReward is Reward {
 
     event Fulfilled(
@@ -12,6 +28,13 @@ contract EscrowReward is Reward {
         uint256 _amount
     );
 
+   /**
+    * @notice initialize init the 
+    *       contract with the following parameters
+    * @param _owner contract's owner account address
+    * @param _conditionStoreManagerAddress condition store manager address
+    * @param _tokenAddress Ocean token contract address
+    */
     function initialize(
         address _owner,
         address _conditionStoreManagerAddress,
@@ -32,6 +55,16 @@ contract EscrowReward is Reward {
         token = OceanToken(_tokenAddress);
     }
 
+   /**
+    * @notice hashValues generates the hash of condition inputs 
+    *        with the following parameters
+    * @param _amount token amount to be locked/released
+    * @param _receiver receiver's address
+    * @param _sender sender's address
+    * @param _lockCondition lock condition identifier
+    * @param _releaseCondition release condition identifier
+    * @return bytes32 hash of all these values 
+    */
     function hashValues(
         uint256 _amount,
         address _receiver,
@@ -53,6 +86,20 @@ contract EscrowReward is Reward {
         );
     }
 
+   /**
+    * @notice fulfill escrow reward condition
+    * @dev fulfill method checks whether the lock and 
+    *      release conditions are fulfilled in order to 
+    *      release/refund the reward to receiver/sender 
+    *      respectively.
+    * @param _agreementId agreement identifier
+    * @param _amount token amount to be locked/released
+    * @param _receiver receiver's address
+    * @param _sender sender's address
+    * @param _lockCondition lock condition identifier
+    * @param _releaseCondition release condition identifier
+    * @return condition state (Fulfilled/Aborted)
+    */
     function fulfill(
         bytes32 _agreementId,
         uint256 _amount,
@@ -132,6 +179,14 @@ contract EscrowReward is Reward {
         return state;
     }
 
+    /**
+    * @notice _transferAndFulfill transfer tokens and 
+    *       fulfill the condition
+    * @param _id condition identifier
+    * @param _receiver receiver's address
+    * @param _amount token amount to be locked/released
+    * @return condition state (Fulfilled/Aborted)
+    */
     function _transferAndFulfill(
         bytes32 _id,
         address _receiver,
