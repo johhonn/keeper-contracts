@@ -141,7 +141,7 @@ contract ServiceExecutorCondition is Condition {
     * @param _serviceConsumer is the service consumer's address
     * @return true if the service is triggered 
     */
-    function isTriggeredService(
+    function wasServiceTriggered(
         bytes32 _did,
         address _serviceConsumer
     )

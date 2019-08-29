@@ -242,7 +242,7 @@ contract('ServiceExecutorCondition constructor', (accounts) => {
             )
         })
     })
-    describe('isTriggeredService', () => {
+    describe('wasServiceTriggered', () => {
         it('should return true if service was triggered', async () => {
             const {
                 did,
@@ -281,7 +281,7 @@ contract('ServiceExecutorCondition constructor', (accounts) => {
             await serviceExecutorCondition.fulfill(agreementId, did, serviceConsumer)
 
             assert.strictEqual(
-                await serviceExecutorCondition.isTriggeredService(
+                await serviceExecutorCondition.wasServiceTriggered(
                     did,
                     serviceConsumer
                 ),
@@ -297,7 +297,7 @@ contract('ServiceExecutorCondition constructor', (accounts) => {
 
             const serviceConsumer = accounts[1]
 
-            expect(await serviceExecutorCondition.isTriggeredService(did, serviceConsumer))
+            expect(await serviceExecutorCondition.wasServiceTriggered(did, serviceConsumer))
                 .to.equal(false)
         })
     })
