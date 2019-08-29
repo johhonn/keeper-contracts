@@ -12,11 +12,11 @@ const ConditionStoreManager = artifacts.require('ConditionStoreManager')
 const AgreementStoreManager = artifacts.require('AgreementStoreManager')
 const DIDRegistry = artifacts.require('DIDRegistry')
 const DIDRegistryLibrary = artifacts.require('DIDRegistryLibrary')
-const ServiceExecutorCondition = artifacts.require('ServiceExecutorCondition')
+const ComputeExecutionCondition = artifacts.require('ComputeExecutionCondition')
 const constants = require('../../helpers/constants.js')
 const testUtils = require('../../helpers/utils.js')
 
-contract('ServiceExecutorCondition constructor', (accounts) => {
+contract('ComputeExecutionCondition constructor', (accounts) => {
     let didRegistry,
         agreementStoreManager,
         conditionStoreManager,
@@ -44,9 +44,9 @@ contract('ServiceExecutorCondition constructor', (accounts) => {
             owner
         ))
 
-        const serviceExecutorCondition = await ServiceExecutorCondition.new()
+        const computeExecutionCondition = await ComputeExecutionCondition.new()
 
-        await serviceExecutorCondition.methods['initialize(address,address,address)'](
+        await computeExecutionCondition.methods['initialize(address,address,address)'](
             accounts[0],
             conditionStoreManager.address,
             agreementStoreManager.address,
@@ -67,7 +67,7 @@ contract('ServiceExecutorCondition constructor', (accounts) => {
             agreementStoreManager,
             conditionStoreManager,
             templateStoreManager,
-            serviceExecutorCondition
+            computeExecutionCondition
         }
     }
 
@@ -83,9 +83,9 @@ contract('ServiceExecutorCondition constructor', (accounts) => {
             await DIDRegistry.link('DIDRegistryLibrary', didRegistryLibrary.address)
             const didRegistry = await DIDRegistry.new()
             await didRegistry.initialize(accounts[0])
-            const serviceExecutorCondition = await ServiceExecutorCondition.new()
+            const computeExecutionCondition = await ComputeExecutionCondition.new()
 
-            await serviceExecutorCondition.methods['initialize(address,address,address)'](
+            await computeExecutionCondition.methods['initialize(address,address,address)'](
                 accounts[0],
                 conditionStoreManager.address,
                 agreementStoreManager.address,
@@ -97,15 +97,15 @@ contract('ServiceExecutorCondition constructor', (accounts) => {
     describe('fulfill non existing condition', () => {
         it('should not fulfill if condition does not exist', async () => {
             const {
-                serviceExecutorCondition
+                computeExecutionCondition
             } = await setupTest({ accounts: accounts })
 
             const agreementId = constants.bytes32.one
             const did = constants.bytes32.one
-            const serviceConsumer = accounts[1]
+            const computeConsumer = accounts[1]
 
             await assert.isRejected(
-                serviceExecutorCondition.fulfill(agreementId, did, serviceConsumer),
+                computeExecutionCondition.fulfill(agreementId, did, computeConsumer),
                 'Invalid DID owner/provider'
             )
         })
@@ -118,23 +118,23 @@ contract('ServiceExecutorCondition constructor', (accounts) => {
                 agreementStoreManager,
                 conditionStoreManager,
                 templateStoreManager,
-                serviceExecutorCondition
+                computeExecutionCondition
 
             } = await setupTest({ accounts: accounts, registerDID: true })
 
             const agreementId = constants.bytes32.one
-            const serviceConsumer = accounts[1]
+            const computeConsumer = accounts[1]
 
             const templateId = accounts[2]
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId)
 
-            const hashValues = await serviceExecutorCondition.hashValues(did, serviceConsumer)
-            const conditionId = await serviceExecutorCondition.generateId(agreementId, hashValues)
+            const hashValues = await computeExecutionCondition.hashValues(did, computeConsumer)
+            const conditionId = await computeExecutionCondition.generateId(agreementId, hashValues)
 
             const agreement = {
                 did: constants.did[0],
-                conditionTypes: [serviceExecutorCondition.address],
+                conditionTypes: [computeExecutionCondition.address],
                 conditionIds: [conditionId],
                 timeLocks: [0],
                 timeOuts: [2]
@@ -146,7 +146,7 @@ contract('ServiceExecutorCondition constructor', (accounts) => {
                 { from: templateId }
             )
 
-            const result = await serviceExecutorCondition.fulfill(agreementId, did, serviceConsumer)
+            const result = await computeExecutionCondition.fulfill(agreementId, did, computeConsumer)
 
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(conditionId)).toNumber(),
@@ -157,7 +157,7 @@ contract('ServiceExecutorCondition constructor', (accounts) => {
             expect(eventArgs._agreementId).to.equal(agreementId)
             expect(eventArgs._conditionId).to.equal(conditionId)
             expect(eventArgs._did).to.equal(did)
-            expect(eventArgs._serviceConsumer).to.equal(serviceConsumer)
+            expect(eventArgs._computeConsumer).to.equal(computeConsumer)
         })
     })
 
@@ -167,23 +167,23 @@ contract('ServiceExecutorCondition constructor', (accounts) => {
                 did,
                 agreementStoreManager,
                 templateStoreManager,
-                serviceExecutorCondition
+                computeExecutionCondition
 
             } = await setupTest({ accounts: accounts, registerDID: true })
 
             const agreementId = constants.bytes32.one
-            const serviceConsumer = accounts[1]
+            const computeConsumer = accounts[1]
 
             const templateId = accounts[2]
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId)
 
-            const hashValues = await serviceExecutorCondition.hashValues(did, serviceConsumer)
-            const conditionId = await serviceExecutorCondition.generateId(agreementId, hashValues)
+            const hashValues = await computeExecutionCondition.hashValues(did, computeConsumer)
+            const conditionId = await computeExecutionCondition.generateId(agreementId, hashValues)
 
             const agreement = {
                 did: constants.did[0],
-                conditionTypes: [serviceExecutorCondition.address],
+                conditionTypes: [computeExecutionCondition.address],
                 conditionIds: [conditionId],
                 timeLocks: [0],
                 timeOuts: [2]
@@ -196,7 +196,7 @@ contract('ServiceExecutorCondition constructor', (accounts) => {
             )
 
             await assert.isRejected(
-                serviceExecutorCondition.fulfill(agreementId, did, serviceConsumer, { from: accounts[1] }),
+                computeExecutionCondition.fulfill(agreementId, did, computeConsumer, { from: accounts[1] }),
                 'Invalid DID owner/provider'
             )
         })
@@ -206,23 +206,23 @@ contract('ServiceExecutorCondition constructor', (accounts) => {
                 did,
                 agreementStoreManager,
                 templateStoreManager,
-                serviceExecutorCondition
+                computeExecutionCondition
 
             } = await setupTest({ accounts: accounts, registerDID: true })
 
             const agreementId = constants.bytes32.one
-            const serviceConsumer = accounts[1]
+            const computeConsumer = accounts[1]
 
             const templateId = accounts[2]
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId)
 
-            const hashValues = await serviceExecutorCondition.hashValues(did, serviceConsumer)
-            const conditionId = await serviceExecutorCondition.generateId(agreementId, hashValues)
+            const hashValues = await computeExecutionCondition.hashValues(did, computeConsumer)
+            const conditionId = await computeExecutionCondition.generateId(agreementId, hashValues)
 
             const agreement = {
                 did: constants.did[0],
-                conditionTypes: [serviceExecutorCondition.address],
+                conditionTypes: [computeExecutionCondition.address],
                 conditionIds: [conditionId],
                 timeLocks: [0],
                 timeOuts: [2]
@@ -234,26 +234,26 @@ contract('ServiceExecutorCondition constructor', (accounts) => {
                 { from: templateId }
             )
 
-            await serviceExecutorCondition.fulfill(agreementId, did, serviceConsumer)
+            await computeExecutionCondition.fulfill(agreementId, did, computeConsumer)
 
             await assert.isRejected(
-                serviceExecutorCondition.fulfill(agreementId, did, serviceConsumer),
+                computeExecutionCondition.fulfill(agreementId, did, computeConsumer),
                 constants.condition.state.error.invalidStateTransition
             )
         })
     })
-    describe('wasServiceTriggered', () => {
-        it('should return true if service was triggered', async () => {
+    describe('wasComputeTriggered', () => {
+        it('should return true if compute was triggered', async () => {
             const {
                 did,
                 agreementStoreManager,
                 templateStoreManager,
-                serviceExecutorCondition
+                computeExecutionCondition
 
             } = await setupTest({ accounts: accounts, registerDID: true })
 
             const agreementId = constants.bytes32.one
-            const serviceConsumer = accounts[1]
+            const computeConsumer = accounts[1]
             const timeLock = 0
             const timeOut = 234898098
 
@@ -261,12 +261,12 @@ contract('ServiceExecutorCondition constructor', (accounts) => {
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId)
 
-            const hashValues = await serviceExecutorCondition.hashValues(did, serviceConsumer)
-            const conditionId = await serviceExecutorCondition.generateId(agreementId, hashValues)
+            const hashValues = await computeExecutionCondition.hashValues(did, computeConsumer)
+            const conditionId = await computeExecutionCondition.generateId(agreementId, hashValues)
 
             const agreement = {
                 did: constants.did[0],
-                conditionTypes: [serviceExecutorCondition.address],
+                conditionTypes: [computeExecutionCondition.address],
                 conditionIds: [conditionId],
                 timeLocks: [timeLock],
                 timeOuts: [timeOut]
@@ -278,26 +278,26 @@ contract('ServiceExecutorCondition constructor', (accounts) => {
                 { from: templateId }
             )
 
-            await serviceExecutorCondition.fulfill(agreementId, did, serviceConsumer)
+            await computeExecutionCondition.fulfill(agreementId, did, computeConsumer)
 
             assert.strictEqual(
-                await serviceExecutorCondition.wasServiceTriggered(
+                await computeExecutionCondition.wasComputeTriggered(
                     did,
-                    serviceConsumer
+                    computeConsumer
                 ),
                 true
             )
         })
-        it('successful return false if service was not triggered', async () => {
+        it('successful return false if compute was not triggered', async () => {
             const {
                 did,
-                serviceExecutorCondition
+                computeExecutionCondition
 
             } = await setupTest({ accounts: accounts, registerDID: true })
 
-            const serviceConsumer = accounts[1]
+            const computeConsumer = accounts[1]
 
-            expect(await serviceExecutorCondition.wasServiceTriggered(did, serviceConsumer))
+            expect(await computeExecutionCondition.wasComputeTriggered(did, computeConsumer))
                 .to.equal(false)
         })
     })
