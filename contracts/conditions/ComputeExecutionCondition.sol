@@ -9,27 +9,27 @@ import '../registry/DIDRegistry.sol';
 import '../agreements/AgreementStoreManager.sol';
 
 /**
- * @title Service Executor Condition
+ * @title Compute Execution Condition
  * @author Ocean Protocol Team
  *
- * @dev Implementation of the Service Executor Condition
+ * @dev Implementation of the Compute Execution Condition
  *      This condition is meant to be a signal in which triggers
- *      the execution of a service. The service is fully described
- *      in the associated DID document. The provider of a service will
+ *      the execution of a compute service. The compute service is fully described
+ *      in the associated DID document. The provider of the compute service will
  *      send this signal to its workers by fulfilling the condition where
  *      they are listening to the fulfilled event.
  */
-contract ServiceExecutorCondition is Condition {
+contract ComputeExecutionCondition is Condition {
 
-    // DID --> Service Consumer address --> triggered service  ?
-    mapping(bytes32 => mapping(address => bool)) private servicesStatus;
+    // DID --> Compute Consumer address --> triggered compute  ?
+    mapping(bytes32 => mapping(address => bool)) private computeExecutionStatus;
     
     AgreementStoreManager private agreementStoreManager;
     
     event Fulfilled(
         bytes32 indexed _agreementId,
         bytes32 indexed _did,
-        address indexed _serviceConsumer,
+        address indexed _computeConsumer,
         bytes32 _conditionId
     );
     
@@ -80,35 +80,35 @@ contract ServiceExecutorCondition is Condition {
    /**
     * @notice hashValues generates the hash of condition inputs 
     *        with the following parameters
-    * @param _did Decentralized Identifier (unique service/asset resolver) describes the service
-    * @param _serviceConsumer is the consumer's address 
+    * @param _did Decentralized Identifier (unique compute/asset resolver) describes the compute service
+    * @param _computeConsumer is the consumer's address 
     * @return bytes32 hash of all these values 
     */
     function hashValues(
         bytes32 _did,
-        address _serviceConsumer
+        address _computeConsumer
     )
         public
         pure
         returns (bytes32)
     {
-        return keccak256(abi.encodePacked(_did, _serviceConsumer));
+        return keccak256(abi.encodePacked(_did, _computeConsumer));
     }
 
    /**
-    * @notice fulfill service executor condition
-    * @dev only the service provider can fulfill this condition. By fulfilling this 
-    * condition the service provider will trigger the execution of 
-    * the offered job/service. The service is described in a DID document.
+    * @notice fulfill compute execution condition
+    * @dev only the compute provider can fulfill this condition. By fulfilling this 
+    * condition the compute provider will trigger the execution of 
+    * the offered job/compute. The compute service is described in a DID document.
     * @param _agreementId agreement identifier
-    * @param _did Decentralized Identifier (unique service/asset resolver) describes the service
-    * @param _serviceConsumer is the consumer's address 
+    * @param _did Decentralized Identifier (unique compute/asset resolver) describes the compute service
+    * @param _computeConsumer is the consumer's address 
     * @return condition state (Fulfilled/Aborted)
     */
     function fulfill(
         bytes32 _agreementId,
         bytes32 _did,
-        address _serviceConsumer
+        address _computeConsumer
     )
         public
         onlyDIDOwnerOrProvider(_did)
@@ -116,7 +116,7 @@ contract ServiceExecutorCondition is Condition {
     {   
         bytes32 _id = generateId(
             _agreementId,
-            hashValues(_did, _serviceConsumer)
+            hashValues(_did, _computeConsumer)
         );
 
         ConditionStoreLibrary.ConditionState state = super.fulfill(
@@ -124,31 +124,31 @@ contract ServiceExecutorCondition is Condition {
             ConditionStoreLibrary.ConditionState.Fulfilled
         );
         
-        servicesStatus[_did][_serviceConsumer] = true;
+        computeExecutionStatus[_did][_computeConsumer] = true;
         
         emit Fulfilled(
             _agreementId,
             _did,
-            _serviceConsumer,
+            _computeConsumer,
             _id
         );
         return state;
     }
     
     /**
-    * @notice isTriggeredService checks whether the service is triggered or not.
-    * @param _did Decentralized Identifier (unique service/asset resolver) describes the service
-    * @param _serviceConsumer is the service consumer's address
-    * @return true if the service is triggered 
+    * @notice wasComputeTriggered checks whether the compute is triggered or not.
+    * @param _did Decentralized Identifier (unique compute/asset resolver) describes the compute service
+    * @param _computeConsumer is the compute consumer's address
+    * @return true if the compute is triggered 
     */
-    function wasServiceTriggered(
+    function wasComputeTriggered(
         bytes32 _did,
-        address _serviceConsumer
+        address _computeConsumer
     )
         public
         view
         returns (bool)
     {
-        return servicesStatus[_did][_serviceConsumer];
+        return computeExecutionStatus[_did][_computeConsumer];
     }
 }
