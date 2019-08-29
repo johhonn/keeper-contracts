@@ -7,7 +7,7 @@ import './BaseEscrowTemplate.sol';
 import '../registry/DIDRegistry.sol';
 import '../conditions/LockRewardCondition.sol';
 import '../conditions/rewards/EscrowReward.sol';
-import '../conditions/ServiceExecutorCondition.sol';
+import '../conditions/ComputeExecutionCondition.sol';
 
 /**
  * @title Service Execution Template
@@ -16,10 +16,10 @@ import '../conditions/ServiceExecutorCondition.sol';
  * @dev Implementation of Service Execution Template
  */
  
-contract EscrowServiceExecutionTemplate is BaseEscrowTemplate {
+contract EscrowComputeExecutionTemplate is BaseEscrowTemplate {
 
     DIDRegistry internal didRegistry;
-    ServiceExecutorCondition internal serviceExecutorCondition;
+    ComputeExecutionCondition internal computeExecutionCondition;
     LockRewardCondition internal lockRewardCondition;
     EscrowReward internal escrowReward;
 
@@ -33,7 +33,7 @@ contract EscrowServiceExecutionTemplate is BaseEscrowTemplate {
     * @param _owner contract's owner account address
     * @param _agreementStoreManagerAddress agreement store manager contract address
     * @param _didRegistryAddress DID registry contract address
-    * @param _serviceExecutorConditionAddress service executor condition contract address
+    * @param _computeExecutionConditionAddress service executor condition contract address
     * @param _lockRewardConditionAddress lock reward condition contract address
     * @param _escrowRewardAddress escrow reward contract address
     */
@@ -41,7 +41,7 @@ contract EscrowServiceExecutionTemplate is BaseEscrowTemplate {
         address _owner,
         address _agreementStoreManagerAddress,
         address _didRegistryAddress,
-        address _serviceExecutorConditionAddress,
+        address _computeExecutionConditionAddress,
         address _lockRewardConditionAddress,
         address _escrowRewardAddress
     )
@@ -52,7 +52,7 @@ contract EscrowServiceExecutionTemplate is BaseEscrowTemplate {
             _owner != address(0) &&
             _agreementStoreManagerAddress != address(0) &&
             _didRegistryAddress != address(0) &&
-            _serviceExecutorConditionAddress != address(0) &&
+            _computeExecutionConditionAddress != address(0) &&
             _lockRewardConditionAddress != address(0) &&
             _escrowRewardAddress != address(0),
             'Invalid address'
@@ -68,8 +68,8 @@ contract EscrowServiceExecutionTemplate is BaseEscrowTemplate {
             _didRegistryAddress
         );
 
-        serviceExecutorCondition = ServiceExecutorCondition(
-            _serviceExecutorConditionAddress
+        computeExecutionCondition = ComputeExecutionCondition(
+            _computeExecutionConditionAddress
         );
 
         lockRewardCondition = LockRewardCondition(
@@ -80,7 +80,7 @@ contract EscrowServiceExecutionTemplate is BaseEscrowTemplate {
             _escrowRewardAddress
         );
 
-        conditionTypes.push(address(serviceExecutorCondition));
+        conditionTypes.push(address(computeExecutionCondition));
         conditionTypes.push(address(lockRewardCondition));
         conditionTypes.push(address(escrowReward));
     }

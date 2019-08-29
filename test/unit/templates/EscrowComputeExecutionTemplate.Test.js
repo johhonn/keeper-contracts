@@ -7,13 +7,13 @@ const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
-const EscrowServiceExecutionTemplate = artifacts.require('EscrowServiceExecutionTemplate')
+const EscrowComputeExecutionTemplate = artifacts.require('EscrowComputeExecutionTemplate')
 
 const constants = require('../../helpers/constants.js')
 const deployManagers = require('../../helpers/deployManagers.js')
 const testUtils = require('../../helpers/utils')
 
-contract('EscrowServiceExecutionTemplate', (accounts) => {
+contract('EscrowComputeExecutionTemplate', (accounts) => {
     async function setupTest({
         deployer = accounts[8],
         owner = accounts[9]
@@ -27,8 +27,8 @@ contract('EscrowServiceExecutionTemplate', (accounts) => {
         } = await deployManagers(deployer, owner)
 
         const contractType = templateStoreManager.address
-        const escrowServiceExecutionTemplate = await EscrowServiceExecutionTemplate.new({ from: deployer })
-        await escrowServiceExecutionTemplate.methods['initialize(address,address,address,address,address,address)'](
+        const escrowComputeExecutionTemplate = await EscrowComputeExecutionTemplate.new({ from: deployer })
+        await escrowComputeExecutionTemplate.methods['initialize(address,address,address,address,address,address)'](
             owner,
             agreementStoreManager.address,
             didRegistry.address,
@@ -44,7 +44,7 @@ contract('EscrowServiceExecutionTemplate', (accounts) => {
             agreementStoreManager,
             conditionStoreManager,
             templateStoreManager,
-            escrowServiceExecutionTemplate,
+            escrowComputeExecutionTemplate,
             deployer,
             owner
         }
@@ -85,33 +85,33 @@ contract('EscrowServiceExecutionTemplate', (accounts) => {
                 agreementStoreManager,
                 conditionStoreManager,
                 templateStoreManager,
-                escrowServiceExecutionTemplate,
+                escrowComputeExecutionTemplate,
                 owner
             } = await setupTest()
 
             const { agreementId, agreement } = await prepareAgreement()
 
             await assert.isRejected(
-                escrowServiceExecutionTemplate.createAgreement(agreementId, ...Object.values(agreement)),
+                escrowComputeExecutionTemplate.createAgreement(agreementId, ...Object.values(agreement)),
                 constants.template.error.templateNotApproved
             )
 
             // propose and approve template
-            const templateId = escrowServiceExecutionTemplate.address
+            const templateId = escrowComputeExecutionTemplate.address
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId, { from: owner })
 
             await assert.isRejected(
-                escrowServiceExecutionTemplate.createAgreement(agreementId, ...Object.values(agreement)),
+                escrowComputeExecutionTemplate.createAgreement(agreementId, ...Object.values(agreement)),
                 constants.registry.error.didNotRegistered
             )
 
             // register DID
             await didRegistry.registerAttribute(agreement.did, constants.bytes32.one, [], constants.registry.url)
 
-            await escrowServiceExecutionTemplate.createAgreement(agreementId, ...Object.values(agreement))
+            await escrowComputeExecutionTemplate.createAgreement(agreementId, ...Object.values(agreement))
 
-            const storedAgreementData = await escrowServiceExecutionTemplate.getAgreementData(agreementId)
+            const storedAgreementData = await escrowComputeExecutionTemplate.getAgreementData(agreementId)
             assert.strictEqual(storedAgreementData.accessConsumer, agreement.accessConsumer)
             assert.strictEqual(storedAgreementData.accessProvider, accounts[0])
 
@@ -122,7 +122,7 @@ contract('EscrowServiceExecutionTemplate', (accounts) => {
                 .to.equal(templateId)
 
             let i = 0
-            const conditionTypes = await escrowServiceExecutionTemplate.getConditionTypes()
+            const conditionTypes = await escrowComputeExecutionTemplate.getConditionTypes()
             for (const conditionId of agreement.conditionIds) {
                 const storedCondition = await conditionStoreManager.getCondition(conditionId)
                 expect(storedCondition.typeRef).to.equal(conditionTypes[i])
@@ -140,7 +140,7 @@ contract('EscrowServiceExecutionTemplate', (accounts) => {
                 didRegistry,
                 agreementStoreManager,
                 templateStoreManager,
-                escrowServiceExecutionTemplate,
+                escrowComputeExecutionTemplate,
                 owner
             } = await setupTest()
 
@@ -150,11 +150,11 @@ contract('EscrowServiceExecutionTemplate', (accounts) => {
             await didRegistry.registerAttribute(agreement.did, constants.bytes32.one, [], constants.registry.url)
 
             // propose and approve template
-            const templateId = escrowServiceExecutionTemplate.address
+            const templateId = escrowComputeExecutionTemplate.address
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId, { from: owner })
 
-            const result = await escrowServiceExecutionTemplate.createAgreement(agreementId, ...Object.values(agreement))
+            const result = await escrowComputeExecutionTemplate.createAgreement(agreementId, ...Object.values(agreement))
 
             testUtils.assertEmitted(result, 1, 'AgreementCreated')
 
@@ -175,7 +175,7 @@ contract('EscrowServiceExecutionTemplate', (accounts) => {
             const {
                 didRegistry,
                 templateStoreManager,
-                escrowServiceExecutionTemplate,
+                escrowComputeExecutionTemplate,
                 owner
             } = await setupTest()
 
@@ -186,11 +186,11 @@ contract('EscrowServiceExecutionTemplate', (accounts) => {
                 agreement.did, constants.bytes32.one, [accounts[2]], constants.registry.url)
 
             // propose and approve template
-            const templateId = escrowServiceExecutionTemplate.address
+            const templateId = escrowComputeExecutionTemplate.address
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId, { from: owner })
 
-            const result = await escrowServiceExecutionTemplate
+            const result = await escrowComputeExecutionTemplate
                 .createAgreement(agreementId, ...Object.values(agreement))
 
             testUtils.assertEmitted(result, 1, 'AgreementCreated')
@@ -201,7 +201,7 @@ contract('EscrowServiceExecutionTemplate', (accounts) => {
             expect(eventArgs._accessProvider).to.equal(accounts[2])
             expect(eventArgs._accessConsumer).to.equal(agreement.accessConsumer)
 
-            const storedAgreementData = await escrowServiceExecutionTemplate.getAgreementData(agreementId)
+            const storedAgreementData = await escrowComputeExecutionTemplate.getAgreementData(agreementId)
             assert.strictEqual(storedAgreementData.accessProvider, accounts[2])
         })
     })
