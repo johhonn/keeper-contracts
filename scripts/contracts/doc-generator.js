@@ -29,7 +29,7 @@ const contracts = [
     'HashLists',
     'ThresholdCondition',
     'ComputeExecutionCondition',
-    'EscrowComputeExecutionCondition'
+    'EscrowComputeExecutionTemplate'
 ]
 
 contracts.forEach((contractName) => {

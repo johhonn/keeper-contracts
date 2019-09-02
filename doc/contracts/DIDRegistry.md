@@ -128,6 +128,46 @@ Parameters:
 * bytes32 _did
 * address _newOwner
 
+### external grantPermission
+
+Documentation:
+
+```
+@dev grantPermission grants access permission to grantee 
+@param _did refers to decentralized identifier (a bytes32 length ID)
+@param _grantee address 
+```
+Parameters:
+* bytes32 _did
+* address _grantee
+
+### external revokePermission
+
+Documentation:
+
+```
+@dev revokePermission revokes access permission from grantee 
+@param _did refers to decentralized identifier (a bytes32 length ID)
+@param _grantee address 
+```
+Parameters:
+* bytes32 _did
+* address _grantee
+
+### external getPermission
+
+Documentation:
+
+```
+@dev getPermission gets access permission of a grantee
+@param _did refers to decentralized identifier (a bytes32 length ID)
+@param _grantee address
+@return true if grantee has access permission to a DID
+```
+Parameters:
+* bytes32 _did
+* address _grantee
+
 ### public isDIDProvider
 
 Documentation:
