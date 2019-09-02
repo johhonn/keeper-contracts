@@ -4,6 +4,7 @@ const EscrowReward = artifacts.require('EscrowReward')
 const HashLockCondition = artifacts.require('HashLockCondition')
 const LockRewardCondition = artifacts.require('LockRewardCondition')
 const SignCondition = artifacts.require('SignCondition')
+const ComputeExecutionCondition = artifacts.require('ComputeExecutionCondition')
 
 const deployConditions = async function(
     deployer,
@@ -51,11 +52,20 @@ const deployConditions = async function(
         { from: deployer }
     )
 
+    const computeExecutionCondition = await ComputeExecutionCondition.new({ from: deployer })
+    await computeExecutionCondition.methods['initialize(address,address,address)'](
+        owner,
+        conditionStoreManager.address,
+        agreementStoreManager.address,
+        { from: deployer }
+    )
+
     return {
         accessSecretStoreCondition,
         escrowReward,
         lockRewardCondition,
-        signCondition
+        signCondition,
+        computeExecutionCondition
     }
 }
 
