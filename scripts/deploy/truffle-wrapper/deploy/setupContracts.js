@@ -55,7 +55,7 @@ async function setupContracts({
             )
         }
 
-        if(addressBook.EscrowComputeExecutionTemplate) {
+        if (addressBook.EscrowComputeExecutionTemplate) {
             if (verbose) {
                 console.log(
                     `Proposing template ${addressBook.EscrowComputeExecutionTemplate} from ${roles.deployer}`

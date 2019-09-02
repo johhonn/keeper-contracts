@@ -27,7 +27,9 @@ const contracts = [
     'HashListLibrary',
     'WhitelistingCondition',
     'HashLists',
-    'ThresholdCondition'
+    'ThresholdCondition',
+    'ComputeExecutionCondition',
+    'EscrowComputeExecutionCondition'
 ]
 
 contracts.forEach((contractName) => {
