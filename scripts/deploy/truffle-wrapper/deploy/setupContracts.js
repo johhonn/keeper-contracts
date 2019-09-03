@@ -1,5 +1,24 @@
 /* eslint-disable no-console */
 
+async function approveTemplate({
+    TemplateStoreManagerInstance,
+    roles,
+    templateAddress
+} = {}) {
+    if (await TemplateStoreManagerInstance.isOwner({ from: roles.deployer })) {
+        await TemplateStoreManagerInstance.approveTemplate(
+            templateAddress,
+            { from: roles.deployer }
+        )
+    } else {
+        // todo: make call to multi sig wallet here instead of warning!
+        console.log('=====================================================================================')
+        console.log(`WARNING: Template ${templateAddress} could not be approved!`)
+        console.log('The deployer is not anymore the owner of the TemplateStoreManager ')
+        console.log('=====================================================================================')
+    }
+}
+
 async function setupContracts({
     web3,
     artifacts,
@@ -49,10 +68,11 @@ async function setupContracts({
                 )
             }
 
-            await TemplateStoreManagerInstance.approveTemplate(
-                addressBook.EscrowAccessSecretStoreTemplate,
-                { from: roles.deployer }
-            )
+            await approveTemplate({
+                TemplateStoreManagerInstance,
+                roles,
+                templateAddress: addressBook.EscrowAccessSecretStoreTemplate
+            })
         }
 
         if (addressBook.EscrowComputeExecutionTemplate) {
@@ -73,10 +93,11 @@ async function setupContracts({
                 )
             }
 
-            await TemplateStoreManagerInstance.approveTemplate(
-                addressBook.EscrowComputeExecutionTemplate,
-                { from: roles.deployer }
-            )
+            await approveTemplate({
+                TemplateStoreManagerInstance,
+                roles,
+                templateAddress: addressBook.EscrowComputeExecutionTemplate
+            })
         }
 
         if (verbose) {
