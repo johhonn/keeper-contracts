@@ -11,5 +11,7 @@
   "OceanToken",
   "DIDRegistry",
   "ThresholdCondition",
-  "WhitelistingCondition"
+  "WhitelistingCondition",
+  "ComputeExecutionCondition",
+  "EscrowComputeExecutionTemplate"
 ]

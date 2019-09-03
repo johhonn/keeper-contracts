@@ -107,6 +107,16 @@ Parameters:
 * address _owner
 
 ### external isAgreementDIDProvider
+
+Documentation:
+
+```
+@dev isAgreementDIDProvider for a given agreement Id 
+and address check whether a DID provider is associated with this agreement
+@param _id is the ID of the agreement
+@param _provider is the DID provider
+@return true if a DID provider is associated with the agreement ID
+```
 Parameters:
 * bytes32 _id
 * address _provider
