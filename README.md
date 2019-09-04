@@ -121,12 +121,14 @@ The contract addresses deployed on Ocean's Duero Test Network:
 |-----------------------------------|---------|----------------------------------------------|
 | AccessSecretStoreCondition        | v0.11.1 | `0x38e26f97AcCc0f6f0bA70b6304d89781449BAc11` |
 | AgreementStoreManager             | v0.11.1 | `0x10f763D50600462F7253dc721dC895754b3Aee26` |
+| ComputeExecutionCondition         | v0.12.0 | `0x69Cf2ae0148140E0d9Fa0AdC6bA7Fd10989Fe940` |
 | ConditionStoreManager             | v0.11.1 | `0x10083113a47E6689D5C526D9e814bA42752BE09c` |
 | DIDRegistry                       | v0.11.1 | `0xb1eA341724Fdcd53CA39d7DE3264bB89E6120BE4` |
 | DIDRegistryLibrary                | v0.11.1 | `0xcb7D122Af3C861a87C9fBb17F1B52b7C501c1062` |
 | Dispenser                         | v0.11.1 | `0xe76548A5b24AF890093A4C8423D542bcA1752CB8` |
 | EpochLibrary                      | v0.11.1 | `0x2B4d53BE84964983932dD6167155052201892c0A` |
 | EscrowAccessSecretStoreTemplate   | v0.11.1 | `0xBd7e5fFf4Eb8d67111227C9541080a74c634d643` |
+| EscrowComputeExecutionTemplate    | v0.12.0 | `0xe509CE38a1A58195D0257c70DeD536253A4039Fc` |
 | EscrowReward                      | v0.11.1 | `0xEb30f990F8F3a784F9eD3A594021D3764af00469` |
 | HashLockCondition                 | v0.11.1 | `0x4939063413A7a9B79d5437de73ed6d9996F92629` |
 | LockRewardCondition               | v0.11.1 | `0x53F89846832a793bF988B604b2489f74E6D22648` |
