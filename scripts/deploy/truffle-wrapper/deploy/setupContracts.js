@@ -19,6 +19,31 @@ async function approveTemplate({
     }
 }
 
+async function transferOwnership({
+    ContractInstance,
+    name,
+    roles,
+    verbose
+} = {}) {
+    if (verbose) {
+        console.log(
+            `Transferring ownership of ${name} from ${roles.deployer} to ${roles.ownerWallet}`
+        )
+    }
+
+    if (await ContractInstance.isOwner({ from: roles.deployer })) {
+        await ContractInstance.transferOwnership(
+            roles.ownerWallet,
+            { from: roles.deployer }
+        )
+    } else {
+        console.log('=====================================================================================')
+        console.log('WARNING: Ownership was not transferred!')
+        console.log(`The deployer is not anymore the owner of the ${name} `)
+        console.log('=====================================================================================')
+    }
+}
+
 async function setupContracts({
     web3,
     artifacts,
@@ -100,16 +125,12 @@ async function setupContracts({
             })
         }
 
-        if (verbose) {
-            console.log(
-                `TemplateStoreManager transferring ownership from ${roles.deployer} to ${roles.ownerWallet}`
-            )
-        }
-
-        await TemplateStoreManagerInstance.transferOwnership(
-            roles.ownerWallet,
-            { from: roles.deployer }
-        )
+        await transferOwnership({
+            ContractInstance: TemplateStoreManagerInstance,
+            name: TemplateStoreManager.contractName,
+            roles,
+            verbose
+        })
     }
 
     if (addressBook.ConditionStoreManager) {
@@ -130,16 +151,12 @@ async function setupContracts({
             )
         }
 
-        if (verbose) {
-            console.log(
-                `ConditionStoreManager transferring ownership from ${roles.deployer} to ${roles.ownerWallet}`
-            )
-        }
-
-        await ConditionStoreManagerInstance.transferOwnership(
-            roles.ownerWallet,
-            { from: roles.deployer }
-        )
+        await transferOwnership({
+            ContractInstance: ConditionStoreManagerInstance,
+            name: ConditionStoreManager.contractName,
+            roles,
+            verbose
+        })
     }
 
     if (addressBook.OceanToken) {
