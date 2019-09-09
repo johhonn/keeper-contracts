@@ -24,18 +24,52 @@ library TemplateStoreLibrary {
         Revoked
     }
 
-    struct Template {
+    // deprecated template definition
+    struct TemplateDeprecated {
         TemplateState state;
         address owner;
         address lastUpdatedBy;
         uint256 blockNumberUpdated;
     }
 
-    struct TemplateList {
-        mapping(address => Template) templates;
+    // deprecated template list definition 
+    struct TemplateListDeprecated {
+        mapping(address => TemplateDeprecated) templates;
         address[] templateIds;
     }
 
+
+    struct Template {
+        TemplateState state;
+        address owner;
+        address lastUpdatedBy;
+        uint256 blockNumberUpdated;
+        address[] conditionTypes;
+        bytes32[] actorTypes;
+    }
+    
+    struct TemplateList {
+        mapping(bytes32 => Template) templates;
+        bytes32[] templateIds;
+    }
+    
+    enum ActorTypeState {
+        Uninitialized,
+        Registered,
+        Deregistered
+    }
+    
+    struct ActorType {
+        string value;
+        ActorTypeState state;
+    }
+    
+    struct TemplateActorTypeList {
+        // actor id (bytes32) = keccak256(string)
+        mapping(bytes32 => ActorType) actorTypes;
+        bytes32[] actorTypeIds;
+    }
+    
    /**
     * @notice propose new template
     * @param _self is the TemplateList storage pointer
@@ -44,7 +78,9 @@ library TemplateStoreLibrary {
     */
     function propose(
         TemplateList storage _self,
-        address _id
+        bytes32 _id,
+        address[] memory _conditionTypes,
+        bytes32[] memory _actorTypeIds
     )
         internal
         returns (uint size)
@@ -58,7 +94,9 @@ library TemplateStoreLibrary {
             state: TemplateState.Proposed,
             owner: msg.sender,
             lastUpdatedBy: msg.sender,
-            blockNumberUpdated: block.number
+            blockNumberUpdated: block.number,
+            conditionTypes: _conditionTypes,
+            actorTypes: _actorTypeIds
         });
 
         _self.templateIds.push(_id);
@@ -73,7 +111,7 @@ library TemplateStoreLibrary {
     */
     function approve(
         TemplateList storage _self,
-        address _id
+        bytes32 _id
     )
         internal
     {
@@ -94,7 +132,7 @@ library TemplateStoreLibrary {
     */
     function revoke(
         TemplateList storage _self,
-        address _id
+        bytes32 _id
     )
         internal
     {
@@ -106,5 +144,37 @@ library TemplateStoreLibrary {
         _self.templates[_id].state = TemplateState.Revoked;
         _self.templates[_id].lastUpdatedBy = msg.sender;
         _self.templates[_id].blockNumberUpdated = block.number;
+    }
+    
+    function registerTemplateActorType(
+        TemplateActorTypeList storage _self,
+        string memory _actorType
+    )
+        internal
+        returns (uint size)
+    {
+        bytes32 Id = keccak256(abi.encodePacked(_actorType));
+        
+        require(
+            _self.actorTypes[Id].state != ActorTypeState.Registered,
+            'Actor type already exists'
+        );
+        _self.actorTypes[Id] = ActorType({
+            value: _actorType,
+            state: ActorTypeState.Registered
+        });
+        
+        _self.actorTypeIds.push(Id);
+        
+        size = _self.actorTypeIds.length;
+    }
+    
+    function deregisterTemplateActorType(
+        TemplateActorTypeList storage _self,
+        bytes32 _Id
+    )
+        internal
+    {
+        _self.actorTypes[_Id].state = ActorTypeState.Deregistered;
     }
 }
