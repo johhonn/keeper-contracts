@@ -66,6 +66,7 @@ contract BaseEscrowTemplate is AgreementTemplate {
         );
 
         address owner = address(0);
+        
         address[] memory providers;
         
         DIDRegistry didRegistryInstance = DIDRegistry(
