@@ -50,7 +50,7 @@ contract AgreementTemplate is Ownable {
         return agreementStoreManager.createAgreement(
             _id,
             _did,
-            getConditionTypes(),
+            keccak256(abi.encodePacked(address(this))),
             _conditionIds,
             _timeLocks,
             _timeOuts
