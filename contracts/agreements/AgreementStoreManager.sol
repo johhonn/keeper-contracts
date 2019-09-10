@@ -79,7 +79,7 @@ contract AgreementStoreManager is Ownable {
      *      Only "approved" templates can access this function.
      * @param _id is the ID of the new agreement. Must be unique.
      * @param _did is the bytes32 DID of the asset. The DID must be registered beforehand.
-     * @param _conditionTypes is a list of addresses that point to Condition contracts.
+     * @param _templateId template ID.
      * @param _conditionIds is a list of bytes32 content-addressed Condition IDs
      * @param _timeLocks is a list of uint time lock values associated to each Condition
      * @param _timeOuts is a list of uint time out values associated to each Condition
@@ -88,7 +88,7 @@ contract AgreementStoreManager is Ownable {
     function createAgreement(
         bytes32 _id,
         bytes32 _did,
-        address[] memory _conditionTypes,
+        bytes32 _templateId,
         bytes32[] memory _conditionIds,
         uint[] memory _timeLocks,
         uint[] memory _timeOuts
@@ -97,13 +97,17 @@ contract AgreementStoreManager is Ownable {
         returns (uint size)
     {
         require(
-            templateStoreManager.isTemplateApproved(msg.sender) == true,
+            templateStoreManager.isTemplateApproved(_templateId) == true,
             'Template not Approved'
         );
         require(
             didRegistry.getBlockNumberUpdated(_did) > 0,
             'DID not registered'
         );
+        address[] memory _conditionTypes;
+        
+        (,,,,_conditionTypes,)= templateStoreManager.getTemplate(_templateId);
+        
         require(
             _conditionIds.length == _conditionTypes.length &&
             _timeLocks.length == _conditionTypes.length &&
