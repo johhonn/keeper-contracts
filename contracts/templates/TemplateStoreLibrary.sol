@@ -3,6 +3,8 @@ pragma solidity 0.5.6;
 // SPDX-License-Identifier: (Apache-2.0 AND CC-BY-4.0)
 // Code is Apache-2.0 and docs are CC-BY-4.0
 
+import '../interfaces/ICondition.sol';
+
 /**
  * @title Template Store Library
  * @author Ocean Protocol Team
@@ -89,7 +91,12 @@ library TemplateStoreLibrary {
             _self.templates[_id].state == TemplateState.Uninitialized,
             'Id already exists'
         );
-
+        
+        require(
+            isValidTemplateConditionTypes(_id, _conditionTypes),
+            'Invalid proposed condition types'
+        );
+        
         _self.templates[_id] = Template({
             state: TemplateState.Proposed,
             owner: msg.sender,
@@ -98,7 +105,7 @@ library TemplateStoreLibrary {
             conditionTypes: _conditionTypes,
             actorTypes: _actorTypeIds
         });
-
+        
         _self.templateIds.push(_id);
 
         return _self.templateIds.length;
@@ -176,5 +183,30 @@ library TemplateStoreLibrary {
         internal
     {
         _self.actorTypes[_Id].state = ActorTypeState.Deregistered;
+    }
+    
+    function isValidTemplateConditionTypes(
+        bytes32 _Id,
+        address[] memory _conditionTypes
+    )
+        private
+        view
+        returns(bool isValidConditionTypes)
+    {
+        isValidConditionTypes = true;
+        for(uint256 i=0; i < _conditionTypes.length; i++){
+            
+            bytes32 conditionId = keccak256(abi.encodePacked(
+                _Id,
+                address(this),
+                _Id
+            ));
+            
+            ICondition conditionType = ICondition(_conditionTypes[i]);
+            
+            if (conditionId != conditionType.generateId(_Id, _Id))
+                isValidConditionTypes = false;
+        }
+        return isValidConditionTypes;
     }
 }
