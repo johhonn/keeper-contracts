@@ -36,6 +36,23 @@ contract TemplateStoreManager is Ownable {
         _;
     }
 
+    event TemplateProposed(
+        bytes32 indexed Id,
+        string indexed name,
+        address[] conditionTypes,
+        bytes32[] actorTypeIds
+    );
+    
+    event TemplateApproved(
+        bytes32 indexed Id,
+        bool state
+    );
+    
+    event TemplateRevoked(
+        bytes32 indexed Id,
+        bool state
+    );
+    
     /**
      * @dev initialize TemplateStoreManager Initializer
      *      Initializes Ownable. Only on contract creation.
@@ -63,12 +80,28 @@ contract TemplateStoreManager is Ownable {
     function proposeTemplate(
         bytes32 _id,
         address[] calldata _conditionTypes,
-        bytes32[] calldata _actorTypeIds
+        bytes32[] calldata _actorTypeIds,
+        string calldata name
     )
         external
         returns (uint size)
-    {
-        return templateList.propose(_id, _conditionTypes, _actorTypeIds);
+    { 
+        uint256 currentSize = templateList.templateIds.length;
+        uint256 newSize = templateList.propose(_id, _conditionTypes, _actorTypeIds);
+        
+        require (
+            newSize > currentSize,
+            'Unable to propose template'
+        );
+        
+        emit TemplateProposed(
+            _id,
+            name,
+            _conditionTypes,
+            _actorTypeIds
+        );
+        
+        return newSize;
     }
 
     /**
@@ -83,7 +116,16 @@ contract TemplateStoreManager is Ownable {
         external
         onlyOwner
     {
-        return templateList.approve(_id);
+        templateList.approve(_id);
+        require(
+            templateList.templates[_id].state == TemplateStoreLibrary.TemplateState.Approved,
+            'Unable to approve template'
+        );
+        
+        emit TemplateApproved(
+            _id,
+            true
+        );
     }
 
     /**
@@ -97,7 +139,16 @@ contract TemplateStoreManager is Ownable {
         external
         onlyOwnerOrTemplateOwner(_id)
     {
-        return templateList.revoke(_id);
+        templateList.revoke(_id);
+        require(
+            templateList.templates[_id].state == TemplateStoreLibrary.TemplateState.Revoked,
+            'Unable to revoke template'
+        );
+        
+        emit TemplateRevoked(
+            _id,
+            true
+        );
     }
 
     /**
