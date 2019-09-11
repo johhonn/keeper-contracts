@@ -77,7 +77,7 @@
   "author": "Ocean Protocol",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@oceanprotocol/dori": "~0.4.1",
+    "@oceanprotocol/dori": "~0.5.0",
     "bignumber.js": "^9.0.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
