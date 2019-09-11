@@ -6,6 +6,13 @@ pragma solidity 0.5.6;
 import './DIDRegistryLibrary.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
+/**
+ * @title DIDPermissionsRegistry
+ * @author Ocean Protocol Team
+ *
+ * @dev Implementation of the DID Permissions Registry.
+ *      This contract meant to allow DID owners to grant/revoke permissions 
+ */
 contract DIDPermissionsRegistry is Ownable {
     // DID -> Address -> Boolean Permission
     mapping(bytes32 => mapping(address => bool)) DIDPermissions;
@@ -72,7 +79,7 @@ contract DIDPermissionsRegistry is Ownable {
     /**
      * @dev _getPermission gets access permission of a grantee
      * @param _did refers to decentralized identifier (a bytes32 length ID)
-     * @param _grantee address
+     * @param _grantee address 
      * @return true if grantee has access permission to a DID 
      */
     function _getPermission(
