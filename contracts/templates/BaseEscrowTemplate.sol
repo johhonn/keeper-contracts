@@ -57,14 +57,6 @@ contract BaseEscrowTemplate is AgreementTemplate {
         public
         returns (uint size)
     {
-        super.createAgreement(
-            _id,
-            _did,
-            _conditionIds,
-            _timeLocks,
-            _timeOuts
-        );
-
         address owner = address(0);
         
         address[] memory providers;
@@ -74,6 +66,19 @@ contract BaseEscrowTemplate is AgreementTemplate {
         );
         
         (owner, , , , providers) = didRegistryInstance.getDIDRegister(_did);
+        
+        address[] memory actors = new address[](providers.length + 2);
+        //TODO: set actors array
+        
+        super.createAgreement(
+            _id,
+            _did,
+            _conditionIds,
+            _timeLocks,
+            _timeOuts,
+            actors
+        );
+
 
         // storing some additional information for the template
         agreementData.agreementDataItems[_id]
@@ -88,7 +93,7 @@ contract BaseEscrowTemplate is AgreementTemplate {
         }
 
         agreementData.agreementIds.push(_id);
-
+        
         emit AgreementCreated(
             _id,
             _did,

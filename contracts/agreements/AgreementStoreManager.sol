@@ -36,6 +36,9 @@ contract AgreementStoreManager is Ownable {
     ConditionStoreManager internal conditionStoreManager;
     TemplateStoreManager internal templateStoreManager;
     DIDRegistry internal didRegistry;
+    
+    using AgreementStoreLibrary for AgreementStoreLibrary.AgreementActors;
+    AgreementStoreLibrary.AgreementActors internal agreementActors;
 
     /**
      * @dev initialize AgreementStoreManager Initializer
@@ -83,6 +86,9 @@ contract AgreementStoreManager is Ownable {
      * @param _conditionIds is a list of bytes32 content-addressed Condition IDs
      * @param _timeLocks is a list of uint time lock values associated to each Condition
      * @param _timeOuts is a list of uint time out values associated to each Condition
+     * @param _actors array includes actor address such as consumer, provider, publisher, or verifier, ect.
+     * For each template, the actors array order should follow the same order in templateStoreManager 
+     * actor types definition.
      * @return the size of the agreement list after the create action.
      */
     function createAgreement(
@@ -91,7 +97,8 @@ contract AgreementStoreManager is Ownable {
         bytes32 _templateId,
         bytes32[] memory _conditionIds,
         uint[] memory _timeLocks,
-        uint[] memory _timeOuts
+        uint[] memory _timeOuts,
+        address[] memory _actors
     )
         public
         returns (uint size)
@@ -105,13 +112,15 @@ contract AgreementStoreManager is Ownable {
             'DID not registered'
         );
         address[] memory _conditionTypes;
+        bytes32[] memory _actorTypes;
         
-        (,,,,_conditionTypes,)= templateStoreManager.getTemplate(_templateId);
+        (,,,,_conditionTypes, _actorTypes)= templateStoreManager.getTemplate(_templateId);
         
         require(
             _conditionIds.length == _conditionTypes.length &&
             _timeLocks.length == _conditionTypes.length &&
-            _timeOuts.length == _conditionTypes.length,
+            _timeOuts.length == _conditionTypes.length &&
+            _actors.length == _actorTypes.length,
             'Arguments have wrong length'
         );
 
@@ -129,6 +138,12 @@ contract AgreementStoreManager is Ownable {
             _did,
             msg.sender,
             _conditionIds
+        );
+        
+        agreementActors.setActors(
+            _id,
+            _actors,
+            _actorTypes
         );
 
         return getAgreementListSize();

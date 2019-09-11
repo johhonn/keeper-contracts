@@ -42,7 +42,8 @@ contract AgreementTemplate is Ownable {
         bytes32 _did,
         bytes32[] memory _conditionIds,
         uint[] memory _timeLocks,
-        uint[] memory _timeOuts
+        uint[] memory _timeOuts,
+        address[] memory _actors
     )
         public
         returns (uint size)
@@ -53,7 +54,8 @@ contract AgreementTemplate is Ownable {
             keccak256(abi.encodePacked(address(this))),
             _conditionIds,
             _timeLocks,
-            _timeOuts
+            _timeOuts,
+            _actors
         );
     }
 
