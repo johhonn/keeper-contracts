@@ -23,10 +23,11 @@ import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 contract TemplateStoreManager is Ownable {
 
     using TemplateStoreLibrary for TemplateStoreLibrary.TemplateList;
-
     TemplateStoreLibrary.TemplateList internal templateList;
-    TemplateStoreLibrary.TemplateActorTypeList internal templateActorTypeList;
 
+    using TemplateStoreLibrary for TemplateStoreLibrary.TemplateActorTypeList;
+    TemplateStoreLibrary.TemplateActorTypeList internal templateActorTypeList;
+    
     modifier onlyOwnerOrTemplateOwner(bytes32 _id){
         require(
             isOwner() ||
@@ -151,6 +152,28 @@ contract TemplateStoreManager is Ownable {
         );
     }
 
+    function registerTemplateActorType(
+        string calldata _actorType
+    )
+        external
+        onlyOwner
+    {
+        templateActorTypeList.registerActorType(
+            _actorType
+        );
+    }
+    
+    function deregisterTemplateActorType(
+        bytes32 _Id
+    )
+        external
+        onlyOwner
+    {
+        templateActorTypeList.deregisterActorType(
+            _Id
+        );
+    }
+    
     /**
      * @notice getTemplate get more information about a template
      * @param _id unique template identifier which is basically

@@ -153,7 +153,7 @@ library TemplateStoreLibrary {
         _self.templates[_id].blockNumberUpdated = block.number;
     }
     
-    function registerTemplateActorType(
+    function registerActorType(
         TemplateActorTypeList storage _self,
         string memory _actorType
     )
@@ -176,7 +176,7 @@ library TemplateStoreLibrary {
         size = _self.actorTypeIds.length;
     }
     
-    function deregisterTemplateActorType(
+    function deregisterActorType(
         TemplateActorTypeList storage _self,
         bytes32 _Id
     )
