@@ -61,7 +61,7 @@ contract ConditionStoreManager is Ownable, Common {
     {
         require(
             conditionList.conditions[_id].typeRef == msg.sender,
-            'Invalid UpdateRole'
+            'Invalid Update Role'
         );
         _;
     }

@@ -32,7 +32,7 @@ contract TemplateStoreManager is Ownable {
         require(
             isOwner() ||
             templateList.templates[_id].owner == msg.sender,
-            'Invalid UpdateRole'
+            'Invalid contract owner or template owner'
         );
         _;
     }

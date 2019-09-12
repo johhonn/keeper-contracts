@@ -4,6 +4,7 @@ const constants = {
     },
     address: {
         zero: '0x0000000000000000000000000000000000000000',
+        one: '0x0000000000000000000000000000000000000000',
         dummy: '0xeE9300b7961e0a01d9f0adb863C7A227A07AaD75',
         error: {
             invalidAddress0x0: 'Invalid address'
