@@ -73,6 +73,25 @@ contract TemplateStoreManager is Ownable {
         Ownable.initialize(_owner);
     }
 
+    function proposeTemplate(
+        address _id,
+        address[] calldata _conditionTypes,
+        bytes32[] calldata _actorTypeIds,
+        string calldata name
+    )
+        external
+        returns (uint size)
+    {
+        bytes32 id = keccak256(abi.encodePacked(_id));
+        return proposeTemplate(
+            id,
+            _conditionTypes,
+            _actorTypeIds,
+            name
+        );
+    }
+    
+    
     /**
      * @notice proposeTemplate proposes a new template
      * @param _id unique template identifier which is basically
@@ -80,11 +99,11 @@ contract TemplateStoreManager is Ownable {
      */
     function proposeTemplate(
         bytes32 _id,
-        address[] calldata _conditionTypes,
-        bytes32[] calldata _actorTypeIds,
-        string calldata name
+        address[] memory _conditionTypes,
+        bytes32[] memory _actorTypeIds,
+        string memory name
     )
-        external
+        public
         returns (uint size)
     { 
         uint256 currentSize = templateList.templateIds.length;
@@ -157,8 +176,9 @@ contract TemplateStoreManager is Ownable {
     )
         external
         onlyOwner
+        returns (bytes32 actorTypeId)
     {
-        templateActorTypeList.registerActorType(
+        actorTypeId = templateActorTypeList.registerActorType(
             _actorType
         );
     }
@@ -213,6 +233,16 @@ contract TemplateStoreManager is Ownable {
         )
     {
         actorTypes = templateActorTypeList.actorTypeIds;
+    }
+    
+    function getTemplateActorTypeId(
+        string calldata actorType
+    )
+        external
+        view
+        returns(bytes32)
+    {
+        return templateActorTypeList.getActorTypeId(actorType);
     }
     
     /**

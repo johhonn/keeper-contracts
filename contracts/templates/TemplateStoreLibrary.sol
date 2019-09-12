@@ -158,7 +158,7 @@ library TemplateStoreLibrary {
         string memory _actorType
     )
         internal
-        returns (uint size)
+        returns (bytes32)
     {
         bytes32 Id = keccak256(abi.encodePacked(_actorType));
         
@@ -166,14 +166,15 @@ library TemplateStoreLibrary {
             _self.actorTypes[Id].state != ActorTypeState.Registered,
             'Actor type already exists'
         );
+
         _self.actorTypes[Id] = ActorType({
             value: _actorType,
             state: ActorTypeState.Registered
         });
-        
+
         _self.actorTypeIds.push(Id);
         
-        size = _self.actorTypeIds.length;
+        return Id;
     }
     
     function deregisterActorType(
@@ -183,6 +184,23 @@ library TemplateStoreLibrary {
         internal
     {
         _self.actorTypes[_Id].state = ActorTypeState.Deregistered;
+    }
+    
+    function getActorTypeId(
+        TemplateActorTypeList storage _self,
+        string memory _actorType
+    )
+        internal
+        view
+        returns(bytes32)
+    {
+        bytes32 Id = keccak256(abi.encodePacked(_actorType));
+        
+        require(
+            _self.actorTypes[Id].state == ActorTypeState.Registered,
+            'Actor type does not exist!'
+        );
+        return Id;
     }
     
     function isValidTemplateConditionTypes(
@@ -198,7 +216,7 @@ library TemplateStoreLibrary {
             
             bytes32 conditionId = keccak256(abi.encodePacked(
                 _Id,
-                address(this),
+                _conditionTypes[i],
                 _Id
             ));
             
