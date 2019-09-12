@@ -107,7 +107,11 @@ contract TemplateStoreManager is Ownable {
         returns (uint size)
     { 
         uint256 currentSize = templateList.templateIds.length;
-        uint256 newSize = templateList.propose(_id, _conditionTypes, _actorTypeIds);
+        uint256 newSize = templateList.propose(
+            _id, 
+            _conditionTypes, 
+            _actorTypeIds
+        );
         
         require (
             newSize > currentSize,

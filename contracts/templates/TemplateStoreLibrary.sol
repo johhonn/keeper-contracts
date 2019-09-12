@@ -212,13 +212,14 @@ library TemplateStoreLibrary {
         returns(bool isValidConditionTypes)
     {
         isValidConditionTypes = true;
-        for(uint256 i=0; i < _conditionTypes.length; i++){
-            
-            bytes32 conditionId = keccak256(abi.encodePacked(
-                _Id,
-                _conditionTypes[i],
-                _Id
-            ));
+        for(uint256 i=0; i < _conditionTypes.length; i++) {
+            bytes32 conditionId = keccak256(
+                abi.encodePacked(
+                    _Id, 
+                    _conditionTypes[i], 
+                    _Id
+                )
+            );
             
             ICondition conditionType = ICondition(_conditionTypes[i]);
             

@@ -114,7 +114,9 @@ contract AgreementStoreManager is Ownable {
         address[] memory _conditionTypes;
         bytes32[] memory _actorTypes;
         
-        (,,,,_conditionTypes, _actorTypes)= templateStoreManager.getTemplate(_templateId);
+        (,,,,_conditionTypes, _actorTypes) = templateStoreManager.getTemplate(
+            _templateId
+        );
         
         require(
             _conditionIds.length == _conditionTypes.length &&
