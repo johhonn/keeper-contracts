@@ -138,7 +138,7 @@ contract AgreementStoreManager is Ownable {
         agreementList.create(
             _id,
             _did,
-            msg.sender,
+            _templateId,
             _conditionIds
         );
         
@@ -164,7 +164,7 @@ contract AgreementStoreManager is Ownable {
         returns (
             bytes32 did,
             address didOwner,
-            address templateId,
+            bytes32 templateId,
             bytes32[] memory conditionIds,
             address lastUpdatedBy,
             uint256 blockNumberUpdated
@@ -250,7 +250,7 @@ contract AgreementStoreManager is Ownable {
      * @param _templateId is the address of the agreement template.
      * @return the agreement IDs for a given DID
      */
-    function getAgreementIdsForTemplateId(address _templateId)
+    function getAgreementIdsForTemplateId(bytes32 _templateId)
         public
         view
         returns (bytes32[] memory)

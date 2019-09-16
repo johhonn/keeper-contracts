@@ -6,9 +6,6 @@ const chai = require('chai')
 const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
-
-const EscrowComputeExecutionTemplate = artifacts.require('EscrowComputeExecutionTemplate')
-
 const constants = require('../../helpers/constants.js')
 const deployManagers = require('../../helpers/deployManagers.js')
 const testUtils = require('../../helpers/utils')
@@ -27,10 +24,10 @@ contract('EscrowComputeExecutionTemplate', (accounts) => {
         } = await deployManagers(deployer, owner)
 
         const contractType = templateStoreManager.address
-        const escrowComputeExecutionTemplate = await EscrowComputeExecutionTemplate.new({ from: deployer })
-        await escrowComputeExecutionTemplate.methods['initialize(address,address,address,address,address,address)'](
+        const templateId = constants.bytes32.one
+        await escrowComputeExecutionTemplate.methods['initialize(bytes32,address,address,address,address,address)'](
             owner,
-            agreementStoreManager.address,
+            templateId,
             didRegistry.address,
             contractType,
             contractType,
@@ -46,7 +43,8 @@ contract('EscrowComputeExecutionTemplate', (accounts) => {
             templateStoreManager,
             escrowComputeExecutionTemplate,
             deployer,
-            owner
+            owner,
+            templateId
         }
     }
 
@@ -86,7 +84,8 @@ contract('EscrowComputeExecutionTemplate', (accounts) => {
                 conditionStoreManager,
                 templateStoreManager,
                 escrowComputeExecutionTemplate,
-                owner
+                owner,
+                templateId
             } = await setupTest()
 
             const { agreementId, agreement } = await prepareAgreement()
@@ -97,7 +96,6 @@ contract('EscrowComputeExecutionTemplate', (accounts) => {
             )
 
             // propose and approve template
-            const templateId = escrowComputeExecutionTemplate.address
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId, { from: owner })
 
@@ -141,7 +139,8 @@ contract('EscrowComputeExecutionTemplate', (accounts) => {
                 agreementStoreManager,
                 templateStoreManager,
                 escrowComputeExecutionTemplate,
-                owner
+                owner,
+                templateId
             } = await setupTest()
 
             const { agreementId, agreement } = await prepareAgreement()
@@ -150,7 +149,6 @@ contract('EscrowComputeExecutionTemplate', (accounts) => {
             await didRegistry.registerAttribute(agreement.did, constants.bytes32.one, [], constants.registry.url)
 
             // propose and approve template
-            const templateId = escrowComputeExecutionTemplate.address
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId, { from: owner })
 
@@ -176,7 +174,8 @@ contract('EscrowComputeExecutionTemplate', (accounts) => {
                 didRegistry,
                 templateStoreManager,
                 escrowComputeExecutionTemplate,
-                owner
+                owner,
+                templateId
             } = await setupTest()
 
             const { agreementId, agreement } = await prepareAgreement()
@@ -186,7 +185,6 @@ contract('EscrowComputeExecutionTemplate', (accounts) => {
                 agreement.did, constants.bytes32.one, [accounts[2]], constants.registry.url)
 
             // propose and approve template
-            const templateId = escrowComputeExecutionTemplate.address
             await templateStoreManager.proposeTemplate(templateId)
             await templateStoreManager.approveTemplate(templateId, { from: owner })
 

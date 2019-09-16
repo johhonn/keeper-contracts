@@ -100,31 +100,6 @@ async function setupContracts({
             })
         }
 
-        if (addressBook.EscrowComputeExecutionTemplate) {
-            if (verbose) {
-                console.log(
-                    `Proposing template ${addressBook.EscrowComputeExecutionTemplate} from ${roles.deployer}`
-                )
-            }
-
-            await TemplateStoreManagerInstance.proposeTemplate(
-                addressBook.EscrowComputeExecutionTemplate,
-                { from: roles.deployer }
-            )
-
-            if (verbose) {
-                console.log(
-                    `Approving template ${addressBook.EscrowComputeExecutionTemplate} from ${roles.deployer}`
-                )
-            }
-
-            await approveTemplate({
-                TemplateStoreManagerInstance,
-                roles,
-                templateAddress: addressBook.EscrowComputeExecutionTemplate
-            })
-        }
-
         await transferOwnership({
             ContractInstance: TemplateStoreManagerInstance,
             name: TemplateStoreManager.contractName,

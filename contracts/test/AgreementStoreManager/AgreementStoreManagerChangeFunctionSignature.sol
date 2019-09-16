@@ -51,7 +51,7 @@ contract AgreementStoreManagerChangeFunctionSignature is
         agreementList.create(
             _id,
             _did,
-            msg.sender,
+            keccak256(abi.encodePacked(msg.sender)),
             _conditionIds
         );
 

@@ -19,7 +19,7 @@ library AgreementStoreLibrary {
 
     struct Agreement {
         bytes32 did;
-        address templateId;
+        bytes32 templateId;
         bytes32[] conditionIds;
         address lastUpdatedBy;
         uint256 blockNumberUpdated;
@@ -28,7 +28,7 @@ library AgreementStoreLibrary {
     struct AgreementList {
         mapping(bytes32 => Agreement) agreements;
         mapping(bytes32 => bytes32[]) didToAgreementIds;
-        mapping(address => bytes32[]) templateIdToAgreementIds;
+        mapping(bytes32 => bytes32[]) templateIdToAgreementIds;
         bytes32[] agreementIds;
     }
     
@@ -51,7 +51,7 @@ library AgreementStoreLibrary {
         AgreementList storage _self,
         bytes32 _id,
         bytes32 _did,
-        address _templateId,
+        bytes32 _templateId,
         bytes32[] memory _conditionIds
     )
         internal

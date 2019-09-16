@@ -18,7 +18,6 @@ const contracts = [
     'LockRewardCondition',
     'AccessSecretStoreCondition',
     'EscrowReward',
-    'EscrowAccessSecretStoreTemplate',
     'OceanToken',
     'Dispenser',
     'DIDRegistry',
@@ -29,7 +28,6 @@ const contracts = [
     'HashLists',
     'ThresholdCondition',
     'ComputeExecutionCondition',
-    'EscrowComputeExecutionTemplate'
 ]
 
 contracts.forEach((contractName) => {
