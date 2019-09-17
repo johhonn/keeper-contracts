@@ -21,7 +21,9 @@ contract('Stake Agreement integration test', (accounts) => {
         templateStoreManager,
         signCondition,
         lockRewardCondition,
-        escrowReward
+        escrowReward,
+        conditionTypes,
+        actorTypeIds
 
     async function setupTest({
         deployer = accounts[8],
@@ -57,9 +59,35 @@ contract('Stake Agreement integration test', (accounts) => {
         }
     }
 
-    async function approveTemplateAccount(owner, templateAccount) {
-        await templateStoreManager.proposeTemplate(templateAccount)
-        await templateStoreManager.approveTemplate(templateAccount, { from: owner })
+    async function approveTemplateAccount(owner, templateId) {
+        // propose and approve template
+        await templateStoreManager.registerTemplateActorType(
+            'staker',
+            {
+                from: owner
+            }
+        )
+        const stakerActorTypeId = await templateStoreManager.getTemplateActorTypeId('staker')
+        // any random ID
+        templateId = constants.bytes32.one
+
+        conditionTypes = [
+            signCondition.address,
+            lockRewardCondition.address,
+            escrowReward.address
+        ]
+        actorTypeIds = [
+            stakerActorTypeId
+        ]
+
+        await templateStoreManager.methods['proposeTemplate(bytes32,address[],bytes32[],string)'](
+            templateId,
+            conditionTypes,
+            actorTypeIds,
+            'EscrowAccessSecretStoreTemplate'
+        )
+
+        await templateStoreManager.approveTemplate(templateId, { from: owner })
     }
 
     async function prepareStakeAgreement({
@@ -71,7 +99,8 @@ contract('Stake Agreement integration test', (accounts) => {
         sign = constants.condition.sign.bytes32,
         did = constants.did[0],
         url = constants.registry.url,
-        checksum = constants.bytes32.one
+        checksum = constants.bytes32.one,
+        templateId = constants.bytes32.one
     } = {}) {
         // generate IDs from attributes
 
@@ -82,18 +111,15 @@ contract('Stake Agreement integration test', (accounts) => {
         // construct agreement
         const agreement = {
             did: did,
-            conditionTypes: [
-                signCondition.address,
-                lockRewardCondition.address,
-                escrowReward.address
-            ],
+            templateId: templateId,
             conditionIds: [
                 conditionIdSign,
                 conditionIdLock,
                 conditionIdEscrow
             ],
             timeLocks: [stakePeriod, 0, 0],
-            timeOuts: [0, 0, 0]
+            timeOuts: [0, 0, 0],
+            actors: [staker]
         }
         return {
             agreementId,
@@ -110,12 +136,13 @@ contract('Stake Agreement integration test', (accounts) => {
         it('stake agreement as an escrow with self-sign release', async () => {
             const { owner } = await setupTest()
 
-            const alice = accounts[0]
+            const templateId = constants.bytes32.one
             // propose and approve account as agreement factory - not for production :)
-            await approveTemplateAccount(owner, alice)
+            await approveTemplateAccount(owner, templateId)
+            const alice = accounts[0]
 
             // prepare: stake agreement
-            const { agreementId, stakeAmount, stakePeriod, sign, checksum, url, agreement } = await prepareStakeAgreement()
+            const { agreementId, stakeAmount, stakePeriod, sign, checksum, url, agreement } = await prepareStakeAgreement({ templateId: templateId })
 
             // fill up wallet
             await oceanToken.mint(alice, stakeAmount, { from: owner })

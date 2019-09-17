@@ -88,7 +88,7 @@ const constants = {
     acl: {
         error: {
             invalidCreateRole: 'Invalid CreateRole',
-            invalidUpdateRole: 'Invalid UpdateRole'
+            invalidUpdateRole: 'Invalid Update Role'
         }
     },
     initialize: {

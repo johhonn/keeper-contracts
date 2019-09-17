@@ -125,8 +125,9 @@ contract('ComputeExecutionCondition constructor', (accounts) => {
             const agreementId = constants.bytes32.one
             const computeConsumer = accounts[1]
 
-            const templateId = accounts[2]
-            await templateStoreManager.proposeTemplate(templateId)
+            const templateId = constants.bytes32.two
+
+
             await templateStoreManager.approveTemplate(templateId)
 
             const hashValues = await computeExecutionCondition.hashValues(did, computeConsumer)
