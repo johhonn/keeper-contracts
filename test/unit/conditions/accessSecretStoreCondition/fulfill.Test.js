@@ -65,7 +65,6 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
                 did,
                 agreementStoreManager,
                 conditionStoreManager,
-                templateStoreManager,
                 accessSecretStoreCondition,
                 templateId
 
@@ -112,7 +111,6 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             const {
                 did,
                 agreementStoreManager,
-                templateStoreManager,
                 accessSecretStoreCondition,
                 templateId
 
@@ -149,7 +147,6 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             const {
                 did,
                 agreementStoreManager,
-                templateStoreManager,
                 accessSecretStoreCondition,
                 templateId
 
@@ -191,7 +188,6 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
                 did,
                 agreementStoreManager,
                 conditionStoreManager,
-                templateStoreManager,
                 accessSecretStoreCondition,
                 templateId
 
@@ -236,8 +232,8 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
                 DIDProvider,
                 did,
                 agreementStoreManager,
-                templateStoreManager,
-                accessSecretStoreCondition
+                accessSecretStoreCondition,
+                templateId
 
             } = await common.setupTest({ accounts: accounts, registerDID: true })
 
@@ -278,7 +274,6 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             const {
                 did,
                 agreementStoreManager,
-                templateStoreManager,
                 accessSecretStoreCondition,
                 templateId
 

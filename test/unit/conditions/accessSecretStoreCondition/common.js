@@ -57,12 +57,12 @@ const common = {
         const granteeActorTypeId = await templateStoreManager.getTemplateActorTypeId('grantee')
 
         // any random ID
-        templateId = constants.bytes32.one
+        const templateId = constants.bytes32.one
 
-        conditionTypes = [
+        const conditionTypes = [
             accessSecretStoreCondition.address
         ]
-        actorTypeIds = [
+        const actorTypeIds = [
             granteeActorTypeId
         ]
 

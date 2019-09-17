@@ -66,12 +66,12 @@ contract('ComputeExecutionCondition constructor', (accounts) => {
         const consumerActorTypeId = await templateStoreManager.getTemplateActorTypeId('consumer')
 
         // any random ID
-        templateId = constants.bytes32.one
+        const templateId = constants.bytes32.one
 
-        conditionTypes = [
+        const conditionTypes = [
             computeExecutionCondition.address
         ]
-        actorTypeIds = [
+        const actorTypeIds = [
             consumerActorTypeId
         ]
 
@@ -145,7 +145,6 @@ contract('ComputeExecutionCondition constructor', (accounts) => {
                 did,
                 agreementStoreManager,
                 conditionStoreManager,
-                templateStoreManager,
                 computeExecutionCondition,
                 templateId
 
@@ -190,7 +189,6 @@ contract('ComputeExecutionCondition constructor', (accounts) => {
             const {
                 did,
                 agreementStoreManager,
-                templateStoreManager,
                 computeExecutionCondition,
                 templateId
 
@@ -226,7 +224,6 @@ contract('ComputeExecutionCondition constructor', (accounts) => {
             const {
                 did,
                 agreementStoreManager,
-                templateStoreManager,
                 computeExecutionCondition,
                 templateId
 
@@ -265,7 +262,6 @@ contract('ComputeExecutionCondition constructor', (accounts) => {
             const {
                 did,
                 agreementStoreManager,
-                templateStoreManager,
                 computeExecutionCondition,
                 templateId
 

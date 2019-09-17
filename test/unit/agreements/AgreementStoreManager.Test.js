@@ -85,7 +85,7 @@ contract('AgreementStoreManager', (accounts) => {
         const consumerActorTypeId = await templateStoreManager.getTemplateActorTypeId('consumer')
         // any random ID
         templateId = constants.bytes32.one
-        conditionType = hashLockCondition.address
+        const conditionType = hashLockCondition.address
 
         conditionTypes = [
             conditionType,
@@ -212,10 +212,7 @@ contract('AgreementStoreManager', (accounts) => {
         it('create agreement should create agreement and conditions', async () => {
             const {
                 did,
-                owner,
-                common,
                 templateId,
-                conditionIds,
                 timeLock,
                 timeOut,
                 providers,
@@ -260,14 +257,10 @@ contract('AgreementStoreManager', (accounts) => {
         it('should not create agreement with existing conditions', async () => {
             const {
                 did,
-                owner,
-                common,
                 templateId,
-                conditionIds,
                 timeLock,
                 timeOut,
-                providers,
-                conditionTypes
+                providers
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
@@ -305,12 +298,10 @@ contract('AgreementStoreManager', (accounts) => {
                 actors: providers
             }
 
-            const otherAgreementId = constants.bytes32.one
-
             await assert.isRejected(
                 agreementStoreManager.createAgreement(
                     agreementId,
-                    ...Object.values(agreement)
+                    ...Object.values(otherAgreement)
                 ),
                 constants.error.idAlreadyExists
             )
@@ -319,14 +310,10 @@ contract('AgreementStoreManager', (accounts) => {
         it('should not create agreement with uninitialized template', async () => {
             const {
                 did,
-                owner,
-                common,
                 templateId,
-                conditionIds,
                 timeLock,
                 timeOut,
-                providers,
-                conditionTypes
+                providers
             } = await setupTest()
 
             // construct agreement
@@ -357,14 +344,10 @@ contract('AgreementStoreManager', (accounts) => {
         it('should not create agreement with proposed template', async () => {
             const {
                 did,
-                owner,
-                common,
                 templateId,
-                conditionIds,
                 timeLock,
                 timeOut,
-                providers,
-                conditionTypes
+                providers
             } = await setupTest({ proposeTemplate: true })
 
             // construct agreement
@@ -396,13 +379,10 @@ contract('AgreementStoreManager', (accounts) => {
             const {
                 did,
                 owner,
-                common,
                 templateId,
-                conditionIds,
                 timeLock,
                 timeOut,
-                providers,
-                conditionTypes
+                providers
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             await templateStoreManager.revokeTemplate(templateId, { from: owner })
@@ -436,13 +416,10 @@ contract('AgreementStoreManager', (accounts) => {
             const {
                 did,
                 owner,
-                common,
                 templateId,
-                conditionIds,
                 timeLock,
                 timeOut,
-                providers,
-                conditionTypes
+                providers
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
@@ -500,11 +477,9 @@ contract('AgreementStoreManager', (accounts) => {
                 owner,
                 common,
                 templateId,
-                conditionIds,
                 timeLock,
                 timeOut,
-                providers,
-                conditionTypes
+                providers
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
@@ -554,13 +529,10 @@ contract('AgreementStoreManager', (accounts) => {
             const {
                 did,
                 owner,
-                common,
                 templateId,
-                conditionIds,
                 timeLock,
                 timeOut,
-                providers,
-                conditionTypes
+                providers
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
@@ -593,14 +565,10 @@ contract('AgreementStoreManager', (accounts) => {
         it('should not create agreement if DID not registered', async () => {
             const {
                 did,
-                owner,
-                common,
                 templateId,
-                conditionIds,
                 timeLock,
                 timeOut,
-                providers,
-                conditionTypes
+                providers
             } = await setupTest({ proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
@@ -636,11 +604,9 @@ contract('AgreementStoreManager', (accounts) => {
                 owner,
                 common,
                 templateId,
-                conditionIds,
                 timeLock,
                 timeOut,
-                providers,
-                conditionTypes
+                providers
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
@@ -686,14 +652,10 @@ contract('AgreementStoreManager', (accounts) => {
         it('should get multiple agreements for same did & template', async () => {
             const {
                 did,
-                owner,
-                common,
                 templateId,
-                conditionIds,
                 timeLock,
                 timeOut,
-                providers,
-                conditionTypes
+                providers
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
@@ -750,14 +712,10 @@ contract('AgreementStoreManager', (accounts) => {
         it('should return true if agreement DID provider', async () => {
             const {
                 did,
-                owner,
-                common,
                 templateId,
-                conditionIds,
                 timeLock,
                 timeOut,
-                providers,
-                conditionTypes
+                providers
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
@@ -793,14 +751,10 @@ contract('AgreementStoreManager', (accounts) => {
         it('should return false if not agreement DID provider', async () => {
             const {
                 did,
-                owner,
-                common,
                 templateId,
-                conditionIds,
                 timeLock,
                 timeOut,
-                providers,
-                conditionTypes
+                providers
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement

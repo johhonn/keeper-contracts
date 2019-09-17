@@ -51,7 +51,7 @@ contract('TemplateStoreManager', (accounts) => {
         await templateStoreManager.registerTemplateActorType(
             'consumer',
             {
-            from: owner
+                from: owner
             }
         )
         const consumerActorTypeId = await templateStoreManager.getTemplateActorTypeId('consumer')
@@ -59,10 +59,10 @@ contract('TemplateStoreManager', (accounts) => {
         // any random ID
         templateId = constants.bytes32.one
 
-        conditionTypes = [
+        const conditionTypes = [
             hashLockCondition.address
         ]
-        actorTypeIds = [
+        const actorTypeIds = [
             consumerActorTypeId
         ]
         return {
@@ -88,7 +88,7 @@ contract('TemplateStoreManager', (accounts) => {
 
     describe('propose template', () => {
         it('should propose and be proposed', async () => {
-            const { templateStoreManager, conditionTypes, templateId, actorTypes, owner } = await setupTest()
+            const { templateStoreManager, conditionTypes, templateId, actorTypeIds, owner } = await setupTest()
 
             await templateStoreManager.methods['proposeTemplate(bytes32,address[],bytes32[],string)'](
                 templateId,
