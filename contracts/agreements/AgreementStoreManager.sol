@@ -7,7 +7,6 @@ import './AgreementStoreLibrary.sol';
 import '../conditions/ConditionStoreManager.sol';
 import '../registry/DIDRegistry.sol';
 import '../templates/TemplateStoreManager.sol';
-
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
 /**
@@ -39,6 +38,9 @@ contract AgreementStoreManager is Ownable {
     
     using AgreementStoreLibrary for AgreementStoreLibrary.AgreementActors;
     AgreementStoreLibrary.AgreementActors internal agreementActors;
+    
+    // this meant as template ID resolver to avoid memory layout corruption
+    mapping (address => bytes32) templateIdAddressToBytes32;
 
     /**
      * @dev initialize AgreementStoreManager Initializer
@@ -114,6 +116,7 @@ contract AgreementStoreManager is Ownable {
         address[] memory _conditionTypes;
         bytes32[] memory _actorTypes;
         
+        
         (,,,,_conditionTypes, _actorTypes) = templateStoreManager.getTemplate(
             _templateId
         );
@@ -135,10 +138,13 @@ contract AgreementStoreManager is Ownable {
                 _timeOuts[i]
             );
         }
+        
+        address templateAddress = convertBytes32ToAddress(_templateId);
+        templateIdAddressToBytes32[templateAddress] = _templateId;
         agreementList.create(
             _id,
             _did,
-            _templateId,
+            templateAddress,
             _conditionIds
         );
         
@@ -172,7 +178,8 @@ contract AgreementStoreManager is Ownable {
     {
         did = agreementList.agreements[_id].did;
         didOwner = didRegistry.getDIDOwner(did);
-        templateId = agreementList.agreements[_id].templateId;
+        address _templateAddress = agreementList.agreements[_id].templateId;
+        templateId = templateIdAddressToBytes32[_templateAddress];
         conditionIds = agreementList.agreements[_id].conditionIds;
         lastUpdatedBy = agreementList.agreements[_id].lastUpdatedBy;
         blockNumberUpdated = agreementList.agreements[_id].blockNumberUpdated;
@@ -255,7 +262,8 @@ contract AgreementStoreManager is Ownable {
         view
         returns (bytes32[] memory)
     {
-        return agreementList.templateIdToAgreementIds[_templateId];
+        address templateId = convertBytes32ToAddress(_templateId);
+        return agreementList.templateIdToAgreementIds[templateId];
     }
     
     /**
@@ -269,5 +277,20 @@ contract AgreementStoreManager is Ownable {
         returns(address)
     {
         return address(didRegistry);
+    }
+    
+   /**
+    * @dev convertBytes32ToAddress 
+    * @param input a 32 bytes input
+    * @return bytes 20 output
+    */
+    function convertBytes32ToAddress(
+        bytes32 input    
+    )
+        private
+        pure
+        returns(address)
+    {
+        return address(ripemd160(abi.encodePacked(input)));
     }
 }

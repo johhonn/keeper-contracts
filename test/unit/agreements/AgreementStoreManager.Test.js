@@ -98,7 +98,7 @@ contract('AgreementStoreManager', (accounts) => {
             consumerActorTypeId
         ]
 
-        if ( proposeTemplate ) {
+        if (proposeTemplate) {
             await templateStoreManager.methods['proposeTemplate(bytes32,address[],bytes32[],string)'](
                 templateId,
                 conditionTypes,
@@ -495,7 +495,6 @@ contract('AgreementStoreManager', (accounts) => {
         })
 
         it('should return false if weather it invalid DID or owner', async () => {
-
             const {
                 did,
                 owner,
@@ -507,7 +506,6 @@ contract('AgreementStoreManager', (accounts) => {
                 providers,
                 conditionTypes
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
-
 
             // construct agreement
             const agreement = {
@@ -530,7 +528,6 @@ contract('AgreementStoreManager', (accounts) => {
                 agreementId,
                 ...Object.values(agreement)
             )
-
 
             // assert
             assert.strictEqual(
@@ -634,7 +631,6 @@ contract('AgreementStoreManager', (accounts) => {
 
     describe('get agreement', () => {
         it('successful create should get agreement', async () => {
-
             const {
                 did,
                 owner,
@@ -784,7 +780,6 @@ contract('AgreementStoreManager', (accounts) => {
                 agreementId,
                 ...Object.values(agreement)
             )
-
 
             assert.strictEqual(
                 await agreementStoreManager.isAgreementDIDProvider(
