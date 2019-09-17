@@ -48,6 +48,33 @@ const common = {
             await didRegistry.registerAttribute(did, checksum, [DIDProvider], value)
         }
 
+        await templateStoreManager.registerTemplateActorType(
+            'grantee',
+            {
+                from: owner
+            }
+        )
+        const granteeActorTypeId = await templateStoreManager.getTemplateActorTypeId('grantee')
+
+        // any random ID
+        templateId = constants.bytes32.one
+
+        conditionTypes = [
+            accessSecretStoreCondition.address
+        ]
+        actorTypeIds = [
+            granteeActorTypeId
+        ]
+
+        await templateStoreManager.methods['proposeTemplate(bytes32,address[],bytes32[],string)'](
+            templateId,
+            conditionTypes,
+            actorTypeIds,
+            'AccessSecretStoreTemplate'
+        )
+
+        await templateStoreManager.approveTemplate(templateId, { from: owner })
+
         return {
             did,
             conditionId,
@@ -58,7 +85,8 @@ const common = {
             agreementStoreManager,
             conditionStoreManager,
             templateStoreManager,
-            accessSecretStoreCondition
+            accessSecretStoreCondition,
+            templateId
         }
     }
 }
