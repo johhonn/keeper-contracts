@@ -298,4 +298,31 @@ contract('TemplateStoreManager', (accounts) => {
             )
         })
     })
+
+    describe('template actor utility functions', () => {
+        it('should get exact template actor type value, state, and Id', async () => {
+            const { templateStoreManager, actorTypeIds } = await setupTest()
+            expect(actorTypeIds[0])
+                .to.equal(await templateStoreManager.getTemplateActorTypeId('consumer'))
+            expect(await templateStoreManager.getTemplateActorTypeValue(actorTypeIds[0]))
+                .to.equal('consumer')
+            expect((await templateStoreManager.getTemplateActorTypeState(actorTypeIds[0])).toNumber())
+                .to.equal(1)
+        })
+
+        it('should deregister template actor and return the corresponding state', async () => {
+            const { templateStoreManager, actorTypeIds } = await setupTest()
+            await templateStoreManager.deregisterTemplateActorType(actorTypeIds[0])
+            expect((await templateStoreManager.getTemplateActorTypeState(actorTypeIds[0])).toNumber())
+                .to.equal(2)
+        })
+
+        it('should return all template actor type IDs', async () => {
+            const { templateStoreManager, actorTypeIds } = await setupTest()
+            const templateActorTypeIds = await templateStoreManager.getTemplateActorTypeIds()
+
+            expect(templateActorTypeIds[0])
+                .to.equal(actorTypeIds[0])
+        })
+    })
 })
