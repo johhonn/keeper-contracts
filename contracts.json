@@ -7,11 +7,9 @@
   "LockRewardCondition",
   "AccessSecretStoreCondition",
   "EscrowReward",
-  "EscrowAccessSecretStoreTemplate",
   "OceanToken",
   "DIDRegistry",
   "ThresholdCondition",
   "WhitelistingCondition",
-  "ComputeExecutionCondition",
-  "EscrowComputeExecutionTemplate"
+  "ComputeExecutionCondition"
 ]

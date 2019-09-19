@@ -75,30 +75,30 @@ async function setupContracts({
         const TemplateStoreManagerInstance =
             await TemplateStoreManager.at(addressBook.TemplateStoreManager)
 
-        if (addressBook.EscrowAccessSecretStoreTemplate) {
-            if (verbose) {
-                console.log(
-                    `Proposing template ${addressBook.EscrowAccessSecretStoreTemplate} from ${roles.deployer}`
-                )
-            }
-
-            await TemplateStoreManagerInstance.proposeTemplate(
-                addressBook.EscrowAccessSecretStoreTemplate,
-                { from: roles.deployer }
-            )
-
-            if (verbose) {
-                console.log(
-                    `Approving template ${addressBook.EscrowAccessSecretStoreTemplate} from ${roles.deployer}`
-                )
-            }
-
-            await approveTemplate({
-                TemplateStoreManagerInstance,
-                roles,
-                templateAddress: addressBook.EscrowAccessSecretStoreTemplate
-            })
-        }
+//        if (addressBook.EscrowAccessSecretStoreTemplate) {
+//            if (verbose) {
+//                console.log(
+//                    `Proposing template ${addressBook.EscrowAccessSecretStoreTemplate} from ${roles.deployer}`
+//                )
+//            }
+//
+//            await TemplateStoreManagerInstance.proposeTemplate(
+//                addressBook.EscrowAccessSecretStoreTemplate,
+//                { from: roles.deployer }
+//            )
+//
+//            if (verbose) {
+//                console.log(
+//                    `Approving template ${addressBook.EscrowAccessSecretStoreTemplate} from ${roles.deployer}`
+//                )
+//            }
+//
+//            await approveTemplate({
+//                TemplateStoreManagerInstance,
+//                roles,
+//                templateAddress: addressBook.EscrowAccessSecretStoreTemplate
+//            })
+//        }
 
         await transferOwnership({
             ContractInstance: TemplateStoreManagerInstance,
