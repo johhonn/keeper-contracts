@@ -82,7 +82,7 @@ contract('TemplateStoreManager', (accounts) => {
         })
 
         it('Should be possible to change function signature', async () => {
-            const { conditionType } = await setupTest()
+            await setupTest()
 
             const taskBook = await upgrade({
                 web3,
@@ -142,7 +142,7 @@ contract('TemplateStoreManager', (accounts) => {
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
-            const { conditionType } = await setupTest()
+            await setupTest()
 
             const taskBook = await upgrade({
                 web3,
