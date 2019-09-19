@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 
+/*
 async function approveTemplate({
     TemplateStoreManagerInstance,
     roles,
@@ -17,7 +18,7 @@ async function approveTemplate({
         console.log('The deployer is not anymore the owner of the TemplateStoreManager ')
         console.log('=====================================================================================')
     }
-}
+} */
 
 async function transferOwnership({
     ContractInstance,
@@ -75,31 +76,32 @@ async function setupContracts({
         const TemplateStoreManagerInstance =
             await TemplateStoreManager.at(addressBook.TemplateStoreManager)
 
-//        if (addressBook.EscrowAccessSecretStoreTemplate) {
-//            if (verbose) {
-//                console.log(
-//                    `Proposing template ${addressBook.EscrowAccessSecretStoreTemplate} from ${roles.deployer}`
-//                )
-//            }
-//
-//            await TemplateStoreManagerInstance.proposeTemplate(
-//                addressBook.EscrowAccessSecretStoreTemplate,
-//                { from: roles.deployer }
-//            )
-//
-//            if (verbose) {
-//                console.log(
-//                    `Approving template ${addressBook.EscrowAccessSecretStoreTemplate} from ${roles.deployer}`
-//                )
-//            }
-//
-//            await approveTemplate({
-//                TemplateStoreManagerInstance,
-//                roles,
-//                templateAddress: addressBook.EscrowAccessSecretStoreTemplate
-//            })
-//        }
+        // TODO: create new templates here
+        /**
+        if (addressBook.EscrowAccessSecretStoreTemplate) {
+            if (verbose) {
+                console.log(
+                    `Proposing template ${addressBook.EscrowAccessSecretStoreTemplate} from ${roles.deployer}`
+                )
+            }
 
+            await TemplateStoreManagerInstance.proposeTemplate(
+                addressBook.EscrowAccessSecretStoreTemplate,
+                { from: roles.deployer }
+            )
+
+            if (verbose) {
+                console.log(
+                    `Approving template ${addressBook.EscrowAccessSecretStoreTemplate} from ${roles.deployer}`
+                )
+            }
+
+            await approveTemplate({
+                TemplateStoreManagerInstance,
+                roles,
+                templateAddress: addressBook.EscrowAccessSecretStoreTemplate
+            })
+        }**/
         await transferOwnership({
             ContractInstance: TemplateStoreManagerInstance,
             name: TemplateStoreManager.contractName,
