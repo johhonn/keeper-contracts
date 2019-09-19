@@ -9,16 +9,17 @@ contract TemplateStoreChangeFunctionSignature is TemplateStoreManager {
 
     function proposeTemplate(
         bytes32 _id, 
-        address _sender, 
         address[] calldata _conditionTypes,
-        bytes32[] calldata _actorTypeIds
+        bytes32[] calldata _actorTypeIds,
+        string calldata name,
+        address sender
     )
         external
         returns (uint size)
     {
         require(
-            _id == keccak256(abi.encodePacked(_sender)),
-            'Invalid sender address'
+            _id == keccak256(abi.encodePacked(sender, name)),
+            'Invalid address hash'
         );
         return templateList.propose(_id, _conditionTypes, _actorTypeIds);
     }

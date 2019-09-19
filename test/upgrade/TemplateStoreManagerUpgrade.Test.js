@@ -101,8 +101,17 @@ contract('TemplateStoreManager', (accounts) => {
 
             // act & assert
             await assert.isRejected(
-                TemplateStoreChangeFunctionSignatureInstance.proposeTemplate(conditionType, constants.address.dummy),
-                'Invalid sender address'
+                TemplateStoreChangeFunctionSignatureInstance.methods['proposeTemplate(bytes32,address[],bytes32[],string,address)'](
+                    constants.bytes32.one,
+                    [TemplateStoreChangeFunctionSignatureInstance.address],
+                    [constants.bytes32.one],
+                    'SampleTemplate',
+                    accounts[3],
+                    {
+                        from: accounts[0]
+                    }
+                ),
+                'Invalid address hash'
             )
         })
 
@@ -152,9 +161,19 @@ contract('TemplateStoreManager', (accounts) => {
 
             // act & assert
             await assert.isRejected(
-                TemplateStoreChangeInStorageAndLogicInstance.proposeTemplate(conditionType, constants.address.dummy),
-                'Invalid sender address'
+                TemplateStoreChangeInStorageAndLogicInstance.methods['proposeTemplate(bytes32,address[],bytes32[],string,address)'](
+                    constants.bytes32.one,
+                    [TemplateStoreChangeInStorageAndLogicInstance.address],
+                    [constants.bytes32.one],
+                    'SampleTemplate',
+                    accounts[3],
+                    {
+                        from: accounts[0]
+                    }
+                ),
+                'Invalid address hash'
             )
+
             assert.strictEqual(
                 (await TemplateStoreChangeInStorageAndLogicInstance.templateCount()).toNumber(),
                 0,
