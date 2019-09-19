@@ -17,6 +17,12 @@ const {
 } = require('./Upgrader')
 
 const AgreementStoreManager = artifacts.require('AgreementStoreManager')
+const TemplateStoreManager = artifacts.require('TemplateStoreManager')
+const TemplateStoreLibrary = artifacts.require('TemplateStoreLibrary')
+const ValidConditionContract = artifacts.require('ComputeExecutionCondition')
+const EpochLibrary = artifacts.require('EpochLibrary')
+const ConditionStoreLibrary = artifacts.require('ConditionStoreLibrary')
+const ConditionStoreManager = artifacts.require('ConditionStoreManager')
 
 const AgreementStoreManagerChangeFunctionSignature =
     artifacts.require('AgreementStoreManagerChangeFunctionSignature')
@@ -40,16 +46,75 @@ contract('AgreementStoreManager', (accounts) => {
         did = constants.did[0],
         conditionTypes = [constants.address.dummy],
         timeLocks = [0],
-        timeOuts = [2]
+        timeOuts = [2],
+        templateId = constants.bytes32.one,
+        owner = accounts[0]
     } = {}) {
-        await AgreementStoreManager.at(agreementStoreManagerAddress)
+        const agreementStoreManager = await AgreementStoreManager.at(agreementStoreManagerAddress)
+
+        const epochLibrary = await EpochLibrary.new()
+        await ConditionStoreLibrary.link('EpochLibrary', epochLibrary.address)
+        const conditionStoreLibrary = await ConditionStoreLibrary.new()
+        await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
+        await ConditionStoreManager.link('ConditionStoreLibrary', conditionStoreLibrary.address)
+        const conditionStoreManager = await ConditionStoreManager.new()
+        await conditionStoreManager.initialize(
+            owner,
+            { from: owner }
+        )
+
+        const templateStoreLibrary = await TemplateStoreLibrary.new()
+        await TemplateStoreManager.link('TemplateStoreLibrary', templateStoreLibrary.address)
+        const templateStoreManager = await TemplateStoreManager.new()
+        await templateStoreManager.initialize(owner)
+
+        const validConditionContract = await ValidConditionContract.new()
+
+        await validConditionContract.methods['initialize(address,address,address)'](
+            accounts[0],
+            conditionStoreManager.address,
+            agreementStoreManager.address,
+            { from: accounts[0] }
+        )
+
+        const consumerAddress = accounts[1]
+        const hashValues = await validConditionContract.hashValues(constants.bytes32.one, consumerAddress)
+        const conditionId = await validConditionContract.generateId(agreementId, hashValues)
+        conditionIds = [conditionId]
+        await templateStoreManager.registerTemplateActorType(
+            'consumer',
+            {
+                from: owner
+            }
+        )
+        const consumerActorTypeId = await templateStoreManager.getTemplateActorTypeId('consumer')
+
+        conditionTypes = [
+            validConditionContract.address
+        ]
+        const actorTypeIds = [
+            consumerActorTypeId
+        ]
+
+        await templateStoreManager.methods['proposeTemplate(bytes32,address[],bytes32[],string)'](
+            templateId,
+            conditionTypes,
+            actorTypeIds,
+            'SampleTemplate'
+        )
+
+        await templateStoreManager.approveTemplate(templateId, { from: owner })
+
         return {
             did,
             agreementId,
             conditionIds,
             conditionTypes,
             timeLocks,
-            timeOuts
+            timeOuts,
+            actorTypeIds,
+            templateId,
+            templateStoreManager
         }
     }
 
@@ -103,7 +168,9 @@ contract('AgreementStoreManager', (accounts) => {
                 conditionIds,
                 conditionTypes,
                 timeLocks,
-                timeOuts
+                timeOuts,
+                templateId,
+                templateStoreManager
             } = await setupTest()
 
             const taskBook = await upgrade({
@@ -127,11 +194,11 @@ contract('AgreementStoreManager', (accounts) => {
                 AgreementStoreManagerChangeFunctionSignatureInstance.createAgreement(
                     agreementId,
                     did,
-                    conditionTypes,
+                    templateId,
                     conditionIds,
                     timeLocks,
                     timeOuts,
-                    accounts[7],
+                    [accounts[1]],
                     { from: accounts[8] }
                 ),
                 'Invalid sender address, should fail in function signature check'
@@ -172,7 +239,8 @@ contract('AgreementStoreManager', (accounts) => {
                 conditionIds,
                 conditionTypes,
                 timeLocks,
-                timeOuts
+                timeOuts,
+                templateId
             } = await setupTest()
 
             const taskBook = await upgrade({
@@ -196,11 +264,11 @@ contract('AgreementStoreManager', (accounts) => {
                 AgreementStoreManagerChangeInStorageAndLogicInstance.createAgreement(
                     agreementId,
                     did,
-                    conditionTypes,
+                    templateId,
                     conditionIds,
                     timeLocks,
                     timeOuts,
-                    accounts[8],
+                    [accounts[8]],
                     { from: accounts[7] }
                 ),
                 'Invalid sender address, should fail in function signature check'
