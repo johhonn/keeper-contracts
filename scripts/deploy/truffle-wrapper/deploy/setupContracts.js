@@ -1,10 +1,17 @@
 /* eslint-disable no-console */
 
 async function approveTemplate({
-    TemplateStoreManagerInstance,
+    web3,
+    artifacts,
+    addressBook,
+    TemplateStoreManagerAddress,
     roles,
     templateId
 } = {}) {
+    const TemplateStoreManager = artifacts.require('TemplateStoreManager')
+    const TemplateStoreManagerInstance =
+            await TemplateStoreManager.at(addressBook.TemplateStoreManager)
+
     if (await TemplateStoreManagerInstance.isOwner({ from: roles.deployer })) {
         await TemplateStoreManagerInstance.approveTemplate(
             templateId,
@@ -125,11 +132,14 @@ async function setupContracts({
             'EscrowAccessSecretStoreTemplate'
         )
 
-        await approveTemplate(
-            TemplateStoreManagerInstance,
-            roles,
-            escrowAccessSecretStoreTemplateId
-        )
+        await approveTemplate({
+            web3: web3,
+            artifacts: artifacts,
+            addressBook: addressBook,
+            TemplateStoreManagerAddress: addressBook.TemplateStoreManager,
+            roles: roles,
+            templateId: escrowAccessSecretStoreTemplateId
+        })
 
         if (verbose) {
             console.log(
@@ -152,11 +162,14 @@ async function setupContracts({
             'EscrowComputeExecutionTemplate'
         )
 
-        await approveTemplate(
-            TemplateStoreManagerInstance,
-            roles,
-            escrowComputeExecutionTemplateId
-        )
+        await approveTemplate({
+            web3: web3,
+            artifacts: artifacts,
+            addressBook: addressBook,
+            TemplateStoreManagerAddress: addressBook.TemplateStoreManager,
+            roles: roles,
+            templateId: escrowComputeExecutionTemplateId
+        })
 
         await transferOwnership({
             ContractInstance: TemplateStoreManagerInstance,

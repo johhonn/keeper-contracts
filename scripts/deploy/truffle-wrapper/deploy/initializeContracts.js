@@ -37,7 +37,7 @@ async function initializeContracts({
         })
     }
 
-    if(contracts.indexOf('Common') > -1) {
+    if (contracts.indexOf('Common') > -1) {
         addressBook.Common = zosCreate({
             contract: 'Common',
             network,
