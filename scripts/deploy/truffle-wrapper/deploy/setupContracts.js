@@ -1,24 +1,24 @@
 /* eslint-disable no-console */
 
-/*
+
 async function approveTemplate({
     TemplateStoreManagerInstance,
     roles,
-    templateAddress
+    templateId
 } = {}) {
     if (await TemplateStoreManagerInstance.isOwner({ from: roles.deployer })) {
         await TemplateStoreManagerInstance.approveTemplate(
-            templateAddress,
+            templateId,
             { from: roles.deployer }
         )
     } else {
         // todo: make call to multi sig wallet here instead of warning!
         console.log('=====================================================================================')
-        console.log(`WARNING: Template ${templateAddress} could not be approved!`)
+        console.log(`WARNING: Template ${templateId} could not be approved!`)
         console.log('The deployer is not anymore the owner of the TemplateStoreManager ')
         console.log('=====================================================================================')
     }
-} */
+}
 
 async function transferOwnership({
     ContractInstance,
@@ -70,38 +70,93 @@ async function setupContracts({
      * setup deployed contracts
      * -----------------------------------------------------------------------
      */
-    if (addressBook.TemplateStoreManager) {
+    if (addressBook.TemplateStoreManager &&
+        addressBook.LockRewardCondition &&
+        addressBook.EscrowReward &&
+        addressBook.AccessSecretStoreCondition &&
+        addressBook.ComputeExecutionCondition &&
+        addressBook.Common) {
         const TemplateStoreManager =
             artifacts.require('TemplateStoreManager')
         const TemplateStoreManagerInstance =
             await TemplateStoreManager.at(addressBook.TemplateStoreManager)
-
-        // TODO: create new templates here
-        /**
-        if (addressBook.EscrowAccessSecretStoreTemplate) {
-            if (verbose) {
-                console.log(
-                    `Proposing template ${addressBook.EscrowAccessSecretStoreTemplate} from ${roles.deployer}`
-                )
-            }
-
-            await TemplateStoreManagerInstance.proposeTemplate(
-                addressBook.EscrowAccessSecretStoreTemplate,
-                { from: roles.deployer }
+        const CommonInstance = await Common.at(addressBook.Common)
+        // TODO: create EscrowAccessSecretStore and EscrowComputeExecution Template
+        if (verbose) {
+            console.log(
+                `Proposing template EscrowAccessSecretStore from ${roles.deployer}`
             )
+        }
 
-            if (verbose) {
-                console.log(
-                    `Approving template ${addressBook.EscrowAccessSecretStoreTemplate} from ${roles.deployer}`
-                )
+        await TemplateStoreManagerInstance.registerTemplateActorType(
+            'provider',
+            {
+                from: owner
             }
+        )
+        const providerActorTypeId = await TemplateStoreManagerInstance.getTemplateActorTypeId('provider')
 
-            await approveTemplate({
-                TemplateStoreManagerInstance,
-                roles,
-                templateAddress: addressBook.EscrowAccessSecretStoreTemplate
-            })
-        }**/
+        await TemplateStoreManagerInstance.registerTemplateActorType(
+            'consumer',
+            {
+                from: owner
+            }
+        )
+
+        const consumerActorTypeId = await TemplateStoreManagerInstance.getTemplateActorTypeId('consumer')
+        const actorTypeIds = [
+            providerActorTypeId,
+            consumerActorTypeId
+        ]
+
+        const EscrowAccessConditionTypes = [
+            addressBook.LockRewardCondition,
+            addressBook.AccessSecretStoreCondition,
+            addressBook.EscrowReward
+        ]
+
+        const escrowAccessSecretStoreTemplateId = await CommonInstance.hashString('EscrowAccessSecretStoreTemplate')
+
+        await TemplateStoreManagerInstance.methods['proposeTemplate(bytes32,address[],bytes32[],string)'](
+            escrowAccessSecretStoreTemplateId,
+            EscrowAccessConditionTypes,
+            actorTypeIds,
+            'EscrowAccessSecretStoreTemplate'
+        )
+
+        await TemplateStoreManagerInstance.approveTemplate(
+            TemplateStoreManagerInstance,
+            roles,
+            escrowAccessSecretStoreTemplateId
+        )
+
+        if (verbose) {
+            console.log(
+                `Proposing template EscrowComputeExecution from ${roles.deployer}`
+            )
+        }
+
+        const escrowComputeExecutionTemplateId = await CommonInstance.hashString('EscrowComputeExecutionTemplate')
+
+        const EscrowComputeConditionTypes = [
+            addressBook.LockRewardCondition,
+            addressBook.AccessSecretStoreCondition,
+            addressBook.EscrowReward
+        ]
+
+        await TemplateStoreManagerInstance.methods['proposeTemplate(bytes32,address[],bytes32[],string)'](
+            escrowComputeExecutionTemplateId,
+            EscrowComputeConditionTypes,
+            actorTypeIds,
+            'EscrowComputeExecutionTemplate'
+        )
+
+        await TemplateStoreManagerInstance.approveTemplate(
+            TemplateStoreManagerInstance,
+            roles,
+            escrowComputeExecutionTemplateId
+        )
+
         await transferOwnership({
             ContractInstance: TemplateStoreManagerInstance,
             name: TemplateStoreManager.contractName,

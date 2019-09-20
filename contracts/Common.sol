@@ -37,4 +37,17 @@ contract Common {
         assembly { size := extcodesize(addr) }
         return size > 0;
     }
+    
+    /**
+     * @dev hashString calculate string hash
+     * @param input input string 
+     * @return bytes32 hash value
+     */
+    function hashString(string memory input)
+        public
+        pure
+        returns(bytes32 hash)
+    {
+        hash = keccak256(abi.encodePacked(input));
+    }
 }
