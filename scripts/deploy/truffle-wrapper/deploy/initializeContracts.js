@@ -37,6 +37,15 @@ async function initializeContracts({
         })
     }
 
+    if(contracts.indexOf('Common') > -1) {
+        addressBook.Common = zosCreate({
+            contract: 'Common',
+            network,
+            args: [roles.ownerWallet],
+            verbose
+        })
+    }
+
     if (contracts.indexOf('OceanToken') > -1) {
         addressBook.OceanToken = zosCreate({
             contract: 'OceanToken',

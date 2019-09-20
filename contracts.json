@@ -11,5 +11,6 @@
   "DIDRegistry",
   "ThresholdCondition",
   "WhitelistingCondition",
-  "ComputeExecutionCondition"
+  "ComputeExecutionCondition",
+  "Common"
 ]
