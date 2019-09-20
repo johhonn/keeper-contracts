@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 
-
 async function approveTemplate({
     TemplateStoreManagerInstance,
     roles,
@@ -74,10 +73,12 @@ async function setupContracts({
         addressBook.LockRewardCondition &&
         addressBook.EscrowReward &&
         addressBook.AccessSecretStoreCondition &&
-        addressBook.ComputeExecutionCondition &&
-        addressBook.Common) {
+        addressBook.ComputeExecutionCondition
+    ) {
         const TemplateStoreManager =
             artifacts.require('TemplateStoreManager')
+        const Common = artifacts.require('Common')
+
         const TemplateStoreManagerInstance =
             await TemplateStoreManager.at(addressBook.TemplateStoreManager)
         const CommonInstance = await Common.at(addressBook.Common)
@@ -91,7 +92,7 @@ async function setupContracts({
         await TemplateStoreManagerInstance.registerTemplateActorType(
             'provider',
             {
-                from: owner
+                from: roles.deployer
             }
         )
         const providerActorTypeId = await TemplateStoreManagerInstance.getTemplateActorTypeId('provider')
@@ -99,7 +100,7 @@ async function setupContracts({
         await TemplateStoreManagerInstance.registerTemplateActorType(
             'consumer',
             {
-                from: owner
+                from: roles.deployer
             }
         )
 
@@ -124,7 +125,7 @@ async function setupContracts({
             'EscrowAccessSecretStoreTemplate'
         )
 
-        await TemplateStoreManagerInstance.approveTemplate(
+        await approveTemplate(
             TemplateStoreManagerInstance,
             roles,
             escrowAccessSecretStoreTemplateId
@@ -151,7 +152,7 @@ async function setupContracts({
             'EscrowComputeExecutionTemplate'
         )
 
-        await TemplateStoreManagerInstance.approveTemplate(
+        await approveTemplate(
             TemplateStoreManagerInstance,
             roles,
             escrowComputeExecutionTemplateId
