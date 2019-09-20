@@ -1,17 +1,10 @@
 /* eslint-disable no-console */
 
 async function approveTemplate({
-    web3,
-    artifacts,
-    addressBook,
-    TemplateStoreManagerAddress,
+    TemplateStoreManagerInstance,
     roles,
     templateId
 } = {}) {
-    const TemplateStoreManager = artifacts.require('TemplateStoreManager')
-    const TemplateStoreManagerInstance =
-            await TemplateStoreManager.at(addressBook.TemplateStoreManager)
-
     if (await TemplateStoreManagerInstance.isOwner({ from: roles.deployer })) {
         await TemplateStoreManagerInstance.approveTemplate(
             templateId,
@@ -89,7 +82,7 @@ async function setupContracts({
         const TemplateStoreManagerInstance =
             await TemplateStoreManager.at(addressBook.TemplateStoreManager)
         const CommonInstance = await Common.at(addressBook.Common)
-        // TODO: create EscrowAccessSecretStore and EscrowComputeExecution Template
+
         if (verbose) {
             console.log(
                 `Proposing template EscrowAccessSecretStore from ${roles.deployer}`
@@ -102,7 +95,10 @@ async function setupContracts({
                 from: roles.deployer
             }
         )
-        const providerActorTypeId = await TemplateStoreManagerInstance.getTemplateActorTypeId('provider')
+        const providerActorTypeId = await TemplateStoreManagerInstance.getTemplateActorTypeId(
+            'provider',
+            { from: roles.deployer }
+        )
 
         await TemplateStoreManagerInstance.registerTemplateActorType(
             'consumer',
@@ -111,7 +107,10 @@ async function setupContracts({
             }
         )
 
-        const consumerActorTypeId = await TemplateStoreManagerInstance.getTemplateActorTypeId('consumer')
+        const consumerActorTypeId = await TemplateStoreManagerInstance.getTemplateActorTypeId(
+            'consumer',
+            { from: roles.deployer }
+        )
         const actorTypeIds = [
             providerActorTypeId,
             consumerActorTypeId
@@ -129,14 +128,12 @@ async function setupContracts({
             escrowAccessSecretStoreTemplateId,
             EscrowAccessConditionTypes,
             actorTypeIds,
-            'EscrowAccessSecretStoreTemplate'
+            'EscrowAccessSecretStoreTemplate',
+            { from: roles.deployer }
         )
 
         await approveTemplate({
-            web3: web3,
-            artifacts: artifacts,
-            addressBook: addressBook,
-            TemplateStoreManagerAddress: addressBook.TemplateStoreManager,
+            TemplateStoreManagerInstance: TemplateStoreManagerInstance,
             roles: roles,
             templateId: escrowAccessSecretStoreTemplateId
         })
@@ -147,11 +144,14 @@ async function setupContracts({
             )
         }
 
-        const escrowComputeExecutionTemplateId = await CommonInstance.hashString('EscrowComputeExecutionTemplate')
+        const escrowComputeExecutionTemplateId = await CommonInstance.hashString(
+            'EscrowComputeExecutionTemplate',
+            { from: roles.deployer }
+        )
 
         const EscrowComputeConditionTypes = [
             addressBook.LockRewardCondition,
-            addressBook.AccessSecretStoreCondition,
+            addressBook.ComputeExecutionCondition,
             addressBook.EscrowReward
         ]
 
@@ -159,14 +159,12 @@ async function setupContracts({
             escrowComputeExecutionTemplateId,
             EscrowComputeConditionTypes,
             actorTypeIds,
-            'EscrowComputeExecutionTemplate'
+            'EscrowComputeExecutionTemplate',
+            { from: roles.deployer }
         )
 
         await approveTemplate({
-            web3: web3,
-            artifacts: artifacts,
-            addressBook: addressBook,
-            TemplateStoreManagerAddress: addressBook.TemplateStoreManager,
+            TemplateStoreManagerInstance: TemplateStoreManagerInstance,
             roles: roles,
             templateId: escrowComputeExecutionTemplateId
         })
