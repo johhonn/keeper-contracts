@@ -8,7 +8,10 @@ chai.use(chaiAsPromised)
 const constants = require('../helpers/constants.js')
 
 const {
-    confirmUpgrade
+    confirmUpgrade,
+    submitTransaction,
+    confirmTransaction,
+    loadWallet
 } = require('@oceanprotocol/dori')
 
 const {
@@ -17,13 +20,9 @@ const {
 } = require('./Upgrader')
 
 const AgreementStoreManager = artifacts.require('AgreementStoreManager')
+const ComputeExecutionCondition = artifacts.require('ComputeExecutionCondition')
 const TemplateStoreManager = artifacts.require('TemplateStoreManager')
-const TemplateStoreLibrary = artifacts.require('TemplateStoreLibrary')
-const ValidConditionContract = artifacts.require('ComputeExecutionCondition')
-const EpochLibrary = artifacts.require('EpochLibrary')
-const ConditionStoreLibrary = artifacts.require('ConditionStoreLibrary')
-const ConditionStoreManager = artifacts.require('ConditionStoreManager')
-
+const Common = artifacts.require('Common')
 const AgreementStoreManagerChangeFunctionSignature =
     artifacts.require('AgreementStoreManagerChangeFunctionSignature')
 const AgreementStoreManagerChangeInStorage =
@@ -35,81 +34,51 @@ const AgreementStoreManagerExtraFunctionality =
 const AgreementStoreManagerWithBug = artifacts.require('AgreementStoreManagerWithBug')
 
 contract('AgreementStoreManager', (accounts) => {
-    let agreementStoreManagerAddress
+    let agreementStoreManagerAddress,
+        templateStoreManagerAddress,
+        ComputeExecutionConditionAddress,
+        CommonAddress,
+        ownerWallet
 
     const verbose = false
     const approver = accounts[3]
 
     async function setupTest({
         agreementId = constants.bytes32.one,
+        templateId = constants.bytes32.two,
         conditionIds = [constants.address.dummy],
         did = constants.did[0],
         conditionTypes = [constants.address.dummy],
         timeLocks = [0],
         timeOuts = [2],
-        templateId = constants.bytes32.one,
-        owner = accounts[0]
+        owner = accounts[0],
+        actorTypeIds = []
     } = {}) {
+
         const agreementStoreManager = await AgreementStoreManager.at(agreementStoreManagerAddress)
-
-        const epochLibrary = await EpochLibrary.new()
-        await ConditionStoreLibrary.link('EpochLibrary', epochLibrary.address)
-        const conditionStoreLibrary = await ConditionStoreLibrary.new()
-        await ConditionStoreManager.link('EpochLibrary', epochLibrary.address)
-        await ConditionStoreManager.link('ConditionStoreLibrary', conditionStoreLibrary.address)
-        const conditionStoreManager = await ConditionStoreManager.new()
-        await conditionStoreManager.initialize(
-            owner,
-            { from: owner }
-        )
-
-        const templateStoreLibrary = await TemplateStoreLibrary.new()
-        await TemplateStoreManager.link('TemplateStoreLibrary', templateStoreLibrary.address)
-        const templateStoreManager = await TemplateStoreManager.new()
-        await templateStoreManager.initialize(owner)
-
-        const validConditionContract = await ValidConditionContract.new()
-
-        await validConditionContract.methods['initialize(address,address,address)'](
-            accounts[0],
-            conditionStoreManager.address,
-            agreementStoreManager.address,
-            { from: accounts[0] }
-        )
+        const templateStoreManager = await TemplateStoreManager.at(templateStoreManagerAddress)
+        const common = await Common.at(CommonAddress)
+        const computeExecutionCondition = await ComputeExecutionCondition.at(ComputeExecutionConditionAddress)
 
         const consumerAddress = accounts[1]
-        const hashValues = await validConditionContract.hashValues(constants.bytes32.one, consumerAddress)
-        const conditionId = await validConditionContract.generateId(agreementId, hashValues)
-        conditionIds = [conditionId]
-        await templateStoreManager.registerTemplateActorType(
-            'consumer',
-            {
-                from: owner
-            }
-        )
-        const consumerActorTypeId = await templateStoreManager.getTemplateActorTypeId('consumer')
+        const computeExecutionConditionHashValues = await computeExecutionCondition.hashValues(constants.bytes32.one, consumerAddress)
+        const computeExecutionConditionId = await computeExecutionCondition.generateId(agreementId, computeExecutionConditionHashValues)
 
-        conditionTypes = [
-            validConditionContract.address
-        ]
-        const actorTypeIds = [
-            consumerActorTypeId
+        const LockRewardConditionId = constants.bytes32.two
+        const EscrowRewardConditionId = constants.bytes32.three
+
+        conditionIds = [
+            LockRewardConditionId,
+            computeExecutionConditionId,
+            EscrowRewardConditionId
         ]
 
-        await templateStoreManager.methods['proposeTemplate(bytes32,address[],bytes32[],string)'](
-            templateId,
-            conditionTypes,
-            actorTypeIds,
-            'SampleTemplate'
-        )
-
-        await templateStoreManager.approveTemplate(templateId, { from: owner })
+        templateId = await common.hashString('EscrowAccessSecretStoreTemplate')
 
         return {
             did,
             agreementId,
             conditionIds,
-            conditionTypes,
             timeLocks,
             timeOuts,
             actorTypeIds,
@@ -124,16 +93,30 @@ contract('AgreementStoreManager', (accounts) => {
                 web3,
                 artifacts,
                 contracts: [
-                    'DIDRegistry',
-                    'ConditionStoreManager',
-                    'TemplateStoreManager',
-                    'AgreementStoreManager'
+                    "ConditionStoreManager",
+                    "TemplateStoreManager",
+                    "AgreementStoreManager",
+                    "LockRewardCondition",
+                    "AccessSecretStoreCondition",
+                    "EscrowReward",
+                    "OceanToken",
+                    "DIDRegistry",
+                    "ComputeExecutionCondition",
+                    "Common"
                 ],
                 verbose
             })
 
             agreementStoreManagerAddress = addressBook.AgreementStoreManager
-            assert(agreementStoreManagerAddress)
+            templateStoreManagerAddress = addressBook.TemplateStoreManager
+            ComputeExecutionConditionAddress = addressBook.ComputeExecutionCondition
+            CommonAddress = addressBook.Common
+
+            ownerWallet = await loadWallet(
+                web3,
+                'owner',
+                verbose
+            )
         })
 
         it('Should be possible to fix/add a bug', async () => {
@@ -151,6 +134,7 @@ contract('AgreementStoreManager', (accounts) => {
                 approver,
                 verbose
             )
+
             const AgreementStoreManagerWithBugInstance =
                 await AgreementStoreManagerWithBug.at(agreementStoreManagerAddress)
 

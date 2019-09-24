@@ -73,7 +73,8 @@ async function setupContracts({
         addressBook.LockRewardCondition &&
         addressBook.EscrowReward &&
         addressBook.AccessSecretStoreCondition &&
-        addressBook.ComputeExecutionCondition
+        addressBook.ComputeExecutionCondition &&
+        addressBook.Common
     ) {
         const TemplateStoreManager =
             artifacts.require('TemplateStoreManager')
