@@ -211,7 +211,7 @@ library TemplateStoreLibrary {
         view
         returns(bool isValidConditionTypes)
     {
-        isValidConditionTypes = true;
+        isValidConditionTypes = false;
         for(uint256 i=0; i < _conditionTypes.length; i++) {
             bytes32 conditionId = keccak256(
                 abi.encodePacked(
@@ -223,9 +223,11 @@ library TemplateStoreLibrary {
             
             ICondition conditionType = ICondition(_conditionTypes[i]);
             
-            if (conditionId != conditionType.generateId(_Id, _Id))
-                isValidConditionTypes = false;
+            require(
+                conditionId == conditionType.generateId(_Id, _Id),
+                'Invalid condition type'
+            );
         }
-        return isValidConditionTypes;
+        isValidConditionTypes = true;
     }
 }
