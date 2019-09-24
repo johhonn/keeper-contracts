@@ -24,12 +24,15 @@ allFiredEvents
 # Mac / Apple
 .DS_Store
 
-$ Python related
+# Python related
 keeper_contracts.egg-info
 venv
-target/
 .python-version
 .eggs/
+
+# Maven related
+target/
+dependency-reduced-pom.xml
 
 # ZeppelinOS related
 zos.dev-*.json
