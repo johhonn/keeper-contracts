@@ -8,10 +8,7 @@ chai.use(chaiAsPromised)
 const constants = require('../helpers/constants.js')
 
 const {
-    confirmUpgrade,
-    submitTransaction,
-    confirmTransaction,
-    loadWallet
+    confirmUpgrade
 } = require('@oceanprotocol/dori')
 
 const {
@@ -19,8 +16,6 @@ const {
     upgrade
 } = require('./Upgrader')
 
-const AgreementStoreManager = artifacts.require('AgreementStoreManager')
-const ComputeExecutionCondition = artifacts.require('ComputeExecutionCondition')
 const TemplateStoreManager = artifacts.require('TemplateStoreManager')
 const Common = artifacts.require('Common')
 const AgreementStoreManagerChangeFunctionSignature =
@@ -36,9 +31,7 @@ const AgreementStoreManagerWithBug = artifacts.require('AgreementStoreManagerWit
 contract('AgreementStoreManager', (accounts) => {
     let agreementStoreManagerAddress,
         templateStoreManagerAddress,
-        ComputeExecutionConditionAddress,
-        CommonAddress,
-        ownerWallet
+        CommonAddress
 
     const verbose = false
     const approver = accounts[3]
@@ -54,16 +47,9 @@ contract('AgreementStoreManager', (accounts) => {
         owner = accounts[0],
         actorTypeIds = []
     } = {}) {
-
-        const agreementStoreManager = await AgreementStoreManager.at(agreementStoreManagerAddress)
         const templateStoreManager = await TemplateStoreManager.at(templateStoreManagerAddress)
         const common = await Common.at(CommonAddress)
-        const computeExecutionCondition = await ComputeExecutionCondition.at(ComputeExecutionConditionAddress)
-
-        const consumerAddress = accounts[1]
-        const computeExecutionConditionHashValues = await computeExecutionCondition.hashValues(constants.bytes32.one, consumerAddress)
-        const computeExecutionConditionId = await computeExecutionCondition.generateId(agreementId, computeExecutionConditionHashValues)
-
+        const computeExecutionConditionId = constants.bytes32.one
         const LockRewardConditionId = constants.bytes32.two
         const EscrowRewardConditionId = constants.bytes32.three
 
@@ -93,30 +79,23 @@ contract('AgreementStoreManager', (accounts) => {
                 web3,
                 artifacts,
                 contracts: [
-                    "ConditionStoreManager",
-                    "TemplateStoreManager",
-                    "AgreementStoreManager",
-                    "LockRewardCondition",
-                    "AccessSecretStoreCondition",
-                    "EscrowReward",
-                    "OceanToken",
-                    "DIDRegistry",
-                    "ComputeExecutionCondition",
-                    "Common"
+                    'ConditionStoreManager',
+                    'TemplateStoreManager',
+                    'AgreementStoreManager',
+                    'LockRewardCondition',
+                    'AccessSecretStoreCondition',
+                    'EscrowReward',
+                    'OceanToken',
+                    'DIDRegistry',
+                    'ComputeExecutionCondition',
+                    'Common'
                 ],
                 verbose
             })
 
             agreementStoreManagerAddress = addressBook.AgreementStoreManager
             templateStoreManagerAddress = addressBook.TemplateStoreManager
-            ComputeExecutionConditionAddress = addressBook.ComputeExecutionCondition
             CommonAddress = addressBook.Common
-
-            ownerWallet = await loadWallet(
-                web3,
-                'owner',
-                verbose
-            )
         })
 
         it('Should be possible to fix/add a bug', async () => {

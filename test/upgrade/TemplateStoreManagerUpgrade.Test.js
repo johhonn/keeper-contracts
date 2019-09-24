@@ -45,16 +45,16 @@ contract('TemplateStoreManager', (accounts) => {
                 web3,
                 artifacts,
                 contracts: [
-                    "ConditionStoreManager",
-                    "TemplateStoreManager",
-                    "AgreementStoreManager",
-                    "LockRewardCondition",
-                    "AccessSecretStoreCondition",
-                    "EscrowReward",
-                    "OceanToken",
-                    "DIDRegistry",
-                    "ComputeExecutionCondition",
-                    "Common"
+                    'ConditionStoreManager',
+                    'TemplateStoreManager',
+                    'AgreementStoreManager',
+                    'LockRewardCondition',
+                    'AccessSecretStoreCondition',
+                    'EscrowReward',
+                    'OceanToken',
+                    'DIDRegistry',
+                    'ComputeExecutionCondition',
+                    'Common'
                 ],
                 verbose
             })
