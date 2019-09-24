@@ -147,12 +147,14 @@ The contract addresses deployed on Ocean's Nile Beta Network:
 |-----------------------------------|---------|----------------------------------------------|
 | AccessSecretStoreCondition        | v0.11.1 | `0x45DE141F8Efc355F1451a102FB6225F1EDd2921d` |
 | AgreementStoreManager             | v0.11.1 | `0x62f84700b1A0ea6Bfb505aDC3c0286B7944D247C` |
+| ComputeExecutionCondition         | v0.12.1 | `0xc63c6DA8Cfa99927E48B5d7784758fef4e5e1D6d` |
 | ConditionStoreManager             | v0.11.1 | `0x39b0AA775496C5ebf26f3B81C9ed1843f09eE466` |
 | DIDRegistry                       | v0.11.1 | `0x4A0f7F763B1A7937aED21D63b2A78adc89c5Db23` |
 | DIDRegistryLibrary                | v0.11.1 | `0x82281775C6AB73E85b7a7e0CEe62910729d1cF95` |
 | Dispenser                         | v0.11.1 | `0x865396b7ddc58C693db7FCAD1168E3BD95Fe3368` |
 | EpochLibrary                      | v0.11.1 | `0x787Cf4627F3F2bf5B8e9Da619aba59CB997A19B4` |
 | EscrowAccessSecretStoreTemplate   | v0.11.1 | `0xfA16d26e9F4fffC6e40963B281a0bB08C31ed40C` |
+| EscrowComputeExecutionTemplate    | v0.12.1 | `0x4dc980aA0786Dc3B5FC76BDb5C9c42cac796e68B` |
 | EscrowReward                      | v0.11.1 | `0xeD4Ef53376C6f103d2d7029D7E702e082767C6ff` |
 | HashLockCondition                 | v0.11.1 | `0xB5f2e45e8aD4a1339D542f2defd5095B98054590` |
 | LockRewardCondition               | v0.11.1 | `0xE30FC30c678437e0e8F78C52dE9db8E2752781a0` |
@@ -161,6 +163,7 @@ The contract addresses deployed on Ocean's Nile Beta Network:
 | TemplateStoreManager              | v0.11.1 | `0x9768c8ae44f1dc81cAA98F48792aA5730cAd2F73` |
 | ThresholdCondition                | v0.11.1 | `0xf29a50080163Fb2938E2024f19681Ac2FB8745De` |
 | WhitelistingCondition             | v0.11.1 | `0x9Db7fE5A18Ff4fb1746c290192EDE67a64EB4385` |
+
 
 #### Kovan Testnet
 
