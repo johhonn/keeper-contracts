@@ -3,6 +3,7 @@
 /* global artifacts, contract, describe, it */
 
 const chai = require('chai')
+const web3 = require('web3')
 const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
@@ -26,7 +27,7 @@ contract('Common', (accounts) => {
             const hash = await common.hashString('string')
             assert.strictEqual(
                 hash,
-                web3.utils.keccak256("string")
+                web3.utils.keccak256('string')
             )
         })
     })
@@ -37,7 +38,7 @@ contract('Common', (accounts) => {
                 true
             )
         })
-        it('should return false in case of non-contract address', async () =>{
+        it('should return false in case of non-contract address', async () => {
             assert.strictEqual(
                 await common.isContract(constants.address.one),
                 false
