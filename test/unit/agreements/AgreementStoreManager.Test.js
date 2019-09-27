@@ -212,11 +212,9 @@ contract('AgreementStoreManager', (accounts) => {
         it('should not create deprecated create agreement method', async () => {
             const {
                 did,
-                templateId,
                 timeLock,
                 timeOut,
-                providers,
-                conditionTypes
+                providers
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
             // construct agreement
             const agreement = {
