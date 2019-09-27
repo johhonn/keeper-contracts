@@ -324,5 +324,15 @@ contract('TemplateStoreManager', (accounts) => {
             expect(templateActorTypeIds[0])
                 .to.equal(actorTypeIds[0])
         })
+        it('should revert if calling deprecated isTemplateApproved method', async () => {
+            const { templateStoreManager } = await setupTest()
+            const templateId = accounts[0]
+            assert.strictEqual(
+                await templateStoreManager.methods['isTemplateApproved(address)'](
+                    templateId
+                ),
+                false
+            )
+        })
     })
 })

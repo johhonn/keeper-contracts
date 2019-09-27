@@ -209,6 +209,42 @@ contract('AgreementStoreManager', (accounts) => {
     })
 
     describe('create agreement', () => {
+        it('should not create deprecated create agreement method', async () => {
+            const {
+                did,
+                templateId,
+                timeLock,
+                timeOut,
+                providers,
+                conditionTypes
+            } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
+            // construct agreement
+            const agreement = {
+                did: did,
+                conditionTypes: [
+                    constants.address.one,
+                    constants.address.two,
+                    constants.address.three
+                ],
+                conditionIds: [
+                    constants.bytes32.zero,
+                    constants.bytes32.one,
+                    constants.bytes32.two
+                ],
+                timeLocks: [0, timeLock, 0],
+                timeOuts: [0, timeOut, 0],
+                actors: providers
+            }
+
+            const agreementId = constants.bytes32.one
+
+            await assert.isRejected(
+                agreementStoreManager.createAgreement(
+                    agreementId,
+                    ...Object.values(agreement)
+                )
+            )
+        })
         it('create agreement should create agreement and conditions', async () => {
             const {
                 did,
