@@ -78,6 +78,60 @@ contract AgreementStoreManager is Ownable {
         );
     }
 
+
+    /**
+     * @dev THIS METHOD HAS BEEN DEPRECATED PLEASE DON'T USE IT.
+     *      WE KEEP THIS METHOD INTERFACE TO AVOID ANY CONTRACT 
+     *      UPGRADEABILITY ISSUES IN THE FUTURE.
+     *      THE NEW METHOD DON'T ACCEPT CONDITIONS, INSTEAD IT USES 
+     *      TEMPLATE ID. FOR MORE INFORMATION PLEASE REFER TO THE BELOW LINK
+     *      https://github.com/oceanprotocol/keeper-contracts/pull/623
+     */
+    function createAgreement(
+        bytes32 _id,
+        bytes32 _did,
+        address[] memory _conditionTypes,
+        bytes32[] memory _conditionIds,
+        uint[] memory _timeLocks,
+        uint[] memory _timeOuts
+    )
+        public
+        returns (uint size)
+    {
+        require(
+            templateStoreManager.isTemplateApproved(msg.sender) == true,
+            'Template not Approved'
+        );
+        require(
+            didRegistry.getBlockNumberUpdated(_did) > 0,
+            'DID not registered'
+        );
+        require(
+            _conditionIds.length == _conditionTypes.length &&
+            _timeLocks.length == _conditionTypes.length &&
+            _timeOuts.length == _conditionTypes.length,
+            'Arguments have wrong length'
+        );
+
+        // create the conditions in condition store. Fail if conditionId already exists.
+        for (uint256 i = 0; i < _conditionTypes.length; i++) {
+            conditionStoreManager.createCondition(
+                _conditionIds[i],
+                _conditionTypes[i],
+                _timeLocks[i],
+                _timeOuts[i]
+            );
+        }
+        agreementList.create(
+            _id,
+            _did,
+            msg.sender,
+            _conditionIds
+        );
+
+        return getAgreementListSize();
+    }
+    
     /**
      * @dev Create a new agreement.
      *      The agreement will create conditions of conditionType with conditionId.

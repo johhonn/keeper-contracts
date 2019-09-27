@@ -22,6 +22,11 @@ import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
  */
 contract TemplateStoreManager is Ownable {
 
+    using TemplateStoreLibrary for 
+    TemplateStoreLibrary.TemplateListDeprecated;
+    TemplateStoreLibrary.TemplateListDeprecated internal 
+    templateListDeprecated; 
+    
     using TemplateStoreLibrary for TemplateStoreLibrary.TemplateList;
     TemplateStoreLibrary.TemplateList internal templateList;
 
@@ -297,6 +302,14 @@ contract TemplateStoreManager is Ownable {
      */
     function isTemplateApproved(bytes32 _id) external view returns (bool) {
         return templateList.templates[_id].state ==
+            TemplateStoreLibrary.TemplateState.Approved;
+    }
+    
+    /**
+     * @notice THIS METHOD HAS BEEN DEPRECATED, PLEASE DON'T USE IT.
+     */
+    function isTemplateApproved(address _id) external view returns (bool) {
+        return templateListDeprecated.templates[_id].state ==
             TemplateStoreLibrary.TemplateState.Approved;
     }
 }
