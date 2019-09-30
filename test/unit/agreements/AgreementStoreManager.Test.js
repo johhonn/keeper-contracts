@@ -213,16 +213,16 @@ contract('AgreementStoreManager', (accounts) => {
             const {
                 did,
                 timeLock,
-                timeOut,
-                providers
+                timeOut
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
             // construct agreement
+            const agreementId = constants.bytes32.one
             const agreement = {
                 did: did,
                 conditionTypes: [
-                    constants.address.one,
-                    constants.address.two,
-                    constants.address.three
+                    agreementStoreManager.address,
+                    agreementStoreManager.address,
+                    agreementStoreManager.address
                 ],
                 conditionIds: [
                     constants.bytes32.zero,
@@ -230,19 +230,17 @@ contract('AgreementStoreManager', (accounts) => {
                     constants.bytes32.two
                 ],
                 timeLocks: [0, timeLock, 0],
-                timeOuts: [0, timeOut, 0],
-                actors: providers
+                timeOuts: [0, timeOut, 0]
             }
-
-            const agreementId = constants.bytes32.one
-
             await assert.isRejected(
-                agreementStoreManager.createAgreement(
+                agreementStoreManager.methods['createAgreement(bytes32,bytes32,address[],bytes32[],uint256[],uint256[])'](
                     agreementId,
                     ...Object.values(agreement)
-                )
+                ),
+                'Template not Approved'
             )
         })
+
         it('create agreement should create agreement and conditions', async () => {
             const {
                 did,

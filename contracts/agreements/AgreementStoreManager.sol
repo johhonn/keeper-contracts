@@ -78,7 +78,6 @@ contract AgreementStoreManager is Ownable {
         );
     }
 
-
     /**
      * @dev THIS METHOD HAS BEEN DEPRECATED PLEASE DON'T USE IT.
      *      WE KEEP THIS METHOD INTERFACE TO AVOID ANY CONTRACT 
