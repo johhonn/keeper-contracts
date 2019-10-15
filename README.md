@@ -202,11 +202,13 @@ The contract addresses deployed on `Pacific` Mainnet:
 |-----------------------------------|---------|----------------------------------------------|
 | AccessSecretStoreCondition        | v0.11.1 | `0x7FC6520Af3F0800d76A3e2FfE7b838c945ADBFE4` |
 | AgreementStoreManager             | v0.11.1 | `0x44665ee68779eC83202702C091279661336F5F8a` |
+| ComputeExecutionCondition         | v0.12.5 | `0xBbaCeaA102e62fEeE89eAF935aD757CD5aac844a` |
 | ConditionStoreManager             | v0.11.1 | `0xbD1dEd7ef05c31F81C54e913a23Da69E77d3e0EE` |
 | DIDRegistry                       | v0.11.1 | `0x1f0E059a50356D8617980F8fa21a53F723072712` |
 | DIDRegistryLibrary                | v0.11.1 | `0x2eBD03c446e11EA4eC58eC092b3906a816828D2f` |
 | EpochLibrary                      | v0.11.1 | `0xBCc5b375AB7ca0AB45b00F3dA24eC8b3b5aEe031` |
 | EscrowAccessSecretStoreTemplate   | v0.11.1 | `0x9BF43606d833489fbD568ace13f535fC41130c28` |
+| EscrowComputeExecutionTemplate    | v0.12.5 | `0x04D939Bbe37de1Aa0261F523EdB7654613dfB97F` |
 | EscrowReward                      | v0.11.1 | `0x656Aa3D9b37A6eA770701ae2c612f760d9254A66` |
 | HashLockCondition                 | v0.11.1 | `0x5Eef92d570996ED20Cb60fE41475f594299Ec21C` |
 | LockRewardCondition               | v0.11.1 | `0x7bf64DaCc7929A1e5466f7d9E575128abf1875f8` |
