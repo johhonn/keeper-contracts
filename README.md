@@ -192,6 +192,7 @@ The contract addresses deployed on Kovan testnet:
 | SignCondition                     | v0.10.3 | `0x7B8B2756de9Ab474ddbCc87047117a2A16419194` |
 | TemplateStoreManager              | v0.10.3 | `0xD20307e2620Bb8a60991f43c52b64f981103A829` |
 
+
 ### Mainnets
 
 ### Pacific Mainnet
@@ -200,23 +201,24 @@ The contract addresses deployed on `Pacific` Mainnet:
 
 | Contract                          | Version | Address                                      |
 |-----------------------------------|---------|----------------------------------------------|
-| AccessSecretStoreCondition        | v0.11.1 | `0x7FC6520Af3F0800d76A3e2FfE7b838c945ADBFE4` |
-| AgreementStoreManager             | v0.11.1 | `0x44665ee68779eC83202702C091279661336F5F8a` |
+| AccessSecretStoreCondition        | v0.12.5 | `0x7FC6520Af3F0800d76A3e2FfE7b838c945ADBFE4` |
+| AgreementStoreManager             | v0.12.5 | `0x44665ee68779eC83202702C091279661336F5F8a` |
 | ComputeExecutionCondition         | v0.12.5 | `0xBbaCeaA102e62fEeE89eAF935aD757CD5aac844a` |
-| ConditionStoreManager             | v0.11.1 | `0xbD1dEd7ef05c31F81C54e913a23Da69E77d3e0EE` |
-| DIDRegistry                       | v0.11.1 | `0x1f0E059a50356D8617980F8fa21a53F723072712` |
-| DIDRegistryLibrary                | v0.11.1 | `0x2eBD03c446e11EA4eC58eC092b3906a816828D2f` |
-| EpochLibrary                      | v0.11.1 | `0xBCc5b375AB7ca0AB45b00F3dA24eC8b3b5aEe031` |
-| EscrowAccessSecretStoreTemplate   | v0.11.1 | `0x9BF43606d833489fbD568ace13f535fC41130c28` |
+| ConditionStoreManager             | v0.12.5 | `0xbD1dEd7ef05c31F81C54e913a23Da69E77d3e0EE` |
+| DIDRegistry                       | v0.12.5 | `0x1f0E059a50356D8617980F8fa21a53F723072712` |
+| DIDRegistryLibrary                | v0.12.5 | `0x2eBD03c446e11EA4eC58eC092b3906a816828D2f` |
+| EpochLibrary                      | v0.12.5 | `0xBCc5b375AB7ca0AB45b00F3dA24eC8b3b5aEe031` |
+| EscrowAccessSecretStoreTemplate   | v0.12.5 | `0x9BF43606d833489fbD568ace13f535fC41130c28` |
 | EscrowComputeExecutionTemplate    | v0.12.5 | `0x04D939Bbe37de1Aa0261F523EdB7654613dfB97F` |
-| EscrowReward                      | v0.11.1 | `0x656Aa3D9b37A6eA770701ae2c612f760d9254A66` |
-| HashLockCondition                 | v0.11.1 | `0x5Eef92d570996ED20Cb60fE41475f594299Ec21C` |
-| LockRewardCondition               | v0.11.1 | `0x7bf64DaCc7929A1e5466f7d9E575128abf1875f8` |
-| OceanToken                        | v0.11.1 | `0x012578f9381e876A9E2a9111Dfd436FF91A451ae` |
-| SignCondition                     | v0.11.1 | `0xB74172078ABb029FaD809335d82241371b998708` |
-| TemplateStoreManager              | v0.11.1 | `0xF2Cf3761c166c6D85d07299427821D18A4329cd1` |
-| ThresholdCondition                | v0.11.1 | `0xeD2A0787885f4ef781E35c5808F3C786fc8C1817` |
-| WhitelistingCondition             | v0.11.1 | `0x5b4c3B48062bDCa9DaA5441c5F5A9D557bFE3356` |
+| EscrowReward                      | v0.12.5 | `0x656Aa3D9b37A6eA770701ae2c612f760d9254A66` |
+| HashLockCondition                 | v0.12.5 | `0x5Eef92d570996ED20Cb60fE41475f594299Ec21C` |
+| LockRewardCondition               | v0.12.5 | `0x7bf64DaCc7929A1e5466f7d9E575128abf1875f8` |
+| OceanToken                        | v0.12.5 | `0x012578f9381e876A9E2a9111Dfd436FF91A451ae` |
+| SignCondition                     | v0.12.5 | `0xB74172078ABb029FaD809335d82241371b998708` |
+| TemplateStoreManager              | v0.12.5 | `0xF2Cf3761c166c6D85d07299427821D18A4329cd1` |
+| ThresholdCondition                | v0.12.5 | `0xeD2A0787885f4ef781E35c5808F3C786fc8C1817` |
+| WhitelistingCondition             | v0.12.5 | `0x5b4c3B48062bDCa9DaA5441c5F5A9D557bFE3356` |
+
 
 ### Ethereum Mainnet
 
@@ -242,6 +244,7 @@ The contract addresses deployed on Ethereum Mainnet:
 | LockRewardCondition               | v0.10.3 | `0xD41161D8f2CE5Ec95465F4b2fBD00Cfea186204C` |
 | SignCondition                     | v0.10.3 | `0xEE33DCDBE6aF6197dD01907cfc4296BFC0448B16` |
 | TemplateStoreManager              | v0.10.3 | `0x04DD5364b12131ae870Ec54bd539b5Cb94B9DC36` |
+
 
 ## Packages
 
