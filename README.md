@@ -115,7 +115,7 @@ Code style is enforced through the CI test process, builds will fail if there're
 
 #### Duero Testnet
 
-The contract addresses deployed on Ocean's Duero Test Network:
+The contract addresses deployed on Ocean's `Duero` Test Network:
 
 | Contract                          | Version | Address                                      |
 |-----------------------------------|---------|----------------------------------------------|
@@ -141,7 +141,7 @@ The contract addresses deployed on Ocean's Duero Test Network:
 
 #### Nile Testnet
 
-The contract addresses deployed on Ocean's Nile Beta Network:
+The contract addresses deployed on Ocean's `Nile` Test Network:
 
 | Contract                          | Version | Address                                      |
 |-----------------------------------|---------|----------------------------------------------|
@@ -196,7 +196,7 @@ The contract addresses deployed on Kovan testnet:
 
 ### Pacific Mainnet
 
-The contract addresses deployed on Pacific Mainnet:
+The contract addresses deployed on `Pacific` Mainnet:
 
 | Contract                          | Version | Address                                      |
 |-----------------------------------|---------|----------------------------------------------|
