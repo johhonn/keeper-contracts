@@ -77,37 +77,36 @@ notifications:
     email: false
 
 deploy:
-#    - provider: script
-#      script: bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
-#      skip_cleanup: true
-#      on:
-#          tags: true
-#          all_branches: true
-#          condition: $DEPLOY_PACKAGE = true
+  - provider: script
+    script: bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
+    skip_cleanup: true
+    on:
+      tags: true
+      all_branches: true
+      condition: $DEPLOY_PACKAGE = true
 
-    - provider: npm
-      email: "devops@oceanprotocol.com"
-      api_key: ${NPM_TOKEN}
-      skip_cleanup: true
-      on:
-          tags: true
-          all_branches: true
-          condition: $DEPLOY_PACKAGE = true
+  - provider: npm
+    email: "devops@oceanprotocol.com"
+    api_key: ${NPM_TOKEN}
+    skip_cleanup: true
+    on:
+      tags: true
+      all_branches: true
+      condition: $DEPLOY_PACKAGE = true
 
-    - provider: script
-      script: bash -x ./scripts/deploy_pypi.sh
-      skip_cleanup: true
-      on:
-          tags: true
-          all_branches: true
-          condition: $DEPLOY_PACKAGE = true
+  - provider: script
+    script: bash -x ./scripts/deploy_pypi.sh
+    skip_cleanup: true
+    on:
+      tags: true
+      all_branches: true
+      condition: $DEPLOY_PACKAGE = true
 
-    - provider: releases
-      skip_cleanup: true
-      api_key: $GITHUB_TOKEN
-      name: "$release_version"
-      on:
-          tags: true
-          all_branches: true
-          condition: $DEPLOY_PACKAGE = true
-
+  - provider: releases
+    skip_cleanup: true
+    api_key: $GITHUB_TOKEN
+    name: "$release_version"
+    on:
+      tags: true
+      all_branches: true
+      condition: $DEPLOY_PACKAGE = true

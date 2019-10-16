@@ -2774,7 +2774,7 @@
     ]
   },
   "zosversion": "2.2",
-  "version": "v0.12.4",
+  "version": "v0.12.5",
   "proxyAdmin": {
     "address": "0x45Cf527ab6b5995Bb841158337E09C967C922E58"
   }
