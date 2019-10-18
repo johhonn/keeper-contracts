@@ -29,8 +29,9 @@
         - [Nile Testnet](#nile-testnet)
         - [Kovan Testnet](#kovan-testnet)
      - [Mainnets](#mainnets)
-        - [Ethereum Mainnet](#ethereum-mainnet)
         - [Pacific Mainnet](#pacific-mainnet)
+        - [DAI Mainnet](#DAI-mainnet)
+        - [Ethereum Mainnet](#ethereum-mainnet)
   - [Packages](#packages)
   - [Documentation](#documentation)
   - [Contributing](#contributing)
@@ -218,6 +219,31 @@ The contract addresses deployed on `Pacific` Mainnet:
 | TemplateStoreManager              | v0.12.5 | `0xF2Cf3761c166c6D85d07299427821D18A4329cd1` |
 | ThresholdCondition                | v0.12.5 | `0xeD2A0787885f4ef781E35c5808F3C786fc8C1817` |
 | WhitelistingCondition             | v0.12.5 | `0x5b4c3B48062bDCa9DaA5441c5F5A9D557bFE3356` |
+
+
+### DAI Mainnet
+
+The contract addresses deployed on `DAI` Mainnet:
+
+| Contract                          | Version | Address                                      |
+|-----------------------------------|---------|----------------------------------------------|
+| AccessSecretStoreCondition        | v0.12.5 | `0xb6c54841705B0053ad48CEfB108F6022b432f13C` |
+| AgreementStoreManager             | v0.12.5 | `0x6508d23D95bFc7fa63BC34F492cAd9B5DbC868F9` |
+| ComputeExecutionCondition         | v0.12.5 | `0xb24924eF6025102F03BF610A6981e686173747cf` |
+| ConditionStoreManager             | v0.12.5 | `0x02A44F7423d35d8859B02Fc5d65056FcaC222867` |
+| DIDRegistry                       | v0.12.5 | `0x58A99828D8F1e814fa07a8002B441EE07b149A02` |
+| DIDRegistryLibrary                | v0.12.5 | `0xA1B190ba00Ffa8Ec6D5905E973CeA64a3DB6C5Ce` |
+| EpochLibrary                      | v0.12.5 | `0x5735E24E1B53B057D1e6765Eb09eC389704043Ef` |
+| EscrowAccessSecretStoreTemplate   | v0.12.5 | `0x1EbdE09ec9C7Dc2F0F8bfECDC8761a7a7e3F28c2` |
+| EscrowComputeExecutionTemplate    | v0.12.5 | `0xfD4C5CfAca17ea28bae857111eDB922D8Ac89375` |
+| EscrowReward                      | v0.12.5 | `0x5AFE706FB78B0049aE32FB20f8C4B23C1C9c2A2b` |
+| HashLockCondition                 | v0.12.5 | `0x7ceF5846d7d8F192d9df1B5D994eC11c5851892B` |
+| LockRewardCondition               | v0.12.5 | `0x32d5fc0eF265100672A36A659DF1b09499f2E61e` |
+| OceanToken                        | v0.12.5 | `0xf98DaA2E4580b207458A24eb1b50ce0d0b8d997A` |
+| SignCondition                     | v0.12.5 | `0x8718b8E70148e1Fe7673f3feAa59980CCDb568B6` |
+| TemplateStoreManager              | v0.12.5 | `0xDd40DeCb8bdF6BfeD95Ca730459118dc862DDFCA` |
+| ThresholdCondition                | v0.12.5 | `0x28c48D52cAE41bB736Ce037676b36e4ba9311AfC` |
+| WhitelistingCondition             | v0.12.5 | `0x790e52C7A237134ecE53fAab8b0a4ec89b889FfF` |
 
 
 ### Ethereum Mainnet
