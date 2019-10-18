@@ -118,7 +118,7 @@ module.exports = {
             provider: () => setupWallet(url || 'https://dai.poa.network/'),
             network_id: 0x64,
             from: '0x177381C1c803a981bCE3E678aD5B4F74e69AE7D5'
-        },
+        }
     },
     compilers: {
         solc: {
