@@ -32,7 +32,7 @@ contract DIDRegistry is Ownable {
     {
         require(
             msg.sender == didRegisterList.didRegisters[_did].owner,
-            'Invalid DID owner'
+            'Invalid DID owner can perform this operation.'
         );
         _;
     }

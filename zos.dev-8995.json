@@ -1860,11 +1860,11 @@
       }
     },
     "DIDRegistry": {
-      "address": "0xf506bcd618d8ea2C6912F53De2654Ad7A7209D5a",
-      "constructorCode": "608060405234801561001057600080fd5b50611539806100206000396000f3fe",
-      "bodyBytecodeHash": "6d861afb0121a4293998c2b33f912adae4933e6fc9729a92264cb2cb23ec3776",
-      "localBytecodeHash": "db245684ff6eed09a0344acc926d798083e7c253da89343cd7512be048d2023a",
-      "deployedBytecodeHash": "d16a16ee5a8b55fe915da5c0d70e1b36d8820fb8781dbf5443a530c41fda2e1a",
+      "address": "0xbE15b931c23804F800bFcEf2cC970eE5Dfa9b8da",
+      "constructorCode": "608060405234801561001057600080fd5b50611525806100206000396000f3fe",
+      "bodyBytecodeHash": "6f467fa4f391cc948d2d6dca08c90e09d712b43dad2eb3af7f2166b1cbb9f962",
+      "localBytecodeHash": "b9d4c939d803d91bd309980938cbdeee027bbcfe24bd2a6ae8722ad84e1771af",
+      "deployedBytecodeHash": "73535cd323c65abd805288dacd743325c1d920d7b5aa09f614fdf338411ad8fb",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -2050,32 +2050,7 @@
             "src": "725:59:23"
           }
         ],
-        "storageDiff": [
-          {
-            "action": "delete",
-            "original": {
-              "index": 5,
-              "contract": "DIDPermissionsRegistry",
-              "path": "contracts/registry/DIDPermissionsRegistry.sol",
-              "label": "DIDPermissions",
-              "astId": 4038,
-              "type": "t_mapping<t_bool>",
-              "src": "581:59:23"
-            }
-          },
-          {
-            "action": "insert",
-            "updated": {
-              "index": 6,
-              "contract": "DIDRegistry",
-              "path": "contracts/registry/DIDRegistry.sol",
-              "label": "DIDPermissions",
-              "astId": 4043,
-              "type": "t_mapping<t_bool>",
-              "src": "839:59:23"
-            }
-          }
-        ]
+        "storageDiff": []
       }
     },
     "ThresholdCondition": {
