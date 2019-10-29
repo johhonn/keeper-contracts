@@ -4,7 +4,6 @@ pragma solidity 0.5.6;
 // Code is Apache-2.0 and docs are CC-BY-4.0
 
 import './DIDRegistryLibrary.sol';
-import './DIDPermissionsRegistry.sol';
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
 /**
@@ -14,7 +13,7 @@ import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
  * @dev Implementation of the DID Registry.
  *      https://github.com/oceanprotocol/OEPs/tree/master/7#registry
  */
-contract DIDRegistry is Ownable, DIDPermissionsRegistry {
+contract DIDRegistry is Ownable {
 
     /**
      * @dev The DIDRegistry Library takes care of the basic storage functions.
@@ -25,12 +24,15 @@ contract DIDRegistry is Ownable, DIDPermissionsRegistry {
      * @dev state storage for the DID registry
      */
     DIDRegistryLibrary.DIDRegisterList internal didRegisterList;
-
+    
+    // DID -> Address -> Boolean Permission
+    mapping(bytes32 => mapping(address => bool)) DIDPermissions;
+    
     modifier onlyDIDOwner(bytes32 _did)
     {
         require(
             msg.sender == didRegisterList.didRegisters[_did].owner,
-            'Invalid DID owner'
+            'Invalid DID owner can perform this operation.'
         );
         _;
     }
@@ -63,6 +65,18 @@ contract DIDRegistry is Ownable, DIDPermissionsRegistry {
         bytes32 _did,
         address _previousOwner,
         address _newOwner
+    );
+    
+    event DIDPermissionGranted(
+        bytes32 indexed _did,
+        address indexed _owner,
+        address indexed _grantee
+    );
+    
+    event DIDPermissionRevoked(
+        bytes32 indexed _did,
+        address indexed _owner,
+        address indexed _grantee
     );
 
     /**
@@ -330,6 +344,69 @@ contract DIDRegistry is Ownable, DIDPermissionsRegistry {
         returns (bytes32[] memory)
     {
         return didRegisterList.didRegisterIds;
+    }
+    
+    /**
+     * @dev _grantPermission grants access permission to grantee 
+     * @param _did refers to decentralized identifier (a bytes32 length ID)
+     * @param _grantee address 
+     */
+    function _grantPermission(
+        bytes32 _did,
+        address _grantee
+    )
+        internal
+    {
+        require(
+            _grantee != address(0),
+            'Invalid grantee address'
+        );
+        DIDPermissions[_did][_grantee] = true;
+        emit DIDPermissionGranted(
+            _did,
+            msg.sender,
+            _grantee
+        );
+    }
+    
+    /**
+     * @dev _revokePermission revokes access permission from grantee 
+     * @param _did refers to decentralized identifier (a bytes32 length ID)
+     * @param _grantee address 
+     */
+    function _revokePermission(
+        bytes32 _did,
+        address _grantee
+    )
+        internal
+    {
+        require(
+            DIDPermissions[_did][_grantee],
+            'Grantee already was revoked'
+        );
+        DIDPermissions[_did][_grantee] = false;
+        emit DIDPermissionRevoked(
+            _did,
+            msg.sender,
+            _grantee
+        );
+    }
+    
+    /**
+     * @dev _getPermission gets access permission of a grantee
+     * @param _did refers to decentralized identifier (a bytes32 length ID)
+     * @param _grantee address 
+     * @return true if grantee has access permission to a DID 
+     */
+    function _getPermission(
+        bytes32 _did,
+        address _grantee
+    )
+        internal
+        view
+        returns(bool)
+    {
+        return DIDPermissions[_did][_grantee];
     }
 
 }
