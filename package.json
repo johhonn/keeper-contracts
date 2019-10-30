@@ -1,6 +1,6 @@
 {
   "name": "@oceanprotocol/keeper-contracts",
-  "version": "0.12.5",
+  "version": "0.12.7",
   "description": "Integration of SEAs, DID and OceanToken in Solidity",
   "bugs": {
     "url": "https://github.com/oceanprotocol/keeper-contracts/issues"
@@ -89,7 +89,7 @@
     "solidity-coverage": "0.6.3",
     "solium": "^1.2.5",
     "solium-plugin-security": "^0.1.1",
-    "truffle": "5.0.41",
+    "truffle": "5.0.42",
     "truffle-contract": "~4.0.31",
     "truffle-hdwallet-provider": "~1.0.17",
     "web3": "1.2.1",
