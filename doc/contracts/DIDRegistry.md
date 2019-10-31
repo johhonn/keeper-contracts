@@ -13,6 +13,8 @@ Documentation:
 
 ### internal didRegisterList
 
+### internal DIDPermissions
+
 ## Events
 
 ###  DIDAttributeRegistered
@@ -47,6 +49,18 @@ Parameters:
 * bytes32 _did
 * address _previousOwner
 * address _newOwner
+
+###  DIDPermissionGranted
+Parameters:
+* bytes32 _did
+* address _owner
+* address _grantee
+
+###  DIDPermissionRevoked
+Parameters:
+* bytes32 _did
+* address _owner
+* address _grantee
 
 ## Modifiers
 
@@ -229,3 +243,43 @@ Documentation:
 ```
 @return the length of the DID registry.
 ```
+
+### internal _grantPermission
+
+Documentation:
+
+```
+@dev _grantPermission grants access permission to grantee 
+@param _did refers to decentralized identifier (a bytes32 length ID)
+@param _grantee address 
+```
+Parameters:
+* bytes32 _did
+* address _grantee
+
+### internal _revokePermission
+
+Documentation:
+
+```
+@dev _revokePermission revokes access permission from grantee 
+@param _did refers to decentralized identifier (a bytes32 length ID)
+@param _grantee address 
+```
+Parameters:
+* bytes32 _did
+* address _grantee
+
+### internal _getPermission
+
+Documentation:
+
+```
+@dev _getPermission gets access permission of a grantee
+@param _did refers to decentralized identifier (a bytes32 length ID)
+@param _grantee address 
+@return true if grantee has access permission to a DID 
+```
+Parameters:
+* bytes32 _did
+* address _grantee
