@@ -77,6 +77,7 @@ notifications:
     email: false
 
 deploy:
+# JAVA PACKAGE HAS BEEN DISABLED
 #  - provider: script
 #    script: bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
 #    skip_cleanup: true
@@ -84,7 +85,6 @@ deploy:
 #      tags: true
 #      all_branches: true
 #      condition: $DEPLOY_PACKAGE = true
-
   - provider: npm
     email: "devops@oceanprotocol.com"
     api_key: ${NPM_TOKEN}
