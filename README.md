@@ -139,6 +139,7 @@ The contract addresses deployed on Ocean's `Duero` Test Network:
 | WhitelistingCondition             | v0.12.7 | `0x453c7912d4e33B3348961810296FE55a6adE20B2` |
 
 
+
 #### Nile Testnet
 
 The contract addresses deployed on Ocean's `Nile` Test Network:
