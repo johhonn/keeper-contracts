@@ -1656,11 +1656,11 @@
       }
     },
     "DIDRegistry": {
-      "address": "0xfFB6C858a44b3E5E158d9d06cBaE62618a05F906",
-      "constructorCode": "608060405234801561001057600080fd5b50611539806100206000396000f3fe",
-      "bodyBytecodeHash": "64b507af0b53e13e6ee765c51192c291482c6936c69696e8c71490a4c147fa42",
-      "localBytecodeHash": "340a1e00be021a23093b0f9b55b2cd3e43b016a943b7eec001221f370cc8e469",
-      "deployedBytecodeHash": "559a87f1c21d499b8dc16a6dd534cfe6f7299d1b924b3c891dc4f2f5cfcd83f0",
+      "address": "0x95126B60aB8A483247761d2066DDaE2c5987bB1a",
+      "constructorCode": "608060405234801561001057600080fd5b50611525806100206000396000f3fe",
+      "bodyBytecodeHash": "baa0dea07765abcd4deeb3a7332267e57774a7616e4240373cdb0a77f0546d4e",
+      "localBytecodeHash": "b9d4c939d803d91bd309980938cbdeee027bbcfe24bd2a6ae8722ad84e1771af",
+      "deployedBytecodeHash": "5300e8042c38ec309ba7c4147a07f91994f5c6d50abde1f91a4ed4a658ce84f6",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -1684,12 +1684,6 @@
           "kind": "elementary",
           "label": "address"
         },
-        "t_mapping<t_bool>": {
-          "id": "t_mapping<t_bool>",
-          "valueType": "t_bool",
-          "label": "mapping(key => bool)",
-          "kind": "mapping"
-        },
         "t_struct<DIDRegistryLibrary.DIDRegisterList>": {
           "id": "t_struct<DIDRegistryLibrary.DIDRegisterList>",
           "kind": "struct",
@@ -1697,15 +1691,15 @@
           "members": [
             {
               "label": "didRegisters",
-              "astId": 4578,
+              "astId": 4568,
               "type": "t_mapping<t_struct<DIDRegistryLibrary.DIDRegister>>",
-              "src": "580:44:25"
+              "src": "580:44:24"
             },
             {
               "label": "didRegisterIds",
-              "astId": 4581,
+              "astId": 4571,
               "type": "t_array:dyn<t_bytes32>",
-              "src": "634:24:25"
+              "src": "634:24:24"
             }
           ]
         },
@@ -1716,33 +1710,33 @@
           "members": [
             {
               "label": "owner",
-              "astId": 4564,
+              "astId": 4554,
               "type": "t_address",
-              "src": "395:13:25"
+              "src": "395:13:24"
             },
             {
               "label": "lastChecksum",
-              "astId": 4566,
+              "astId": 4556,
               "type": "t_bytes32",
-              "src": "418:20:25"
+              "src": "418:20:24"
             },
             {
               "label": "lastUpdatedBy",
-              "astId": 4568,
+              "astId": 4558,
               "type": "t_address",
-              "src": "448:21:25"
+              "src": "448:21:24"
             },
             {
               "label": "blockNumberUpdated",
-              "astId": 4570,
+              "astId": 4560,
               "type": "t_uint256",
-              "src": "479:26:25"
+              "src": "479:26:24"
             },
             {
               "label": "providers",
-              "astId": 4573,
+              "astId": 4563,
               "type": "t_array:dyn<t_address>",
-              "src": "515:19:25"
+              "src": "515:19:24"
             }
           ]
         },
@@ -1770,6 +1764,12 @@
           "length": "dyn",
           "kind": "array",
           "label": "bytes32[]"
+        },
+        "t_mapping<t_bool>": {
+          "id": "t_mapping<t_bool>",
+          "valueType": "t_bool",
+          "label": "mapping(key => bool)",
+          "kind": "mapping"
         }
       },
       "storage": [
@@ -1777,57 +1777,57 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initialized",
-          "astId": 7866,
+          "astId": 7856,
           "type": "t_bool",
-          "src": "757:24:72"
+          "src": "757:24:71"
         },
         {
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initializing",
-          "astId": 7868,
+          "astId": 7858,
           "type": "t_bool",
-          "src": "876:25:72"
+          "src": "876:25:71"
         },
         {
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "______gap",
-          "astId": 7924,
+          "astId": 7914,
           "type": "t_array:50<t_uint256>",
-          "src": "1951:29:72"
+          "src": "1951:29:71"
         },
         {
           "contract": "Ownable",
           "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
           "label": "_owner",
-          "astId": 7101,
+          "astId": 7091,
           "type": "t_address",
-          "src": "302:22:66"
+          "src": "302:22:65"
         },
         {
           "contract": "Ownable",
           "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
           "label": "______gap",
-          "astId": 7212,
+          "astId": 7202,
           "type": "t_array:50<t_uint256>",
-          "src": "2262:29:66"
-        },
-        {
-          "contract": "DIDPermissionsRegistry",
-          "path": "contracts/registry/DIDPermissionsRegistry.sol",
-          "label": "DIDPermissions",
-          "astId": 4038,
-          "type": "t_mapping<t_bool>",
-          "src": "373:59:23"
+          "src": "2262:29:65"
         },
         {
           "contract": "DIDRegistry",
           "path": "contracts/registry/DIDRegistry.sol",
           "label": "didRegisterList",
-          "astId": 4149,
+          "astId": 4037,
           "type": "t_struct<DIDRegistryLibrary.DIDRegisterList>",
-          "src": "788:59:24"
+          "src": "725:59:23"
+        },
+        {
+          "contract": "DIDRegistry",
+          "path": "contracts/registry/DIDRegistry.sol",
+          "label": "DIDPermissions",
+          "astId": 4043,
+          "type": "t_mapping<t_bool>",
+          "src": "839:59:23"
         }
       ],
       "warnings": {
@@ -1841,15 +1841,15 @@
             "contract": "DIDRegistry",
             "path": "contracts/registry/DIDRegistry.sol",
             "label": "didRegisterList",
-            "astId": 4149,
+            "astId": 4037,
             "type": "t_struct<DIDRegistryLibrary.DIDRegisterList>",
-            "src": "788:59:24"
+            "src": "725:59:23"
           }
         ],
         "storageDiff": [
           {
-            "action": "insert",
-            "updated": {
+            "action": "delete",
+            "original": {
               "index": 5,
               "contract": "DIDPermissionsRegistry",
               "path": "contracts/registry/DIDPermissionsRegistry.sol",
@@ -1857,6 +1857,18 @@
               "astId": 4038,
               "type": "t_mapping<t_bool>",
               "src": "373:59:23"
+            }
+          },
+          {
+            "action": "insert",
+            "updated": {
+              "index": 6,
+              "contract": "DIDRegistry",
+              "path": "contracts/registry/DIDRegistry.sol",
+              "label": "DIDPermissions",
+              "astId": 4043,
+              "type": "t_mapping<t_bool>",
+              "src": "839:59:23"
             }
           }
         ]
@@ -2712,7 +2724,7 @@
     ]
   },
   "zosversion": "2.2",
-  "version": "v0.12.0",
+  "version": "v0.12.7",
   "proxyAdmin": {
     "address": "0x82C89A5ab85bC887D37DC40786702700D7CEC7Db"
   }
