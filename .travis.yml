@@ -73,14 +73,14 @@ notifications:
   email: false
 
 deploy:
-  - provider: script
-    script: bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
-    skip_cleanup: true
-    on:
-      tags: true
-      all_branches: true
-      condition: $DEPLOY_PACKAGE = true
-
+# JAVA PACKAGE HAS BEEN DISABLED
+#  - provider: script
+#    script: bash -x ./scripts/maven.sh && mvn clean deploy --settings .maven.xml -B -U -Prelease
+#    skip_cleanup: true
+#    on:
+#      tags: true
+#      all_branches: true
+#      condition: $DEPLOY_PACKAGE = true
   - provider: npm
     email: "devops@oceanprotocol.com"
     api_key: ${NPM_TOKEN}
