@@ -414,7 +414,7 @@ contract('DIDRegistry', (accounts) => {
                         from: didOwner
                     }
                 ),
-                'Invalid new owner address'
+                'Invalid new DID owner address'
             )
         })
     })

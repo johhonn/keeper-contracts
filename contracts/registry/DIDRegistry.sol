@@ -202,10 +202,6 @@ contract DIDRegistry is Ownable {
         external
         onlyDIDOwner(_did)
     {
-        require(
-            _newOwner != address(0),
-            'Invalid new owner address'
-        );
         address _previousOwner = didRegisterList.didRegisters[_did].owner;
         didRegisterList.updateDIDOwner(_did, _newOwner);
         
