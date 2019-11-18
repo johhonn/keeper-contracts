@@ -1,5 +1,6 @@
 # Keeper Contracts Documentation
-
+A hig level keeper contracts diagram model:
+![](images/Keeper-contracts-diagram.png)
 ## File Structure
 
 There are several folders and each includes solidity source files for each module:
