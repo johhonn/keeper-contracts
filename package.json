@@ -77,6 +77,7 @@
   "author": "Ocean Protocol",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@oceanprotocol/multisigwallet": "git+https://github.com/oceanprotocol/MultiSigWalletContracts.git#v2.0.4",
     "@oceanprotocol/dori": "~0.5.1",
     "bignumber.js": "^9.0.0",
     "chai": "^4.2.0",
@@ -92,7 +93,7 @@
     "truffle": "5.0.42",
     "truffle-contract": "~4.0.31",
     "truffle-hdwallet-provider": "~1.0.17",
-    "web3": "^1.2.4",
+    "web3": "1.2.4",
     "web3-provider-engine": "~15.0.3",
     "yargs": "~14.2.0"
   }
