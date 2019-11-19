@@ -1,5 +1,5 @@
 # Keeper Contracts Documentation
-A hig level keeper contracts diagram model:
+A high level keeper contracts diagram model:
 ![](images/Keeper-contracts-diagram.png)
 ## File Structure
 
