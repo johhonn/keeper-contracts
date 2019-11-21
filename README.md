@@ -249,7 +249,7 @@ The contract addresses deployed on Ethereum Mainnet:
 
 ### xDai
 
-The contract addresses deployed on `Xdai` Mainnet:
+The contract addresses deployed on `xDai` Mainnet:
 
 | Contract                          | Version | Address                                      |
 |-----------------------------------|---------|----------------------------------------------|
