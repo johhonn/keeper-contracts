@@ -31,6 +31,7 @@
      - [Mainnets](#mainnets)
         - [Ethereum Mainnet](#ethereum-mainnet)
         - [Pacific Mainnet](#pacific-mainnet)
+        - [xDai](#xdai)
   - [Packages](#packages)
   - [Documentation](#documentation)
   - [Contributing](#contributing)
@@ -246,6 +247,29 @@ The contract addresses deployed on Ethereum Mainnet:
 | SignCondition                     | v0.10.3 | `0xEE33DCDBE6aF6197dD01907cfc4296BFC0448B16` |
 | TemplateStoreManager              | v0.10.3 | `0x04DD5364b12131ae870Ec54bd539b5Cb94B9DC36` |
 
+### xDai
+
+The contract addresses deployed on `xDai` Mainnet:
+
+| Contract                          | Version | Address                                      |
+|-----------------------------------|---------|----------------------------------------------|
+| AccessSecretStoreCondition        | v0.12.7 | `0x2EadA723f7C631284B299E5BfB724B2153D4c1d7` |
+| AgreementStoreManager             | v0.12.7 | `0x5E12966F910A819a84D359383F0B2777Af04B664` |
+| ComputeExecutionCondition         | v0.12.7 | `0x0233d73aFf3030FE26a53F363217c84DF25638E9` |
+| ConditionStoreManager             | v0.12.7 | `0xBe3419C1E4764BeF16A272A45865c1C1072Bf8AB` |
+| DIDRegistry                       | v0.12.7 | `0x99ae43155D8Fa205b5CEE705aD8ab1a1A92B904E` |
+| DIDRegistryLibrary                | v0.12.7 | `0x99ae43155D8Fa205b5CEE705aD8ab1a1A92B904E` |
+| EpochLibrary                      | v0.12.7 | `0x99ae43155D8Fa205b5CEE705aD8ab1a1A92B904E` |
+| EscrowAccessSecretStoreTemplate   | v0.12.7 | `0xCD3a33379DBDc6Cb14C3bf8eAb594e5ae1317BB1` |
+| EscrowComputeExecutionTemplate    | v0.12.7 | `0xbb3B88589902eFF97d3E6Af2757f83c66a9FE2Ac` |
+| EscrowReward                      | v0.12.7 | `0x9C71Ac20Ef2178bD6f9d927a601985f9983b1E8E` |
+| HashLockCondition                 | v0.12.7 | `0x6a9C322ADE3c58b6D83DA1cB4A687D834872BFc8` |
+| LockRewardCondition               | v0.12.7 | `0x3857986E111d78E1bD4017Efe620e05e3cb9376b` |
+| OceanToken                        | v0.12.7 | `0x83180c00b360b17b7d2158bfefd32d17f01695b3` |
+| SignCondition                     | v0.12.7 | `0x547A4BA7Bec2AE45393D07AF9E0F53aEA50aD968` |
+| TemplateStoreManager              | v0.12.7 | `0xD2f1Ccb9E51659f1bAC7EF3e6cD713b536C1BDa4` |
+| ThresholdCondition                | v0.12.7 | `0xeED6Bf968e5808f6Ba0d284475f437aa93997aC4` |
+| WhitelistingCondition             | v0.12.7 | `0xA9c8Ae2784BF0FdB56004BE0D46dE1BeE15Fe421` |
 
 ## Packages
 
