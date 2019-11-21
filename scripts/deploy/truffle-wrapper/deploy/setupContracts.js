@@ -73,17 +73,12 @@ async function setupContracts({
         addressBook.LockRewardCondition &&
         addressBook.EscrowReward &&
         addressBook.AccessSecretStoreCondition &&
-        addressBook.ComputeExecutionCondition &&
-        addressBook.Common
+        addressBook.ComputeExecutionCondition
     ) {
         const TemplateStoreManager =
             artifacts.require('TemplateStoreManager')
-        const Common = artifacts.require('Common')
-
         const TemplateStoreManagerInstance =
             await TemplateStoreManager.at(addressBook.TemplateStoreManager)
-        const CommonInstance = await Common.at(addressBook.Common)
-
         if (verbose) {
             console.log(
                 `Proposing template EscrowAccessSecretStore from ${roles.deployer}`
@@ -123,7 +118,7 @@ async function setupContracts({
             addressBook.EscrowReward
         ]
 
-        const escrowAccessSecretStoreTemplateId = await CommonInstance.hashString('EscrowAccessSecretStoreTemplate')
+        const escrowAccessSecretStoreTemplateId = await TemplateStoreManagerInstance.generateId('EscrowAccessSecretStoreTemplate')
 
         await TemplateStoreManagerInstance.methods['proposeTemplate(bytes32,address[],bytes32[],string)'](
             escrowAccessSecretStoreTemplateId,
@@ -145,7 +140,7 @@ async function setupContracts({
             )
         }
 
-        const escrowComputeExecutionTemplateId = await CommonInstance.hashString(
+        const escrowComputeExecutionTemplateId = await TemplateStoreManagerInstance.generateId(
             'EscrowComputeExecutionTemplate',
             { from: roles.deployer }
         )

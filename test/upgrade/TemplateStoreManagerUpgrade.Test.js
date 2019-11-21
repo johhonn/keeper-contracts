@@ -53,8 +53,7 @@ contract('TemplateStoreManager', (accounts) => {
                     'EscrowReward',
                     'OceanToken',
                     'DIDRegistry',
-                    'ComputeExecutionCondition',
-                    'Common'
+                    'ComputeExecutionCondition'
                 ],
                 verbose
             })

@@ -78,6 +78,14 @@ contract TemplateStoreManager is Ownable {
         Ownable.initialize(_owner);
     }
 
+    function generateId(string memory templateName)
+        public
+        pure
+        returns(bytes32 Id)
+    {
+        Id = keccak256(abi.encodePacked(templateName));
+    }
+    
     function proposeTemplate(
         address _id,
         address[] calldata _conditionTypes,

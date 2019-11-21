@@ -17,7 +17,6 @@ const {
 } = require('./Upgrader')
 
 const TemplateStoreManager = artifacts.require('TemplateStoreManager')
-const Common = artifacts.require('Common')
 const AgreementStoreManagerChangeFunctionSignature =
     artifacts.require('AgreementStoreManagerChangeFunctionSignature')
 const AgreementStoreManagerChangeInStorage =
@@ -30,8 +29,7 @@ const AgreementStoreManagerWithBug = artifacts.require('AgreementStoreManagerWit
 
 contract('AgreementStoreManager', (accounts) => {
     let agreementStoreManagerAddress,
-        templateStoreManagerAddress,
-        CommonAddress
+        templateStoreManagerAddress
 
     const verbose = false
     const approver = accounts[3]
@@ -48,7 +46,6 @@ contract('AgreementStoreManager', (accounts) => {
         actorTypeIds = []
     } = {}) {
         const templateStoreManager = await TemplateStoreManager.at(templateStoreManagerAddress)
-        const common = await Common.at(CommonAddress)
         const computeExecutionConditionId = constants.bytes32.one
         const LockRewardConditionId = constants.bytes32.two
         const EscrowRewardConditionId = constants.bytes32.three
@@ -59,7 +56,7 @@ contract('AgreementStoreManager', (accounts) => {
             EscrowRewardConditionId
         ]
 
-        templateId = await common.hashString('EscrowAccessSecretStoreTemplate')
+        templateId = await templateStoreManager.generateId('EscrowAccessSecretStoreTemplate')
 
         return {
             did,
@@ -87,15 +84,13 @@ contract('AgreementStoreManager', (accounts) => {
                     'EscrowReward',
                     'OceanToken',
                     'DIDRegistry',
-                    'ComputeExecutionCondition',
-                    'Common'
+                    'ComputeExecutionCondition'
                 ],
                 verbose
             })
 
             agreementStoreManagerAddress = addressBook.AgreementStoreManager
             templateStoreManagerAddress = addressBook.TemplateStoreManager
-            CommonAddress = addressBook.Common
         })
 
         it('Should be possible to fix/add a bug', async () => {
