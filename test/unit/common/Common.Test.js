@@ -16,10 +16,6 @@ contract('Common', (accounts) => {
     describe('deploy and setup', () => {
         it('contract should deploy', async () => {
             common = await Common.new()
-            await common.initialize(
-                accounts[0],
-                { from: accounts[0] }
-            )
         })
     })
     describe('hashString', () => {

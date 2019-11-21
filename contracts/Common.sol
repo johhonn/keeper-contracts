@@ -10,22 +10,7 @@ import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
  * @title Common functions
  * @author Ocean Protocol Team
  */
-contract Common is Ownable {
-   
-   /**
-     * @dev Common Initializer
-     *      Initialize Ownable. Only on contract creation.
-     * @param _owner refers to the owner of the contract.
-     */
-    function initialize(
-        address _owner
-    )
-        public
-        initializer
-    {
-        Ownable.initialize(_owner);
-    }
-   
+contract Common {
    /**
     * @notice getCurrentBlockNumber get block number
     * @return the current block number
