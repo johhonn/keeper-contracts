@@ -310,6 +310,24 @@ contract('TemplateStoreManager', (accounts) => {
                 .to.equal(1)
         })
 
+        it('should generate and get exact template Id', async () => {
+            const { templateStoreManager, conditionTypes, actorTypeIds, owner } = await setupTest()
+            const templateId = await templateStoreManager.generateId('MyNewTemplate')
+
+            await templateStoreManager.methods['proposeTemplate(bytes32,address[],bytes32[],string)'](
+                templateId,
+                conditionTypes,
+                actorTypeIds,
+                'MyNewTemplate',
+                {
+                    from: owner
+                }
+            )
+            await templateStoreManager.approveTemplate(templateId, { from: owner })
+            expect((await templateStoreManager.getTemplate(templateId)).state.toNumber())
+                .to.equal(constants.template.state.approved)
+        })
+
         it('should deregister template actor and return the corresponding state', async () => {
             const { templateStoreManager, actorTypeIds } = await setupTest()
             await templateStoreManager.deregisterTemplateActorType(actorTypeIds[0])
