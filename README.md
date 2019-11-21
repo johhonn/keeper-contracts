@@ -31,7 +31,7 @@
      - [Mainnets](#mainnets)
         - [Ethereum Mainnet](#ethereum-mainnet)
         - [Pacific Mainnet](#pacific-mainnet)
-        - [Xdai](#xdai)
+        - [xDai](#xdai)
   - [Packages](#packages)
   - [Documentation](#documentation)
   - [Contributing](#contributing)
@@ -247,7 +247,7 @@ The contract addresses deployed on Ethereum Mainnet:
 | SignCondition                     | v0.10.3 | `0xEE33DCDBE6aF6197dD01907cfc4296BFC0448B16` |
 | TemplateStoreManager              | v0.10.3 | `0x04DD5364b12131ae870Ec54bd539b5Cb94B9DC36` |
 
-### Xdai
+### xDai
 
 The contract addresses deployed on `Xdai` Mainnet:
 
