@@ -3,7 +3,6 @@
 /* global artifacts, contract, describe, it */
 
 const chai = require('chai')
-const web3 = require('web3')
 const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
