@@ -18,15 +18,6 @@ contract('Common', (accounts) => {
             common = await Common.new()
         })
     })
-    describe('hashString', () => {
-        it('should be able to hash string', async () => {
-            const hash = await common.hashString('string')
-            assert.strictEqual(
-                hash,
-                web3.utils.keccak256('string')
-            )
-        })
-    })
     describe('isContract', () => {
         it('should return true in case of contract address', async () => {
             assert.strictEqual(

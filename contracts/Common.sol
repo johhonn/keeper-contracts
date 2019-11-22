@@ -3,9 +3,6 @@ pragma solidity 0.5.6;
 // SPDX-License-Identifier: (Apache-2.0 AND CC-BY-4.0)
 // Code is Apache-2.0 and docs are CC-BY-4.0
 
-import 'zos-lib/contracts/Initializable.sol';
-import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
-
 /**
  * @title Common functions
  * @author Ocean Protocol Team
@@ -37,18 +34,5 @@ contract Common {
         /* solium-disable-next-line security/no-inline-assembly */
         assembly { size := extcodesize(addr) }
         return size > 0;
-    }
-    
-    /**
-     * @dev hashString calculate string hash
-     * @param input input string 
-     * @return bytes32 hash value
-     */
-    function hashString(string memory input)
-        public
-        pure
-        returns(bytes32 hash)
-    {
-        hash = keccak256(abi.encodePacked(input));
     }
 }
