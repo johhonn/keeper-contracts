@@ -7,7 +7,6 @@ import './AgreementStoreLibrary.sol';
 import '../conditions/ConditionStoreManager.sol';
 import '../registry/DIDRegistry.sol';
 import '../templates/TemplateStoreManager.sol';
-
 import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
 
 /**
@@ -36,6 +35,12 @@ contract AgreementStoreManager is Ownable {
     ConditionStoreManager internal conditionStoreManager;
     TemplateStoreManager internal templateStoreManager;
     DIDRegistry internal didRegistry;
+    
+    using AgreementStoreLibrary for AgreementStoreLibrary.AgreementActors;
+    AgreementStoreLibrary.AgreementActors internal agreementActors;
+    
+    // this meant as template ID resolver to avoid memory layout corruption
+    mapping (address => bytes32) templateIdAddressToBytes32;
 
     /**
      * @dev initialize AgreementStoreManager Initializer
@@ -74,16 +79,12 @@ contract AgreementStoreManager is Ownable {
     }
 
     /**
-     * @dev Create a new agreement.
-     *      The agreement will create conditions of conditionType with conditionId.
-     *      Only "approved" templates can access this function.
-     * @param _id is the ID of the new agreement. Must be unique.
-     * @param _did is the bytes32 DID of the asset. The DID must be registered beforehand.
-     * @param _conditionTypes is a list of addresses that point to Condition contracts.
-     * @param _conditionIds is a list of bytes32 content-addressed Condition IDs
-     * @param _timeLocks is a list of uint time lock values associated to each Condition
-     * @param _timeOuts is a list of uint time out values associated to each Condition
-     * @return the size of the agreement list after the create action.
+     * @dev THIS METHOD HAS BEEN DEPRECATED PLEASE DON'T USE IT.
+     *      WE KEEP THIS METHOD INTERFACE TO AVOID ANY CONTRACT 
+     *      UPGRADEABILITY ISSUES IN THE FUTURE.
+     *      THE NEW METHOD DON'T ACCEPT CONDITIONS, INSTEAD IT USES 
+     *      TEMPLATE ID. FOR MORE INFORMATION PLEASE REFER TO THE BELOW LINK
+     *      https://github.com/oceanprotocol/keeper-contracts/pull/623
      */
     function createAgreement(
         bytes32 _id,
@@ -129,6 +130,85 @@ contract AgreementStoreManager is Ownable {
 
         return getAgreementListSize();
     }
+    
+    /**
+     * @dev Create a new agreement.
+     *      The agreement will create conditions of conditionType with conditionId.
+     *      Only "approved" templates can access this function.
+     * @param _id is the ID of the new agreement. Must be unique.
+     * @param _did is the bytes32 DID of the asset. The DID must be registered beforehand.
+     * @param _templateId template ID.
+     * @param _conditionIds is a list of bytes32 content-addressed Condition IDs
+     * @param _timeLocks is a list of uint time lock values associated to each Condition
+     * @param _timeOuts is a list of uint time out values associated to each Condition
+     * @param _actors array includes actor address such as consumer, provider, publisher, or verifier, ect.
+     * For each template, the actors array order should follow the same order in templateStoreManager 
+     * actor types definition.
+     * @return the size of the agreement list after the create action.
+     */
+    function createAgreement(
+        bytes32 _id,
+        bytes32 _did,
+        bytes32 _templateId,
+        bytes32[] memory _conditionIds,
+        uint[] memory _timeLocks,
+        uint[] memory _timeOuts,
+        address[] memory _actors
+    )
+        public
+        returns (uint size)
+    {
+        require(
+            templateStoreManager.isTemplateApproved(_templateId) == true,
+            'Template not Approved'
+        );
+        require(
+            didRegistry.getBlockNumberUpdated(_did) > 0,
+            'DID not registered'
+        );
+        address[] memory _conditionTypes;
+        bytes32[] memory _actorTypes;
+        
+        
+        (,,,,_conditionTypes, _actorTypes) = templateStoreManager.getTemplate(
+            _templateId
+        );
+        
+        require(
+            _conditionIds.length == _conditionTypes.length &&
+            _timeLocks.length == _conditionTypes.length &&
+            _timeOuts.length == _conditionTypes.length &&
+            _actors.length == _actorTypes.length,
+            'Arguments have wrong length'
+        );
+
+        // create the conditions in condition store. Fail if conditionId already exists.
+        for (uint256 i = 0; i < _conditionTypes.length; i++) {
+            conditionStoreManager.createCondition(
+                _conditionIds[i],
+                _conditionTypes[i],
+                _timeLocks[i],
+                _timeOuts[i]
+            );
+        }
+        
+        address templateAddress = convertBytes32ToAddress(_templateId);
+        templateIdAddressToBytes32[templateAddress] = _templateId;
+        agreementList.create(
+            _id,
+            _did,
+            templateAddress,
+            _conditionIds
+        );
+        
+        agreementActors.setActors(
+            _id,
+            _actors,
+            _actorTypes
+        );
+
+        return getAgreementListSize();
+    }
 
     /**
      * @dev Get agreement with _id.
@@ -143,7 +223,7 @@ contract AgreementStoreManager is Ownable {
         returns (
             bytes32 did,
             address didOwner,
-            address templateId,
+            bytes32 templateId,
             bytes32[] memory conditionIds,
             address lastUpdatedBy,
             uint256 blockNumberUpdated
@@ -151,7 +231,8 @@ contract AgreementStoreManager is Ownable {
     {
         did = agreementList.agreements[_id].did;
         didOwner = didRegistry.getDIDOwner(did);
-        templateId = agreementList.agreements[_id].templateId;
+        address _templateAddress = agreementList.agreements[_id].templateId;
+        templateId = templateIdAddressToBytes32[_templateAddress];
         conditionIds = agreementList.agreements[_id].conditionIds;
         lastUpdatedBy = agreementList.agreements[_id].lastUpdatedBy;
         blockNumberUpdated = agreementList.agreements[_id].blockNumberUpdated;
@@ -229,12 +310,13 @@ contract AgreementStoreManager is Ownable {
      * @param _templateId is the address of the agreement template.
      * @return the agreement IDs for a given DID
      */
-    function getAgreementIdsForTemplateId(address _templateId)
+    function getAgreementIdsForTemplateId(bytes32 _templateId)
         public
         view
         returns (bytes32[] memory)
     {
-        return agreementList.templateIdToAgreementIds[_templateId];
+        address templateId = convertBytes32ToAddress(_templateId);
+        return agreementList.templateIdToAgreementIds[templateId];
     }
     
     /**
@@ -248,5 +330,20 @@ contract AgreementStoreManager is Ownable {
         returns(address)
     {
         return address(didRegistry);
+    }
+    
+   /**
+    * @dev convertBytes32ToAddress 
+    * @param input a 32 bytes input
+    * @return bytes 20 output
+    */
+    function convertBytes32ToAddress(
+        bytes32 input    
+    )
+        private
+        pure
+        returns(address)
+    {
+        return address(ripemd160(abi.encodePacked(input)));
     }
 }

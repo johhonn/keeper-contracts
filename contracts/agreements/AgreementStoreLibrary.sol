@@ -31,7 +31,11 @@ library AgreementStoreLibrary {
         mapping(address => bytes32[]) templateIdToAgreementIds;
         bytes32[] agreementIds;
     }
-
+    
+    struct AgreementActors {
+        mapping(bytes32 => mapping(address => bytes32)) AgreementActor;
+    }
+    
     /**
      * @dev create new agreement
      *      checks whether the agreement Id exists, creates new agreement 
@@ -70,5 +74,31 @@ library AgreementStoreLibrary {
         _self.didToAgreementIds[_did].push(_id);
         _self.templateIdToAgreementIds[_templateId].push(_id);
         return _self.agreementIds.length;
+    }
+    
+    /**
+     * @dev setActors set a mapping between actors and their types
+     * @param _self is AgreementActors storage pointer
+     * @param _id agreement identifier
+     * @param _actors actors addresses
+     * @param _actorTypes actors types (consumer, provider, verifier, publisher, curator)
+     */
+    function setActors(
+        AgreementActors storage _self,
+        bytes32 _id,
+        address[] memory _actors,
+        bytes32[] memory _actorTypes
+    )
+        internal
+    {
+        require(
+            _actors.length == _actorTypes.length,
+            'Invalid actor/actor types array length'
+        );
+        
+        for(uint256 i=0; i < _actors.length; i++)
+        {
+            _self.AgreementActor[_id][_actors[i]] = _actorTypes[i];
+        }
     }
 }

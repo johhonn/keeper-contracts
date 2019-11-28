@@ -1,19 +1,18 @@
 /* eslint-env mocha */
 /* eslint-disable no-console */
-/* global artifacts, contract, describe, it, expect */
+/* global contract, describe, it, expect */
 
 const chai = require('chai')
 const { assert } = chai
 const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 
-const EscrowComputeExecutionTemplate = artifacts.require('EscrowComputeExecutionTemplate')
-
 const constants = require('../../helpers/constants.js')
 const deployConditions = require('../../helpers/deployConditions.js')
 const deployManagers = require('../../helpers/deployManagers.js')
 const getBalance = require('../../helpers/getBalance.js')
 const increaseTime = require('../../helpers/increaseTime.js')
+const testUtils = require('../../helpers/utils.js')
 
 contract('Escrow Compute Execution Template integration test', (accounts) => {
     let oceanToken,
@@ -21,10 +20,12 @@ contract('Escrow Compute Execution Template integration test', (accounts) => {
         agreementStoreManager,
         conditionStoreManager,
         templateStoreManager,
-        escrowComputeExecutionTemplate,
         computeExecutionCondition,
         lockRewardCondition,
-        escrowReward
+        escrowReward,
+        conditionTypes,
+        actorTypeIds,
+        templateId
 
     async function setupTest({
         deployer = accounts[8],
@@ -35,7 +36,10 @@ contract('Escrow Compute Execution Template integration test', (accounts) => {
             didRegistry,
             agreementStoreManager,
             conditionStoreManager,
-            templateStoreManager
+            templateStoreManager,
+            conditionTypes,
+            actorTypeIds,
+            templateId
         } = await deployManagers(
             deployer,
             owner
@@ -54,35 +58,66 @@ contract('Escrow Compute Execution Template integration test', (accounts) => {
             oceanToken
         ))
 
-        escrowComputeExecutionTemplate = await EscrowComputeExecutionTemplate.new()
-        await escrowComputeExecutionTemplate.methods['initialize(address,address,address,address,address,address)'](
-            owner,
-            agreementStoreManager.address,
-            didRegistry.address,
-            computeExecutionCondition.address,
+        // propose and approve template
+        await templateStoreManager.registerTemplateActorType(
+            'provider',
+            {
+                from: owner
+            }
+        )
+        const providerActorTypeId = await templateStoreManager.getTemplateActorTypeId('provider')
+
+        await templateStoreManager.registerTemplateActorType(
+            'consumer',
+            {
+                from: owner
+            }
+        )
+        const consumerActorTypeId = await templateStoreManager.getTemplateActorTypeId('consumer')
+
+        // any dummy contract address, also we can use the bytes32 version
+        const templateAddress = templateStoreManager.address
+        // you can also use the proposeTemplate version using bytes32 templateId
+
+        conditionTypes = [
             lockRewardCondition.address,
-            escrowReward.address,
-            { from: deployer }
+            computeExecutionCondition.address,
+            escrowReward.address
+        ]
+        actorTypeIds = [
+            providerActorTypeId,
+            consumerActorTypeId
+        ]
+
+        const proposedTemplateResult = await templateStoreManager.methods['proposeTemplate(address,address[],bytes32[],string)'](
+            templateAddress,
+            conditionTypes,
+            actorTypeIds,
+            'EscrowComputeExecutionTemplate'
         )
 
-        // propose and approve template
-        const templateId = escrowComputeExecutionTemplate.address
-        await templateStoreManager.proposeTemplate(templateId)
+        const eventArgs = testUtils.getEventArgsFromTx(proposedTemplateResult, 'TemplateProposed')
+
+        templateId = eventArgs.Id
+
         await templateStoreManager.approveTemplate(templateId, { from: owner })
 
         return {
             templateId,
-            owner
+            owner,
+            conditionTypes,
+            actorTypeIds
         }
     }
 
     async function prepareEscrowAgreement({
         agreementId = constants.bytes32.one,
-        sender = accounts[0],
-        receiver = accounts[1],
+        templateId = constants.bytes32.one,
+        receiver = accounts[0],
+        sender = accounts[1],
         escrowAmount = 10,
-        timeLockAccess = 0,
-        timeOutAccess = 0,
+        timeLockCompute = 0,
+        timeOutCompute = 0,
         did = constants.did[0],
         url = constants.registry.url,
         checksum = constants.bytes32.one
@@ -92,53 +127,80 @@ contract('Escrow Compute Execution Template integration test', (accounts) => {
         const conditionIdLock = await lockRewardCondition.generateId(agreementId, await lockRewardCondition.hashValues(escrowReward.address, escrowAmount))
         const conditionIdEscrow = await escrowReward.generateId(agreementId, await escrowReward.hashValues(escrowAmount, receiver, sender, conditionIdLock, conditionIdCompute))
 
+        const actors = [
+            receiver, // provider address
+            sender // consumer address
+        ]
         // construct agreement
         const agreement = {
             did: did,
+            templateId: templateId,
             conditionIds: [
-                conditionIdCompute,
                 conditionIdLock,
+                conditionIdCompute,
                 conditionIdEscrow
             ],
-            timeLocks: [timeLockAccess, 0, 0],
-            timeOuts: [timeOutAccess, 0, 0],
-            consumer: receiver
+            timeLocks: [0, timeLockCompute, 0],
+            timeOuts: [0, timeOutCompute, 0],
+            actors: actors
         }
+
+        const conditionIds = [
+            conditionIdCompute,
+            conditionIdLock,
+            conditionIdEscrow
+        ]
+
         return {
             agreementId,
             agreement,
             sender,
             receiver,
+            actors,
             escrowAmount,
-            timeLockAccess,
-            timeOutAccess,
+            timeLockCompute,
+            timeOutCompute,
             checksum,
-            url
+            url,
+            conditionIds
         }
     }
 
     describe('create and fulfill escrow agreement', () => {
         it('should create escrow agreement and fulfill', async () => {
-            const { owner } = await setupTest()
+            const { owner, templateId } = await setupTest()
 
             // prepare: escrow agreement
-            const { agreementId, agreement, sender, receiver, escrowAmount, checksum, url } = await prepareEscrowAgreement()
+            const {
+                agreementId,
+                agreement,
+                sender,
+                receiver,
+                escrowAmount,
+                checksum,
+                url
+            } = await prepareEscrowAgreement({ templateId: templateId })
 
             // register DID
             await didRegistry.registerAttribute(agreement.did, checksum, [], url, { from: receiver })
 
             // create agreement
-            await escrowComputeExecutionTemplate.createAgreement(agreementId, ...Object.values(agreement))
+            await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement)
+            )
 
             // check state of agreement and conditions
             expect((await agreementStoreManager.getAgreement(agreementId)).did)
                 .to.equal(constants.did[0])
 
-            const conditionTypes = await escrowComputeExecutionTemplate.getConditionTypes()
+            const template = await templateStoreManager.getTemplate(templateId)
+            const templateConditionTypes = template.conditionTypes
+
             let storedCondition
             agreement.conditionIds.forEach(async (conditionId, i) => {
                 storedCondition = await conditionStoreManager.getCondition(conditionId)
-                expect(storedCondition.typeRef).to.equal(conditionTypes[i])
+                expect(storedCondition.typeRef).to.equal(templateConditionTypes[i])
                 expect(storedCondition.state.toNumber()).to.equal(constants.condition.state.unfulfilled)
             })
 
@@ -160,18 +222,20 @@ contract('Escrow Compute Execution Template integration test', (accounts) => {
             assert.strictEqual(await getBalance(oceanToken, receiver), 0)
 
             assert.strictEqual(
-                (await conditionStoreManager.getConditionState(agreement.conditionIds[1])).toNumber(),
-                constants.condition.state.fulfilled)
+                (await conditionStoreManager.getConditionState(agreement.conditionIds[0])).toNumber(),
+                constants.condition.state.fulfilled
+            )
 
             // fulfill access
             await computeExecutionCondition.fulfill(agreementId, agreement.did, receiver, { from: receiver })
 
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(agreement.conditionIds[0])).toNumber(),
-                constants.condition.state.fulfilled)
+                constants.condition.state.fulfilled
+            )
 
             // get reward
-            await escrowReward.fulfill(agreementId, escrowAmount, receiver, sender, agreement.conditionIds[1], agreement.conditionIds[0], { from: receiver })
+            await escrowReward.fulfill(agreementId, escrowAmount, receiver, sender, agreement.conditionIds[0], agreement.conditionIds[1], { from: receiver })
 
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(agreement.conditionIds[2])).toNumber(),
@@ -185,47 +249,66 @@ contract('Escrow Compute Execution Template integration test', (accounts) => {
         })
 
         it('should create escrow agreement and abort after timeout', async () => {
-            const { owner } = await setupTest()
+            const { owner, templateId } = await setupTest()
 
             // prepare: escrow agreement
-            const { agreementId, agreement, sender, receiver, escrowAmount, timeOutAccess, checksum, url } = await prepareEscrowAgreement({ timeOutAccess: 10 })
+            const {
+                agreementId,
+                agreement,
+                sender,
+                receiver,
+                escrowAmount,
+                timeOutCompute,
+                checksum,
+                url
+            } = await prepareEscrowAgreement({
+                templateId: templateId,
+                timeOutCompute: 10
+            })
 
             // register DID
             await didRegistry.registerAttribute(agreement.did, checksum, [], url, { from: receiver })
 
             // create agreement
-            await escrowComputeExecutionTemplate.createAgreement(agreementId, ...Object.values(agreement))
+            await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement)
+            )
 
             // fill up wallet
             await oceanToken.mint(sender, escrowAmount, { from: owner })
 
             // fulfill lock reward
             await oceanToken.approve(lockRewardCondition.address, escrowAmount, { from: sender })
+
             await lockRewardCondition.fulfill(agreementId, escrowReward.address, escrowAmount, { from: sender })
             assert.strictEqual(
-                (await conditionStoreManager.getConditionState(agreement.conditionIds[1])).toNumber(),
-                constants.condition.state.fulfilled)
+                (await conditionStoreManager.getConditionState(agreement.conditionIds[0])).toNumber(),
+                constants.condition.state.fulfilled
+            )
 
             // No update since access is not fulfilled yet
             // refund
-            const result = await escrowReward.fulfill(agreementId, escrowAmount, receiver, sender, agreement.conditionIds[1], agreement.conditionIds[0], { from: receiver })
+            const result = await escrowReward.fulfill(agreementId, escrowAmount, receiver, sender, agreement.conditionIds[0], agreement.conditionIds[1], { from: receiver })
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(agreement.conditionIds[2])).toNumber(),
                 constants.condition.state.unfulfilled
             )
+
             assert.strictEqual(result.logs.length, 0)
 
             // wait: for time out
-            await increaseTime(timeOutAccess)
+            await increaseTime(timeOutCompute)
 
-            // abort: fulfill access after timeout
+            // abort: fulfill compute after timeout
             await computeExecutionCondition.fulfill(agreementId, agreement.did, receiver, { from: receiver })
             assert.strictEqual(
-                (await conditionStoreManager.getConditionState(agreement.conditionIds[0])).toNumber(),
-                constants.condition.state.aborted)
+                (await conditionStoreManager.getConditionState(agreement.conditionIds[1])).toNumber(),
+                constants.condition.state.aborted
+            )
 
             // refund
-            await escrowReward.fulfill(agreementId, escrowAmount, receiver, sender, agreement.conditionIds[1], agreement.conditionIds[0], { from: sender })
+            await escrowReward.fulfill(agreementId, escrowAmount, receiver, sender, agreement.conditionIds[0], agreement.conditionIds[1], { from: sender })
             assert.strictEqual(
                 (await conditionStoreManager.getConditionState(agreement.conditionIds[2])).toNumber(),
                 constants.condition.state.fulfilled
@@ -237,39 +320,57 @@ contract('Escrow Compute Execution Template integration test', (accounts) => {
 
     describe('create and fulfill escrow agreement with access secret store and timeLock', () => {
         it('should create escrow agreement and fulfill', async () => {
-            const { owner } = await setupTest()
+            const { owner, templateId } = await setupTest()
 
             // prepare: escrow agreement
-            const { agreementId, agreement, sender, receiver, escrowAmount, timeLockAccess, checksum, url } = await prepareEscrowAgreement({ timeLockAccess: 10 })
+            const {
+                agreementId,
+                agreement,
+                sender,
+                receiver,
+                escrowAmount,
+                timeLockCompute,
+                checksum,
+                url
+            } = await prepareEscrowAgreement({
+                templateId: templateId,
+                timeLockCompute: 10
+            })
 
             // register DID
             await didRegistry.registerAttribute(agreement.did, checksum, [], url, { from: receiver })
+
+            // create agreement
+            await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement)
+            )
+
             // fill up wallet
             await oceanToken.mint(sender, escrowAmount, { from: owner })
 
-            // create agreement
-            await escrowComputeExecutionTemplate.createAgreement(agreementId, ...Object.values(agreement))
-
             // fulfill lock reward
             await oceanToken.approve(lockRewardCondition.address, escrowAmount, { from: sender })
+
             await lockRewardCondition.fulfill(agreementId, escrowReward.address, escrowAmount, { from: sender })
             assert.strictEqual(
-                (await conditionStoreManager.getConditionState(agreement.conditionIds[1])).toNumber(),
-                constants.condition.state.fulfilled)
+                (await conditionStoreManager.getConditionState(agreement.conditionIds[0])).toNumber(),
+                constants.condition.state.fulfilled
+            )
 
-            // fail: fulfill access before time lock
+            // fail: fulfill compute before time lock
             await assert.isRejected(
                 computeExecutionCondition.fulfill(agreementId, agreement.did, receiver, { from: receiver }),
                 constants.condition.epoch.error.isTimeLocked
             )
 
             // wait: for time lock
-            await increaseTime(timeLockAccess)
+            await increaseTime(timeLockCompute)
 
             // execute: fulfill access after time lock
             await computeExecutionCondition.fulfill(agreementId, agreement.did, receiver, { from: receiver })
             assert.strictEqual(
-                (await conditionStoreManager.getConditionState(agreement.conditionIds[0])).toNumber(),
+                (await conditionStoreManager.getConditionState(agreement.conditionIds[1])).toNumber(),
                 constants.condition.state.fulfilled)
             expect(await computeExecutionCondition.wasComputeTriggered(agreement.did, receiver)).to.equal(true)
 
@@ -279,8 +380,8 @@ contract('Escrow Compute Execution Template integration test', (accounts) => {
                 escrowAmount,
                 receiver,
                 sender,
-                agreement.conditionIds[1],
                 agreement.conditionIds[0],
+                agreement.conditionIds[1],
                 { from: receiver }
             )
             assert.strictEqual(
@@ -293,19 +394,33 @@ contract('Escrow Compute Execution Template integration test', (accounts) => {
 
         describe('drain escrow reward', () => {
             it('should create escrow agreement and fulfill', async () => {
-                const { owner } = await setupTest()
+                const { owner, templateId } = await setupTest()
 
                 // prepare: escrow agreement
-                const { agreementId, agreement, sender, receiver, escrowAmount, checksum, url } = await prepareEscrowAgreement()
+                const {
+                    agreementId,
+                    agreement,
+                    sender,
+                    receiver,
+                    escrowAmount,
+                    checksum,
+                    url
+                } = await prepareEscrowAgreement({ templateId: templateId })
 
                 // register DID
                 await didRegistry.registerAttribute(agreement.did, checksum, [], url, { from: receiver })
 
                 // create agreement
-                await escrowComputeExecutionTemplate.createAgreement(agreementId, ...Object.values(agreement))
+                await agreementStoreManager.createAgreement(
+                    agreementId,
+                    ...Object.values(agreement)
+                )
 
                 const { agreementId: agreementId2, agreement: agreement2 } = await prepareEscrowAgreement(
-                    { agreementId: constants.bytes32.two }
+                    {
+                        agreementId: constants.bytes32.two,
+                        templateId: templateId
+                    }
                 )
                 agreement2.conditionIds[2] = await escrowReward.generateId(
                     agreementId2,
@@ -314,10 +429,15 @@ contract('Escrow Compute Execution Template integration test', (accounts) => {
                         receiver,
                         sender,
                         agreement2.conditionIds[1],
-                        agreement2.conditionIds[0]))
+                        agreement2.conditionIds[0]
+                    )
+                )
 
-                // create agreement2
-                await escrowComputeExecutionTemplate.createAgreement(agreementId2, ...Object.values(agreement2))
+                // create agreement
+                await agreementStoreManager.createAgreement(
+                    agreementId2,
+                    ...Object.values(agreement2)
+                )
 
                 // fill up wallet
                 await oceanToken.mint(sender, escrowAmount * 2, { from: owner })
@@ -328,13 +448,13 @@ contract('Escrow Compute Execution Template integration test', (accounts) => {
 
                 await oceanToken.approve(lockRewardCondition.address, escrowAmount, { from: sender })
                 await lockRewardCondition.fulfill(agreementId2, escrowReward.address, escrowAmount, { from: sender })
-                // fulfill access
+                // fulfill compute
                 await computeExecutionCondition.fulfill(agreementId, agreement.did, receiver, { from: receiver })
                 await computeExecutionCondition.fulfill(agreementId2, agreement2.did, receiver, { from: receiver })
 
                 // get reward
                 await assert.isRejected(
-                    escrowReward.fulfill(agreementId2, escrowAmount * 2, receiver, sender, agreement2.conditionIds[1], agreement2.conditionIds[0], { from: receiver }),
+                    escrowReward.fulfill(agreementId2, escrowAmount * 2, receiver, sender, agreement2.conditionIds[0], agreement2.conditionIds[1], { from: receiver }),
                     constants.condition.reward.escrowReward.error.lockConditionIdDoesNotMatch
                 )
 
@@ -343,7 +463,7 @@ contract('Escrow Compute Execution Template integration test', (accounts) => {
                     constants.condition.state.unfulfilled
                 )
 
-                await escrowReward.fulfill(agreementId, escrowAmount, receiver, sender, agreement.conditionIds[1], agreement.conditionIds[0], { from: receiver })
+                await escrowReward.fulfill(agreementId, escrowAmount, receiver, sender, agreement.conditionIds[0], agreement.conditionIds[1], { from: receiver })
                 assert.strictEqual(
                     (await conditionStoreManager.getConditionState(agreement.conditionIds[2])).toNumber(),
                     constants.condition.state.fulfilled

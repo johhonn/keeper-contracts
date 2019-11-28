@@ -22,19 +22,43 @@ import 'openzeppelin-eth/contracts/ownership/Ownable.sol';
  */
 contract TemplateStoreManager is Ownable {
 
+    using TemplateStoreLibrary for 
+    TemplateStoreLibrary.TemplateListDeprecated;
+    TemplateStoreLibrary.TemplateListDeprecated internal 
+    templateListDeprecated; 
+    
     using TemplateStoreLibrary for TemplateStoreLibrary.TemplateList;
-
     TemplateStoreLibrary.TemplateList internal templateList;
 
-    modifier onlyOwnerOrTemplateOwner(address _id){
+    using TemplateStoreLibrary for TemplateStoreLibrary.TemplateActorTypeList;
+    TemplateStoreLibrary.TemplateActorTypeList internal templateActorTypeList;
+    
+    modifier onlyOwnerOrTemplateOwner(bytes32 _id){
         require(
             isOwner() ||
             templateList.templates[_id].owner == msg.sender,
-            'Invalid UpdateRole'
+            'Invalid contract owner or template owner'
         );
         _;
     }
 
+    event TemplateProposed(
+        bytes32 indexed Id,
+        string indexed name,
+        address[] conditionTypes,
+        bytes32[] actorTypeIds
+    );
+    
+    event TemplateApproved(
+        bytes32 indexed Id,
+        bool state
+    );
+    
+    event TemplateRevoked(
+        bytes32 indexed Id,
+        bool state
+    );
+    
     /**
      * @dev initialize TemplateStoreManager Initializer
      *      Initializes Ownable. Only on contract creation.
@@ -54,16 +78,67 @@ contract TemplateStoreManager is Ownable {
         Ownable.initialize(_owner);
     }
 
+    function generateId(string memory templateName)
+        public
+        pure
+        returns(bytes32 Id)
+    {
+        Id = keccak256(abi.encodePacked(templateName));
+    }
+    
+    function proposeTemplate(
+        address _id,
+        address[] calldata _conditionTypes,
+        bytes32[] calldata _actorTypeIds,
+        string calldata name
+    )
+        external
+        returns (uint size)
+    {
+        bytes32 id = keccak256(abi.encodePacked(_id));
+        return proposeTemplate(
+            id,
+            _conditionTypes,
+            _actorTypeIds,
+            name
+        );
+    }
+    
+    
     /**
      * @notice proposeTemplate proposes a new template
      * @param _id unique template identifier which is basically
      *        the template contract address
      */
-    function proposeTemplate(address _id)
-        external
+    function proposeTemplate(
+        bytes32 _id,
+        address[] memory _conditionTypes,
+        bytes32[] memory _actorTypeIds,
+        string memory name
+    )
+        public
         returns (uint size)
-    {
-        return templateList.propose(_id);
+    { 
+        uint256 currentSize = templateList.templateIds.length;
+        uint256 newSize = templateList.propose(
+            _id, 
+            _conditionTypes, 
+            _actorTypeIds
+        );
+        
+        require (
+            newSize > currentSize,
+            'Unable to propose template'
+        );
+        
+        emit TemplateProposed(
+            _id,
+            name,
+            _conditionTypes,
+            _actorTypeIds
+        );
+        
+        return newSize;
     }
 
     /**
@@ -72,11 +147,22 @@ contract TemplateStoreManager is Ownable {
      *        the template contract address. Only template store
      *        manager owner (i.e OPNF) can approve this template.
      */
-    function approveTemplate(address _id)
+    function approveTemplate(
+        bytes32 _id
+    )
         external
         onlyOwner
     {
-        return templateList.approve(_id);
+        templateList.approve(_id);
+        require(
+            templateList.templates[_id].state == TemplateStoreLibrary.TemplateState.Approved,
+            'Unable to approve template'
+        );
+        
+        emit TemplateApproved(
+            _id,
+            true
+        );
     }
 
     /**
@@ -86,13 +172,45 @@ contract TemplateStoreManager is Ownable {
      *        manager owner (i.e OPNF) or template owner
      *        can revoke this template.
      */
-    function revokeTemplate(address _id)
+    function revokeTemplate(bytes32 _id)
         external
         onlyOwnerOrTemplateOwner(_id)
     {
-        return templateList.revoke(_id);
+        templateList.revoke(_id);
+        require(
+            templateList.templates[_id].state == TemplateStoreLibrary.TemplateState.Revoked,
+            'Unable to revoke template'
+        );
+        
+        emit TemplateRevoked(
+            _id,
+            true
+        );
     }
 
+    function registerTemplateActorType(
+        string calldata _actorType
+    )
+        external
+        onlyOwner
+        returns (bytes32 actorTypeId)
+    {
+        actorTypeId = templateActorTypeList.registerActorType(
+            _actorType
+        );
+    }
+    
+    function deregisterTemplateActorType(
+        bytes32 _Id
+    )
+        external
+        onlyOwner
+    {
+        templateActorTypeList.deregisterActorType(
+            _Id
+        );
+    }
+    
     /**
      * @notice getTemplate get more information about a template
      * @param _id unique template identifier which is basically
@@ -100,20 +218,76 @@ contract TemplateStoreManager is Ownable {
      * @return template status, template owner, last updated by and
      *        last updated at.
      */
-    function getTemplate(address _id)
+    function getTemplate(bytes32 _id)
         external
         view
         returns (
             TemplateStoreLibrary.TemplateState state,
             address owner,
             address lastUpdatedBy,
-            uint blockNumberUpdated
+            uint blockNumberUpdated,
+            address[] memory conditionTypes,
+            bytes32[] memory actorTypes
         )
     {
         state = templateList.templates[_id].state;
         owner = templateList.templates[_id].owner;
         lastUpdatedBy = templateList.templates[_id].lastUpdatedBy;
         blockNumberUpdated = templateList.templates[_id].blockNumberUpdated;
+        conditionTypes = templateList.templates[_id].conditionTypes;
+        actorTypes = templateList.templates[_id].actorTypes;
+    }
+    
+    /**
+     * @notice 
+     *
+     */
+    function getTemplateActorTypeIds()
+        external
+        view
+        returns (
+            bytes32[] memory actorTypes
+        )
+    {
+        actorTypes = templateActorTypeList.actorTypeIds;
+    }
+    
+    function getTemplateActorTypeId(
+        string calldata actorType
+    )
+        external
+        view
+        returns(bytes32)
+    {
+        return templateActorTypeList.getActorTypeId(actorType);
+    }
+    
+    /**
+     * @notice 
+     *
+     */
+    function getTemplateActorTypeValue(bytes32 _Id)
+        external
+        view
+        returns (
+            string memory actorType
+        )
+    {
+        actorType = templateActorTypeList.actorTypes[_Id].value;
+    }
+    
+    /**
+     * @notice 
+     *
+     */
+    function getTemplateActorTypeState(bytes32 _Id)
+        external
+        view
+        returns (
+            uint256 state
+        )
+    {
+        state = uint256(templateActorTypeList.actorTypes[_Id].state);
     }
 
     /**
@@ -134,8 +308,16 @@ contract TemplateStoreManager is Ownable {
      *        the template contract address.
      * @return true if the template is approved
      */
-    function isTemplateApproved(address _id) external view returns (bool) {
+    function isTemplateApproved(bytes32 _id) external view returns (bool) {
         return templateList.templates[_id].state ==
+            TemplateStoreLibrary.TemplateState.Approved;
+    }
+    
+    /**
+     * @notice THIS METHOD HAS BEEN DEPRECATED, PLEASE DON'T USE IT.
+     */
+    function isTemplateApproved(address _id) external view returns (bool) {
+        return templateListDeprecated.templates[_id].state ==
             TemplateStoreLibrary.TemplateState.Approved;
     }
 }
