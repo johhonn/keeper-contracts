@@ -7,7 +7,6 @@ const contracts = [
     'EpochLibrary',
     'Condition',
     'Reward',
-    'AgreementTemplate',
     'DIDRegistryLibrary',
     'AgreementStoreLibrary',
     'TemplateStoreLibrary',
