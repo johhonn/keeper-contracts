@@ -221,8 +221,6 @@ The contract addresses deployed on `Pacific` Mainnet:
 | ThresholdCondition                | v0.13.0 | `0xeD2A0787885f4ef781E35c5808F3C786fc8C1817` |
 | WhitelistingCondition             | v0.13.0 | `0x5b4c3B48062bDCa9DaA5441c5F5A9D557bFE3356` |
 
-
-
 ### Ethereum Mainnet
 
 ----
