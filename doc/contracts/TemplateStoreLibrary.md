@@ -16,17 +16,41 @@ Documentation:
 
 ## Structs
 
-### public Template
+### public TemplateDeprecated
 Members:
 * enum TemplateStoreLibrary.TemplateState state
 * address owner
 * address lastUpdatedBy
 * uint256 blockNumberUpdated
 
+### public TemplateListDeprecated
+Members:
+* mapping(address => struct TemplateStoreLibrary.TemplateDeprecated) templates
+* address[] templateIds
+
+### public Template
+Members:
+* enum TemplateStoreLibrary.TemplateState state
+* address owner
+* address lastUpdatedBy
+* uint256 blockNumberUpdated
+* address[] conditionTypes
+* bytes32[] actorTypes
+
 ### public TemplateList
 Members:
-* mapping(address => struct TemplateStoreLibrary.Template) templates
-* address[] templateIds
+* mapping(bytes32 => struct TemplateStoreLibrary.Template) templates
+* bytes32[] templateIds
+
+### public ActorType
+Members:
+* string value
+* enum TemplateStoreLibrary.ActorTypeState state
+
+### public TemplateActorTypeList
+Members:
+* mapping(bytes32 => struct TemplateStoreLibrary.ActorType) actorTypes
+* bytes32[] actorTypeIds
 
 ## Enums
 
@@ -36,6 +60,12 @@ Members:
 *  Proposed
 *  Approved
 *  Revoked
+
+###  ActorTypeState
+Members:
+*  Uninitialized
+*  Registered
+*  Deregistered
 
 ## Functions
 
@@ -51,7 +81,9 @@ Documentation:
 ```
 Parameters:
 * struct TemplateStoreLibrary.TemplateList _self
-* address _id
+* bytes32 _id
+* address[] _conditionTypes
+* bytes32[] _actorTypeIds
 
 ### internal approve
 
@@ -64,7 +96,7 @@ Documentation:
 ```
 Parameters:
 * struct TemplateStoreLibrary.TemplateList _self
-* address _id
+* bytes32 _id
 
 ### internal revoke
 
@@ -77,4 +109,24 @@ Documentation:
 ```
 Parameters:
 * struct TemplateStoreLibrary.TemplateList _self
-* address _id
+* bytes32 _id
+
+### internal registerActorType
+Parameters:
+* struct TemplateStoreLibrary.TemplateActorTypeList _self
+* string _actorType
+
+### internal deregisterActorType
+Parameters:
+* struct TemplateStoreLibrary.TemplateActorTypeList _self
+* bytes32 _Id
+
+### internal getActorTypeId
+Parameters:
+* struct TemplateStoreLibrary.TemplateActorTypeList _self
+* string _actorType
+
+### private isValidTemplateConditionTypes
+Parameters:
+* bytes32 _Id
+* address[] _conditionTypes
