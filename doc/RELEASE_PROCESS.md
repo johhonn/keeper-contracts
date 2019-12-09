@@ -143,14 +143,15 @@ It will output the current proxy addresses in the `README` friendly format.
 - Commit the missing changes to the feature branch.
 ```bash
 git commit -m 'v0.2.5'
+git push
 ```
 - Tag the last commit with the new version number ie. `v0.2.5`
 ```bash
-git tag -a v0.2.5 ab54f4d4 // ab54f4d4 is the commit ID
+git tag -a v0.2.5
 ```
 - Push the feature branch to GitHub.
 ```bash
-git push
+git push --tags
 ```
 - Make a pull request from the just-pushed branch to `develop` branch.
 - Wait for all the tests to pass!
