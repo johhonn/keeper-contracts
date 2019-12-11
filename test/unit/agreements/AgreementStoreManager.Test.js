@@ -681,6 +681,44 @@ contract('AgreementStoreManager', (accounts) => {
                 .to.equal(blockNumber.toNumber())
         })
 
+        it('should create agreement emit event', async () => {
+            const {
+                did,
+                owner,
+                common,
+                templateId,
+                timeLock,
+                timeOut,
+                providers
+            } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
+
+            // construct agreement
+            const agreement = {
+                did: did,
+                templateId: templateId,
+                conditionIds: [
+                    constants.bytes32.zero,
+                    constants.bytes32.one,
+                    constants.bytes32.two
+                ],
+                timeLocks: [0, timeLock, 0],
+                timeOuts: [0, timeOut, 0],
+                actors: providers
+            }
+
+            const agreementId = constants.bytes32.zero
+
+            const trxReceipt = await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement)
+            )
+            testUtils.assertEmitted(trxReceipt, 1, 'AgreementCreated')
+            const eventArgs = testUtils.getEventArgsFromTx(trxReceipt, 'AgreementCreated')
+            expect(eventArgs.agreementId).to.equal(agreementId)
+            expect(eventArgs.did).to.equal(did)
+            expect(eventArgs.createdBy).to.equal(accounts[0])
+        })
+
         it('should get multiple agreements for same did & template', async () => {
             const {
                 did,
