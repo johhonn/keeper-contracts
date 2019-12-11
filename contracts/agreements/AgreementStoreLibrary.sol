@@ -37,8 +37,8 @@ library AgreementStoreLibrary {
     }
     
     event AgreementActorAdded(
-        bytes32 agreementId,
-        address actor
+        bytes32 indexed agreementId,
+        address indexed actor
     );
     /**
      * @dev create new agreement
