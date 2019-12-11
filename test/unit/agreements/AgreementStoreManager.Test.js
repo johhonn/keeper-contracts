@@ -711,10 +711,11 @@ contract('AgreementStoreManager', (accounts) => {
                 ...Object.values(agreement)
             )
             testUtils.assertEmitted(trxReceipt, 1, 'AgreementCreated')
-            const eventArgs = testUtils.getEventArgsFromTx(trxReceipt, 'AgreementCreated')
-            expect(eventArgs.agreementId).to.equal(agreementId)
-            expect(eventArgs.did).to.equal(did)
-            expect(eventArgs.createdBy).to.equal(accounts[0])
+            testUtils.assertEmitted(trxReceipt, 0, 'AgreementActorAdded')
+            const AgreementCreatedEventArgs = testUtils.getEventArgsFromTx(trxReceipt, 'AgreementCreated')
+            expect(AgreementCreatedEventArgs.agreementId).to.equal(agreementId)
+            expect(AgreementCreatedEventArgs.did).to.equal(did)
+            expect(AgreementCreatedEventArgs.createdBy).to.equal(accounts[0])
         })
 
         it('should get multiple agreements for same did & template', async () => {
