@@ -38,9 +38,7 @@ library AgreementStoreLibrary {
     
     event AgreementActorAdded(
         bytes32 agreementId,
-        address createdBy,
-        address actor,
-        uint256 createdAt
+        address actor
     );
     /**
      * @dev create new agreement
@@ -107,9 +105,7 @@ library AgreementStoreLibrary {
             _self.AgreementActor[_id][_actors[i]] = _actorTypes[i];
             emit AgreementActorAdded(
                 _id,
-                msg.sender,
-                _actors[i],
-                block.number
+                _actors[i]
             );
         }
     }

@@ -42,6 +42,13 @@ contract AgreementStoreManager is Ownable {
     // this meant as template ID resolver to avoid memory layout corruption
     mapping (address => bytes32) templateIdAddressToBytes32;
     
+    event AgreementCreated(
+        bytes32 indexed agreementId,
+        bytes32 indexed did,
+        address indexed createdBy,
+        uint256 createdAt
+    );
+    
     /**
      * @dev initialize AgreementStoreManager Initializer
      *      Initializes Ownable. Only on contract creation.
@@ -127,7 +134,13 @@ contract AgreementStoreManager is Ownable {
             msg.sender,
             _conditionIds
         );
-        
+
+        emit AgreementCreated(
+            _id,
+            _did,
+            msg.sender,
+            block.number
+        );
         return getAgreementListSize();
     }
     
@@ -205,6 +218,13 @@ contract AgreementStoreManager is Ownable {
             _id,
             _actors,
             _actorTypes
+        );
+        
+        emit AgreementCreated(
+            _id,
+            _did,
+            msg.sender,
+            block.number
         );
         return getAgreementListSize();
     }
