@@ -684,8 +684,6 @@ contract('AgreementStoreManager', (accounts) => {
         it('should create agreement emit event', async () => {
             const {
                 did,
-                owner,
-                common,
                 templateId,
                 timeLock,
                 timeOut,
