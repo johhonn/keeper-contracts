@@ -36,6 +36,10 @@ library AgreementStoreLibrary {
         mapping(bytes32 => mapping(address => bytes32)) AgreementActor;
     }
     
+    event AgreementActorAdded(
+        bytes32 indexed agreementId,
+        address indexed actor
+    );
     /**
      * @dev create new agreement
      *      checks whether the agreement Id exists, creates new agreement 
@@ -99,6 +103,10 @@ library AgreementStoreLibrary {
         for(uint256 i=0; i < _actors.length; i++)
         {
             _self.AgreementActor[_id][_actors[i]] = _actorTypes[i];
+            emit AgreementActorAdded(
+                _id,
+                _actors[i]
+            );
         }
     }
 }

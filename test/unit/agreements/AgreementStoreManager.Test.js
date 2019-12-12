@@ -627,6 +627,43 @@ contract('AgreementStoreManager', (accounts) => {
                 constants.registry.error.didNotRegistered
             )
         })
+
+        it('should create agreement emit event', async () => {
+            const {
+                did,
+                templateId,
+                timeLock,
+                timeOut,
+                providers
+            } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
+
+            // construct agreement
+            const agreement = {
+                did: did,
+                templateId: templateId,
+                conditionIds: [
+                    constants.bytes32.zero,
+                    constants.bytes32.one,
+                    constants.bytes32.two
+                ],
+                timeLocks: [0, timeLock, 0],
+                timeOuts: [0, timeOut, 0],
+                actors: providers
+            }
+
+            const agreementId = constants.bytes32.zero
+
+            const trxReceipt = await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement)
+            )
+            testUtils.assertEmitted(trxReceipt, 1, 'AgreementCreated')
+            testUtils.assertEmitted(trxReceipt, 0, 'AgreementActorAdded')
+            const AgreementCreatedEventArgs = testUtils.getEventArgsFromTx(trxReceipt, 'AgreementCreated')
+            expect(AgreementCreatedEventArgs.agreementId).to.equal(agreementId)
+            expect(AgreementCreatedEventArgs.did).to.equal(did)
+            expect(AgreementCreatedEventArgs.createdBy).to.equal(accounts[0])
+        })
     })
 
     describe('get agreement', () => {
