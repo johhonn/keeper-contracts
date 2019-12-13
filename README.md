@@ -313,6 +313,7 @@ The structure of the `artifacts` is:
 * [Release process](doc/RELEASE_PROCESS.md)
 * [Packaging of libraries](doc/PACKAGING.md)
 * [Upgrading of contracts](doc/UPGRADES.md)
+* [Template lifecycle](doc/TEMPLATE_LIFE_CYCLE.md)
 
 ## Contributing
 
