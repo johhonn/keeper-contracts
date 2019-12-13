@@ -35,6 +35,13 @@ Members:
 Members:
 * mapping(bytes32 => mapping(address => bytes32)) AgreementActor
 
+## Events
+
+###  AgreementActorAdded
+Parameters:
+* bytes32 agreementId
+* address actor
+
 ## Functions
 
 ### internal create
