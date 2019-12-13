@@ -26,6 +26,15 @@ Documentation:
 
 ### internal templateIdAddressToBytes32
 
+## Events
+
+###  AgreementCreated
+Parameters:
+* bytes32 agreementId
+* bytes32 did
+* address createdBy
+* uint256 createdAt
+
 ## Functions
 
 ### public initialize
