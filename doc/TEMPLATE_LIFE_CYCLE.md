@@ -22,10 +22,12 @@ To `propose` a new template, a user should define the template as follows:
 For example a `WhitelistingCondition` has an address `0x5b4c3B48062bDCa9DaA5441c5F5A9D557bFE3356`
 on [Pacific network](https://submarine.oceanprotocol.com/). For more about the current deployed conditions,
 please refer to this [section](../README.md#pacific-mainnet)
-- `actor Type Ids`: Template hold actor type (e.g `provider`, `consumer`, `marketplace`, `publisher`, `curator`, etc).
+- `actor Type Ids`: set of actor types. Template MUST hold set of actor types > 2 (e.g `provider`, `consumer`, `marketplace`, `publisher`, `curator`, etc).
 User can define new actor type using `registerTemplateActorType` or use the existing types by providing their Ids.
 
 By providing these data inputs to `proposeTemplate`, the new template will be available on-chain, and waiting approval by Ocean Protocol Foundation.
+
+**NOTE** The actor type values prior the agreement creation should follow the same order of the actor types in the template.
 
 ### Approve
 
