@@ -55,6 +55,8 @@ As a pre-requisite, you need:
 - Node.js
 - npm
 
+Note: For MacOS, make sure to have `node@10` installed.
+
 Clone the project and install all dependencies:
 
 ```bash
