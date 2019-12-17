@@ -7,7 +7,6 @@
   "LockRewardCondition",
   "AccessSecretStoreCondition",
   "EscrowReward",
-  "OceanToken",
   "DIDRegistry",
   "ThresholdCondition",
   "WhitelistingCondition",
