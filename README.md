@@ -122,24 +122,24 @@ The contract addresses deployed on Ocean's `Duero` Test Network:
 
 | Contract                          | Version | Address                                      |
 |-----------------------------------|---------|----------------------------------------------|
-| AccessSecretStoreCondition        | v0.13.0 | `0x38e26f97AcCc0f6f0bA70b6304d89781449BAc11` |
-| AgreementStoreManager             | v0.13.0 | `0x10f763D50600462F7253dc721dC895754b3Aee26` |
-| ComputeExecutionCondition         | v0.13.0 | `0x69Cf2ae0148140E0d9Fa0AdC6bA7Fd10989Fe940` |
-| ConditionStoreManager             | v0.13.0 | `0x10083113a47E6689D5C526D9e814bA42752BE09c` |
-| DIDRegistry                       | v0.13.0 | `0xb1eA341724Fdcd53CA39d7DE3264bB89E6120BE4` |
-| DIDRegistryLibrary                | v0.13.0 | `0xcb7D122Af3C861a87C9fBb17F1B52b7C501c1062` |
-| Dispenser                         | v0.13.0 | `0xe76548A5b24AF890093A4C8423D542bcA1752CB8` |
-| EpochLibrary                      | v0.13.0 | `0x2B4d53BE84964983932dD6167155052201892c0A` |
+| AccessSecretStoreCondition        | v0.13.1 | `0x38e26f97AcCc0f6f0bA70b6304d89781449BAc11` |
+| AgreementStoreManager             | v0.13.1 | `0x10f763D50600462F7253dc721dC895754b3Aee26` |
+| ComputeExecutionCondition         | v0.13.1 | `0x69Cf2ae0148140E0d9Fa0AdC6bA7Fd10989Fe940` |
+| ConditionStoreManager             | v0.13.1 | `0x10083113a47E6689D5C526D9e814bA42752BE09c` |
+| DIDRegistry                       | v0.13.1 | `0xb1eA341724Fdcd53CA39d7DE3264bB89E6120BE4` |
+| DIDRegistryLibrary                | v0.13.1 | `0xcb7D122Af3C861a87C9fBb17F1B52b7C501c1062` |
+| Dispenser                         | v0.13.1 | `0xe76548A5b24AF890093A4C8423D542bcA1752CB8` |
+| EpochLibrary                      | v0.13.1 | `0x2B4d53BE84964983932dD6167155052201892c0A` |
 | EscrowAccessSecretStoreTemplate   | v0.12.7 | `0xBd7e5fFf4Eb8d67111227C9541080a74c634d643` |
 | EscrowComputeExecutionTemplate    | v0.12.7 | `0xe509CE38a1A58195D0257c70DeD536253A4039Fc` |
-| EscrowReward                      | v0.13.0 | `0xEb30f990F8F3a784F9eD3A594021D3764af00469` |
-| HashLockCondition                 | v0.13.0 | `0x4939063413A7a9B79d5437de73ed6d9996F92629` |
-| LockRewardCondition               | v0.13.0 | `0x53F89846832a793bF988B604b2489f74E6D22648` |
-| OceanToken                        | v0.13.0 | `0xFEBfC7dA1cAf52E4207501ad6df6B19EcDA4614b` |
-| SignCondition                     | v0.13.0 | `0x127c9A80A61b5BB6b97EE796CACDFbc201969447` |
-| TemplateStoreManager              | v0.13.0 | `0x6d3d30BB9074c1e3013A8b99A2e22a3FF5966EA2` |
-| ThresholdCondition                | v0.13.0 | `0xe940DBA354d444aA9Af0723A46a277ea6Ac36DE1` |
-| WhitelistingCondition             | v0.13.0 | `0x453c7912d4e33B3348961810296FE55a6adE20B2` |
+| EscrowReward                      | v0.13.1 | `0xEb30f990F8F3a784F9eD3A594021D3764af00469` |
+| HashLockCondition                 | v0.13.1 | `0x4939063413A7a9B79d5437de73ed6d9996F92629` |
+| LockRewardCondition               | v0.13.1 | `0x53F89846832a793bF988B604b2489f74E6D22648` |
+| OceanToken                        | v0.13.1 | `0xFEBfC7dA1cAf52E4207501ad6df6B19EcDA4614b` |
+| SignCondition                     | v0.13.1 | `0x127c9A80A61b5BB6b97EE796CACDFbc201969447` |
+| TemplateStoreManager              | v0.13.1 | `0x6d3d30BB9074c1e3013A8b99A2e22a3FF5966EA2` |
+| ThresholdCondition                | v0.13.1 | `0xe940DBA354d444aA9Af0723A46a277ea6Ac36DE1` |
+| WhitelistingCondition             | v0.13.1 | `0x453c7912d4e33B3348961810296FE55a6adE20B2` |
 
 
 
@@ -205,23 +205,24 @@ The contract addresses deployed on `Pacific` Mainnet:
 
 | Contract                          | Version | Address                                      |
 |-----------------------------------|---------|----------------------------------------------|
-| AccessSecretStoreCondition        | v0.13.0 | `0x7FC6520Af3F0800d76A3e2FfE7b838c945ADBFE4` |
-| AgreementStoreManager             | v0.13.0 | `0x44665ee68779eC83202702C091279661336F5F8a` |
-| ComputeExecutionCondition         | v0.13.0 | `0xBbaCeaA102e62fEeE89eAF935aD757CD5aac844a` |
-| ConditionStoreManager             | v0.13.0 | `0xbD1dEd7ef05c31F81C54e913a23Da69E77d3e0EE` |
-| DIDRegistry                       | v0.13.0 | `0x1f0E059a50356D8617980F8fa21a53F723072712` |
-| DIDRegistryLibrary                | v0.13.0 | `0x2eBD03c446e11EA4eC58eC092b3906a816828D2f` |
-| EpochLibrary                      | v0.13.0 | `0xBCc5b375AB7ca0AB45b00F3dA24eC8b3b5aEe031` |
+| AccessSecretStoreCondition        | v0.13.1 | `0x7FC6520Af3F0800d76A3e2FfE7b838c945ADBFE4` |
+| AgreementStoreManager             | v0.13.1 | `0x44665ee68779eC83202702C091279661336F5F8a` |
+| ComputeExecutionCondition         | v0.13.1 | `0xBbaCeaA102e62fEeE89eAF935aD757CD5aac844a` |
+| ConditionStoreManager             | v0.13.1 | `0xbD1dEd7ef05c31F81C54e913a23Da69E77d3e0EE` |
+| DIDRegistry                       | v0.13.1 | `0x1f0E059a50356D8617980F8fa21a53F723072712` |
+| DIDRegistryLibrary                | v0.13.1 | `0x2eBD03c446e11EA4eC58eC092b3906a816828D2f` |
+| EpochLibrary                      | v0.13.1 | `0xBCc5b375AB7ca0AB45b00F3dA24eC8b3b5aEe031` |
 | EscrowAccessSecretStoreTemplate   | v0.12.7 | `0x9BF43606d833489fbD568ace13f535fC41130c28` |
 | EscrowComputeExecutionTemplate    | v0.12.7 | `0x04D939Bbe37de1Aa0261F523EdB7654613dfB97F` |
-| EscrowReward                      | v0.13.0 | `0x656Aa3D9b37A6eA770701ae2c612f760d9254A66` |
-| HashLockCondition                 | v0.13.0 | `0x5Eef92d570996ED20Cb60fE41475f594299Ec21C` |
-| LockRewardCondition               | v0.13.0 | `0x7bf64DaCc7929A1e5466f7d9E575128abf1875f8` |
-| OceanToken                        | v0.13.0 | `0x012578f9381e876A9E2a9111Dfd436FF91A451ae` |
-| SignCondition                     | v0.13.0 | `0xB74172078ABb029FaD809335d82241371b998708` |
-| TemplateStoreManager              | v0.13.0 | `0xF2Cf3761c166c6D85d07299427821D18A4329cd1` |
-| ThresholdCondition                | v0.13.0 | `0xeD2A0787885f4ef781E35c5808F3C786fc8C1817` |
-| WhitelistingCondition             | v0.13.0 | `0x5b4c3B48062bDCa9DaA5441c5F5A9D557bFE3356` |
+| EscrowReward                      | v0.13.1 | `0x656Aa3D9b37A6eA770701ae2c612f760d9254A66` |
+| HashLockCondition                 | v0.13.1 | `0x5Eef92d570996ED20Cb60fE41475f594299Ec21C` |
+| LockRewardCondition               | v0.13.1 | `0x7bf64DaCc7929A1e5466f7d9E575128abf1875f8` |
+| OceanToken                        | v0.13.1 | `0x012578f9381e876A9E2a9111Dfd436FF91A451ae` |
+| SignCondition                     | v0.13.1 | `0xB74172078ABb029FaD809335d82241371b998708` |
+| TemplateStoreManager              | v0.13.1 | `0xF2Cf3761c166c6D85d07299427821D18A4329cd1` |
+| ThresholdCondition                | v0.13.1 | `0xeD2A0787885f4ef781E35c5808F3C786fc8C1817` |
+| WhitelistingCondition             | v0.13.1 | `0x5b4c3B48062bDCa9DaA5441c5F5A9D557bFE3356` |
+
 
 ### Ethereum Mainnet
 
@@ -254,23 +255,22 @@ The contract addresses deployed on `xDai` Mainnet:
 
 | Contract                          | Version | Address                                      |
 |-----------------------------------|---------|----------------------------------------------|
-| AccessSecretStoreCondition        | v0.12.7 | `0x2EadA723f7C631284B299E5BfB724B2153D4c1d7` |
-| AgreementStoreManager             | v0.12.7 | `0x5E12966F910A819a84D359383F0B2777Af04B664` |
-| ComputeExecutionCondition         | v0.12.7 | `0x0233d73aFf3030FE26a53F363217c84DF25638E9` |
-| ConditionStoreManager             | v0.12.7 | `0xBe3419C1E4764BeF16A272A45865c1C1072Bf8AB` |
-| DIDRegistry                       | v0.12.7 | `0x99ae43155D8Fa205b5CEE705aD8ab1a1A92B904E` |
-| DIDRegistryLibrary                | v0.12.7 | `0x99ae43155D8Fa205b5CEE705aD8ab1a1A92B904E` |
-| EpochLibrary                      | v0.12.7 | `0x99ae43155D8Fa205b5CEE705aD8ab1a1A92B904E` |
+| AccessSecretStoreCondition        | v0.13.1 | `0x2EadA723f7C631284B299E5BfB724B2153D4c1d7` |
+| AgreementStoreManager             | v0.13.1 | `0x5E12966F910A819a84D359383F0B2777Af04B664` |
+| ComputeExecutionCondition         | v0.13.1 | `0x0233d73aFf3030FE26a53F363217c84DF25638E9` |
+| ConditionStoreManager             | v0.13.1 | `0xBe3419C1E4764BeF16A272A45865c1C1072Bf8AB` |
+| DIDRegistry                       | v0.13.1 | `0x99ae43155D8Fa205b5CEE705aD8ab1a1A92B904E` |
+| DIDRegistryLibrary                | v0.13.1 | `0x304AA20E6D04B18221D7a1d971ff4C245039486D` |
+| EpochLibrary                      | v0.13.1 | `0xa1BC282eAc22092C0D9344aba38F65aDA6200242` |
 | EscrowAccessSecretStoreTemplate   | v0.12.7 | `0xCD3a33379DBDc6Cb14C3bf8eAb594e5ae1317BB1` |
 | EscrowComputeExecutionTemplate    | v0.12.7 | `0xbb3B88589902eFF97d3E6Af2757f83c66a9FE2Ac` |
-| EscrowReward                      | v0.12.7 | `0x9C71Ac20Ef2178bD6f9d927a601985f9983b1E8E` |
-| HashLockCondition                 | v0.12.7 | `0x6a9C322ADE3c58b6D83DA1cB4A687D834872BFc8` |
-| LockRewardCondition               | v0.12.7 | `0x3857986E111d78E1bD4017Efe620e05e3cb9376b` |
-| OceanToken                        | v0.12.7 | `0x83180c00b360b17b7d2158bfefd32d17f01695b3` |
-| SignCondition                     | v0.12.7 | `0x547A4BA7Bec2AE45393D07AF9E0F53aEA50aD968` |
-| TemplateStoreManager              | v0.12.7 | `0xD2f1Ccb9E51659f1bAC7EF3e6cD713b536C1BDa4` |
-| ThresholdCondition                | v0.12.7 | `0xeED6Bf968e5808f6Ba0d284475f437aa93997aC4` |
-| WhitelistingCondition             | v0.12.7 | `0xA9c8Ae2784BF0FdB56004BE0D46dE1BeE15Fe421` |
+| EscrowReward                      | v0.13.1 | `0x9C71Ac20Ef2178bD6f9d927a601985f9983b1E8E` |
+| HashLockCondition                 | v0.13.1 | `0x6a9C322ADE3c58b6D83DA1cB4A687D834872BFc8` |
+| LockRewardCondition               | v0.13.1 | `0x3857986E111d78E1bD4017Efe620e05e3cb9376b` |
+| SignCondition                     | v0.13.1 | `0x547A4BA7Bec2AE45393D07AF9E0F53aEA50aD968` |
+| TemplateStoreManager              | v0.13.1 | `0xD2f1Ccb9E51659f1bAC7EF3e6cD713b536C1BDa4` |
+| ThresholdCondition                | v0.13.1 | `0xeED6Bf968e5808f6Ba0d284475f437aa93997aC4` |
+| WhitelistingCondition             | v0.13.1 | `0xA9c8Ae2784BF0FdB56004BE0D46dE1BeE15Fe421` |
 
 ## Packages
 
