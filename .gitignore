@@ -7,7 +7,7 @@ files
 test/verification/manticore/results/*
 
 # Development
-artifacts/*.development.json
+#artifacts/*.development.json
 artifacts/*.spree.json
 
 # Build / Travis
