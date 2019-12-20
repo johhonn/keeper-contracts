@@ -63,7 +63,7 @@ script:
   - npm run test:echidna
   - npm run deploy:development -- --deeper-clean
   - git status
-  - git add package-lock.json
+  - git add package-lock.json artifacts/EscrowAccessSecretStoreTemplate.development.json artifacts/EscrowComputeExecutionTemplate.development.json
   - git diff-index --quiet HEAD || git commit -m "Travis update"
 
 after_script:
