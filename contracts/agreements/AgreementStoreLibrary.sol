@@ -36,10 +36,6 @@ library AgreementStoreLibrary {
         mapping(bytes32 => mapping(address => bytes32)) AgreementActor;
     }
     
-    event AgreementActorAdded(
-        bytes32 indexed agreementId,
-        address indexed actor
-    );
     /**
      * @dev create new agreement
      *      checks whether the agreement Id exists, creates new agreement 
@@ -81,32 +77,24 @@ library AgreementStoreLibrary {
     }
     
     /**
-     * @dev setActors set a mapping between actors and their types
+     * @dev setActor set a mapping between actors and their types
      * @param _self is AgreementActors storage pointer
      * @param _id agreement identifier
-     * @param _actors actors addresses
-     * @param _actorTypes actors types (consumer, provider, verifier, publisher, curator)
+     * @param _actor actor address
+     * @param _actorType actor type (consumer, provider, verifier, publisher, curator)
      */
-    function setActors(
+    function setActor(
         AgreementActors storage _self,
         bytes32 _id,
-        address[] memory _actors,
-        bytes32[] memory _actorTypes
+        address _actor,
+        bytes32 _actorType
     )
         internal
     {
         require(
-            _actors.length == _actorTypes.length,
-            'Invalid actor/actor types array length'
+            _self.AgreementActor[_id][_actor] == bytes32(0),
+            'Actor already exists'
         );
-        
-        for(uint256 i=0; i < _actors.length; i++)
-        {
-            _self.AgreementActor[_id][_actors[i]] = _actorTypes[i];
-            emit AgreementActorAdded(
-                _id,
-                _actors[i]
-            );
-        }
+        _self.AgreementActor[_id][_actor] = _actorType;
     }
 }

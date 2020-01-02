@@ -48,6 +48,11 @@ contract AgreementStoreManager is Ownable {
         address indexed createdBy,
         uint256 createdAt
     );
+
+    event AgreementActorAdded(
+        bytes32 indexed agreementId,
+        address indexed actor
+    );
     
     /**
      * @dev initialize AgreementStoreManager Initializer
@@ -213,12 +218,20 @@ contract AgreementStoreManager is Ownable {
             templateAddress,
             _conditionIds
         );
-        
-        agreementActors.setActors(
-            _id,
-            _actors,
-            _actorTypes
-        );
+
+        // set agreement actors
+        for(uint256 i=0; i < _actors.length; i++)
+        {
+            agreementActors.setActor(
+                _id,
+                _actors[i],
+                _actorTypes[i]
+            );
+            emit AgreementActorAdded(
+                _id,
+                _actors[i]
+            );
+        }
         
         emit AgreementCreated(
             _id,
