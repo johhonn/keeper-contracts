@@ -658,7 +658,7 @@ contract('AgreementStoreManager', (accounts) => {
                 ...Object.values(agreement)
             )
             testUtils.assertEmitted(trxReceipt, 1, 'AgreementCreated')
-            testUtils.assertEmitted(trxReceipt, 0, 'AgreementActorAdded')
+            testUtils.assertEmitted(trxReceipt, 2, 'AgreementActorAdded')
             const AgreementCreatedEventArgs = testUtils.getEventArgsFromTx(trxReceipt, 'AgreementCreated')
             expect(AgreementCreatedEventArgs.agreementId).to.equal(agreementId)
             expect(AgreementCreatedEventArgs.did).to.equal(did)
