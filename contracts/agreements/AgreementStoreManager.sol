@@ -35,13 +35,13 @@ contract AgreementStoreManager is Ownable {
     ConditionStoreManager internal conditionStoreManager;
     TemplateStoreManager internal templateStoreManager;
     DIDRegistry internal didRegistry;
-    
+
     using AgreementStoreLibrary for AgreementStoreLibrary.AgreementActors;
     AgreementStoreLibrary.AgreementActors internal agreementActors;
-    
+
     // this meant as template ID resolver to avoid memory layout corruption
     mapping (address => bytes32) templateIdAddressToBytes32;
-    
+
     event AgreementCreated(
         bytes32 indexed agreementId,
         bytes32 indexed did,
@@ -51,9 +51,10 @@ contract AgreementStoreManager is Ownable {
 
     event AgreementActorAdded(
         bytes32 indexed agreementId,
-        address indexed actor
+        address indexed actor,
+        bytes32 actorType
     );
-    
+
     /**
      * @dev initialize AgreementStoreManager Initializer
      *      Initializes Ownable. Only on contract creation.
@@ -68,8 +69,8 @@ contract AgreementStoreManager is Ownable {
         address _templateStoreManagerAddress,
         address _didRegistryAddress
     )
-        public
-        initializer
+    public
+    initializer
     {
         require(
             _owner != address(0) &&
@@ -106,8 +107,8 @@ contract AgreementStoreManager is Ownable {
         uint[] memory _timeLocks,
         uint[] memory _timeOuts
     )
-        public
-        returns (uint size)
+    public
+    returns (uint size)
     {
         require(
             templateStoreManager.isTemplateApproved(msg.sender) == true,
@@ -148,7 +149,7 @@ contract AgreementStoreManager is Ownable {
         );
         return getAgreementListSize();
     }
-    
+
     /**
      * @dev Create a new agreement.
      *      The agreement will create conditions of conditionType with conditionId.
@@ -173,8 +174,8 @@ contract AgreementStoreManager is Ownable {
         uint[] memory _timeOuts,
         address[] memory _actors
     )
-        public
-        returns (uint size)
+    public
+    returns (uint size)
     {
         require(
             templateStoreManager.isTemplateApproved(_templateId) == true,
@@ -186,12 +187,12 @@ contract AgreementStoreManager is Ownable {
         );
         address[] memory _conditionTypes;
         bytes32[] memory _actorTypes;
-        
-        
+
+
         (,,,,_conditionTypes, _actorTypes) = templateStoreManager.getTemplate(
             _templateId
         );
-        
+
         require(
             _conditionIds.length == _conditionTypes.length &&
             _timeLocks.length == _conditionTypes.length &&
@@ -209,7 +210,7 @@ contract AgreementStoreManager is Ownable {
                 _timeOuts[i]
             );
         }
-        
+
         address templateAddress = convertBytes32ToAddress(_templateId);
         templateIdAddressToBytes32[templateAddress] = _templateId;
         agreementList.create(
@@ -229,10 +230,11 @@ contract AgreementStoreManager is Ownable {
             );
             emit AgreementActorAdded(
                 _id,
-                _actors[i]
+                _actors[i],
+                _actorTypes[i]
             );
         }
-        
+
         emit AgreementCreated(
             _id,
             _did,
@@ -250,16 +252,16 @@ contract AgreementStoreManager is Ownable {
      * @return the agreement attributes.
      */
     function getAgreement(bytes32 _id)
-        external
-        view
-        returns (
-            bytes32 did,
-            address didOwner,
-            bytes32 templateId,
-            bytes32[] memory conditionIds,
-            address lastUpdatedBy,
-            uint256 blockNumberUpdated
-        )
+    external
+    view
+    returns (
+        bytes32 did,
+        address didOwner,
+        bytes32 templateId,
+        bytes32[] memory conditionIds,
+        address lastUpdatedBy,
+        uint256 blockNumberUpdated
+    )
     {
         did = agreementList.agreements[_id].did;
         didOwner = didRegistry.getDIDOwner(did);
@@ -276,9 +278,9 @@ contract AgreementStoreManager is Ownable {
      * @return the DID owner associated with agreement.did from the DID registry.
      */
     function getAgreementDIDOwner(bytes32 _id)
-        external
-        view
-        returns (address didOwner)
+    external
+    view
+    returns (address didOwner)
     {
         bytes32 did = agreementList.agreements[_id].did;
         return didRegistry.getDIDOwner(did);
@@ -291,9 +293,9 @@ contract AgreementStoreManager is Ownable {
      * @return the DID owner associated with agreement.did from the DID registry.
      */
     function isAgreementDIDOwner(bytes32 _id, address _owner)
-        external
-        view
-        returns (bool)
+    external
+    view
+    returns (bool)
     {
         bytes32 did = agreementList.agreements[_id].did;
         return (_owner == didRegistry.getDIDOwner(did));
@@ -307,9 +309,9 @@ contract AgreementStoreManager is Ownable {
      * @return true if a DID provider is associated with the agreement ID
      */
     function isAgreementDIDProvider(bytes32 _id, address _provider)
-        external
-        view
-        returns(bool)
+    external
+    view
+    returns(bool)
     {
         bytes32 did = agreementList.agreements[_id].did;
         return didRegistry.isDIDProvider(did, _provider);
@@ -319,9 +321,9 @@ contract AgreementStoreManager is Ownable {
      * @return the length of the agreement list.
      */
     function getAgreementListSize()
-        public
-        view
-        returns (uint size)
+    public
+    view
+    returns (uint size)
     {
         return agreementList.agreementIds.length;
     }
@@ -331,9 +333,9 @@ contract AgreementStoreManager is Ownable {
      * @return the agreement IDs for a given DID
      */
     function getAgreementIdsForDID(bytes32 _did)
-        public
-        view
-        returns (bytes32[] memory)
+    public
+    view
+    returns (bytes32[] memory)
     {
         return agreementList.didToAgreementIds[_did];
     }
@@ -343,38 +345,38 @@ contract AgreementStoreManager is Ownable {
      * @return the agreement IDs for a given DID
      */
     function getAgreementIdsForTemplateId(bytes32 _templateId)
-        public
-        view
-        returns (bytes32[] memory)
+    public
+    view
+    returns (bytes32[] memory)
     {
         address templateId = convertBytes32ToAddress(_templateId);
         return agreementList.templateIdToAgreementIds[templateId];
     }
-    
+
     /**
      * @dev getDIDRegistryAddress utility function 
      * used by other contracts or any EOA.
      * @return the DIDRegistry address
      */
     function getDIDRegistryAddress()
-        public
-        view
-        returns(address)
+    public
+    view
+    returns(address)
     {
         return address(didRegistry);
     }
-    
-   /**
-    * @dev convertBytes32ToAddress 
-    * @param input a 32 bytes input
-    * @return bytes 20 output
-    */
+
+    /**
+     * @dev convertBytes32ToAddress 
+     * @param input a 32 bytes input
+     * @return bytes 20 output
+     */
     function convertBytes32ToAddress(
-        bytes32 input    
+        bytes32 input
     )
-        private
-        pure
-        returns(address)
+    private
+    pure
+    returns(address)
     {
         return address(ripemd160(abi.encodePacked(input)));
     }
