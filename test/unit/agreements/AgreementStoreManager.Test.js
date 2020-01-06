@@ -284,7 +284,6 @@ contract('AgreementStoreManager', (accounts) => {
             })
 
             expect((await agreementStoreManager.getAgreementListSize()).toNumber()).to.equal(1)
-            
         })
 
         it('should not create agreement with existing conditions', async () => {
@@ -598,7 +597,6 @@ contract('AgreementStoreManager', (accounts) => {
         it('should get agreement actors data', async () => {
             const {
                 did,
-                owner,
                 templateId,
                 timeLock,
                 timeOut,
@@ -628,7 +626,7 @@ contract('AgreementStoreManager', (accounts) => {
             )
 
             const actors = await agreementStoreManager.getAgreementActors(agreementId)
-            for (var i = 0; i < actors.length; i++){
+            for (var i = 0; i < actors.length; i++) {
                 assert.strictEqual(
                     actors[i],
                     providers[i]
