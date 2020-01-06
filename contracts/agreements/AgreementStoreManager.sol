@@ -259,15 +259,14 @@ contract AgreementStoreManager is Ownable {
      */
     function getAgreement(bytes32 _id)
         external
+        view
         returns (
             bytes32 did,
             address didOwner,
             bytes32 templateId,
             bytes32[] memory conditionIds,
             address lastUpdatedBy,
-            uint256 blockNumberUpdated,
-            address[] memory actors,
-            bytes32[] memory actorTypes
+            uint256 blockNumberUpdated
         )
     {
         did = agreementList.agreements[_id].did;
@@ -277,10 +276,22 @@ contract AgreementStoreManager is Ownable {
         conditionIds = agreementList.agreements[_id].conditionIds;
         lastUpdatedBy = agreementList.agreements[_id].lastUpdatedBy;
         blockNumberUpdated = agreementList.agreements[_id].blockNumberUpdated;
+    }
+
+
+    function getAgreementActors(
+        bytes32 _id
+    )
+        external
+        returns(
+            address[] memory actors,
+            bytes32[] memory actorTypes
+        )
+    {
         actors = agreementActorsList.get(_id);
         actorTypes = agreementActors.getTypes(_id, actors);
     }
-
+    
     /**
      * @dev get the DID owner for this agreement with _id.
      * @param _id is the ID of the agreement.
