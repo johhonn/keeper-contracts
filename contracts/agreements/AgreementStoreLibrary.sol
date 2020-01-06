@@ -154,12 +154,11 @@ library AgreementStoreLibrary {
         bytes32 _id
     )
         internal
+        view
         returns ( 
             address[] memory _actors
         )
     {
-        if ( _self.ActorsList[_id].length == 0 )
-            return _actors;
-        _actors = _self.ActorsList[_id];
+        return _self.ActorsList[_id];
     }
 }

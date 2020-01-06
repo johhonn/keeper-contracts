@@ -284,6 +284,7 @@ contract('AgreementStoreManager', (accounts) => {
             })
 
             expect((await agreementStoreManager.getAgreementListSize()).toNumber()).to.equal(1)
+            
         })
 
         it('should not create agreement with existing conditions', async () => {
@@ -593,6 +594,46 @@ contract('AgreementStoreManager', (accounts) => {
                 await agreementStoreManager.getAgreementDIDOwner(agreementId),
                 owner
             )
+        })
+        it('should get agreement actors data', async () => {
+            const {
+                did,
+                owner,
+                templateId,
+                timeLock,
+                timeOut,
+                providers
+            } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
+
+            // construct agreement
+            const agreement = {
+                did: did,
+                templateId: templateId,
+                conditionIds: [
+                    constants.bytes32.zero,
+                    constants.bytes32.one,
+                    constants.bytes32.two
+                ],
+                timeLocks: [0, timeLock, 0],
+                timeOuts: [0, timeOut, 0],
+                actors: providers
+            }
+
+            const agreementId = constants.bytes32.zero
+
+            // create agreement
+            await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement)
+            )
+
+            const actors = await agreementStoreManager.getAgreementActors(agreementId)
+            for (var i = 0; i < actors.length; i++){
+                assert.strictEqual(
+                    actors[i],
+                    providers[i]
+                )
+            }
         })
         it('should not create agreement if DID not registered', async () => {
             const {

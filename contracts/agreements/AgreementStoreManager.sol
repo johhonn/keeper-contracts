@@ -287,13 +287,14 @@ contract AgreementStoreManager is Ownable {
         bytes32 _id
     )
         external
+        view
         returns(
-            address[] memory actors,
-            bytes32[] memory actorTypes
+            address[] memory actors
+            //bytes32[] memory actorTypes
         )
     {
         actors = agreementActorsList.get(_id);
-        actorTypes = agreementActors.getTypes(_id, actors);
+        //actorTypes = agreementActors.getTypes(_id, actors);
     }
     
     /**
