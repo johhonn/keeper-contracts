@@ -26,6 +26,8 @@ Documentation:
 
 ### internal templateIdAddressToBytes32
 
+### internal agreementActorsList
+
 ## Events
 
 ###  AgreementCreated
@@ -34,6 +36,12 @@ Parameters:
 * bytes32 did
 * address createdBy
 * uint256 createdAt
+
+###  AgreementActorAdded
+Parameters:
+* bytes32 agreementId
+* address actor
+* bytes32 actorType
 
 ## Functions
 
@@ -113,6 +121,18 @@ Documentation:
      Only "approved" templates can access this function.
 @param _id is the ID of the agreement.
 @return the agreement attributes.
+```
+Parameters:
+* bytes32 _id
+
+### external getAgreementActors
+
+Documentation:
+
+```
+@dev getAgreementActors for a given agreement Id retrieves actors data  
+@param _id is the ID of the agreement.
+@return agreement actors data (addresses and types)
 ```
 Parameters:
 * bytes32 _id
