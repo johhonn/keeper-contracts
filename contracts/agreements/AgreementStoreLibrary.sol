@@ -81,11 +81,13 @@ library AgreementStoreLibrary {
     }
     
     /**
-     * @dev setActor set a mapping between actors and their types
+     * @dev setType set a mapping between actors and their types.
+     * The stored type is the hash of the string format of an actor type 
+     * (consumer, provider, verifier, publisher, curator, etc).
      * @param _self is AgreementActors storage pointer
      * @param _id agreement identifier
      * @param _actor actor address
-     * @param _actorType actor type (consumer, provider, verifier, publisher, curator)
+     * @param _actorType actor type hash
      */
     function setType(
         AgreementActors storage _self,
@@ -103,6 +105,12 @@ library AgreementStoreLibrary {
         _self.AgreementActor[_id][_actor] = _actorType;
     }
 
+    /**
+     * @dev getTypes for a given agreement Id, returns the actor types
+     * @param _self is AgreementActors storage pointer
+     * @param _id agreement identifier
+     * @return array of bytes32 actor types
+     */
     function getTypes(
         AgreementActors storage _self,
         bytes32 _id,
@@ -119,6 +127,12 @@ library AgreementStoreLibrary {
         }
     }
     
+    /**
+     * @dev set associate actor addresses to an agreement
+     * @param _self is AgreementActorsList storage pointer
+     * @param _id agreement identifier
+     * @param _actors array of actor addresses
+     */
     function set(
         AgreementActorsList storage _self,
         bytes32 _id,
@@ -129,6 +143,12 @@ library AgreementStoreLibrary {
         _self.ActorsList[_id] = _actors;
     }
     
+    /**
+     * @dev get actor addresses for an agreement
+     * @param _self is AgreementActorsList storage pointer
+     * @param _id agreement identifier
+     * @return _actors array of actor addresses
+     */
     function get(
         AgreementActorsList storage _self,
         bytes32 _id
