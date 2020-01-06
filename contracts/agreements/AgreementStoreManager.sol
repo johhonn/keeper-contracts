@@ -278,7 +278,11 @@ contract AgreementStoreManager is Ownable {
         blockNumberUpdated = agreementList.agreements[_id].blockNumberUpdated;
     }
 
-
+    /**
+     * @dev getAgreementActors for a given agreement Id retrieves actors data  
+     * @param _id is the ID of the agreement.
+     * @return agreement actors data (addresses and types)
+     */
     function getAgreementActors(
         bytes32 _id
     )
