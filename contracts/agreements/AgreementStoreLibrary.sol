@@ -36,6 +36,10 @@ library AgreementStoreLibrary {
         mapping(bytes32 => mapping(address => bytes32)) AgreementActor;
     }
     
+    struct AgreementActorsList {
+        mapping(bytes32 => address[]) ActorsList;
+    }
+    
     /**
      * @dev create new agreement
      *      checks whether the agreement Id exists, creates new agreement 
@@ -83,7 +87,7 @@ library AgreementStoreLibrary {
      * @param _actor actor address
      * @param _actorType actor type (consumer, provider, verifier, publisher, curator)
      */
-    function setActor(
+    function setType(
         AgreementActors storage _self,
         bytes32 _id,
         address _actor,
@@ -92,9 +96,50 @@ library AgreementStoreLibrary {
         internal
     {
         require(
-            _self.AgreementActor[_id][_actor] == bytes32(0),
+            _self.AgreementActor[_id][_actor] == bytes32(0) && 
+            _actor != address(0),
             'Actor already exists'
         );
         _self.AgreementActor[_id][_actor] = _actorType;
+    }
+
+    function getTypes(
+        AgreementActors storage _self,
+        bytes32 _id,
+        address[] memory _actors
+    )
+        internal
+        returns ( bytes32[] memory actorTypes )
+    {
+        if ( _actors.length == 0 )
+            return actorTypes;
+        for ( uint256 i = 0 ; i < _actors.length; i++)
+        {
+            actorTypes[i] = _self.AgreementActor[_id][_actors[i]];
+        }
+    }
+    
+    function set(
+        AgreementActorsList storage _self,
+        bytes32 _id,
+        address[] memory _actors
+    )
+        internal
+    {
+        _self.ActorsList[_id] = _actors;
+    }
+    
+    function get(
+        AgreementActorsList storage _self,
+        bytes32 _id
+    )
+        internal
+        returns ( 
+            address[] memory _actors
+        )
+    {
+        if ( _self.ActorsList[_id].length == 0 )
+            return _actors;
+        _actors = _self.ActorsList[_id];
     }
 }

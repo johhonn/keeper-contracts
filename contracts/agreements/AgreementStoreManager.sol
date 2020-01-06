@@ -35,13 +35,15 @@ contract AgreementStoreManager is Ownable {
     ConditionStoreManager internal conditionStoreManager;
     TemplateStoreManager internal templateStoreManager;
     DIDRegistry internal didRegistry;
-    
+
     using AgreementStoreLibrary for AgreementStoreLibrary.AgreementActors;
+    using AgreementStoreLibrary for AgreementStoreLibrary.AgreementActorsList;
     AgreementStoreLibrary.AgreementActors internal agreementActors;
-    
+
     // this meant as template ID resolver to avoid memory layout corruption
     mapping (address => bytes32) templateIdAddressToBytes32;
-    
+    AgreementStoreLibrary.AgreementActorsList internal agreementActorsList;
+
     event AgreementCreated(
         bytes32 indexed agreementId,
         bytes32 indexed did,
@@ -51,9 +53,10 @@ contract AgreementStoreManager is Ownable {
 
     event AgreementActorAdded(
         bytes32 indexed agreementId,
-        address indexed actor
+        address indexed actor,
+        bytes32 actorType
     );
-    
+
     /**
      * @dev initialize AgreementStoreManager Initializer
      *      Initializes Ownable. Only on contract creation.
@@ -148,7 +151,7 @@ contract AgreementStoreManager is Ownable {
         );
         return getAgreementListSize();
     }
-    
+
     /**
      * @dev Create a new agreement.
      *      The agreement will create conditions of conditionType with conditionId.
@@ -186,12 +189,12 @@ contract AgreementStoreManager is Ownable {
         );
         address[] memory _conditionTypes;
         bytes32[] memory _actorTypes;
-        
-        
+
+
         (,,,,_conditionTypes, _actorTypes) = templateStoreManager.getTemplate(
             _templateId
         );
-        
+
         require(
             _conditionIds.length == _conditionTypes.length &&
             _timeLocks.length == _conditionTypes.length &&
@@ -209,7 +212,7 @@ contract AgreementStoreManager is Ownable {
                 _timeOuts[i]
             );
         }
-        
+
         address templateAddress = convertBytes32ToAddress(_templateId);
         templateIdAddressToBytes32[templateAddress] = _templateId;
         agreementList.create(
@@ -220,19 +223,24 @@ contract AgreementStoreManager is Ownable {
         );
 
         // set agreement actors
-        for(uint256 i=0; i < _actors.length; i++)
+        for(uint256 i = 0; i < _actors.length; i++)
         {
-            agreementActors.setActor(
+            agreementActors.setType(
                 _id,
                 _actors[i],
                 _actorTypes[i]
             );
             emit AgreementActorAdded(
                 _id,
-                _actors[i]
+                _actors[i],
+                _actorTypes[i]
             );
         }
-        
+        agreementActorsList.set(
+            _id,
+            _actors
+        );
+
         emit AgreementCreated(
             _id,
             _did,
@@ -251,14 +259,15 @@ contract AgreementStoreManager is Ownable {
      */
     function getAgreement(bytes32 _id)
         external
-        view
         returns (
             bytes32 did,
             address didOwner,
             bytes32 templateId,
             bytes32[] memory conditionIds,
             address lastUpdatedBy,
-            uint256 blockNumberUpdated
+            uint256 blockNumberUpdated,
+            address[] memory actors,
+            bytes32[] memory actorTypes
         )
     {
         did = agreementList.agreements[_id].did;
@@ -268,6 +277,8 @@ contract AgreementStoreManager is Ownable {
         conditionIds = agreementList.agreements[_id].conditionIds;
         lastUpdatedBy = agreementList.agreements[_id].lastUpdatedBy;
         blockNumberUpdated = agreementList.agreements[_id].blockNumberUpdated;
+        actors = agreementActorsList.get(_id);
+        actorTypes = agreementActors.getTypes(_id, actors);
     }
 
     /**
@@ -350,7 +361,7 @@ contract AgreementStoreManager is Ownable {
         address templateId = convertBytes32ToAddress(_templateId);
         return agreementList.templateIdToAgreementIds[templateId];
     }
-    
+
     /**
      * @dev getDIDRegistryAddress utility function 
      * used by other contracts or any EOA.
@@ -363,14 +374,14 @@ contract AgreementStoreManager is Ownable {
     {
         return address(didRegistry);
     }
-    
-   /**
-    * @dev convertBytes32ToAddress 
-    * @param input a 32 bytes input
-    * @return bytes 20 output
-    */
+
+    /**
+     * @dev convertBytes32ToAddress 
+     * @param input a 32 bytes input
+     * @return bytes 20 output
+     */
     function convertBytes32ToAddress(
-        bytes32 input    
+        bytes32 input
     )
         private
         pure
