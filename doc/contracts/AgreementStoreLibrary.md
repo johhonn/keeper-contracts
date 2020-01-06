@@ -82,20 +82,21 @@ Parameters:
 * address _actor
 * bytes32 _actorType
 
-### internal getTypes
+### internal getType
 
 Documentation:
 
 ```
-@dev getTypes for a given agreement Id, returns the actor types
+@dev getType for a given agreement Id, returns the actor type
 @param _self is AgreementActors storage pointer
 @param _id agreement identifier
-@return array of bytes32 actor types
+@param _actor actor address
+@return bytes32 actor type
 ```
 Parameters:
 * struct AgreementStoreLibrary.AgreementActors _self
 * bytes32 _id
-* address[] _actors
+* address _actor
 
 ### internal set
 

@@ -137,6 +137,11 @@ Documentation:
 Parameters:
 * bytes32 _id
 
+### external getActorType
+Parameters:
+* bytes32 _id
+* address _actor
+
 ### external getAgreementDIDOwner
 
 Documentation:
