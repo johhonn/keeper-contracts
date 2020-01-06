@@ -106,25 +106,22 @@ library AgreementStoreLibrary {
     }
 
     /**
-     * @dev getTypes for a given agreement Id, returns the actor types
+     * @dev getType for a given agreement Id, returns the actor type
      * @param _self is AgreementActors storage pointer
      * @param _id agreement identifier
-     * @return array of bytes32 actor types
+     * @param _actor actor address
+     * @return bytes32 actor type
      */
-    function getTypes(
+    function getType(
         AgreementActors storage _self,
         bytes32 _id,
-        address[] memory _actors
+        address _actor
     )
         internal
-        returns ( bytes32[] memory actorTypes )
+        view
+        returns ( bytes32 actorType )
     {
-        if ( _actors.length == 0 )
-            return actorTypes;
-        for ( uint256 i = 0 ; i < _actors.length; i++)
-        {
-            actorTypes[i] = _self.AgreementActor[_id][_actors[i]];
-        }
+        actorType = _self.AgreementActor[_id][_actor];
     }
     
     /**

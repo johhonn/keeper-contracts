@@ -296,6 +296,17 @@ contract AgreementStoreManager is Ownable {
         actors = agreementActorsList.get(_id);
         //actorTypes = agreementActors.getTypes(_id, actors);
     }
+
+    function getActorType(
+        bytes32 _id,
+        address _actor
+    )
+        external
+        view
+        returns(bytes32 actorType)
+    {
+        actorType = agreementActors.getType(_id, _actor);
+    }
     
     /**
      * @dev get the DID owner for this agreement with _id.

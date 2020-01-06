@@ -125,7 +125,8 @@ contract('AgreementStoreManager', (accounts) => {
             templateId,
             timeLock,
             timeOut,
-            conditionTypes
+            conditionTypes,
+            actorTypeIds
         }
     }
 
@@ -600,7 +601,8 @@ contract('AgreementStoreManager', (accounts) => {
                 templateId,
                 timeLock,
                 timeOut,
-                providers
+                providers,
+                actorTypeIds
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
@@ -630,6 +632,13 @@ contract('AgreementStoreManager', (accounts) => {
                 assert.strictEqual(
                     actors[i],
                     providers[i]
+                )
+                assert.strictEqual(
+                    await agreementStoreManager.getActorType(
+                        agreementId,
+                        actors[i]
+                    ),
+                    actorTypeIds[i]
                 )
             }
         })
