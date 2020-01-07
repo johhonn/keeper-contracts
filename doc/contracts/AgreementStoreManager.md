@@ -130,14 +130,23 @@ Parameters:
 Documentation:
 
 ```
-@dev getAgreementActors for a given agreement Id retrieves actors data  
+@dev getAgreementActors for a given agreement Id retrieves actors addresses list 
 @param _id is the ID of the agreement.
-@return agreement actors data (addresses and types)
+@return agreement actors list of addresses
 ```
 Parameters:
 * bytes32 _id
 
 ### external getActorType
+
+Documentation:
+
+```
+@dev getActorType for a given agreement Id, and actor address retrieves actors type  
+@param _id is the ID of the agreement
+@param _actor agreement actor address
+@return agreement actor type
+```
 Parameters:
 * bytes32 _id
 * address _actor

@@ -280,9 +280,9 @@ contract AgreementStoreManager is Ownable {
     }
 
     /**
-     * @dev getAgreementActors for a given agreement Id retrieves actors data  
+     * @dev getAgreementActors for a given agreement Id retrieves actors addresses list 
      * @param _id is the ID of the agreement.
-     * @return agreement actors data (addresses and types)
+     * @return agreement actors list of addresses
      */
     function getAgreementActors(
         bytes32 _id
@@ -296,6 +296,12 @@ contract AgreementStoreManager is Ownable {
         actors = agreementActorsList.getActors(_id);
     }
 
+    /**
+     * @dev getActorType for a given agreement Id, and actor address retrieves actors type  
+     * @param _id is the ID of the agreement
+     * @param _actor agreement actor address
+     * @return agreement actor type
+     */
     function getActorType(
         bytes32 _id,
         address _actor

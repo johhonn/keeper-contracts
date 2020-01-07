@@ -63,12 +63,12 @@ Parameters:
 * address _templateId
 * bytes32[] _conditionIds
 
-### internal setType
+### internal setActorType
 
 Documentation:
 
 ```
-@dev setType set a mapping between actors and their types.
+@dev setActorType set a mapping between actors and their types.
 The stored type is the hash of the string format of an actor type 
 (consumer, provider, verifier, publisher, curator, etc).
 @param _self is AgreementActors storage pointer
@@ -82,12 +82,12 @@ Parameters:
 * address _actor
 * bytes32 _actorType
 
-### internal getType
+### internal getActorType
 
 Documentation:
 
 ```
-@dev getType for a given agreement Id, returns the actor type
+@dev getActorType for a given agreement Id, returns the actor type
 @param _self is AgreementActors storage pointer
 @param _id agreement identifier
 @param _actor actor address
@@ -98,12 +98,12 @@ Parameters:
 * bytes32 _id
 * address _actor
 
-### internal set
+### internal setActors
 
 Documentation:
 
 ```
-@dev set associate actor addresses to an agreement
+@dev setActors associate actor addresses to an agreement
 @param _self is AgreementActorsList storage pointer
 @param _id agreement identifier
 @param _actors array of actor addresses
@@ -113,12 +113,12 @@ Parameters:
 * bytes32 _id
 * address[] _actors
 
-### internal get
+### internal getActors
 
 Documentation:
 
 ```
-@dev get actor addresses for an agreement
+@dev getActors actor addresses for an agreement
 @param _self is AgreementActorsList storage pointer
 @param _id agreement identifier
 @return _actors array of actor addresses
