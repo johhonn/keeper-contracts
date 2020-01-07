@@ -35,6 +35,11 @@ Parameters:
 * address createdBy
 * uint256 createdAt
 
+###  AgreementActorAdded
+Parameters:
+* bytes32 agreementId
+* address actor
+
 ## Functions
 
 ### public initialize
