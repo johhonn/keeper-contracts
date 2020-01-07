@@ -35,12 +35,9 @@ Members:
 Members:
 * mapping(bytes32 => mapping(address => bytes32)) AgreementActor
 
-## Events
-
-###  AgreementActorAdded
-Parameters:
-* bytes32 agreementId
-* address actor
+### public AgreementActorsList
+Members:
+* mapping(bytes32 => address[]) ActorsList
 
 ## Functions
 
@@ -66,19 +63,66 @@ Parameters:
 * address _templateId
 * bytes32[] _conditionIds
 
+### internal setActorType
+
+Documentation:
+
+```
+@dev setActorType set a mapping between actors and their types.
+The stored type is the hash of the string format of an actor type 
+(consumer, provider, verifier, publisher, curator, etc).
+@param _self is AgreementActors storage pointer
+@param _id agreement identifier
+@param _actor actor address
+@param _actorType actor type hash
+```
+Parameters:
+* struct AgreementStoreLibrary.AgreementActors _self
+* bytes32 _id
+* address _actor
+* bytes32 _actorType
+
+### internal getActorType
+
+Documentation:
+
+```
+@dev getActorType for a given agreement Id, returns the actor type
+@param _self is AgreementActors storage pointer
+@param _id agreement identifier
+@param _actor actor address
+@return bytes32 actor type
+```
+Parameters:
+* struct AgreementStoreLibrary.AgreementActors _self
+* bytes32 _id
+* address _actor
+
 ### internal setActors
 
 Documentation:
 
 ```
-@dev setActors set a mapping between actors and their types
-@param _self is AgreementActors storage pointer
+@dev setActors associate actor addresses to an agreement
+@param _self is AgreementActorsList storage pointer
 @param _id agreement identifier
-@param _actors actors addresses
-@param _actorTypes actors types (consumer, provider, verifier, publisher, curator)
+@param _actors array of actor addresses
 ```
 Parameters:
-* struct AgreementStoreLibrary.AgreementActors _self
+* struct AgreementStoreLibrary.AgreementActorsList _self
 * bytes32 _id
 * address[] _actors
-* bytes32[] _actorTypes
+
+### internal getActors
+
+Documentation:
+
+```
+@dev getActors actor addresses for an agreement
+@param _self is AgreementActorsList storage pointer
+@param _id agreement identifier
+@return _actors array of actor addresses
+```
+Parameters:
+* struct AgreementStoreLibrary.AgreementActorsList _self
+* bytes32 _id
