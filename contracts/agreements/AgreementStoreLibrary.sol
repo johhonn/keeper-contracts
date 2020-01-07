@@ -89,7 +89,7 @@ library AgreementStoreLibrary {
      * @param _actor actor address
      * @param _actorType actor type hash
      */
-    function setType(
+    function setActorType(
         AgreementActors storage _self,
         bytes32 _id,
         address _actor,
@@ -112,7 +112,7 @@ library AgreementStoreLibrary {
      * @param _actor actor address
      * @return bytes32 actor type
      */
-    function getType(
+    function getActorType(
         AgreementActors storage _self,
         bytes32 _id,
         address _actor
@@ -130,7 +130,7 @@ library AgreementStoreLibrary {
      * @param _id agreement identifier
      * @param _actors array of actor addresses
      */
-    function set(
+    function setActors(
         AgreementActorsList storage _self,
         bytes32 _id,
         address[] memory _actors
@@ -146,7 +146,7 @@ library AgreementStoreLibrary {
      * @param _id agreement identifier
      * @return _actors array of actor addresses
      */
-    function get(
+    function getActors(
         AgreementActorsList storage _self,
         bytes32 _id
     )

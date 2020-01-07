@@ -41,7 +41,7 @@ contract AgreementStoreManager is Ownable {
 
     // this meant as template ID resolver to avoid memory layout corruption
     mapping (address => bytes32) templateIdAddressToBytes32;
-    
+
     using AgreementStoreLibrary for AgreementStoreLibrary.AgreementActorsList;
     AgreementStoreLibrary.AgreementActorsList internal agreementActorsList;
 
@@ -226,7 +226,7 @@ contract AgreementStoreManager is Ownable {
         // set agreement actors
         for(uint256 i = 0; i < _actors.length; i++)
         {
-            agreementActors.setType(
+            agreementActors.setActorType(
                 _id,
                 _actors[i],
                 _actorTypes[i]
@@ -237,7 +237,7 @@ contract AgreementStoreManager is Ownable {
                 _actorTypes[i]
             );
         }
-        agreementActorsList.set(
+        agreementActorsList.setActors(
             _id,
             _actors
         );
@@ -291,11 +291,9 @@ contract AgreementStoreManager is Ownable {
         view
         returns(
             address[] memory actors
-            //bytes32[] memory actorTypes
         )
     {
-        actors = agreementActorsList.get(_id);
-        //actorTypes = agreementActors.getTypes(_id, actors);
+        actors = agreementActorsList.getActors(_id);
     }
 
     function getActorType(
@@ -306,7 +304,7 @@ contract AgreementStoreManager is Ownable {
         view
         returns(bytes32 actorType)
     {
-        actorType = agreementActors.getType(_id, _actor);
+        actorType = agreementActors.getActorType(_id, _actor);
     }
     
     /**
