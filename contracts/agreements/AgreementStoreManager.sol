@@ -37,11 +37,12 @@ contract AgreementStoreManager is Ownable {
     DIDRegistry internal didRegistry;
 
     using AgreementStoreLibrary for AgreementStoreLibrary.AgreementActors;
-    using AgreementStoreLibrary for AgreementStoreLibrary.AgreementActorsList;
     AgreementStoreLibrary.AgreementActors internal agreementActors;
 
     // this meant as template ID resolver to avoid memory layout corruption
     mapping (address => bytes32) templateIdAddressToBytes32;
+    
+    using AgreementStoreLibrary for AgreementStoreLibrary.AgreementActorsList;
     AgreementStoreLibrary.AgreementActorsList internal agreementActorsList;
 
     event AgreementCreated(
