@@ -35,13 +35,6 @@ Members:
 Members:
 * mapping(bytes32 => mapping(address => bytes32)) AgreementActor
 
-## Events
-
-###  AgreementActorAdded
-Parameters:
-* bytes32 agreementId
-* address actor
-
 ## Functions
 
 ### internal create
@@ -66,19 +59,19 @@ Parameters:
 * address _templateId
 * bytes32[] _conditionIds
 
-### internal setActors
+### internal setActor
 
 Documentation:
 
 ```
-@dev setActors set a mapping between actors and their types
+@dev setActor set a mapping between actors and their types
 @param _self is AgreementActors storage pointer
 @param _id agreement identifier
-@param _actors actors addresses
-@param _actorTypes actors types (consumer, provider, verifier, publisher, curator)
+@param _actor actor address
+@param _actorType actor type (consumer, provider, verifier, publisher, curator)
 ```
 Parameters:
 * struct AgreementStoreLibrary.AgreementActors _self
 * bytes32 _id
-* address[] _actors
-* bytes32[] _actorTypes
+* address _actor
+* bytes32 _actorType
