@@ -303,12 +303,12 @@ contract TemplateStoreManager is Ownable {
     }
 
     /**
-     * @notice isTemplateApproved check whether the template is approved
-     * @param _id unique template identifier which is basically
+     * @notice isTemplateIdApproved check whether the template is approved
+     * @param _id bytes32 unique template identifier which is basically
      *        the template contract address.
      * @return true if the template is approved
      */
-    function isTemplateApproved(bytes32 _id) external view returns (bool) {
+    function isTemplateIdApproved(bytes32 _id) external view returns (bool) {
         return templateList.templates[_id].state ==
             TemplateStoreLibrary.TemplateState.Approved;
     }
