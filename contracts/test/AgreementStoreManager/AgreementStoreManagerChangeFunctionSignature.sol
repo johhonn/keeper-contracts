@@ -31,7 +31,7 @@ contract AgreementStoreManagerChangeFunctionSignature is
         );
         address[] memory _conditionTypes;
         
-        (,,,,_conditionTypes,)= templateStoreManager.getTemplate(_templateId);
+        (,,,,_conditionTypes,) = templateStoreManager.getTemplate(_templateId);
         
         require(
             _conditionIds.length == _conditionTypes.length &&
