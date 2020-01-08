@@ -7,7 +7,6 @@ import '../Common.sol';
 import './Condition.sol';
 import './ConditionStoreLibrary.sol';
 import '../interfaces/IList.sol';
-import 'openzeppelin-eth/contracts/cryptography/ECDSA.sol';
 /**
  * @title Whitelisting Condition
  * @author Ocean Protocol Team
