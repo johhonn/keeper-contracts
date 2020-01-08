@@ -75,6 +75,7 @@ async function setupContracts({
         addressBook.AccessSecretStoreCondition &&
         addressBook.ComputeExecutionCondition
     ) {
+        var isTemplateApproved = false
         const TemplateStoreManager =
             artifacts.require('TemplateStoreManager')
         const TemplateStoreManagerInstance =
@@ -135,6 +136,20 @@ async function setupContracts({
         })
 
         if (verbose) {
+            isTemplateApproved = await TemplateStoreManagerInstance.isTemplateIdApproved(escrowAccessSecretStoreTemplateId)
+            if (isTemplateApproved) {
+                console.log(
+                    `EscrowAccessSecretStore has been approved successfully by ${roles.deployer}`
+                )
+            } else {
+                console.log(
+                    `EscrowAccessSecretStore failed to approve by ${roles.deployer}`
+                )
+            }
+            isTemplateApproved = false
+        }
+        // EscrowComputeExecution Template
+        if (verbose) {
             console.log(
                 `Proposing template EscrowComputeExecution from ${roles.deployer}`
             )
@@ -164,6 +179,20 @@ async function setupContracts({
             roles: roles,
             templateId: escrowComputeExecutionTemplateId
         })
+
+        if (verbose) {
+            isTemplateApproved = await TemplateStoreManagerInstance.isTemplateIdApproved(escrowComputeExecutionTemplateId)
+            if (isTemplateApproved) {
+                console.log(
+                    `EscrowComputeExecution has been approved successfully by ${roles.deployer}`
+                )
+            } else {
+                console.log(
+                    `EscrowComputeExecution failed to approve by ${roles.deployer}`
+                )
+            }
+            isTemplateApproved = false
+        }
 
         await transferOwnership({
             ContractInstance: TemplateStoreManagerInstance,

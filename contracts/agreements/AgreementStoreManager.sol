@@ -181,7 +181,7 @@ contract AgreementStoreManager is Ownable {
         returns (uint size)
     {
         require(
-            templateStoreManager.isTemplateApproved(_templateId) == true,
+            templateStoreManager.isTemplateIdApproved(_templateId) == true,
             'Template not Approved'
         );
         require(
