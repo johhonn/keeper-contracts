@@ -1,6 +1,6 @@
 {
   "name": "OceanToken",
-"abi": [
+  "abi": [
     {
       "constant": true,
       "inputs": [],
