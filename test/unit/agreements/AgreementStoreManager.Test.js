@@ -125,7 +125,8 @@ contract('AgreementStoreManager', (accounts) => {
             templateId,
             timeLock,
             timeOut,
-            conditionTypes
+            conditionTypes,
+            actorTypeIds
         }
     }
 
@@ -593,6 +594,53 @@ contract('AgreementStoreManager', (accounts) => {
                 await agreementStoreManager.getAgreementDIDOwner(agreementId),
                 owner
             )
+        })
+        it('should get agreement actors data', async () => {
+            const {
+                did,
+                templateId,
+                timeLock,
+                timeOut,
+                providers,
+                actorTypeIds
+            } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
+
+            // construct agreement
+            const agreement = {
+                did: did,
+                templateId: templateId,
+                conditionIds: [
+                    constants.bytes32.zero,
+                    constants.bytes32.one,
+                    constants.bytes32.two
+                ],
+                timeLocks: [0, timeLock, 0],
+                timeOuts: [0, timeOut, 0],
+                actors: providers
+            }
+
+            const agreementId = constants.bytes32.zero
+
+            // create agreement
+            await agreementStoreManager.createAgreement(
+                agreementId,
+                ...Object.values(agreement)
+            )
+
+            const actors = await agreementStoreManager.getAgreementActors(agreementId)
+            for (var i = 0; i < actors.length; i++) {
+                assert.strictEqual(
+                    actors[i],
+                    providers[i]
+                )
+                assert.strictEqual(
+                    await agreementStoreManager.getActorType(
+                        agreementId,
+                        actors[i]
+                    ),
+                    actorTypeIds[i]
+                )
+            }
         })
         it('should not create agreement if DID not registered', async () => {
             const {
