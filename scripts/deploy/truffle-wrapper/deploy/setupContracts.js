@@ -146,9 +146,8 @@ async function setupContracts({
                     `EscrowAccessSecretStore failed to approve by ${roles.deployer}`
                 )
             }
-            isTemplateApproved = false;
+            isTemplateApproved = false
         }
-        
         // EscrowComputeExecution Template
         if (verbose) {
             console.log(
@@ -192,7 +191,7 @@ async function setupContracts({
                     `EscrowComputeExecution failed to approve by ${roles.deployer}`
                 )
             }
-            isTemplateApproved = false;
+            isTemplateApproved = false
         }
 
         await transferOwnership({
