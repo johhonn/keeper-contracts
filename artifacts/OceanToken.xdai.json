@@ -47,7 +47,7 @@
           "name": "",
           "type": "bool"
         }
-],
+      ],
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
@@ -93,7 +93,7 @@
       "stateMutability": "nonpayable",
       "type": "function"
     },
-{
+    {
       "constant": true,
       "inputs": [],
       "name": "decimals",
@@ -142,7 +142,7 @@
       "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
-"type": "function"
+      "type": "function"
     },
     {
       "constant": false,
@@ -190,7 +190,7 @@
       "constant": true,
       "inputs": [],
       "name": "owner",
-"outputs": [
+      "outputs": [
         {
           "name": "",
           "type": "address"
@@ -239,7 +239,7 @@
           "name": "_addedValue",
           "type": "uint256"
         }
-],
+      ],
       "name": "increaseApproval",
       "outputs": [
         {
@@ -288,7 +288,7 @@
       "stateMutability": "nonpayable",
       "type": "function"
     },
-{
+    {
       "inputs": [
         {
           "name": "_name",
@@ -337,7 +337,7 @@
           "name": "to",
           "type": "address"
         },
-{
+        {
           "indexed": false,
           "name": "amount",
           "type": "uint256"
@@ -381,7 +381,7 @@
       "name": "OwnershipTransferred",
       "type": "event"
     },
-{
+    {
       "anonymous": false,
       "inputs": [
         {
@@ -425,7 +425,7 @@
       "name": "Transfer",
       "type": "event"
     },
-{
+    {
       "anonymous": false,
       "inputs": [
         {
@@ -569,7 +569,7 @@
       "stateMutability": "nonpayable",
       "type": "function"
     },
-{
+    {
       "constant": false,
       "inputs": [],
       "name": "renounceOwnership",
