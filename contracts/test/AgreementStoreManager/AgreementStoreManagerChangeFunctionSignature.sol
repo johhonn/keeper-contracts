@@ -26,7 +26,7 @@ contract AgreementStoreManagerChangeFunctionSignature is
             'Invalid sender address, should fail in function signature check'
         );
         require(
-            templateStoreManager.isTemplateApproved(_templateId) == true,
+            templateStoreManager.isTemplateIdApproved(_templateId) == true,
             'Template not Approved'
         );
         address[] memory _conditionTypes;
