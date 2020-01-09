@@ -182,13 +182,13 @@ Documentation:
 @return number of templates
 ```
 
-### external isTemplateApproved
+### external isTemplateIdApproved
 
 Documentation:
 
 ```
-@notice isTemplateApproved check whether the template is approved
-@param _id unique template identifier which is basically
+@notice isTemplateIdApproved check whether the template is approved
+@param _id bytes32 unique template identifier which is basically
        the template contract address.
 @return true if the template is approved
 ```
