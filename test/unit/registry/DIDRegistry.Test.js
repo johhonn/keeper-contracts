@@ -410,9 +410,9 @@ contract('DIDRegistry', (accounts) => {
                 didRegistry.transferDIDOwnership(
                     did,
                     didOwner,
-                {
-                    from: didOwner
-                }
+                    {
+                        from: didOwner
+                    }
 
                 ),
                 'New Owner is already a DID owner'
