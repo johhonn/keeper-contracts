@@ -255,22 +255,23 @@ The contract addresses deployed on `xDai` Mainnet:
 
 | Contract                          | Version | Address                                      |
 |-----------------------------------|---------|----------------------------------------------|
-| AccessSecretStoreCondition        | v0.13.1 | `0x2EadA723f7C631284B299E5BfB724B2153D4c1d7` |
-| AgreementStoreManager             | v0.13.1 | `0x5E12966F910A819a84D359383F0B2777Af04B664` |
-| ComputeExecutionCondition         | v0.13.1 | `0x0233d73aFf3030FE26a53F363217c84DF25638E9` |
-| ConditionStoreManager             | v0.13.1 | `0xBe3419C1E4764BeF16A272A45865c1C1072Bf8AB` |
-| DIDRegistry                       | v0.13.1 | `0x99ae43155D8Fa205b5CEE705aD8ab1a1A92B904E` |
-| DIDRegistryLibrary                | v0.13.1 | `0x304AA20E6D04B18221D7a1d971ff4C245039486D` |
-| EpochLibrary                      | v0.13.1 | `0xa1BC282eAc22092C0D9344aba38F65aDA6200242` |
+| AccessSecretStoreCondition        | v0.13.2 | `0x2EadA723f7C631284B299E5BfB724B2153D4c1d7` |
+| AgreementStoreManager             | v0.13.2 | `0x5E12966F910A819a84D359383F0B2777Af04B664` |
+| ComputeExecutionCondition         | v0.13.2 | `0x0233d73aFf3030FE26a53F363217c84DF25638E9` |
+| ConditionStoreManager             | v0.13.2 | `0xBe3419C1E4764BeF16A272A45865c1C1072Bf8AB` |
+| DIDRegistry                       | v0.13.2 | `0x99ae43155D8Fa205b5CEE705aD8ab1a1A92B904E` |
+| DIDRegistryLibrary                | v0.13.2 | `0x304AA20E6D04B18221D7a1d971ff4C245039486D` |
+| EpochLibrary                      | v0.13.2 | `0xa1BC282eAc22092C0D9344aba38F65aDA6200242` |
 | EscrowAccessSecretStoreTemplate   | v0.12.7 | `0xCD3a33379DBDc6Cb14C3bf8eAb594e5ae1317BB1` |
 | EscrowComputeExecutionTemplate    | v0.12.7 | `0xbb3B88589902eFF97d3E6Af2757f83c66a9FE2Ac` |
-| EscrowReward                      | v0.13.1 | `0x9C71Ac20Ef2178bD6f9d927a601985f9983b1E8E` |
-| HashLockCondition                 | v0.13.1 | `0x6a9C322ADE3c58b6D83DA1cB4A687D834872BFc8` |
-| LockRewardCondition               | v0.13.1 | `0x3857986E111d78E1bD4017Efe620e05e3cb9376b` |
-| SignCondition                     | v0.13.1 | `0x547A4BA7Bec2AE45393D07AF9E0F53aEA50aD968` |
-| TemplateStoreManager              | v0.13.1 | `0xD2f1Ccb9E51659f1bAC7EF3e6cD713b536C1BDa4` |
-| ThresholdCondition                | v0.13.1 | `0xeED6Bf968e5808f6Ba0d284475f437aa93997aC4` |
-| WhitelistingCondition             | v0.13.1 | `0xA9c8Ae2784BF0FdB56004BE0D46dE1BeE15Fe421` |
+| EscrowReward                      | v0.13.2 | `0x9C71Ac20Ef2178bD6f9d927a601985f9983b1E8E` |
+| HashLockCondition                 | v0.13.2 | `0x6a9C322ADE3c58b6D83DA1cB4A687D834872BFc8` |
+| LockRewardCondition               | v0.13.2 | `0x3857986E111d78E1bD4017Efe620e05e3cb9376b` |
+| OceanToken                        | v0.13.2 | `0x83180c00B360B17b7d2158bfeFD32D17F01695b3` |
+| SignCondition                     | v0.13.2 | `0x547A4BA7Bec2AE45393D07AF9E0F53aEA50aD968` |
+| TemplateStoreManager              | v0.13.2 | `0xD2f1Ccb9E51659f1bAC7EF3e6cD713b536C1BDa4` |
+| ThresholdCondition                | v0.13.2 | `0xeED6Bf968e5808f6Ba0d284475f437aa93997aC4` |
+| WhitelistingCondition             | v0.13.2 | `0xA9c8Ae2784BF0FdB56004BE0D46dE1BeE15Fe421` |
 
 ## Packages
 
