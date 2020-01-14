@@ -13,6 +13,8 @@ Documentation:
 
 ### internal didRegisterList
 
+### internal DIDPermissions
+
 ## Events
 
 ###  DIDAttributeRegistered
@@ -48,6 +50,18 @@ Parameters:
 * address _previousOwner
 * address _newOwner
 
+###  DIDPermissionGranted
+Parameters:
+* bytes32 _did
+* address _owner
+* address _grantee
+
+###  DIDPermissionRevoked
+Parameters:
+* bytes32 _did
+* address _owner
+* address _grantee
+
 ## Modifiers
 
 ### internal onlyDIDOwner
@@ -78,6 +92,7 @@ Documentation:
      Subsequent updates record _checksum and update info.
      * @param _did refers to decentralized identifier (a bytes32 length ID).
 @param _checksum includes a one-way HASH calculated using the DDO content.
+@param _providers list of provider addresses that can provide the services associated with the DID
 @param _value refers to the attribute value, limited to 2048 bytes.
 @return the size of the registry after the register action.
 ```
@@ -127,6 +142,46 @@ Documentation:
 Parameters:
 * bytes32 _did
 * address _newOwner
+
+### external grantPermission
+
+Documentation:
+
+```
+@dev grantPermission grants access permission to grantee 
+@param _did refers to decentralized identifier (a bytes32 length ID)
+@param _grantee address 
+```
+Parameters:
+* bytes32 _did
+* address _grantee
+
+### external revokePermission
+
+Documentation:
+
+```
+@dev revokePermission revokes access permission from grantee 
+@param _did refers to decentralized identifier (a bytes32 length ID)
+@param _grantee address 
+```
+Parameters:
+* bytes32 _did
+* address _grantee
+
+### external getPermission
+
+Documentation:
+
+```
+@dev getPermission gets access permission of a grantee
+@param _did refers to decentralized identifier (a bytes32 length ID)
+@param _grantee address
+@return true if grantee has access permission to a DID
+```
+Parameters:
+* bytes32 _did
+* address _grantee
 
 ### public isDIDProvider
 
@@ -189,3 +244,43 @@ Documentation:
 ```
 @return the length of the DID registry.
 ```
+
+### internal _grantPermission
+
+Documentation:
+
+```
+@dev _grantPermission grants access permission to grantee 
+@param _did refers to decentralized identifier (a bytes32 length ID)
+@param _grantee address 
+```
+Parameters:
+* bytes32 _did
+* address _grantee
+
+### internal _revokePermission
+
+Documentation:
+
+```
+@dev _revokePermission revokes access permission from grantee 
+@param _did refers to decentralized identifier (a bytes32 length ID)
+@param _grantee address 
+```
+Parameters:
+* bytes32 _did
+* address _grantee
+
+### internal _getPermission
+
+Documentation:
+
+```
+@dev _getPermission gets access permission of a grantee
+@param _did refers to decentralized identifier (a bytes32 length ID)
+@param _grantee address 
+@return true if grantee has access permission to a DID 
+```
+Parameters:
+* bytes32 _did
+* address _grantee

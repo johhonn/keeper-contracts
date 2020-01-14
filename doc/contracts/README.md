@@ -1,5 +1,6 @@
 # Keeper Contracts Documentation
-
+A high level keeper contracts diagram model:
+![](images/Keeper-contracts-diagram.png)
 ## File Structure
 
 There are several folders and each includes solidity source files for each module:
@@ -11,8 +12,9 @@ There are several folders and each includes solidity source files for each modul
     - [Templates](#)
         - [Template Store Manager](TemplateStoreManager.md)
         - [Template Store Library](TemplateStoreLibrary.md)    
-        - [Agreement Template](AgreementTemplate.md)
-        - [Escrow Access Secret Store Template](EscrowAccessSecretStoreTemplate.md)
+        - [Agreement Template (DEPRECATED)](AgreementTemplate.md)
+        - [Escrow Access Secret Store Template (DEPRECATED)](EscrowAccessSecretStoreTemplate.md)
+        - [Escrow Compute Execution Template (DEPRECATED)](EscrowComputeExecutionTemplate.mds)
     - [Conditions](#)
         - [Condition Store Manager](ConditionStoreManager.md)
         - [Condition Store Library](ConditionStoreLibrary.md)
@@ -23,6 +25,7 @@ There are several folders and each includes solidity source files for each modul
         - [Access Secret Store Condition](AccessSecretStoreCondition.md)
         - [Whitelisting Condition](WhitelistingCondition.md)
         - [Threshold Condition](ThresholdCondition.md)
+        - [Compute Execution Condition](ComputeExecutionCondition.md)
         - [Rewards](#)
             - [Reward](Reward.md)
             - [Escrow Reward](EscrowReward.md)

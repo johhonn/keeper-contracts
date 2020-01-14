@@ -7,7 +7,6 @@ import '../Common.sol';
 import './Condition.sol';
 import './ConditionStoreLibrary.sol';
 import '../interfaces/IList.sol';
-import 'openzeppelin-eth/contracts/cryptography/ECDSA.sol';
 /**
  * @title Whitelisting Condition
  * @author Ocean Protocol Team
@@ -60,7 +59,7 @@ contract WhitelistingCondition is Condition, Common {
    /**
     * @notice fulfill check whether address is whitelisted
     * in order to fulfill the condition. This method will be 
-    * called by whitelist owner. 
+    * called by anyone in this whitelist. 
     * @param _agreementId SEA agreement identifier
     * @param _listAddress list contract address
     * @param _item item in the list

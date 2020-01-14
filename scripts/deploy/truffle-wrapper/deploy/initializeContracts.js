@@ -194,22 +194,16 @@ async function initializeContracts({
         }
     }
 
-    if (getAddress('AgreementStoreManager') &&
-        getAddress('DIDRegistry') &&
-        getAddress('AccessSecretStoreCondition') &&
-        getAddress('LockRewardCondition') &&
-        getAddress('EscrowReward')) {
-        if (contracts.indexOf('EscrowAccessSecretStoreTemplate') > -1) {
-            addressBook.EscrowAccessSecretStoreTemplate = zosCreate({
-                contract: 'EscrowAccessSecretStoreTemplate',
+    if (getAddress('ConditionStoreManager') &&
+        getAddress('AgreementStoreManager')) {
+        if (contracts.indexOf('ComputeExecutionCondition') > -1) {
+            addressBook.ComputeExecutionCondition = zosCreate({
+                contract: 'ComputeExecutionCondition',
                 network,
                 args: [
                     roles.ownerWallet,
-                    getAddress('AgreementStoreManager'),
-                    getAddress('DIDRegistry'),
-                    getAddress('AccessSecretStoreCondition'),
-                    getAddress('LockRewardCondition'),
-                    getAddress('EscrowReward')
+                    getAddress('ConditionStoreManager'),
+                    getAddress('AgreementStoreManager')
                 ],
                 verbose
             })

@@ -1,6 +1,6 @@
 
 # contract: EscrowAccessSecretStoreTemplate
-
+## (DEPRECATED)
 Documentation:
 ```
 @title Agreement Template
@@ -25,18 +25,6 @@ Documentation:
      can ask for refund.
 ```
 
-## Structs
-
-### public AgreementDataModel
-Members:
-* address accessConsumer
-* address accessProvider
-
-### public AgreementData
-Members:
-* mapping(bytes32 => struct EscrowAccessSecretStoreTemplate.AgreementDataModel) agreementDataItems
-* bytes32[] agreementIds
-
 ## Variables
 
 ### internal didRegistry
@@ -46,19 +34,6 @@ Members:
 ### internal lockRewardCondition
 
 ### internal escrowReward
-
-### internal agreementData
-
-## Events
-
-###  AgreementCreated
-Parameters:
-* bytes32 _agreementId
-* bytes32 _did
-* address _accessConsumer
-* address _accessProvider
-* uint256[] _timeLocks
-* uint256[] _timeOuts
 
 ## Functions
 
@@ -87,43 +62,3 @@ Parameters:
 * address _accessSecretStoreConditionAddress
 * address _lockRewardConditionAddress
 * address _escrowRewardAddress
-
-### public createAgreement
-
-Documentation:
-
-```
-@notice createAgreement creates agreements through agreement template
-@dev this function initializes the agreement by setting the DID,
-      conditions ID, timeouts, time locks and the consumer address.
-      The DID provider/owner is automatically detected by the DID
-      Registry
-@param _id SEA agreement unique identifier
-@param _did Decentralized Identifier (DID)
-@param _conditionIds conditions ID associated with the condition types
-@param _timeLocks the starting point of the time window ,time lock is 
-      in block number not seconds
-@param _timeOuts the ending point of the time window ,time lock is 
-      in block number not seconds
-@param _accessConsumer consumer address
-@return the agreement index
-```
-Parameters:
-* bytes32 _id
-* bytes32 _did
-* bytes32[] _conditionIds
-* uint256[] _timeLocks
-* uint256[] _timeOuts
-* address _accessConsumer
-
-### external getAgreementData
-
-Documentation:
-
-```
-@notice getAgreementData return the agreement Data
-@param _id SEA agreement unique identifier
-@return the agreement consumer and provider addresses
-```
-Parameters:
-* bytes32 _id

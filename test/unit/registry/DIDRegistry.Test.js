@@ -388,5 +388,220 @@ contract('DIDRegistry', (accounts) => {
                 'Invalid DID owner'
             )
         })
+
+        it('should reject to transfer a DID ownership to the old DID owner', async () => {
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const didOwner = accounts[2]
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            await didRegistry.registerAttribute(
+                did,
+                checksum,
+                providers,
+                value,
+                {
+                    from: didOwner
+                }
+            )
+
+            // act & assert
+            await assert.isRejected(
+                didRegistry.transferDIDOwnership(
+                    did,
+                    didOwner,
+                    {
+                        from: didOwner
+                    }
+
+                ),
+                'New Owner is already a DID owner'
+            )
+        })
+
+        it('should reject to transfer a DID ownership in case of invalid new owner address', async () => {
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const didOwner = accounts[2]
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            await didRegistry.registerAttribute(
+                did,
+                checksum,
+                providers,
+                value,
+                {
+                    from: didOwner
+                }
+            )
+
+            // act & assert
+            await assert.isRejected(
+                didRegistry.transferDIDOwnership(
+                    did,
+                    constants.address.zero,
+                    {
+                        from: didOwner
+                    }
+                ),
+                'Invalid new DID owner address'
+            )
+        })
+    })
+
+    describe('grantPermissions', () => {
+        it('should grant permission only in case of DID owner', async () => {
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const didOwner = accounts[2]
+            const grantee = accounts[3]
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            await didRegistry.registerAttribute(
+                did,
+                checksum,
+                providers,
+                value,
+                {
+                    from: didOwner
+                }
+            )
+
+            await didRegistry.grantPermission(
+                did,
+                grantee,
+                {
+                    from: didOwner
+                }
+            )
+            // act & assert
+            assert.strictEqual(
+                await didRegistry.getPermission(
+                    did,
+                    grantee
+                ),
+                true
+            )
+        })
+        it('should fail to grant permission if not a DID owner', async () => {
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const didOwner = accounts[2]
+            const grantee = accounts[3]
+            const newDIDOwner = accounts[4]
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            await didRegistry.registerAttribute(
+                did,
+                checksum,
+                providers,
+                value,
+                {
+                    from: didOwner
+                }
+            )
+
+            await assert.isRejected(
+                didRegistry.grantPermission(
+                    did,
+                    grantee,
+                    {
+                        from: newDIDOwner
+                    }
+                ),
+                'Invalid DID owner'
+            )
+            // act & assert
+            assert.strictEqual(
+                await didRegistry.getPermission(
+                    did,
+                    grantee
+                ),
+                false
+            )
+        })
+    })
+
+    describe('revokePermissions', () => {
+        it('should revoke permission only in case of DID owner', async () => {
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const didOwner = accounts[2]
+            const grantee = accounts[3]
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            await didRegistry.registerAttribute(
+                did,
+                checksum,
+                providers,
+                value,
+                {
+                    from: didOwner
+                }
+            )
+
+            await didRegistry.grantPermission(
+                did,
+                grantee,
+                {
+                    from: didOwner
+                }
+            )
+
+            await didRegistry.revokePermission(
+                did,
+                grantee,
+                {
+                    from: didOwner
+                }
+            )
+
+            // act & assert
+            assert.strictEqual(
+                await didRegistry.getPermission(
+                    did,
+                    grantee
+                ),
+                false
+            )
+        })
+
+        it('should fail to revoke permission if permission is not exists', async () => {
+            const { didRegistry } = await setupTest()
+            const did = constants.did[0]
+            const checksum = testUtils.generateId()
+            const didOwner = accounts[2]
+            const grantee = accounts[3]
+            const value = 'https://exmaple.com/did/ocean/test-attr-example.txt'
+            await didRegistry.registerAttribute(
+                did,
+                checksum,
+                providers,
+                value,
+                {
+                    from: didOwner
+                }
+            )
+
+            await assert.isRejected(
+                didRegistry.revokePermission(
+                    did,
+                    grantee,
+                    {
+                        from: didOwner
+                    }
+                ),
+                'Grantee already was revoked'
+            )
+
+            // act & assert
+            assert.strictEqual(
+                await didRegistry.getPermission(
+                    did,
+                    grantee
+                ),
+                false
+            )
+        })
     })
 })

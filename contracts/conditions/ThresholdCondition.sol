@@ -127,7 +127,7 @@ contract ThresholdCondition is Condition {
         ConditionStoreLibrary.ConditionState Fulfilled;
         Fulfilled = ConditionStoreLibrary.ConditionState.Fulfilled;
         
-        for (uint i=0; i < _inputConditions.length; i++)
+        for(uint i = 0; i < _inputConditions.length; i++)
         { 
             (,inputConditionState,,,,,) = conditionStoreManager.
             getCondition(_inputConditions[i]);

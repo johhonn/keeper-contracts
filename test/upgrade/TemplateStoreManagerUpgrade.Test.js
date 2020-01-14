@@ -45,7 +45,15 @@ contract('TemplateStoreManager', (accounts) => {
                 web3,
                 artifacts,
                 contracts: [
-                    'TemplateStoreManager'
+                    'ConditionStoreManager',
+                    'TemplateStoreManager',
+                    'AgreementStoreManager',
+                    'LockRewardCondition',
+                    'AccessSecretStoreCondition',
+                    'EscrowReward',
+                    'OceanToken',
+                    'DIDRegistry',
+                    'ComputeExecutionCondition'
                 ],
                 verbose
             })
@@ -82,7 +90,7 @@ contract('TemplateStoreManager', (accounts) => {
         })
 
         it('Should be possible to change function signature', async () => {
-            const { conditionType } = await setupTest()
+            await setupTest()
 
             const taskBook = await upgrade({
                 web3,
@@ -101,8 +109,17 @@ contract('TemplateStoreManager', (accounts) => {
 
             // act & assert
             await assert.isRejected(
-                TemplateStoreChangeFunctionSignatureInstance.proposeTemplate(conditionType, constants.address.dummy),
-                'Invalid sender address'
+                TemplateStoreChangeFunctionSignatureInstance.methods['proposeTemplate(bytes32,address[],bytes32[],string,address)'](
+                    constants.bytes32.one,
+                    [TemplateStoreChangeFunctionSignatureInstance.address],
+                    [constants.bytes32.one],
+                    'SampleTemplate',
+                    accounts[3],
+                    {
+                        from: accounts[0]
+                    }
+                ),
+                'Invalid address hash'
             )
         })
 
@@ -133,7 +150,7 @@ contract('TemplateStoreManager', (accounts) => {
         })
 
         it('Should be possible to append storage variables and change logic', async () => {
-            const { conditionType } = await setupTest()
+            await setupTest()
 
             const taskBook = await upgrade({
                 web3,
@@ -152,9 +169,19 @@ contract('TemplateStoreManager', (accounts) => {
 
             // act & assert
             await assert.isRejected(
-                TemplateStoreChangeInStorageAndLogicInstance.proposeTemplate(conditionType, constants.address.dummy),
-                'Invalid sender address'
+                TemplateStoreChangeInStorageAndLogicInstance.methods['proposeTemplate(bytes32,address[],bytes32[],string,address)'](
+                    constants.bytes32.one,
+                    [TemplateStoreChangeInStorageAndLogicInstance.address],
+                    [constants.bytes32.one],
+                    'SampleTemplate',
+                    accounts[3],
+                    {
+                        from: accounts[0]
+                    }
+                ),
+                'Invalid address hash'
             )
+
             assert.strictEqual(
                 (await TemplateStoreChangeInStorageAndLogicInstance.templateCount()).toNumber(),
                 0,

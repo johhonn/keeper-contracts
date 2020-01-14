@@ -7,14 +7,20 @@ import '../../templates/TemplateStoreManager.sol';
 
 contract TemplateStoreChangeFunctionSignature is TemplateStoreManager {
 
-    function proposeTemplate(address _id, address _sender)
+    function proposeTemplate(
+        bytes32 _id, 
+        address[] calldata _conditionTypes,
+        bytes32[] calldata _actorTypeIds,
+        string calldata name,
+        address sender
+    )
         external
         returns (uint size)
     {
         require(
-            _id == _sender,
-            'Invalid sender address'
+            _id == keccak256(abi.encodePacked(sender, name)),
+            'Invalid address hash'
         );
-        return templateList.propose(_id);
+        return templateList.propose(_id, _conditionTypes, _actorTypeIds);
     }
 }

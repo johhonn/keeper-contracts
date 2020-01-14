@@ -24,12 +24,15 @@ contract DIDRegistry is Ownable {
      * @dev state storage for the DID registry
      */
     DIDRegistryLibrary.DIDRegisterList internal didRegisterList;
-
+    
+    // DID -> Address -> Boolean Permission
+    mapping(bytes32 => mapping(address => bool)) DIDPermissions;
+    
     modifier onlyDIDOwner(bytes32 _did)
     {
         require(
             msg.sender == didRegisterList.didRegisters[_did].owner,
-            'Invalid DID owner'
+            'Invalid DID owner can perform this operation.'
         );
         _;
     }
@@ -63,6 +66,18 @@ contract DIDRegistry is Ownable {
         address _previousOwner,
         address _newOwner
     );
+    
+    event DIDPermissionGranted(
+        bytes32 indexed _did,
+        address indexed _owner,
+        address indexed _grantee
+    );
+    
+    event DIDPermissionRevoked(
+        bytes32 indexed _did,
+        address indexed _owner,
+        address indexed _grantee
+    );
 
     /**
      * @dev DIDRegistry Initializer
@@ -86,6 +101,7 @@ contract DIDRegistry is Ownable {
      *
      * @param _did refers to decentralized identifier (a bytes32 length ID).
      * @param _checksum includes a one-way HASH calculated using the DDO content.
+     * @param _providers list of provider addresses that can provide the services associated with the DID
      * @param _value refers to the attribute value, limited to 2048 bytes.
      * @return the size of the registry after the register action.
      */
@@ -198,6 +214,53 @@ contract DIDRegistry is Ownable {
     }
 
     /**
+     * @dev grantPermission grants access permission to grantee 
+     * @param _did refers to decentralized identifier (a bytes32 length ID)
+     * @param _grantee address 
+     */
+    function grantPermission(
+        bytes32 _did,
+        address _grantee
+    )
+        external
+        onlyDIDOwner(_did)
+    {
+        _grantPermission(_did, _grantee);
+    }
+    
+    /**
+     * @dev revokePermission revokes access permission from grantee 
+     * @param _did refers to decentralized identifier (a bytes32 length ID)
+     * @param _grantee address 
+     */
+    function revokePermission(
+        bytes32 _did,
+        address _grantee
+    )
+        external
+        onlyDIDOwner(_did)
+    {
+        _revokePermission(_did, _grantee);
+    }
+    
+    /**
+     * @dev getPermission gets access permission of a grantee
+     * @param _did refers to decentralized identifier (a bytes32 length ID)
+     * @param _grantee address
+     * @return true if grantee has access permission to a DID
+     */
+    function getPermission(
+        bytes32 _did,
+        address _grantee
+    )
+        external
+        view
+        returns(bool)
+    {
+        return _getPermission(_did, _grantee);
+    }
+        
+    /**
      * @notice isDIDProvider check whether a given DID provider exists
      * @param _did refers to decentralized identifier (a bytes32 length ID).
      * @param _provider provider's address.
@@ -282,6 +345,69 @@ contract DIDRegistry is Ownable {
         returns (bytes32[] memory)
     {
         return didRegisterList.didRegisterIds;
+    }
+    
+    /**
+     * @dev _grantPermission grants access permission to grantee 
+     * @param _did refers to decentralized identifier (a bytes32 length ID)
+     * @param _grantee address 
+     */
+    function _grantPermission(
+        bytes32 _did,
+        address _grantee
+    )
+        internal
+    {
+        require(
+            _grantee != address(0),
+            'Invalid grantee address'
+        );
+        DIDPermissions[_did][_grantee] = true;
+        emit DIDPermissionGranted(
+            _did,
+            msg.sender,
+            _grantee
+        );
+    }
+    
+    /**
+     * @dev _revokePermission revokes access permission from grantee 
+     * @param _did refers to decentralized identifier (a bytes32 length ID)
+     * @param _grantee address 
+     */
+    function _revokePermission(
+        bytes32 _did,
+        address _grantee
+    )
+        internal
+    {
+        require(
+            DIDPermissions[_did][_grantee],
+            'Grantee already was revoked'
+        );
+        DIDPermissions[_did][_grantee] = false;
+        emit DIDPermissionRevoked(
+            _did,
+            msg.sender,
+            _grantee
+        );
+    }
+    
+    /**
+     * @dev _getPermission gets access permission of a grantee
+     * @param _did refers to decentralized identifier (a bytes32 length ID)
+     * @param _grantee address 
+     * @return true if grantee has access permission to a DID 
+     */
+    function _getPermission(
+        bytes32 _did,
+        address _grantee
+    )
+        internal
+        view
+        returns(bool)
+    {
+        return DIDPermissions[_did][_grantee];
     }
 
 }
