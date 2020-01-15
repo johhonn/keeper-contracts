@@ -39,3 +39,8 @@ In this phase, the multi-sig will sign the approve template transaction using th
 
 At some point, we can find that this template has a vulnerability, or no longer needed by the users, so
 The template owner (the same template proposal) or the OPF can revoke the template from public access by calling `revokeTemplate(bytes32 _id)`
+
+### Get Template
+
+The `generateId` method in `TemplateStoreManager.sol` allows anyone to get the bytes32 template Id. Using this template Id, users 
+can get the template details by calling `getTemplate`. 
