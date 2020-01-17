@@ -270,9 +270,9 @@ contract AgreementStoreManager is Ownable {
             uint256 blockNumberUpdated
         )
     {
+        address _templateAddress = agreementList.agreements[_id].templateId;
         did = agreementList.agreements[_id].did;
         didOwner = didRegistry.getDIDOwner(did);
-        address _templateAddress = agreementList.agreements[_id].templateId;
         templateId = templateIdAddressToBytes32[_templateAddress];
         conditionIds = agreementList.agreements[_id].conditionIds;
         lastUpdatedBy = agreementList.agreements[_id].lastUpdatedBy;
@@ -324,7 +324,7 @@ contract AgreementStoreManager is Ownable {
         returns (address didOwner)
     {
         bytes32 did = agreementList.agreements[_id].did;
-        return didRegistry.getDIDOwner(did);
+        didOwner = didRegistry.getDIDOwner(did);
     }
 
     /**
@@ -366,7 +366,7 @@ contract AgreementStoreManager is Ownable {
         view
         returns (uint size)
     {
-        return agreementList.agreementIds.length;
+        size = agreementList.agreementIds.length;
     }
 
     /**
