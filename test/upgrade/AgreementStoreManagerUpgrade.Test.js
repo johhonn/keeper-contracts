@@ -198,7 +198,8 @@ contract('AgreementStoreManager', (accounts) => {
                 conditionIds,
                 timeLocks,
                 timeOuts,
-                templateId
+                templateId,
+                legalAgreementHash
             } = await setupTest()
 
             const taskBook = await upgrade({
@@ -223,6 +224,7 @@ contract('AgreementStoreManager', (accounts) => {
                     agreementId,
                     did,
                     templateId,
+                    legalAgreementHash,
                     conditionIds,
                     timeLocks,
                     timeOuts,
