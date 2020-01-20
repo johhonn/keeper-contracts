@@ -74,7 +74,7 @@ const common = {
         )
 
         await templateStoreManager.approveTemplate(templateId, { from: owner })
-
+        const legalAgreementHash = constants.bytes32.one
         return {
             did,
             conditionId,
@@ -86,7 +86,8 @@ const common = {
             conditionStoreManager,
             templateStoreManager,
             accessSecretStoreCondition,
-            templateId
+            templateId,
+            legalAgreementHash
         }
     }
 }

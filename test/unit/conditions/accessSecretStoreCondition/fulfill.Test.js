@@ -66,8 +66,8 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
                 agreementStoreManager,
                 conditionStoreManager,
                 accessSecretStoreCondition,
-                templateId
-
+                templateId,
+                legalAgreementHash
             } = await common.setupTest({ accounts: accounts, registerDID: true })
 
             const agreementId = constants.bytes32.one
@@ -80,6 +80,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             const agreement = {
                 did: constants.did[0],
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [conditionId],
                 timeLocks: [0],
                 timeOuts: [2],
@@ -112,8 +113,8 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
                 did,
                 agreementStoreManager,
                 accessSecretStoreCondition,
-                templateId
-
+                templateId,
+                legalAgreementHash
             } = await common.setupTest({ accounts: accounts, registerDID: true })
 
             const agreementId = constants.bytes32.one
@@ -126,6 +127,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             const agreement = {
                 did: constants.did[0],
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [conditionId],
                 timeLocks: [0],
                 timeOuts: [2],
@@ -148,8 +150,8 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
                 did,
                 agreementStoreManager,
                 accessSecretStoreCondition,
-                templateId
-
+                templateId,
+                legalAgreementHash
             } = await common.setupTest({ accounts: accounts, registerDID: true })
 
             const agreementId = constants.bytes32.one
@@ -162,6 +164,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             const agreement = {
                 did: constants.did[0],
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [conditionId],
                 timeLocks: [0],
                 timeOuts: [2],
@@ -189,7 +192,8 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
                 agreementStoreManager,
                 conditionStoreManager,
                 accessSecretStoreCondition,
-                templateId
+                templateId,
+                legalAgreementHash
 
             } = await common.setupTest({ accounts: accounts, registerDID: true })
 
@@ -205,6 +209,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             const agreement = {
                 did: constants.did[0],
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [conditionId],
                 timeLocks: [timeLock],
                 timeOuts: [timeOut],
@@ -233,8 +238,8 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
                 did,
                 agreementStoreManager,
                 accessSecretStoreCondition,
-                templateId
-
+                templateId,
+                legalAgreementHash
             } = await common.setupTest({ accounts: accounts, registerDID: true })
 
             const agreementId = constants.bytes32.one
@@ -249,6 +254,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             const agreement = {
                 did: constants.did[0],
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [conditionId],
                 timeLocks: [timeLock],
                 timeOuts: [timeOut],
@@ -275,8 +281,8 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
                 did,
                 agreementStoreManager,
                 accessSecretStoreCondition,
-                templateId
-
+                templateId,
+                legalAgreementHash
             } = await common.setupTest({ accounts: accounts, registerDID: true })
 
             const agreementId = constants.bytes32.one
@@ -291,6 +297,7 @@ contract('AccessSecretStoreCondition constructor', (accounts) => {
             const agreement = {
                 did: constants.did[0],
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [conditionId],
                 timeLocks: [timeLock],
                 timeOuts: [timeOut],

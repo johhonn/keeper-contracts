@@ -112,7 +112,7 @@ contract('AgreementStoreManager', (accounts) => {
         }
 
         conditionIds = [constants.bytes32.zero, constants.bytes32.one, constants.bytes32.two]
-
+        const legalAgreementHash = constants.bytes32.one
         return {
             common,
             agreementStoreManager,
@@ -126,7 +126,8 @@ contract('AgreementStoreManager', (accounts) => {
             timeLock,
             timeOut,
             conditionTypes,
-            actorTypeIds
+            actorTypeIds,
+            legalAgreementHash
         }
     }
 
@@ -218,6 +219,7 @@ contract('AgreementStoreManager', (accounts) => {
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
             // construct agreement
             const agreementId = constants.bytes32.one
+            
             const agreement = {
                 did: did,
                 conditionTypes: [
@@ -249,13 +251,15 @@ contract('AgreementStoreManager', (accounts) => {
                 timeLock,
                 timeOut,
                 providers,
-                conditionTypes
+                conditionTypes,
+                legalAgreementHash
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
             const agreement = {
                 did: did,
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [
                     constants.bytes32.zero,
                     constants.bytes32.one,
@@ -293,13 +297,15 @@ contract('AgreementStoreManager', (accounts) => {
                 templateId,
                 timeLock,
                 timeOut,
-                providers
+                providers,
+                legalAgreementHash
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
             const agreement = {
                 did: did,
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [
                     constants.bytes32.zero,
                     constants.bytes32.one,
@@ -321,6 +327,7 @@ contract('AgreementStoreManager', (accounts) => {
             const otherAgreement = {
                 did: did,
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [
                     constants.bytes32.zero,
                     constants.bytes32.one,
@@ -346,13 +353,15 @@ contract('AgreementStoreManager', (accounts) => {
                 templateId,
                 timeLock,
                 timeOut,
-                providers
+                providers,
+                legalAgreementHash
             } = await setupTest()
 
             // construct agreement
             const agreement = {
                 did: did,
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [
                     constants.bytes32.zero,
                     constants.bytes32.one,
@@ -380,13 +389,15 @@ contract('AgreementStoreManager', (accounts) => {
                 templateId,
                 timeLock,
                 timeOut,
-                providers
+                providers,
+                legalAgreementHash
             } = await setupTest({ proposeTemplate: true })
 
             // construct agreement
             const agreement = {
                 did: did,
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [
                     constants.bytes32.zero,
                     constants.bytes32.one,
@@ -415,7 +426,8 @@ contract('AgreementStoreManager', (accounts) => {
                 templateId,
                 timeLock,
                 timeOut,
-                providers
+                providers,
+                legalAgreementHash
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             await templateStoreManager.revokeTemplate(templateId, { from: owner })
@@ -424,6 +436,7 @@ contract('AgreementStoreManager', (accounts) => {
             const agreement = {
                 did: did,
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [
                     constants.bytes32.zero,
                     constants.bytes32.one,
@@ -452,13 +465,15 @@ contract('AgreementStoreManager', (accounts) => {
                 templateId,
                 timeLock,
                 timeOut,
-                providers
+                providers,
+                legalAgreementHash,
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
             const agreement = {
                 did: did,
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [
                     constants.bytes32.zero,
                     constants.bytes32.one,
@@ -485,6 +500,7 @@ contract('AgreementStoreManager', (accounts) => {
             const otherAgreement = {
                 did: did,
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [
                     constants.bytes32.zero,
                     constants.bytes32.one,
@@ -512,13 +528,15 @@ contract('AgreementStoreManager', (accounts) => {
                 templateId,
                 timeLock,
                 timeOut,
-                providers
+                providers,
+                legalAgreementHash,
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
             const agreement = {
                 did: did,
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [
                     constants.bytes32.zero,
                     constants.bytes32.one,
@@ -565,13 +583,15 @@ contract('AgreementStoreManager', (accounts) => {
                 templateId,
                 timeLock,
                 timeOut,
-                providers
+                providers,
+                legalAgreementHash,
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
             const agreement = {
                 did: did,
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [
                     constants.bytes32.zero,
                     constants.bytes32.one,
@@ -602,13 +622,15 @@ contract('AgreementStoreManager', (accounts) => {
                 timeLock,
                 timeOut,
                 providers,
-                actorTypeIds
+                actorTypeIds,
+                legalAgreementHash,
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
             const agreement = {
                 did: did,
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [
                     constants.bytes32.zero,
                     constants.bytes32.one,
@@ -648,13 +670,15 @@ contract('AgreementStoreManager', (accounts) => {
                 templateId,
                 timeLock,
                 timeOut,
-                providers
+                providers,
+                legalAgreementHash,
             } = await setupTest({ proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
             const agreement = {
                 did: did,
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [
                     constants.bytes32.zero,
                     constants.bytes32.one,
@@ -682,13 +706,15 @@ contract('AgreementStoreManager', (accounts) => {
                 templateId,
                 timeLock,
                 timeOut,
-                providers
+                providers,
+                legalAgreementHash,
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
             const agreement = {
                 did: did,
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [
                     constants.bytes32.zero,
                     constants.bytes32.one,
@@ -723,13 +749,15 @@ contract('AgreementStoreManager', (accounts) => {
                 templateId,
                 timeLock,
                 timeOut,
-                providers
+                providers,
+                legalAgreementHash
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
             const agreement = {
                 did: did,
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [
                     constants.bytes32.zero,
                     constants.bytes32.one,
@@ -764,6 +792,8 @@ contract('AgreementStoreManager', (accounts) => {
                 .to.equal(accounts[0])
             expect(storedAgreement.blockNumberUpdated.toNumber())
                 .to.equal(blockNumber.toNumber())
+            expect(storedAgreement.legalRef)
+                .to.equal(legalAgreementHash)
         })
 
         it('should get multiple agreements for same did & template', async () => {
@@ -772,13 +802,15 @@ contract('AgreementStoreManager', (accounts) => {
                 templateId,
                 timeLock,
                 timeOut,
-                providers
+                providers,
+                legalAgreementHash,
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
             const agreement = {
                 did: did,
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [
                     constants.bytes32.zero,
                     constants.bytes32.one,
@@ -799,6 +831,7 @@ contract('AgreementStoreManager', (accounts) => {
             const otherAgreement = {
                 did: did,
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [
                     constants.bytes32.three,
                     constants.bytes32.four,
@@ -832,13 +865,15 @@ contract('AgreementStoreManager', (accounts) => {
                 templateId,
                 timeLock,
                 timeOut,
-                providers
+                providers,
+                legalAgreementHash,
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
             const agreement = {
                 did: did,
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [
                     constants.bytes32.zero,
                     constants.bytes32.one,
@@ -871,13 +906,15 @@ contract('AgreementStoreManager', (accounts) => {
                 templateId,
                 timeLock,
                 timeOut,
-                providers
+                providers,
+                legalAgreementHash
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
             const agreement = {
                 did: did,
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [
                     constants.bytes32.zero,
                     constants.bytes32.one,
