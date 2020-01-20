@@ -39,6 +39,10 @@ library AgreementStoreLibrary {
     struct AgreementActorsList {
         mapping(bytes32 => address[]) ActorsList;
     }
+
+    struct LegalAgreementReference {
+        mapping(bytes32 => bytes32) legalAgreementReference;
+    }
     
     /**
      * @dev create new agreement
@@ -80,6 +84,27 @@ library AgreementStoreLibrary {
         return _self.agreementIds.length;
     }
     
+    function setLegalAgreementReference(
+        LegalAgreementReference storage _self,
+        bytes32 _id,
+        bytes32 _legalReference
+    )
+        internal
+    {
+        _self.legalAgreementReference[_id] = _legalReference;
+    }
+
+    function getLegalAgreementReference(
+        LegalAgreementReference storage _self,
+        bytes32 _id
+    )
+        internal
+        view
+        returns (bytes32 legalReference)
+    {
+        legalReference = _self.legalAgreementReference[_id];
+    }
+
     /**
      * @dev setActorType set a mapping between actors and their types.
      * The stored type is the hash of the string format of an actor type 

@@ -45,6 +45,11 @@ contract AgreementStoreManager is Ownable {
     using AgreementStoreLibrary for AgreementStoreLibrary.AgreementActorsList;
     AgreementStoreLibrary.AgreementActorsList internal agreementActorsList;
 
+    using AgreementStoreLibrary for 
+    AgreementStoreLibrary.LegalAgreementReference;
+    AgreementStoreLibrary.LegalAgreementReference internal 
+    legalAgreementReference;
+
     event AgreementCreated(
         bytes32 indexed agreementId,
         bytes32 indexed did,
@@ -159,7 +164,8 @@ contract AgreementStoreManager is Ownable {
      *      Only "approved" templates can access this function.
      * @param _id is the ID of the new agreement. Must be unique.
      * @param _did is the bytes32 DID of the asset. The DID must be registered beforehand.
-     * @param _templateId template ID.
+     * @param _templateId template unique identifier.
+     * @param _legalAgreementRef hash of off-chain legal agreement
      * @param _conditionIds is a list of bytes32 content-addressed Condition IDs
      * @param _timeLocks is a list of uint time lock values associated to each Condition
      * @param _timeOuts is a list of uint time out values associated to each Condition
@@ -172,6 +178,7 @@ contract AgreementStoreManager is Ownable {
         bytes32 _id,
         bytes32 _did,
         bytes32 _templateId,
+        bytes32 _legalAgreementRef,
         bytes32[] memory _conditionIds,
         uint[] memory _timeLocks,
         uint[] memory _timeOuts,
@@ -242,6 +249,11 @@ contract AgreementStoreManager is Ownable {
             _actors
         );
 
+        legalAgreementReference.setLegalAgreementReference(
+            _id,
+            _legalAgreementRef
+        );
+
         emit AgreementCreated(
             _id,
             _did,
@@ -267,7 +279,8 @@ contract AgreementStoreManager is Ownable {
             bytes32 templateId,
             bytes32[] memory conditionIds,
             address lastUpdatedBy,
-            uint256 blockNumberUpdated
+            uint256 blockNumberUpdated,
+            bytes32 legalRef
         )
     {
         address _templateAddress = agreementList.agreements[_id].templateId;
@@ -277,6 +290,7 @@ contract AgreementStoreManager is Ownable {
         conditionIds = agreementList.agreements[_id].conditionIds;
         lastUpdatedBy = agreementList.agreements[_id].lastUpdatedBy;
         blockNumberUpdated = agreementList.agreements[_id].blockNumberUpdated;
+        legalRef = legalAgreementReference.getLegalAgreementReference(_id);
     }
 
     /**
