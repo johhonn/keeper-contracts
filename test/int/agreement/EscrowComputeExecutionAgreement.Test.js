@@ -101,12 +101,13 @@ contract('Escrow Compute Execution Template integration test', (accounts) => {
         templateId = eventArgs.Id
 
         await templateStoreManager.approveTemplate(templateId, { from: owner })
-
+        const legalAgreementHash = constants.bytes32.one
         return {
             templateId,
             owner,
             conditionTypes,
-            actorTypeIds
+            actorTypeIds,
+            legalAgreementHash
         }
     }
 
@@ -120,7 +121,8 @@ contract('Escrow Compute Execution Template integration test', (accounts) => {
         timeOutCompute = 0,
         did = constants.did[0],
         url = constants.registry.url,
-        checksum = constants.bytes32.one
+        checksum = constants.bytes32.one,
+        legalAgreementHash = constants.bytes32.one
     } = {}) {
         // generate IDs from attributes
         const conditionIdCompute = await computeExecutionCondition.generateId(agreementId, await computeExecutionCondition.hashValues(did, receiver))
@@ -135,6 +137,7 @@ contract('Escrow Compute Execution Template integration test', (accounts) => {
         const agreement = {
             did: did,
             templateId: templateId,
+            legalAgreementRef: legalAgreementHash,
             conditionIds: [
                 conditionIdLock,
                 conditionIdCompute,

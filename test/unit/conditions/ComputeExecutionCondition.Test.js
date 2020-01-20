@@ -83,7 +83,7 @@ contract('ComputeExecutionCondition constructor', (accounts) => {
         )
 
         await templateStoreManager.approveTemplate(templateId, { from: owner })
-
+        const legalAgreementHash = constants.bytes32.one
         return {
             did,
             conditionId,
@@ -95,7 +95,8 @@ contract('ComputeExecutionCondition constructor', (accounts) => {
             conditionStoreManager,
             templateStoreManager,
             computeExecutionCondition,
-            templateId
+            templateId,
+            legalAgreementHash
         }
     }
 
@@ -146,8 +147,8 @@ contract('ComputeExecutionCondition constructor', (accounts) => {
                 agreementStoreManager,
                 conditionStoreManager,
                 computeExecutionCondition,
-                templateId
-
+                templateId,
+                legalAgreementHash
             } = await setupTest({ accounts: accounts, registerDID: true })
 
             const agreementId = constants.bytes32.one
@@ -158,6 +159,7 @@ contract('ComputeExecutionCondition constructor', (accounts) => {
             const agreement = {
                 did: constants.did[0],
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [conditionId],
                 timeLocks: [0],
                 timeOuts: [2],
@@ -190,8 +192,8 @@ contract('ComputeExecutionCondition constructor', (accounts) => {
                 did,
                 agreementStoreManager,
                 computeExecutionCondition,
-                templateId
-
+                templateId,
+                legalAgreementHash
             } = await setupTest({ accounts: accounts, registerDID: true })
 
             const agreementId = constants.bytes32.one
@@ -203,6 +205,7 @@ contract('ComputeExecutionCondition constructor', (accounts) => {
             const agreement = {
                 did: constants.did[0],
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [conditionId],
                 timeLocks: [0],
                 timeOuts: [2],
@@ -225,8 +228,8 @@ contract('ComputeExecutionCondition constructor', (accounts) => {
                 did,
                 agreementStoreManager,
                 computeExecutionCondition,
-                templateId
-
+                templateId,
+                legalAgreementHash
             } = await setupTest({ accounts: accounts, registerDID: true })
 
             const agreementId = constants.bytes32.one
@@ -238,6 +241,7 @@ contract('ComputeExecutionCondition constructor', (accounts) => {
             const agreement = {
                 did: constants.did[0],
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [conditionId],
                 timeLocks: [0],
                 timeOuts: [2],
@@ -263,8 +267,8 @@ contract('ComputeExecutionCondition constructor', (accounts) => {
                 did,
                 agreementStoreManager,
                 computeExecutionCondition,
-                templateId
-
+                templateId,
+                legalAgreementHash
             } = await setupTest({ accounts: accounts, registerDID: true })
 
             const agreementId = constants.bytes32.one
@@ -278,6 +282,7 @@ contract('ComputeExecutionCondition constructor', (accounts) => {
             const agreement = {
                 did: constants.did[0],
                 templateId: templateId,
+                legalAgreementRef: legalAgreementHash,
                 conditionIds: [conditionId],
                 timeLocks: [timeLock],
                 timeOuts: [timeOut],

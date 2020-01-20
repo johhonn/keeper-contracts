@@ -46,7 +46,7 @@ contract('AccessSecretStoreCondition', (accounts) => {
                 DIDProvider,
                 did,
                 accessSecretStoreCondition
-
+                
             } = await common.setupTest({ accounts: accounts, registerDID: true })
 
             const documentId = did

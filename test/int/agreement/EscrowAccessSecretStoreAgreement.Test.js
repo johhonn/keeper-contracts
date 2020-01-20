@@ -93,12 +93,14 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
         )
 
         await templateStoreManager.approveTemplate(templateId, { from: owner })
+        const legalAgreementHash = constants.bytes32.one
 
         return {
             templateId,
             owner,
             conditionTypes,
-            actorTypeIds
+            actorTypeIds,
+            legalAgreementHash
         }
     }
 
@@ -111,7 +113,8 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
         timeOutAccess = 0,
         did = constants.did[0],
         url = constants.registry.url,
-        checksum = constants.bytes32.one
+        checksum = constants.bytes32.one,
+        legalAgreementHash = constants.bytes32.one
     } = {}) {
         // generate IDs from attributes
         const conditionIdAccess = await accessSecretStoreCondition.generateId(agreementId, await accessSecretStoreCondition.hashValues(did, receiver))
@@ -128,6 +131,7 @@ contract('Escrow Access Secret Store integration test', (accounts) => {
         const agreement = {
             did: did,
             templateId: templateId,
+            legalAgreementRef: legalAgreementHash,
             conditionIds: [
                 conditionIdLock,
                 conditionIdAccess,
