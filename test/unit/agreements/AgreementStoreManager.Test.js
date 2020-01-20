@@ -219,7 +219,7 @@ contract('AgreementStoreManager', (accounts) => {
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
             // construct agreement
             const agreementId = constants.bytes32.one
-            
+
             const agreement = {
                 did: did,
                 conditionTypes: [
@@ -466,7 +466,7 @@ contract('AgreementStoreManager', (accounts) => {
                 timeLock,
                 timeOut,
                 providers,
-                legalAgreementHash,
+                legalAgreementHash
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
@@ -529,7 +529,7 @@ contract('AgreementStoreManager', (accounts) => {
                 timeLock,
                 timeOut,
                 providers,
-                legalAgreementHash,
+                legalAgreementHash
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
@@ -584,7 +584,7 @@ contract('AgreementStoreManager', (accounts) => {
                 timeLock,
                 timeOut,
                 providers,
-                legalAgreementHash,
+                legalAgreementHash
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
@@ -623,7 +623,7 @@ contract('AgreementStoreManager', (accounts) => {
                 timeOut,
                 providers,
                 actorTypeIds,
-                legalAgreementHash,
+                legalAgreementHash
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
@@ -671,7 +671,7 @@ contract('AgreementStoreManager', (accounts) => {
                 timeLock,
                 timeOut,
                 providers,
-                legalAgreementHash,
+                legalAgreementHash
             } = await setupTest({ proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
@@ -707,7 +707,7 @@ contract('AgreementStoreManager', (accounts) => {
                 timeLock,
                 timeOut,
                 providers,
-                legalAgreementHash,
+                legalAgreementHash
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
@@ -803,7 +803,7 @@ contract('AgreementStoreManager', (accounts) => {
                 timeLock,
                 timeOut,
                 providers,
-                legalAgreementHash,
+                legalAgreementHash
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
@@ -866,7 +866,7 @@ contract('AgreementStoreManager', (accounts) => {
                 timeLock,
                 timeOut,
                 providers,
-                legalAgreementHash,
+                legalAgreementHash
             } = await setupTest({ registerDID: true, proposeTemplate: true, approveTemplate: true })
 
             // construct agreement
