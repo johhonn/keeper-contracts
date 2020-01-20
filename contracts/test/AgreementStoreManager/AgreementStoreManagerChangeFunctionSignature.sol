@@ -13,6 +13,7 @@ contract AgreementStoreManagerChangeFunctionSignature is
         bytes32 _id,
         bytes32 _did,
         bytes32 _templateId,
+        bytes32 _legalRef,
         bytes32[] memory _conditionIds,
         uint[] memory _timeLocks,
         uint[] memory _timeOuts,
@@ -53,6 +54,11 @@ contract AgreementStoreManagerChangeFunctionSignature is
             _did,
             msg.sender,
             _conditionIds
+        );
+
+        legalAgreementReference.setLegalAgreementReference(
+            _id,
+            _legalRef
         );
 
         return getAgreementListSize();

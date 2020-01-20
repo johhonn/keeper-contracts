@@ -57,7 +57,7 @@ contract('AgreementStoreManager', (accounts) => {
         ]
 
         templateId = await templateStoreManager.generateId('EscrowAccessSecretStoreTemplate')
-
+        const legalAgreementHash = constants.bytes32.one
         return {
             did,
             agreementId,
@@ -66,7 +66,8 @@ contract('AgreementStoreManager', (accounts) => {
             timeOuts,
             actorTypeIds,
             templateId,
-            templateStoreManager
+            templateStoreManager,
+            legalAgreementHash
         }
     }
 
@@ -126,7 +127,8 @@ contract('AgreementStoreManager', (accounts) => {
                 conditionIds,
                 timeLocks,
                 timeOuts,
-                templateId
+                templateId,
+                legalAgreementHash
             } = await setupTest()
 
             const taskBook = await upgrade({
@@ -151,6 +153,7 @@ contract('AgreementStoreManager', (accounts) => {
                     agreementId,
                     did,
                     templateId,
+                    legalAgreementHash,
                     conditionIds,
                     timeLocks,
                     timeOuts,
