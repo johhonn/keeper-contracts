@@ -84,6 +84,12 @@ library AgreementStoreLibrary {
         return _self.agreementIds.length;
     }
     
+    /**
+     * @dev set the legal agreement reference 
+     * @param _self is LegalAgreementReference storage pointer
+     * @param _id agreement identifier
+     * @param _legalReference is the hash of a legal agreement
+     */
     function setLegalAgreementReference(
         LegalAgreementReference storage _self,
         bytes32 _id,
@@ -94,6 +100,12 @@ library AgreementStoreLibrary {
         _self.legalAgreementReference[_id] = _legalReference;
     }
 
+    /**
+     * @dev get the legal agreement reference 
+     * @param _self is LegalAgreementReference storage pointer
+     * @param _id agreement identifier
+     * @return bytes32 legal agreement hash
+     */
     function getLegalAgreementReference(
         LegalAgreementReference storage _self,
         bytes32 _id

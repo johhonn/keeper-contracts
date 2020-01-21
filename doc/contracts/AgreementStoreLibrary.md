@@ -39,6 +39,10 @@ Members:
 Members:
 * mapping(bytes32 => address[]) ActorsList
 
+### public LegalAgreementReference
+Members:
+* mapping(bytes32 => bytes32) legalAgreementReference
+
 ## Functions
 
 ### internal create
@@ -62,6 +66,17 @@ Parameters:
 * bytes32 _did
 * address _templateId
 * bytes32[] _conditionIds
+
+### internal setLegalAgreementReference
+Parameters:
+* struct AgreementStoreLibrary.LegalAgreementReference _self
+* bytes32 _id
+* bytes32 _legalReference
+
+### internal getLegalAgreementReference
+Parameters:
+* struct AgreementStoreLibrary.LegalAgreementReference _self
+* bytes32 _id
 
 ### internal setActorType
 

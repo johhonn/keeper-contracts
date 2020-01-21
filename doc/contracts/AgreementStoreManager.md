@@ -28,6 +28,8 @@ Documentation:
 
 ### internal agreementActorsList
 
+### internal legalAgreementReference
+
 ## Events
 
 ###  AgreementCreated
@@ -93,7 +95,8 @@ Documentation:
      Only "approved" templates can access this function.
 @param _id is the ID of the new agreement. Must be unique.
 @param _did is the bytes32 DID of the asset. The DID must be registered beforehand.
-@param _templateId template ID.
+@param _templateId template unique identifier.
+@param _legalAgreementRef hash of off-chain legal agreement
 @param _conditionIds is a list of bytes32 content-addressed Condition IDs
 @param _timeLocks is a list of uint time lock values associated to each Condition
 @param _timeOuts is a list of uint time out values associated to each Condition
@@ -106,6 +109,7 @@ Parameters:
 * bytes32 _id
 * bytes32 _did
 * bytes32 _templateId
+* bytes32 _legalAgreementRef
 * bytes32[] _conditionIds
 * uint256[] _timeLocks
 * uint256[] _timeOuts
