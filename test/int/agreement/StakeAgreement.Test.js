@@ -107,11 +107,12 @@ contract('Stake Agreement integration test', (accounts) => {
         const conditionIdSign = await signCondition.generateId(agreementId, await signCondition.hashValues(sign.message, sign.publicKey))
         const conditionIdLock = await lockRewardCondition.generateId(agreementId, await lockRewardCondition.hashValues(escrowReward.address, stakeAmount))
         const conditionIdEscrow = await escrowReward.generateId(agreementId, await escrowReward.hashValues(stakeAmount, staker, staker, conditionIdLock, conditionIdSign))
-
+        const legalAgreementHash = constants.bytes32.one
         // construct agreement
         const agreement = {
             did: did,
             templateId: templateId,
+            legalAgreementRef: legalAgreementHash,
             conditionIds: [
                 conditionIdSign,
                 conditionIdLock,
