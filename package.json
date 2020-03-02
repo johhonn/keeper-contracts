@@ -19,6 +19,7 @@
     "audit:pacific": "export NETWORK=pacific&&npm run audit -- --network pacific",
     "audit:xdai": "export NETWORK=xdai&&npm run audit -- --network xdai",
     "deploy": "npx truffle exec ./scripts/deploy/truffle-wrapper/deployContractsWrapper.js",
+    "manage:template": "export NETWORK=development&&truffle exec ./scripts/deploy/truffle-wrapper/templateManager.js --network development --testnet true",
     "deploy:development": "export NETWORK=development&&npm run deploy -- --network development --testnet true",
     "deploy:spree": "export NETWORK=spree&&npm run deploy -- --network spree --testnet true",
     "deploy:duero": "export NETWORK=duero&&npm run deploy -- --network duero --testnet true",
@@ -100,5 +101,8 @@
     "web3": "1.2.6",
     "web3-provider-engine": "~15.0.3",
     "yargs": "~15.0.1"
+  },
+  "dependencies": {
+    "scrypt": "^6.0.3"
   }
 }
