@@ -57,17 +57,19 @@ module.exports = (cb) => {
             zosProject.name,
             NETWORK,
             VERSION,
-            false,
+            true,
             verbose,
             true
         )
+
+        console.log(roles)
 
         await setupContracts({
             web3,
             artifacts,
             addressBook,
             roles,
-            verbose
+            true
         })
     }
 
