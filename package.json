@@ -91,7 +91,7 @@
     "glob": "^7.1.6",
     "mathjs": "~6.6.0",
     "openzeppelin-eth": "^2.2.0",
-    "solidity-coverage": "0.6.3",
+    "solidity-coverage": "0.7.4",
     "solium": "^1.2.5",
     "solium-plugin-security": "^0.1.1",
     "truffle": "5.1.18",
