@@ -97,7 +97,7 @@
     "truffle": "5.1.23",
     "truffle-contract": "~4.0.31",
     "truffle-hdwallet-provider": "~1.0.17",
-    "web3": "1.2.6",
+    "web3": "1.2.7",
     "web3-provider-engine": "~15.0.3",
     "yargs": "~15.3.0"
   }
